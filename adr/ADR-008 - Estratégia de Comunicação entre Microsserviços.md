@@ -21,7 +21,7 @@ Os requisitos da Fase 4 estabelecem que a solução deve utilizar:
 
 Além disso, nenhum microsserviço pode acessar diretamente o banco de dados de outro serviço.
 
-A solução já adota a plataforma AWS como ambiente principal de execução, conforme definido na ADR-001.
+A solução já adota a plataforma AWS como ambiente principal de execução, conforme definido na [ADR-001](ADR-001%20-%20Escolha%20da%20Plataforma%20de%20Nuvem.md).
 
 ---
 
@@ -315,7 +315,7 @@ A utilização de SNS e SQS aumenta o acoplamento à AWS.
 
 Entretanto:
 
-* a plataforma AWS já foi definida como padrão arquitetural na ADR-001;
+* a plataforma AWS já foi definida como padrão arquitetural na [ADR-001](ADR-001%20-%20Escolha%20da%20Plataforma%20de%20Nuvem.md);
 * os benefícios operacionais superam os riscos para o contexto atual do projeto;
 * os contratos de eventos permanecerão independentes da tecnologia utilizada.
 
@@ -355,11 +355,11 @@ Essa combinação fornece equilíbrio entre simplicidade operacional e desacopla
 
 ## Relação com ADRs Existentes
 
-### ADR-004 - Padrões de Comunicação
+### [ADR-004 - Padrões de Comunicação](ADR-004%20-%20Padrões%20de%20comunicação.md)
 
 **Status: Substituído por esta ADR**
 
-A ADR-004 foi criada em um contexto anterior à adoção da arquitetura de microsserviços da Fase 4.
+A [ADR-004](ADR-004%20-%20Padrões%20de%20comunicação.md) foi criada em um contexto anterior à adoção da arquitetura de microsserviços da Fase 4.
 
 Esta ADR amplia e substitui a estratégia anterior, incorporando:
 
@@ -380,7 +380,7 @@ Esta ADR amplia e substitui a estratégia anterior, incorporando:
 * Criar tópicos SNS e filas SQS da solução;
 * Implementar DLQs;
 * Integrar observabilidade aos fluxos distribuídos;
-* Implementar a estratégia de Saga definida na ADR-009.
+* Implementar a estratégia de Saga definida na [ADR-009](ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md).
 
 ---
 

@@ -235,7 +235,7 @@ Objetivos:
 
 ## Integração com a Estratégia de Comunicação
 
-Esta ADR complementa a ADR-008.
+Esta ADR complementa a [ADR-008](ADR-008%20-%20Estratégia%20de%20Comunicação%20entre%20Microsserviços.md).
 
 A coordenação da Saga utilizará:
 
@@ -340,11 +340,11 @@ O coordenador será responsável pela visão global do processo, enquanto cada m
 
 ## Relação com ADRs Existentes
 
-### ADR-008 - Estratégia de Comunicação entre Microsserviços
+### [ADR-008 - Estratégia de Comunicação entre Microsserviços](ADR-008%20-%20Estratégia%20de%20Comunicação%20entre%20Microsserviços.md)
 
-Esta ADR complementa a ADR-008.
+Esta ADR complementa a [ADR-008](ADR-008%20-%20Estratégia%20de%20Comunicação%20entre%20Microsserviços.md).
 
-A ADR-008 define os mecanismos de comunicação.
+A [ADR-008](ADR-008%20-%20Estratégia%20de%20Comunicação%20entre%20Microsserviços.md) define os mecanismos de comunicação.
 
 A ADR-009 define como esses mecanismos serão utilizados para coordenar transações distribuídas e compensações.
 

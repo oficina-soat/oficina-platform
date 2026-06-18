@@ -139,7 +139,7 @@ Responsabilidades principais:
 * atualização de status;
 * manutenção do histórico de estados;
 * controle do estado global da OS;
-* coordenação da Saga, conforme definido na ADR-009.
+* coordenação da Saga, conforme definido na [ADR-009](ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md).
 
 Este serviço representa o núcleo do fluxo de negócio.
 
@@ -188,7 +188,7 @@ Nenhum serviço poderá acessar diretamente o banco de dados de outro serviço.
 A comunicação entre serviços deverá ocorrer exclusivamente por:
 
 * APIs REST, quando houver necessidade de comunicação síncrona;
-* eventos assíncronos via mensageria, conforme definido na ADR-008.
+* eventos assíncronos via mensageria, conforme definido na [ADR-008](ADR-008%20-%20Estratégia%20de%20Comunicação%20entre%20Microsserviços.md).
 
 ---
 
@@ -269,9 +269,9 @@ oficina-billing-service
 oficina-execution-service
 ```
 
-A comunicação entre eles seguirá a estratégia definida na ADR-008.
+A comunicação entre eles seguirá a estratégia definida na [ADR-008](ADR-008%20-%20Estratégia%20de%20Comunicação%20entre%20Microsserviços.md).
 
-A coordenação transacional seguirá a estratégia definida na ADR-009.
+A coordenação transacional seguirá a estratégia definida na [ADR-009](ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md).
 
 A persistência será definida em ADR específica posterior.
 
@@ -279,17 +279,17 @@ A persistência será definida em ADR específica posterior.
 
 ## Relação com ADRs Existentes
 
-### ADR-007 - Governança Multi-Repositório e Plataforma Compartilhada
+### [ADR-007 - Governança Multi-Repositório e Plataforma Compartilhada](ADR-007%20-%20Governança%20Multi-Repositório%20e%20Plataforma%20Compartilhada.md)
 
-Esta ADR complementa a ADR-007, pois define quais repositórios de microsserviços serão criados inicialmente.
+Esta ADR complementa a [ADR-007](ADR-007%20-%20Governança%20Multi-Repositório%20e%20Plataforma%20Compartilhada.md), pois define quais repositórios de microsserviços serão criados inicialmente.
 
-### ADR-008 - Estratégia de Comunicação entre Microsserviços
+### [ADR-008 - Estratégia de Comunicação entre Microsserviços](ADR-008%20-%20Estratégia%20de%20Comunicação%20entre%20Microsserviços.md)
 
-Esta ADR complementa a ADR-008, pois define os serviços que utilizarão comunicação REST e mensageria.
+Esta ADR complementa a [ADR-008](ADR-008%20-%20Estratégia%20de%20Comunicação%20entre%20Microsserviços.md), pois define os serviços que utilizarão comunicação REST e mensageria.
 
-### ADR-009 - Estratégia de Saga Pattern
+### [ADR-009 - Estratégia de Saga Pattern](ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md)
 
-Esta ADR complementa a ADR-009, pois define os participantes da Saga.
+Esta ADR complementa a [ADR-009](ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), pois define os participantes da Saga.
 
 ---
 

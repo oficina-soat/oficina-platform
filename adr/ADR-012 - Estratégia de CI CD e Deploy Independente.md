@@ -21,12 +21,12 @@ Os requisitos da Fase 4 estabelecem que cada microsserviço deve possuir:
 
 Além disso, as ADRs anteriores definiram:
 
-* AWS como plataforma principal da solução (ADR-001);
-* governança multi-repositório (ADR-007);
-* comunicação entre microsserviços (ADR-008);
-* Saga Pattern (ADR-009);
-* divisão dos microsserviços (ADR-010);
-* persistência distribuída (ADR-011).
+* AWS como plataforma principal da solução ([ADR-001](ADR-001%20-%20Escolha%20da%20Plataforma%20de%20Nuvem.md));
+* governança multi-repositório ([ADR-007](ADR-007%20-%20Governança%20Multi-Repositório%20e%20Plataforma%20Compartilhada.md));
+* comunicação entre microsserviços ([ADR-008](ADR-008%20-%20Estratégia%20de%20Comunicação%20entre%20Microsserviços.md));
+* Saga Pattern ([ADR-009](ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md));
+* divisão dos microsserviços ([ADR-010](ADR-010%20-%20Estratégia%20de%20Divisão%20dos%20Microsserviços.md));
+* persistência distribuída ([ADR-011](ADR-011%20-%20Estratégia%20de%20Persistência%20Poliglota%20por%20Microsserviço.md)).
 
 Torna-se necessário definir uma estratégia padronizada de integração contínua e entrega contínua para todos os serviços da solução.
 
@@ -363,15 +363,15 @@ Cada microsserviço percorre esse fluxo de forma independente.
 
 ## Relação com ADRs Existentes
 
-### ADR-007 - Governança Multi-Repositório
+### [ADR-007 - Governança Multi-Repositório](ADR-007%20-%20Governança%20Multi-Repositório%20e%20Plataforma%20Compartilhada.md)
 
 Complementa esta ADR ao definir a organização dos repositórios.
 
-### ADR-010 - Estratégia de Divisão dos Microsserviços
+### [ADR-010 - Estratégia de Divisão dos Microsserviços](ADR-010%20-%20Estratégia%20de%20Divisão%20dos%20Microsserviços.md)
 
 Define os serviços que possuirão pipelines independentes.
 
-### ADR-011 - Estratégia de Persistência Poliglota por Microsserviço
+### [ADR-011 - Estratégia de Persistência Poliglota por Microsserviço](ADR-011%20-%20Estratégia%20de%20Persistência%20Poliglota%20por%20Microsserviço.md)
 
 Define os componentes de persistência que serão implantados e utilizados pelos microsserviços.
 

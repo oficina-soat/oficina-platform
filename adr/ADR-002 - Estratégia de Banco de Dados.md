@@ -1,6 +1,6 @@
 # ADR-002 - Estratégia de Banco de Dados
 
-**Substituído por ADR-011**
+**Substituído por [ADR-011](ADR-011%20-%20Estratégia%20de%20Persistência%20Poliglota%20por%20Microsserviço.md)**
 
 ---
 
@@ -19,7 +19,7 @@ Com a evolução da solução para a Fase 4, tornou-se necessário redefinir a e
 * coexistência de bancos relacionais e não relacionais;
 * consistência distribuída suportada por Saga Pattern.
 
-Essas decisões foram consolidadas e detalhadas na ADR-011 - Estratégia de Persistência Poliglota por Microsserviço, que passa a substituir integralmente esta ADR.
+Essas decisões foram consolidadas e detalhadas na [ADR-011 - Estratégia de Persistência Poliglota por Microsserviço](ADR-011%20-%20Estratégia%20de%20Persistência%20Poliglota%20por%20Microsserviço.md), que passa a substituir integralmente esta ADR.
 
 ## Contexto
 

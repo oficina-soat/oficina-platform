@@ -2,7 +2,7 @@
 
 ## Status
 
-**Substituído por ADR-008**
+**Substituído por [ADR-008](ADR-008%20-%20Estratégia%20de%20Comunicação%20entre%20Microsserviços.md)**
 
 --
 
@@ -19,9 +19,9 @@ contratos versionados de APIs e eventos;
 restrições de acesso entre bancos de dados dos microsserviços;
 suporte à implementação do Saga Pattern.
 
-Essas decisões foram consolidadas e detalhadas na ADR-008 - Estratégia de Comunicação entre Microsserviços, que passa a substituir integralmente esta ADR.
+Essas decisões foram consolidadas e detalhadas na [ADR-008 - Estratégia de Comunicação entre Microsserviços](ADR-008%20-%20Estratégia%20de%20Comunicação%20entre%20Microsserviços.md), que passa a substituir integralmente esta ADR.
 
-> As decisões desta ADR permanecem válidas apenas quando não conflitarem com as definições estabelecidas na ADR-008, que passa a ser a referência principal para comunicação entre microsserviços.
+> As decisões desta ADR permanecem válidas apenas quando não conflitarem com as definições estabelecidas na [ADR-008](ADR-008%20-%20Estratégia%20de%20Comunicação%20entre%20Microsserviços.md), que passa a ser a referência principal para comunicação entre microsserviços.
 
 ---
 

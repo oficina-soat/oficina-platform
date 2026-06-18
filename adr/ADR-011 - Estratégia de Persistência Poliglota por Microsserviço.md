@@ -12,11 +12,11 @@ A arquitetura da aplicação foi evoluída para um modelo baseado em microsservi
 
 As ADRs anteriores estabeleceram:
 
-* Governança multi-repositório (ADR-007);
-* Estratégia de comunicação entre microsserviços (ADR-008);
-* Utilização de Saga Pattern para coordenação transacional (ADR-009);
-* Divisão da solução em microsserviços independentes (ADR-010);
-* Utilização da AWS como plataforma principal da solução (ADR-001).
+* Governança multi-repositório ([ADR-007](ADR-007%20-%20Governança%20Multi-Repositório%20e%20Plataforma%20Compartilhada.md));
+* Estratégia de comunicação entre microsserviços ([ADR-008](ADR-008%20-%20Estratégia%20de%20Comunicação%20entre%20Microsserviços.md));
+* Utilização de Saga Pattern para coordenação transacional ([ADR-009](ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md));
+* Divisão da solução em microsserviços independentes ([ADR-010](ADR-010%20-%20Estratégia%20de%20Divisão%20dos%20Microsserviços.md));
+* Utilização da AWS como plataforma principal da solução ([ADR-001](ADR-001%20-%20Escolha%20da%20Plataforma%20de%20Nuvem.md)).
 
 Além disso, os requisitos da Fase 4 estabelecem que:
 
@@ -213,7 +213,7 @@ Toda integração deverá ocorrer através de:
 * APIs REST;
 * eventos de domínio.
 
-Conforme definido na ADR-008.
+Conforme definido na [ADR-008](ADR-008%20-%20Estratégia%20de%20Comunicação%20entre%20Microsserviços.md).
 
 ---
 
@@ -228,7 +228,7 @@ A consistência entre serviços será mantida através de:
 * compensações;
 * consistência eventual.
 
-Conforme definido na ADR-009.
+Conforme definido na [ADR-009](ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md).
 
 ---
 
@@ -360,11 +360,11 @@ Os dados passam a ser distribuídos entre domínios independentes, eliminando de
 
 ## Relação com ADRs Existentes
 
-### ADR-002 - Estratégia de Banco de Dados
+### [ADR-002 - Estratégia de Banco de Dados](ADR-002%20-%20Estratégia%20de%20Banco%20de%20Dados.md)
 
 **Status: Substituída por esta ADR**
 
-A ADR-002 foi criada em um contexto anterior à adoção de microsserviços.
+A [ADR-002](ADR-002%20-%20Estratégia%20de%20Banco%20de%20Dados.md) foi criada em um contexto anterior à adoção de microsserviços.
 
 A nova arquitetura exige:
 
@@ -375,15 +375,15 @@ A nova arquitetura exige:
 
 Essas decisões passam a ser formalizadas nesta ADR.
 
-### ADR-008 - Estratégia de Comunicação entre Microsserviços
+### [ADR-008 - Estratégia de Comunicação entre Microsserviços](ADR-008%20-%20Estratégia%20de%20Comunicação%20entre%20Microsserviços.md)
 
 Complementa esta ADR ao definir os mecanismos de integração entre serviços.
 
-### ADR-009 - Estratégia de Saga Pattern
+### [ADR-009 - Estratégia de Saga Pattern](ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md)
 
 Complementa esta ADR ao definir como a consistência distribuída será mantida.
 
-### ADR-010 - Estratégia de Divisão dos Microsserviços
+### [ADR-010 - Estratégia de Divisão dos Microsserviços](ADR-010%20-%20Estratégia%20de%20Divisão%20dos%20Microsserviços.md)
 
 Fornece os limites dos domínios que orientam a estratégia de persistência.
 

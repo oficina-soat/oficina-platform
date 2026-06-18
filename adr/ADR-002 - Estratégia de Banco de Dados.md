@@ -1,8 +1,25 @@
 # ADR-002 - Estratégia de Banco de Dados
 
-## Status
+**Substituído por ADR-011**
 
-**Aceito**
+---
+
+## Observação
+
+Esta ADR foi criada em um contexto anterior à adoção da arquitetura baseada em microsserviços.
+
+Na arquitetura original, a estratégia de persistência considerava uma visão centralizada do banco de dados da aplicação, adequada ao modelo então adotado.
+
+Com a evolução da solução para a Fase 4, tornou-se necessário redefinir a estratégia de persistência para atender aos requisitos de:
+
+* bancos de dados independentes por microsserviço;
+* propriedade exclusiva dos dados por domínio;
+* proibição de acesso direto entre bancos de diferentes serviços;
+* utilização de persistência poliglota;
+* coexistência de bancos relacionais e não relacionais;
+* consistência distribuída suportada por Saga Pattern.
+
+Essas decisões foram consolidadas e detalhadas na ADR-011 - Estratégia de Persistência Poliglota por Microsserviço, que passa a substituir integralmente esta ADR.
 
 ## Contexto
 

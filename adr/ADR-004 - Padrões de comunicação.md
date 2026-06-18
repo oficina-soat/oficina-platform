@@ -2,9 +2,29 @@
 
 ## Status
 
-**Aceito**
+**Substituído por ADR-008**
+
+--
+
+## Observação
+
+Esta ADR foi criada em um contexto anterior à adoção da arquitetura de microsserviços definida para a Fase 4 do projeto.
+
+Com a evolução da solução, tornou-se necessário formalizar uma estratégia de comunicação específica para ambientes distribuídos, contemplando:
+
+comunicação síncrona via APIs REST;
+comunicação assíncrona baseada em eventos;
+utilização de mensageria para integração desacoplada;
+contratos versionados de APIs e eventos;
+restrições de acesso entre bancos de dados dos microsserviços;
+suporte à implementação do Saga Pattern.
+
+Essas decisões foram consolidadas e detalhadas na ADR-008 - Estratégia de Comunicação entre Microsserviços, que passa a substituir integralmente esta ADR.
+
+> As decisões desta ADR permanecem válidas apenas quando não conflitarem com as definições estabelecidas na ADR-008, que passa a ser a referência principal para comunicação entre microsserviços.
 
 ---
+
 ## Contexto
 
 A aplicação evoluiu para uma arquitetura distribuída composta por:

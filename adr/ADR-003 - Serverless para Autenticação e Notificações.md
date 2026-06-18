@@ -1,10 +1,12 @@
-### Status
+# ADR-003 - Serverless para Autenticação e Notificações
 
-Aprovado
+## Status
+
+**Aceito**
 
 ---
 
-### Contexto
+## Contexto
 
 A aplicação backend em Quarkus já está consolidada na Amazon Web Services, utilizando Amazon RDS PostgreSQL como banco de dados principal.
 
@@ -26,7 +28,7 @@ Atualmente, essas responsabilidades estariam acopladas ao backend principal, aum
 
 ---
 
-### Decisão
+## Decisão
 
 Será adotado AWS Lambda integrado ao Amazon API Gateway para implementação dos fluxos serverless de autenticação e notificações.
 
@@ -41,19 +43,19 @@ A configuração inicial será enxuta, priorizando baixo custo e simplicidade op
 - memória das funções: configuração mínima inicial com ajuste baseado em métricas
 - deploy: pipelines independentes da aplicação principal
 
-**Lambda de autenticação será responsável por:**
+### Responsabilidades da Lambda de autenticação
 
 - validar o CPF
 - consultar existência e status do cliente
 - gerar e retornar token JWT
 
-**Lambda de notificações será responsável por:**
+### Responsabilidades da Lambda de notificações
 
 - processar eventos de negócio
 - disparar notificações (ex: integração futura com e-mail, SMS ou outros canais)
 - operar de forma assíncrona sempre que possível
 
-**O API Gateway será responsável por:**
+### Responsabilidades do API Gateway
 
 - expor endpoint público de autenticação
 - centralizar entrada de requisições externas
@@ -61,9 +63,9 @@ A configuração inicial será enxuta, priorizando baixo custo e simplicidade op
 
 ---
 
-### Consequências
+## Consequências
 
-#### Positivas
+### Positivas
 
 - aderência direta à diretriz de uso de serverless
 - custo proporcional ao uso, adequado para cargas intermitentes
@@ -72,7 +74,7 @@ A configuração inicial será enxuta, priorizando baixo custo e simplicidade op
 - redução do impacto de cold start com uso de Quarkus nativo
 - melhoria na segurança ao separar o ponto de entrada
 
-#### Negativas
+### Negativas
 
 - maior dependência de serviços específicos da AWS
 - aumento da complexidade de deploy e versionamento (múltiplas funções)
@@ -81,7 +83,7 @@ A configuração inicial será enxuta, priorizando baixo custo e simplicidade op
 
 ---
 
-### Mitigações
+## Mitigações
 
 - utilizar Quarkus nativo para reduzir impacto de cold start
 - iniciar com configuração mínima de memória e ajustar com base em métricas

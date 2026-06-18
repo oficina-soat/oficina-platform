@@ -1,6 +1,8 @@
+# ADR-004 - Padrões de comunicação
+
 ## Status
 
-Aprovado
+**Aceito**
 
 ---
 ## Contexto

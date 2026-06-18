@@ -1,6 +1,8 @@
+# ADR-002 - Estratégia de Banco de Dados
+
 ## Status
 
-Aprovado
+**Aceito**
 
 ## Contexto
 

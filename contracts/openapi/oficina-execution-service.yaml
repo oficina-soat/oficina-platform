@@ -1,0 +1,816 @@
+openapi: 3.1.0
+info:
+  title: oficina-execution-service API
+  version: 1.0.0
+  description: Contrato REST v1 para catalogo de servicos, pecas, estoque, diagnostico, execucao e reparo.
+servers:
+  - url: /api/v1
+security:
+  - bearerAuth: []
+tags:
+  - name: Servicos
+  - name: Pecas
+  - name: Estoque
+  - name: Execucoes
+paths:
+  /servicos:
+    post:
+      tags: [Servicos]
+      summary: Criar servico
+      operationId: criarServico
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServicoCreateRequest"
+            examples:
+              servico:
+                value:
+                  nome: Troca de bateria
+                  descricao: Substituicao da bateria
+                  valorBase: 80.0
+      responses:
+        "201":
+          description: Servico criado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Servico"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    get:
+      tags: [Servicos]
+      summary: Consultar servicos
+      operationId: consultarServicos
+      responses:
+        "200":
+          description: Servicos encontrados.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Servico"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /servicos/{servicoId}:
+    get:
+      tags: [Servicos]
+      summary: Consultar servico
+      operationId: consultarServico
+      parameters:
+        - $ref: "#/components/parameters/ServicoId"
+      responses:
+        "200":
+          description: Servico encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Servico"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Servicos]
+      summary: Atualizar servico
+      operationId: atualizarServico
+      parameters:
+        - $ref: "#/components/parameters/ServicoId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServicoUpdateRequest"
+      responses:
+        "200":
+          description: Servico atualizado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Servico"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /pecas:
+    post:
+      tags: [Pecas]
+      summary: Criar peca
+      operationId: criarPeca
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PecaCreateRequest"
+            examples:
+              peca:
+                value:
+                  nome: Bateria 60Ah
+                  codigo: BAT-60AH
+                  valorUnitario: 320.0
+      responses:
+        "201":
+          description: Peca criada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Peca"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    get:
+      tags: [Pecas]
+      summary: Consultar pecas
+      operationId: consultarPecas
+      responses:
+        "200":
+          description: Pecas encontradas.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Peca"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /pecas/{pecaId}:
+    get:
+      tags: [Pecas]
+      summary: Consultar peca
+      operationId: consultarPeca
+      parameters:
+        - $ref: "#/components/parameters/PecaId"
+      responses:
+        "200":
+          description: Peca encontrada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Peca"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Pecas]
+      summary: Atualizar peca
+      operationId: atualizarPeca
+      parameters:
+        - $ref: "#/components/parameters/PecaId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PecaUpdateRequest"
+      responses:
+        "200":
+          description: Peca atualizada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Peca"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /estoques/pecas/{pecaId}/saldo:
+    get:
+      tags: [Estoque]
+      summary: Consultar saldo
+      operationId: consultarSaldoEstoque
+      parameters:
+        - $ref: "#/components/parameters/PecaId"
+      responses:
+        "200":
+          description: Saldo encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SaldoEstoque"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /estoques/movimentos:
+    get:
+      tags: [Estoque]
+      summary: Consultar movimentacoes
+      operationId: consultarMovimentosEstoque
+      parameters:
+        - name: pecaId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: ordemServicoId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Movimentacoes encontradas.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MovimentoEstoque"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /estoques/movimentos/entrada:
+    post:
+      tags: [Estoque]
+      summary: Registrar entrada
+      operationId: registrarEntradaEstoque
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MovimentoEstoqueRequest"
+      responses:
+        "201":
+          $ref: "#/components/responses/MovimentoEstoqueCriado"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /estoques/movimentos/reserva:
+    post:
+      tags: [Estoque]
+      summary: Reservar estoque
+      operationId: reservarEstoque
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MovimentoEstoqueRequest"
+      responses:
+        "201":
+          $ref: "#/components/responses/MovimentoEstoqueCriado"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /estoques/movimentos/consumo:
+    post:
+      tags: [Estoque]
+      summary: Consumir estoque
+      operationId: consumirEstoque
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MovimentoEstoqueRequest"
+      responses:
+        "201":
+          $ref: "#/components/responses/MovimentoEstoqueCriado"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /estoques/movimentos/estorno:
+    post:
+      tags: [Estoque]
+      summary: Estornar estoque
+      operationId: estornarEstoque
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MovimentoEstoqueRequest"
+      responses:
+        "201":
+          $ref: "#/components/responses/MovimentoEstoqueCriado"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /execucoes:
+    post:
+      tags: [Execucoes]
+      summary: Criar execucao
+      operationId: criarExecucao
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExecucaoCreateRequest"
+            examples:
+              execucao:
+                value:
+                  ordemServicoId: d290f1ee-6c54-4b01-90e6-d701748f0851
+      responses:
+        "201":
+          description: Execucao criada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Execucao"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    get:
+      tags: [Execucoes]
+      summary: Consultar execucoes
+      operationId: consultarExecucoes
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/StatusExecucao"
+      responses:
+        "200":
+          description: Execucoes encontradas.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Execucao"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /execucoes/{execucaoId}:
+    get:
+      tags: [Execucoes]
+      summary: Consultar execucao
+      operationId: consultarExecucao
+      parameters:
+        - $ref: "#/components/parameters/ExecucaoId"
+      responses:
+        "200":
+          description: Execucao encontrada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Execucao"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /ordens-servico/{ordemServicoId}/execucao:
+    get:
+      tags: [Execucoes]
+      summary: Consultar execucao da OS
+      operationId: consultarExecucaoDaOrdemServico
+      parameters:
+        - $ref: "#/components/parameters/OrdemServicoId"
+      responses:
+        "200":
+          description: Execucao da OS encontrada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Execucao"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /execucoes/{execucaoId}/diagnostico/inicio:
+    post:
+      tags: [Execucoes]
+      summary: Iniciar diagnostico
+      operationId: iniciarDiagnostico
+      parameters:
+        - $ref: "#/components/parameters/ExecucaoId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Diagnostico iniciado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Execucao"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /execucoes/{execucaoId}/diagnostico/conclusao:
+    post:
+      tags: [Execucoes]
+      summary: Concluir diagnostico
+      operationId: concluirDiagnostico
+      parameters:
+        - $ref: "#/components/parameters/ExecucaoId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConclusaoDiagnosticoRequest"
+      responses:
+        "200":
+          description: Diagnostico concluido.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Execucao"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /execucoes/{execucaoId}/reparo/inicio:
+    post:
+      tags: [Execucoes]
+      summary: Iniciar reparo
+      operationId: iniciarReparo
+      parameters:
+        - $ref: "#/components/parameters/ExecucaoId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Reparo iniciado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Execucao"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /execucoes/{execucaoId}/reparo/conclusao:
+    post:
+      tags: [Execucoes]
+      summary: Concluir reparo
+      operationId: concluirReparo
+      parameters:
+        - $ref: "#/components/parameters/ExecucaoId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConclusaoReparoRequest"
+      responses:
+        "200":
+          description: Reparo concluido.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Execucao"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /execucoes/{execucaoId}/cancelamento:
+    post:
+      tags: [Execucoes]
+      summary: Cancelar execucao
+      operationId: cancelarExecucao
+      parameters:
+        - $ref: "#/components/parameters/ExecucaoId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelamentoRequest"
+      responses:
+        "200":
+          description: Execucao cancelada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Execucao"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    ServicoId:
+      name: servicoId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    PecaId:
+      name: pecaId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ExecucaoId:
+      name: execucaoId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    OrdemServicoId:
+      name: ordemServicoId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    IdempotencyKey:
+      name: X-Idempotency-Key
+      in: header
+      required: false
+      schema:
+        type: string
+        minLength: 8
+        maxLength: 128
+  responses:
+    MovimentoEstoqueCriado:
+      description: Movimento de estoque registrado.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MovimentoEstoque"
+    BadRequest:
+      description: Requisicao invalida.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthorized:
+      description: Token JWT ausente, invalido ou expirado.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Recurso nao encontrado.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Conflito de estado, duplicidade, saldo ou idempotencia.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+  schemas:
+    ServicoCreateRequest:
+      type: object
+      required: [nome, valorBase]
+      properties:
+        nome:
+          type: string
+        descricao:
+          type: string
+        valorBase:
+          type: number
+          format: decimal
+          minimum: 0
+    ServicoUpdateRequest:
+      allOf:
+        - $ref: "#/components/schemas/ServicoCreateRequest"
+    Servico:
+      allOf:
+        - $ref: "#/components/schemas/ServicoCreateRequest"
+        - type: object
+          required: [servicoId, ativo, criadoEm, atualizadoEm]
+          properties:
+            servicoId:
+              type: string
+              format: uuid
+            ativo:
+              type: boolean
+            criadoEm:
+              type: string
+              format: date-time
+            atualizadoEm:
+              type: string
+              format: date-time
+    PecaCreateRequest:
+      type: object
+      required: [nome, codigo, valorUnitario]
+      properties:
+        nome:
+          type: string
+        codigo:
+          type: string
+        valorUnitario:
+          type: number
+          format: decimal
+          minimum: 0
+    PecaUpdateRequest:
+      allOf:
+        - $ref: "#/components/schemas/PecaCreateRequest"
+    Peca:
+      allOf:
+        - $ref: "#/components/schemas/PecaCreateRequest"
+        - type: object
+          required: [pecaId, ativo, criadoEm, atualizadoEm]
+          properties:
+            pecaId:
+              type: string
+              format: uuid
+            ativo:
+              type: boolean
+            criadoEm:
+              type: string
+              format: date-time
+            atualizadoEm:
+              type: string
+              format: date-time
+    SaldoEstoque:
+      type: object
+      required: [pecaId, quantidadeDisponivel, quantidadeReservada, atualizadoEm]
+      properties:
+        pecaId:
+          type: string
+          format: uuid
+        quantidadeDisponivel:
+          type: integer
+          minimum: 0
+        quantidadeReservada:
+          type: integer
+          minimum: 0
+        atualizadoEm:
+          type: string
+          format: date-time
+    MovimentoEstoqueRequest:
+      type: object
+      required: [pecaId, quantidade]
+      properties:
+        pecaId:
+          type: string
+          format: uuid
+        ordemServicoId:
+          type: string
+          format: uuid
+        quantidade:
+          type: integer
+          minimum: 1
+        motivo:
+          type: string
+    MovimentoEstoque:
+      allOf:
+        - $ref: "#/components/schemas/MovimentoEstoqueRequest"
+        - type: object
+          required: [movimentoId, tipo, criadoEm]
+          properties:
+            movimentoId:
+              type: string
+              format: uuid
+            tipo:
+              $ref: "#/components/schemas/TipoMovimentoEstoque"
+            criadoEm:
+              type: string
+              format: date-time
+    TipoMovimentoEstoque:
+      type: string
+      enum: [ENTRADA, RESERVA, CONSUMO, ESTORNO]
+    ExecucaoCreateRequest:
+      type: object
+      required: [ordemServicoId]
+      properties:
+        ordemServicoId:
+          type: string
+          format: uuid
+    Execucao:
+      allOf:
+        - $ref: "#/components/schemas/ExecucaoCreateRequest"
+        - type: object
+          required: [execucaoId, status, criadoEm, atualizadoEm]
+          properties:
+            execucaoId:
+              type: string
+              format: uuid
+            status:
+              $ref: "#/components/schemas/StatusExecucao"
+            diagnostico:
+              type: string
+            observacoesReparo:
+              type: string
+            criadoEm:
+              type: string
+              format: date-time
+            atualizadoEm:
+              type: string
+              format: date-time
+    StatusExecucao:
+      type: string
+      enum: [CRIADA, EM_DIAGNOSTICO, DIAGNOSTICO_CONCLUIDO, EM_REPARO, REPARO_CONCLUIDO, CANCELADA]
+    ConclusaoDiagnosticoRequest:
+      type: object
+      properties:
+        diagnostico:
+          type: string
+    ConclusaoReparoRequest:
+      type: object
+      properties:
+        observacoes:
+          type: string
+    CancelamentoRequest:
+      type: object
+      properties:
+        motivo:
+          type: string
+    ErrorResponse:
+      type: object
+      required: [timestamp, status, error, code, message, path, correlationId]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-06-23T15:30:00Z"
+        status:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: Bad Request
+        code:
+          type: string
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          example: Campo obrigatorio ausente.
+        path:
+          type: string
+          example: /api/v1/execucoes
+        correlationId:
+          type: string
+          example: 7f4d0c4b6b8a4bb8a2f49bb8f06e1c3d

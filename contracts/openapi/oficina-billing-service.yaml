@@ -1,0 +1,500 @@
+openapi: 3.1.0
+info:
+  title: oficina-billing-service API
+  version: 1.0.0
+  description: Contrato REST v1 para orcamentos, aprovacoes, recusas e pagamentos.
+servers:
+  - url: /api/v1
+security:
+  - bearerAuth: []
+tags:
+  - name: Orcamentos
+  - name: Pagamentos
+paths:
+  /orcamentos:
+    post:
+      tags: [Orcamentos]
+      summary: Gerar orcamento
+      operationId: gerarOrcamento
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GerarOrcamentoRequest"
+            examples:
+              orcamento:
+                value:
+                  ordemServicoId: d290f1ee-6c54-4b01-90e6-d701748f0851
+      responses:
+        "201":
+          description: Orcamento gerado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Orcamento"
+              examples:
+                orcamento:
+                  value:
+                    orcamentoId: 53c52fe8-13cf-4568-9a64-d4f548134b8b
+                    ordemServicoId: d290f1ee-6c54-4b01-90e6-d701748f0851
+                    valorTotal: 350.0
+                    status: GERADO
+                    criadoEm: "2026-06-23T15:30:00Z"
+                    atualizadoEm: "2026-06-23T15:30:00Z"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /orcamentos/{orcamentoId}:
+    get:
+      tags: [Orcamentos]
+      summary: Consultar orcamento
+      operationId: consultarOrcamento
+      parameters:
+        - $ref: "#/components/parameters/OrcamentoId"
+      responses:
+        "200":
+          description: Orcamento encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Orcamento"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /ordens-servico/{ordemServicoId}/orcamentos:
+    get:
+      tags: [Orcamentos]
+      summary: Consultar orcamento da OS
+      operationId: consultarOrcamentosDaOrdemServico
+      parameters:
+        - $ref: "#/components/parameters/OrdemServicoId"
+      responses:
+        "200":
+          description: Orcamentos da OS encontrados.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Orcamento"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /orcamentos/{orcamentoId}/aprovacao:
+    post:
+      tags: [Orcamentos]
+      summary: Aprovar orcamento
+      operationId: aprovarOrcamento
+      parameters:
+        - $ref: "#/components/parameters/OrcamentoId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DecisaoOrcamentoRequest"
+      responses:
+        "200":
+          description: Orcamento aprovado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Orcamento"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /orcamentos/{orcamentoId}/recusa:
+    post:
+      tags: [Orcamentos]
+      summary: Recusar orcamento
+      operationId: recusarOrcamento
+      parameters:
+        - $ref: "#/components/parameters/OrcamentoId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DecisaoOrcamentoRequest"
+      responses:
+        "200":
+          description: Orcamento recusado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Orcamento"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /pagamentos:
+    post:
+      tags: [Pagamentos]
+      summary: Registrar pagamento
+      operationId: registrarPagamento
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PagamentoCreateRequest"
+            examples:
+              pagamento:
+                value:
+                  ordemServicoId: d290f1ee-6c54-4b01-90e6-d701748f0851
+                  orcamentoId: 53c52fe8-13cf-4568-9a64-d4f548134b8b
+                  valor: 350.0
+                  metodo: PIX
+      responses:
+        "201":
+          description: Pagamento registrado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pagamento"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /pagamentos/{pagamentoId}:
+    get:
+      tags: [Pagamentos]
+      summary: Consultar pagamento
+      operationId: consultarPagamento
+      parameters:
+        - $ref: "#/components/parameters/PagamentoId"
+      responses:
+        "200":
+          description: Pagamento encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pagamento"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /ordens-servico/{ordemServicoId}/pagamentos:
+    get:
+      tags: [Pagamentos]
+      summary: Consultar pagamentos da OS
+      operationId: consultarPagamentosDaOrdemServico
+      parameters:
+        - $ref: "#/components/parameters/OrdemServicoId"
+      responses:
+        "200":
+          description: Pagamentos da OS encontrados.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Pagamento"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /pagamentos/{pagamentoId}/confirmacao:
+    post:
+      tags: [Pagamentos]
+      summary: Confirmar pagamento
+      operationId: confirmarPagamento
+      parameters:
+        - $ref: "#/components/parameters/PagamentoId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfirmacaoPagamentoRequest"
+      responses:
+        "200":
+          description: Pagamento confirmado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pagamento"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /pagamentos/{pagamentoId}/recusa:
+    post:
+      tags: [Pagamentos]
+      summary: Recusar pagamento
+      operationId: recusarPagamento
+      parameters:
+        - $ref: "#/components/parameters/PagamentoId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecusaPagamentoRequest"
+      responses:
+        "200":
+          description: Pagamento recusado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pagamento"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /pagamentos/{pagamentoId}/cancelamento:
+    post:
+      tags: [Pagamentos]
+      summary: Cancelar pagamento
+      operationId: cancelarPagamento
+      parameters:
+        - $ref: "#/components/parameters/PagamentoId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelamentoRequest"
+      responses:
+        "200":
+          description: Pagamento cancelado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pagamento"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    OrcamentoId:
+      name: orcamentoId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    PagamentoId:
+      name: pagamentoId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    OrdemServicoId:
+      name: ordemServicoId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    IdempotencyKey:
+      name: X-Idempotency-Key
+      in: header
+      required: false
+      schema:
+        type: string
+        minLength: 8
+        maxLength: 128
+  responses:
+    BadRequest:
+      description: Requisicao invalida.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthorized:
+      description: Token JWT ausente, invalido ou expirado.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Recurso nao encontrado.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Conflito de estado, duplicidade ou idempotencia.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+  schemas:
+    GerarOrcamentoRequest:
+      type: object
+      required: [ordemServicoId]
+      properties:
+        ordemServicoId:
+          type: string
+          format: uuid
+    DecisaoOrcamentoRequest:
+      type: object
+      properties:
+        motivo:
+          type: string
+    Orcamento:
+      type: object
+      required: [orcamentoId, ordemServicoId, valorTotal, status, criadoEm, atualizadoEm]
+      properties:
+        orcamentoId:
+          type: string
+          format: uuid
+        ordemServicoId:
+          type: string
+          format: uuid
+        valorTotal:
+          type: number
+          format: decimal
+          minimum: 0
+        status:
+          $ref: "#/components/schemas/StatusOrcamento"
+        criadoEm:
+          type: string
+          format: date-time
+        atualizadoEm:
+          type: string
+          format: date-time
+    StatusOrcamento:
+      type: string
+      enum: [GERADO, APROVADO, RECUSADO]
+    PagamentoCreateRequest:
+      type: object
+      required: [ordemServicoId, orcamentoId, valor, metodo]
+      properties:
+        ordemServicoId:
+          type: string
+          format: uuid
+        orcamentoId:
+          type: string
+          format: uuid
+        valor:
+          type: number
+          format: decimal
+          minimum: 0
+        metodo:
+          $ref: "#/components/schemas/MetodoPagamento"
+    ConfirmacaoPagamentoRequest:
+      type: object
+      properties:
+        provedor:
+          type: string
+          example: mercado-pago
+        transacaoExternaId:
+          type: string
+    RecusaPagamentoRequest:
+      type: object
+      properties:
+        provedor:
+          type: string
+          example: mercado-pago
+        motivo:
+          type: string
+    CancelamentoRequest:
+      type: object
+      properties:
+        motivo:
+          type: string
+    Pagamento:
+      allOf:
+        - $ref: "#/components/schemas/PagamentoCreateRequest"
+        - type: object
+          required: [pagamentoId, status, criadoEm, atualizadoEm]
+          properties:
+            pagamentoId:
+              type: string
+              format: uuid
+            status:
+              $ref: "#/components/schemas/StatusPagamento"
+            provedor:
+              type: string
+              example: mercado-pago
+            transacaoExternaId:
+              type: string
+            criadoEm:
+              type: string
+              format: date-time
+            atualizadoEm:
+              type: string
+              format: date-time
+    MetodoPagamento:
+      type: string
+      enum: [PIX, CARTAO_CREDITO, CARTAO_DEBITO, DINHEIRO]
+    StatusPagamento:
+      type: string
+      enum: [CRIADO, CONFIRMADO, RECUSADO, CANCELADO]
+    ErrorResponse:
+      type: object
+      required: [timestamp, status, error, code, message, path, correlationId]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-06-23T15:30:00Z"
+        status:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: Bad Request
+        code:
+          type: string
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          example: Campo obrigatorio ausente.
+        path:
+          type: string
+          example: /api/v1/orcamentos
+        correlationId:
+          type: string
+          example: 7f4d0c4b6b8a4bb8a2f49bb8f06e1c3d

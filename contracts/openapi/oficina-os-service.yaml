@@ -1,0 +1,625 @@
+openapi: 3.1.0
+info:
+  title: oficina-os-service API
+  version: 1.0.0
+  description: Contrato REST v1 para clientes, veiculos, ordens de servico, estados e historico da OS.
+servers:
+  - url: /api/v1
+security:
+  - bearerAuth: []
+tags:
+  - name: Clientes
+  - name: Veiculos
+  - name: Ordens de Servico
+paths:
+  /clientes:
+    post:
+      tags: [Clientes]
+      summary: Criar cliente
+      operationId: criarCliente
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClienteCreateRequest"
+            examples:
+              cliente:
+                value:
+                  nome: Maria Souza
+                  documento: "12345678901"
+                  telefone: "+5511999999999"
+                  email: maria@example.com
+      responses:
+        "201":
+          description: Cliente criado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cliente"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    get:
+      tags: [Clientes]
+      summary: Consultar clientes
+      operationId: consultarClientes
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Size"
+      responses:
+        "200":
+          description: Clientes encontrados.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageResponse"
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Cliente"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /clientes/{clienteId}:
+    get:
+      tags: [Clientes]
+      summary: Consultar cliente
+      operationId: consultarCliente
+      parameters:
+        - $ref: "#/components/parameters/ClienteId"
+      responses:
+        "200":
+          description: Cliente encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cliente"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Clientes]
+      summary: Atualizar cliente
+      operationId: atualizarCliente
+      parameters:
+        - $ref: "#/components/parameters/ClienteId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClienteUpdateRequest"
+      responses:
+        "200":
+          description: Cliente atualizado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cliente"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /clientes/{clienteId}/veiculos:
+    post:
+      tags: [Veiculos]
+      summary: Criar veiculo para cliente
+      operationId: criarVeiculo
+      parameters:
+        - $ref: "#/components/parameters/ClienteId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VeiculoCreateRequest"
+            examples:
+              veiculo:
+                value:
+                  placa: ABC1D23
+                  marca: Volkswagen
+                  modelo: Gol
+                  ano: 2020
+      responses:
+        "201":
+          description: Veiculo criado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Veiculo"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    get:
+      tags: [Veiculos]
+      summary: Consultar veiculos do cliente
+      operationId: consultarVeiculosDoCliente
+      parameters:
+        - $ref: "#/components/parameters/ClienteId"
+      responses:
+        "200":
+          description: Veiculos encontrados.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Veiculo"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /veiculos/{veiculoId}:
+    get:
+      tags: [Veiculos]
+      summary: Consultar veiculo
+      operationId: consultarVeiculo
+      parameters:
+        - $ref: "#/components/parameters/VeiculoId"
+      responses:
+        "200":
+          description: Veiculo encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Veiculo"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Veiculos]
+      summary: Atualizar veiculo
+      operationId: atualizarVeiculo
+      parameters:
+        - $ref: "#/components/parameters/VeiculoId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VeiculoUpdateRequest"
+      responses:
+        "200":
+          description: Veiculo atualizado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Veiculo"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /ordens-servico:
+    post:
+      tags: [Ordens de Servico]
+      summary: Abrir OS
+      operationId: abrirOrdemServico
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrdemServicoCreateRequest"
+            examples:
+              ordemServico:
+                value:
+                  clienteId: d290f1ee-6c54-4b01-90e6-d701748f0851
+                  veiculoId: 7b1f1a8d-7f4a-4f25-8e74-27d50210a61e
+                  descricaoProblema: Veiculo nao liga
+      responses:
+        "201":
+          description: Ordem de servico criada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrdemServico"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    get:
+      tags: [Ordens de Servico]
+      summary: Consultar OS
+      operationId: consultarOrdensServico
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Size"
+        - name: estado
+          in: query
+          schema:
+            $ref: "#/components/schemas/EstadoOrdemServico"
+      responses:
+        "200":
+          description: Ordens de servico encontradas.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageResponse"
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/OrdemServico"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /ordens-servico/{ordemServicoId}:
+    get:
+      tags: [Ordens de Servico]
+      summary: Consultar OS por id
+      operationId: consultarOrdemServico
+      parameters:
+        - $ref: "#/components/parameters/OrdemServicoId"
+      responses:
+        "200":
+          description: Ordem de servico encontrada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrdemServico"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /ordens-servico/{ordemServicoId}/historico:
+    get:
+      tags: [Ordens de Servico]
+      summary: Consultar historico
+      operationId: consultarHistoricoOrdemServico
+      parameters:
+        - $ref: "#/components/parameters/OrdemServicoId"
+      responses:
+        "200":
+          description: Historico encontrado.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HistoricoOrdemServico"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /ordens-servico/{ordemServicoId}/estado:
+    patch:
+      tags: [Ordens de Servico]
+      summary: Alterar estado
+      operationId: alterarEstadoOrdemServico
+      parameters:
+        - $ref: "#/components/parameters/OrdemServicoId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AlterarEstadoRequest"
+            examples:
+              alterarEstado:
+                value:
+                  estado: EM_DIAGNOSTICO
+                  motivo: Diagnostico iniciado
+      responses:
+        "200":
+          description: Estado alterado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrdemServico"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /ordens-servico/{ordemServicoId}/cancelamento:
+    post:
+      tags: [Ordens de Servico]
+      summary: Cancelar OS
+      operationId: cancelarOrdemServico
+      parameters:
+        - $ref: "#/components/parameters/OrdemServicoId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelamentoRequest"
+      responses:
+        "202":
+          description: Cancelamento aceito para processamento.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperacaoAssincrona"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    ClienteId:
+      name: clienteId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    VeiculoId:
+      name: veiculoId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    OrdemServicoId:
+      name: ordemServicoId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    IdempotencyKey:
+      name: X-Idempotency-Key
+      in: header
+      required: false
+      schema:
+        type: string
+        minLength: 8
+        maxLength: 128
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    Size:
+      name: size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  responses:
+    BadRequest:
+      description: Requisicao invalida.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthorized:
+      description: Token JWT ausente, invalido ou expirado.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Recurso nao encontrado.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Conflito de estado, duplicidade ou idempotencia.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+  schemas:
+    ClienteCreateRequest:
+      type: object
+      required: [nome, documento]
+      properties:
+        nome:
+          type: string
+        documento:
+          type: string
+        telefone:
+          type: string
+        email:
+          type: string
+          format: email
+    ClienteUpdateRequest:
+      allOf:
+        - $ref: "#/components/schemas/ClienteCreateRequest"
+    Cliente:
+      allOf:
+        - $ref: "#/components/schemas/ClienteCreateRequest"
+        - type: object
+          required: [clienteId, criadoEm, atualizadoEm]
+          properties:
+            clienteId:
+              type: string
+              format: uuid
+            criadoEm:
+              type: string
+              format: date-time
+            atualizadoEm:
+              type: string
+              format: date-time
+    VeiculoCreateRequest:
+      type: object
+      required: [placa, marca, modelo]
+      properties:
+        placa:
+          type: string
+        marca:
+          type: string
+        modelo:
+          type: string
+        ano:
+          type: integer
+          minimum: 1900
+    VeiculoUpdateRequest:
+      allOf:
+        - $ref: "#/components/schemas/VeiculoCreateRequest"
+    Veiculo:
+      allOf:
+        - $ref: "#/components/schemas/VeiculoCreateRequest"
+        - type: object
+          required: [veiculoId, clienteId, criadoEm, atualizadoEm]
+          properties:
+            veiculoId:
+              type: string
+              format: uuid
+            clienteId:
+              type: string
+              format: uuid
+            criadoEm:
+              type: string
+              format: date-time
+            atualizadoEm:
+              type: string
+              format: date-time
+    OrdemServicoCreateRequest:
+      type: object
+      required: [clienteId, veiculoId, descricaoProblema]
+      properties:
+        clienteId:
+          type: string
+          format: uuid
+        veiculoId:
+          type: string
+          format: uuid
+        descricaoProblema:
+          type: string
+    OrdemServico:
+      allOf:
+        - $ref: "#/components/schemas/OrdemServicoCreateRequest"
+        - type: object
+          required: [ordemServicoId, estado, criadoEm, atualizadoEm]
+          properties:
+            ordemServicoId:
+              type: string
+              format: uuid
+            estado:
+              $ref: "#/components/schemas/EstadoOrdemServico"
+            criadoEm:
+              type: string
+              format: date-time
+            atualizadoEm:
+              type: string
+              format: date-time
+    EstadoOrdemServico:
+      type: string
+      enum: [RECEBIDA, EM_DIAGNOSTICO, AGUARDANDO_APROVACAO, EM_EXECUCAO, FINALIZADA, ENTREGUE]
+    AlterarEstadoRequest:
+      type: object
+      required: [estado]
+      properties:
+        estado:
+          $ref: "#/components/schemas/EstadoOrdemServico"
+        motivo:
+          type: string
+    HistoricoOrdemServico:
+      type: object
+      required: [estado, dataDoEstado]
+      properties:
+        estado:
+          $ref: "#/components/schemas/EstadoOrdemServico"
+        dataDoEstado:
+          type: string
+          format: date-time
+        motivo:
+          type: string
+    CancelamentoRequest:
+      type: object
+      properties:
+        motivo:
+          type: string
+    OperacaoAssincrona:
+      type: object
+      required: [status, solicitadoEm]
+      properties:
+        status:
+          type: string
+          example: ACEITO
+        solicitadoEm:
+          type: string
+          format: date-time
+    PageResponse:
+      type: object
+      required: [items, page, size, totalItems, totalPages]
+      properties:
+        items:
+          type: array
+          items: {}
+        page:
+          type: integer
+        size:
+          type: integer
+        totalItems:
+          type: integer
+        totalPages:
+          type: integer
+    ErrorResponse:
+      type: object
+      required: [timestamp, status, error, code, message, path, correlationId]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-06-23T15:30:00Z"
+        status:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: Bad Request
+        code:
+          type: string
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          example: Campo obrigatorio ausente.
+        path:
+          type: string
+          example: /api/v1/ordens-servico
+        correlationId:
+          type: string
+          example: 7f4d0c4b6b8a4bb8a2f49bb8f06e1c3d

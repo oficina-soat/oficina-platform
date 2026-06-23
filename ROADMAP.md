@@ -221,9 +221,9 @@ contracts/idempotency.md
 - [ ] Revisar divergências entre eventos de domínio e tópicos de mensageria.
 - [ ] Criar tabela canônica `evento -> tópico -> produtor -> consumidores`.
 - [ ] Criar schemas JSON para eventos fundamentais.
-- [ ] Criar OpenAPI do `oficina-os-service`.
-- [ ] Criar OpenAPI do `oficina-billing-service`.
-- [ ] Criar OpenAPI do `oficina-execution-service`.
+- [x] Criar OpenAPI do `oficina-os-service`.
+- [x] Criar OpenAPI do `oficina-billing-service`.
+- [x] Criar OpenAPI do `oficina-execution-service`.
 - [ ] Criar contrato de erros REST.
 - [ ] Criar contrato de idempotência.
 

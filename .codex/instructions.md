@@ -75,9 +75,11 @@ Se uma tarefa concluir ou alterar um item do roadmap, atualize o checklist corre
 
 ## Git
 
-Ao concluir qualquer alteração relevante no repositório, crie um commit ao final do trabalho. Considere alteração relevante toda mudança de documentação, contrato, ADR, template, instrução, workflow ou arquivo de projeto feita como resultado da tarefa.
+Ao concluir qualquer alteração relevante no repositório, crie um commit local ao final do trabalho para avaliação do usuário. Considere alteração relevante toda mudança de documentação, contrato, ADR, template, instrução, workflow ou arquivo de projeto feita como resultado da tarefa.
 
 Não deixe alterações relevantes sem commit, salvo quando o usuário pedir explicitamente para não commitar ou quando houver impedimento técnico que precise ser relatado.
+
+Não faça `git push`, salvo se o usuário pedir explicitamente.
 
 Antes de commitar:
 

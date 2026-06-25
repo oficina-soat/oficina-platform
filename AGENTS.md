@@ -138,13 +138,19 @@ Este projeto depende de versionamento explícito dos contratos e decisões para 
 
 ## Commits
 
-Sempre que houver alterações no repositório como resultado da tarefa, crie um commit ao final do trabalho quando o usuário solicitar entrega versionada ou quando o fluxo da tarefa pedir explicitamente commit.
+Sempre que houver alteração relevante no repositório como resultado da tarefa, crie um commit ao final do trabalho.
+
+Considere alteração relevante toda mudança de documentação, contrato, ADR, template, instrução, workflow ou arquivo de projeto feita como resultado da tarefa.
+
+Não deixe alterações relevantes sem commit, salvo quando o usuário pedir explicitamente para não commitar ou quando houver impedimento técnico que precise ser relatado.
 
 Antes de criar o commit:
 
 - adicione ao Git todos os arquivos novos criados no escopo da tarefa com `git add <arquivos-da-tarefa>`
 - faça stage dos arquivos alterados que pertencem à tarefa
 - não inclua arquivos locais ou não relacionados, como metadados de IDE
+- verifique `git status --short` antes de fazer stage
+- use `git diff -- <arquivo>` para revisar o conteúdo que será commitado quando houver mudanças pré-existentes no repositório
 
 Ao criar o commit, use mensagens em português seguindo Conventional Commits:
 

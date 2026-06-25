@@ -15,7 +15,7 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
 - Plataforma de nuvem definida como AWS.
 - Repositório `oficina-platform` definido como fonte central de arquitetura, contratos e padrões.
 - Governança multi-repositório definida, mantendo microsserviços em repositórios independentes.
-- Divisão inicial definida em três microsserviços:
+- Divisão inicial definida em três microsserviços, com repositórios independentes criados na suíte:
   - `oficina-os-service`;
   - `oficina-billing-service`;
   - `oficina-execution-service`.
@@ -175,6 +175,8 @@ contracts/idempotency.md
 
 **Objetivo:** criar a base reutilizável para implementação dos repositórios independentes.
 
+**Pré-condição atendida:** os repositórios `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service` já existem como repositórios independentes da suíte.
+
 **Entregas:**
 
 1. Criar matriz de ownership por serviço.
@@ -229,6 +231,7 @@ contracts/idempotency.md
 
 ### Épico B — Microsserviços
 
+- [x] Criar repositórios independentes `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`.
 - [ ] Criar matriz de ownership por microsserviço.
 - [ ] Criar template base Quarkus.
 - [ ] Criar padrão de configuração por ambiente.
@@ -289,4 +292,4 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é normalizar eventos e tópicos antes de gerar OpenAPI e schemas JSON. Essa etapa reduz inconsistências de vocabulário e evita que agentes propaguem nomes divergentes para implementações, testes e pipelines.
+O próximo passo mais importante é normalizar eventos e tópicos antes de evoluir os repositórios dos microsserviços. Essa etapa reduz inconsistências de vocabulário e evita que agentes propaguem nomes divergentes para implementações, testes e pipelines.

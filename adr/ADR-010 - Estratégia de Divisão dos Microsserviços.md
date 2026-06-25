@@ -275,6 +275,18 @@ A coordenação transacional seguirá a estratégia definida na [ADR-009](ADR-00
 
 A persistência será definida em ADR específica posterior.
 
+## Estado de Implementação
+
+Os repositórios independentes previstos por esta ADR foram criados na suíte:
+
+```text
+../oficina-os-service
+../oficina-billing-service
+../oficina-execution-service
+```
+
+Esses repositórios devem continuar seguindo os contratos, ADRs e padrões definidos no `oficina-platform`.
+
 ---
 
 ## Relação com ADRs Existentes
@@ -295,7 +307,7 @@ Esta ADR complementa a [ADR-009](ADR-009%20-%20Estratégia%20de%20Saga%20Pattern
 
 ## Próximos Passos
 
-* Criar os repositórios dos microsserviços;
+* Evoluir a estrutura base dos repositórios dos microsserviços;
 * Definir os contratos OpenAPI de cada serviço;
 * Definir os eventos de domínio entre os serviços;
 * Definir a estratégia de persistência de cada microsserviço;

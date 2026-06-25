@@ -1,6 +1,24 @@
 # oficina-platform
 Seu objetivo é centralizar a governança da plataforma, fornecendo uma visão unificada da arquitetura e servindo como fonte oficial para contratos, padrões e decisões compartilhadas.
 
+## Repositórios da plataforma
+
+Os microsserviços canônicos da plataforma possuem repositórios independentes na mesma suíte:
+
+| Repositório | Responsabilidade |
+| --- | --- |
+| `../oficina-os-service` | Gestão da Ordem de Serviço, cadastros principais e orquestração da Saga. |
+| `../oficina-billing-service` | Cobrança, pagamentos, notas fiscais e integrações financeiras. |
+| `../oficina-execution-service` | Diagnóstico, execução, alocação técnica, estoque operacional e finalização do serviço. |
+
+Os repositórios remotos verificados seguem a organização `oficina-soat` no GitHub:
+
+- `git@github.com:oficina-soat/oficina-os-service.git`
+- `git@github.com:oficina-soat/oficina-billing-service.git`
+- `git@github.com:oficina-soat/oficina-execution-service.git`
+
+Este repositório continua sendo a fonte normativa para ADRs, contratos, OpenAPI, eventos, padrões e artefatos compartilhados. Código de aplicação, pipelines específicos e manifestos próprios permanecem nos repositórios dos microsserviços.
+
 ## Roadmap
 
 O planejamento incremental da plataforma, incluindo lacunas restantes e backlog orientado a agentes, está documentado em [ROADMAP.md](ROADMAP.md).

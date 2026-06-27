@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oficina.example.com/contracts/events/schemas/ordemDeServicoEntregue.schema.json",
+  "title": "ordemDeServicoEntregue",
+  "type": "object",
+  "x-topic": "oficina.os.ordem-de-servico-entregue",
+  "allOf": [
+    {
+      "$ref": "./common.schema.json#/$defs/eventEnvelope"
+    }
+  ],
+  "properties": {
+    "eventType": {
+      "const": "ordemDeServicoEntregue"
+    },
+    "eventVersion": {
+      "const": 1
+    },
+    "producer": {
+      "const": "oficina-os-service"
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "ordemServicoId",
+        "estadoAnterior",
+        "estadoAtual",
+        "entregueEm"
+      ],
+      "properties": {
+        "ordemServicoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "estadoAnterior": {
+          "$ref": "./common.schema.json#/$defs/estadoOrdemServico"
+        },
+        "estadoAtual": {
+          "const": "ENTREGUE"
+        },
+        "entregueEm": {
+          "$ref": "./common.schema.json#/$defs/dateTime"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "eventId": "f8355064-f4ea-4737-bf56-9f89a0a9458f",
+      "eventType": "ordemDeServicoEntregue",
+      "eventVersion": 1,
+      "occurredAt": "2026-06-23T19:30:00Z",
+      "producer": "oficina-os-service",
+      "aggregateId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+      "payload": {
+        "ordemServicoId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+        "estadoAnterior": "FINALIZADA",
+        "estadoAtual": "ENTREGUE",
+        "entregueEm": "2026-06-23T19:30:00Z"
+      }
+    }
+  ]
+}

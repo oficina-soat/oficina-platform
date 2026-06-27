@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oficina.example.com/contracts/events/schemas/orcamentoRecusado.schema.json",
+  "title": "orcamentoRecusado",
+  "type": "object",
+  "x-topic": "oficina.billing.orcamento-recusado",
+  "allOf": [
+    {
+      "$ref": "./common.schema.json#/$defs/eventEnvelope"
+    }
+  ],
+  "properties": {
+    "eventType": {
+      "const": "orcamentoRecusado"
+    },
+    "eventVersion": {
+      "const": 1
+    },
+    "producer": {
+      "const": "oficina-billing-service"
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "orcamentoId",
+        "ordemServicoId",
+        "valorTotal",
+        "status",
+        "recusadoEm"
+      ],
+      "properties": {
+        "orcamentoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "ordemServicoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "valorTotal": {
+          "$ref": "./common.schema.json#/$defs/money"
+        },
+        "status": {
+          "const": "RECUSADO"
+        },
+        "motivo": {
+          "type": "string"
+        },
+        "recusadoEm": {
+          "$ref": "./common.schema.json#/$defs/dateTime"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "eventId": "311adf75-8d6f-4843-bc6b-1847b934bb83",
+      "eventType": "orcamentoRecusado",
+      "eventVersion": 1,
+      "occurredAt": "2026-06-23T16:35:00Z",
+      "producer": "oficina-billing-service",
+      "aggregateId": "53c52fe8-13cf-4568-9a64-d4f548134b8b",
+      "payload": {
+        "orcamentoId": "53c52fe8-13cf-4568-9a64-d4f548134b8b",
+        "ordemServicoId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+        "valorTotal": 400.0,
+        "status": "RECUSADO",
+        "motivo": "Cliente nao aprovou o valor",
+        "recusadoEm": "2026-06-23T16:35:00Z"
+      }
+    }
+  ]
+}

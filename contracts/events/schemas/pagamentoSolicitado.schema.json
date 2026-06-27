@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oficina.example.com/contracts/events/schemas/pagamentoSolicitado.schema.json",
+  "title": "pagamentoSolicitado",
+  "type": "object",
+  "x-topic": "oficina.billing.pagamento-solicitado",
+  "allOf": [
+    {
+      "$ref": "./common.schema.json#/$defs/eventEnvelope"
+    }
+  ],
+  "properties": {
+    "eventType": {
+      "const": "pagamentoSolicitado"
+    },
+    "eventVersion": {
+      "const": 1
+    },
+    "producer": {
+      "const": "oficina-billing-service"
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "pagamentoId",
+        "ordemServicoId",
+        "orcamentoId",
+        "valor",
+        "metodo",
+        "status",
+        "solicitadoEm"
+      ],
+      "properties": {
+        "pagamentoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "ordemServicoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "orcamentoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "valor": {
+          "$ref": "./common.schema.json#/$defs/money"
+        },
+        "metodo": {
+          "$ref": "./common.schema.json#/$defs/metodoPagamento"
+        },
+        "status": {
+          "const": "CRIADO"
+        },
+        "solicitadoEm": {
+          "$ref": "./common.schema.json#/$defs/dateTime"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "eventId": "4221b841-21ff-4e35-b68e-87e805f4a4af",
+      "eventType": "pagamentoSolicitado",
+      "eventVersion": 1,
+      "occurredAt": "2026-06-23T18:15:00Z",
+      "producer": "oficina-billing-service",
+      "aggregateId": "ba4a41e7-6724-4583-9f25-bd7732ec5935",
+      "payload": {
+        "pagamentoId": "ba4a41e7-6724-4583-9f25-bd7732ec5935",
+        "ordemServicoId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+        "orcamentoId": "53c52fe8-13cf-4568-9a64-d4f548134b8b",
+        "valor": 400.0,
+        "metodo": "PIX",
+        "status": "CRIADO",
+        "solicitadoEm": "2026-06-23T18:15:00Z"
+      }
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oficina.example.com/contracts/events/schemas/pecaIncluidaNaOrdemDeServico.schema.json",
+  "title": "pecaIncluidaNaOrdemDeServico",
+  "type": "object",
+  "x-topic": "oficina.os.peca-incluida-na-ordem-de-servico",
+  "allOf": [
+    {
+      "$ref": "./common.schema.json#/$defs/eventEnvelope"
+    }
+  ],
+  "properties": {
+    "eventType": {
+      "const": "pecaIncluidaNaOrdemDeServico"
+    },
+    "eventVersion": {
+      "const": 1
+    },
+    "producer": {
+      "const": "oficina-os-service"
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "ordemServicoId",
+        "peca"
+      ],
+      "properties": {
+        "ordemServicoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "peca": {
+          "$ref": "./common.schema.json#/$defs/itemPeca"
+        },
+        "incluidaEm": {
+          "$ref": "./common.schema.json#/$defs/dateTime"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "eventId": "92f38399-b482-4f67-bbf0-25cb55fc74b2",
+      "eventType": "pecaIncluidaNaOrdemDeServico",
+      "eventVersion": 1,
+      "occurredAt": "2026-06-23T15:40:00Z",
+      "producer": "oficina-os-service",
+      "aggregateId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+      "payload": {
+        "ordemServicoId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+        "peca": {
+          "pecaId": "bb3eb9a2-d19d-46b4-a3b3-729b67ff3795",
+          "nome": "Bateria 60Ah",
+          "quantidade": 1,
+          "valorUnitario": 320.0,
+          "valorTotal": 320.0
+        },
+        "incluidaEm": "2026-06-23T15:40:00Z"
+      }
+    }
+  ]
+}

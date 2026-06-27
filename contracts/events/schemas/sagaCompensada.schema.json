@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oficina.example.com/contracts/events/schemas/sagaCompensada.schema.json",
+  "title": "sagaCompensada",
+  "type": "object",
+  "x-topic": "oficina.saga.saga-compensada",
+  "allOf": [
+    {
+      "$ref": "./common.schema.json#/$defs/eventEnvelope"
+    }
+  ],
+  "properties": {
+    "eventType": {
+      "const": "sagaCompensada"
+    },
+    "eventVersion": {
+      "const": 1
+    },
+    "producer": {
+      "const": "oficina-os-service"
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "sagaId",
+        "ordemServicoId",
+        "motivo",
+        "compensadaEm"
+      ],
+      "properties": {
+        "sagaId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "ordemServicoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "etapaFalha": {
+          "type": "string"
+        },
+        "motivo": {
+          "type": "string"
+        },
+        "compensadaEm": {
+          "$ref": "./common.schema.json#/$defs/dateTime"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "eventId": "2c139f88-d031-4061-a9f4-baa29f054bec",
+      "eventType": "sagaCompensada",
+      "eventVersion": 1,
+      "occurredAt": "2026-06-23T18:30:00Z",
+      "producer": "oficina-os-service",
+      "aggregateId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+      "payload": {
+        "sagaId": "6c0e1384-4efa-47a8-a92e-081c8b4e77bc",
+        "ordemServicoId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+        "etapaFalha": "pagamentoConfirmado",
+        "motivo": "Pagamento recusado apos retentativas",
+        "compensadaEm": "2026-06-23T18:30:00Z"
+      }
+    }
+  ]
+}

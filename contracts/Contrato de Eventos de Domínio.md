@@ -91,6 +91,20 @@ Observabilidade pode consumir qualquer tópico da tabela, mas não deve ser trat
 
 ---
 
+# Schemas JSON
+
+Os schemas JSON dos eventos ficam em:
+
+```text
+contracts/events/schemas/
+```
+
+Cada schema de evento deve validar o envelope padrão de mensageria e fixar `eventType`, `eventVersion`, `producer`, tópico canônico e payload obrigatório do evento.
+
+O arquivo `contracts/events/schemas/common.schema.json` concentra tipos compartilhados extraídos dos contratos REST atuais e da comunicação existente no `oficina-app`, como identificadores, datas, estados da Ordem de Serviço, status de execução, status de orçamento, status de pagamento, itens de peça, itens de serviço e movimentos de estoque.
+
+---
+
 # Eventos Fora do Escopo Inicial
 
 Os eventos abaixo não fazem parte do contrato fundamental da Fase 4 e podem ser definidos posteriormente caso surja necessidade de integração entre microsserviços:

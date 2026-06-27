@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oficina.example.com/contracts/events/schemas/diagnosticoFinalizado.schema.json",
+  "title": "diagnosticoFinalizado",
+  "type": "object",
+  "x-topic": "oficina.execution.diagnostico-finalizado",
+  "allOf": [
+    {
+      "$ref": "./common.schema.json#/$defs/eventEnvelope"
+    }
+  ],
+  "properties": {
+    "eventType": {
+      "const": "diagnosticoFinalizado"
+    },
+    "eventVersion": {
+      "const": 1
+    },
+    "producer": {
+      "const": "oficina-execution-service"
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "execucaoId",
+        "ordemServicoId",
+        "statusExecucao",
+        "finalizadoEm"
+      ],
+      "properties": {
+        "execucaoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "ordemServicoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "statusExecucao": {
+          "const": "DIAGNOSTICO_CONCLUIDO"
+        },
+        "diagnostico": {
+          "type": "string"
+        },
+        "servicos": {
+          "type": "array",
+          "items": {
+            "$ref": "./common.schema.json#/$defs/itemServico"
+          }
+        },
+        "pecas": {
+          "type": "array",
+          "items": {
+            "$ref": "./common.schema.json#/$defs/itemPeca"
+          }
+        },
+        "finalizadoEm": {
+          "$ref": "./common.schema.json#/$defs/dateTime"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "eventId": "c5085e5a-fd80-4d10-bf1a-d900747522d9",
+      "eventType": "diagnosticoFinalizado",
+      "eventVersion": 1,
+      "occurredAt": "2026-06-23T16:00:00Z",
+      "producer": "oficina-execution-service",
+      "aggregateId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+      "payload": {
+        "execucaoId": "9de93dbf-0f40-4ad4-85a1-462a345a1cb0",
+        "ordemServicoId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+        "statusExecucao": "DIAGNOSTICO_CONCLUIDO",
+        "diagnostico": "Bateria sem carga util",
+        "servicos": [
+          {
+            "servicoId": "f0db68e2-9f06-4d3e-9eb7-67992b10b0c2",
+            "nome": "Troca de bateria",
+            "quantidade": 1,
+            "valorUnitario": 80.0,
+            "valorTotal": 80.0
+          }
+        ],
+        "pecas": [
+          {
+            "pecaId": "bb3eb9a2-d19d-46b4-a3b3-729b67ff3795",
+            "nome": "Bateria 60Ah",
+            "quantidade": 1,
+            "valorUnitario": 320.0,
+            "valorTotal": 320.0
+          }
+        ],
+        "finalizadoEm": "2026-06-23T16:00:00Z"
+      }
+    }
+  ]
+}

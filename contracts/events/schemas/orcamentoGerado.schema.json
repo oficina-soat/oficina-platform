@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oficina.example.com/contracts/events/schemas/orcamentoGerado.schema.json",
+  "title": "orcamentoGerado",
+  "type": "object",
+  "x-topic": "oficina.billing.orcamento-gerado",
+  "allOf": [
+    {
+      "$ref": "./common.schema.json#/$defs/eventEnvelope"
+    }
+  ],
+  "properties": {
+    "eventType": {
+      "const": "orcamentoGerado"
+    },
+    "eventVersion": {
+      "const": 1
+    },
+    "producer": {
+      "const": "oficina-billing-service"
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "orcamentoId",
+        "ordemServicoId",
+        "valorTotal",
+        "status",
+        "geradoEm"
+      ],
+      "properties": {
+        "orcamentoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "ordemServicoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "valorTotal": {
+          "$ref": "./common.schema.json#/$defs/money"
+        },
+        "status": {
+          "const": "GERADO"
+        },
+        "servicos": {
+          "type": "array",
+          "items": {
+            "$ref": "./common.schema.json#/$defs/itemServico"
+          }
+        },
+        "pecas": {
+          "type": "array",
+          "items": {
+            "$ref": "./common.schema.json#/$defs/itemPeca"
+          }
+        },
+        "geradoEm": {
+          "$ref": "./common.schema.json#/$defs/dateTime"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "eventId": "ab946786-86f0-42e7-82a5-5180c1f26891",
+      "eventType": "orcamentoGerado",
+      "eventVersion": 1,
+      "occurredAt": "2026-06-23T16:05:00Z",
+      "producer": "oficina-billing-service",
+      "aggregateId": "53c52fe8-13cf-4568-9a64-d4f548134b8b",
+      "payload": {
+        "orcamentoId": "53c52fe8-13cf-4568-9a64-d4f548134b8b",
+        "ordemServicoId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+        "valorTotal": 400.0,
+        "status": "GERADO",
+        "geradoEm": "2026-06-23T16:05:00Z"
+      }
+    }
+  ]
+}

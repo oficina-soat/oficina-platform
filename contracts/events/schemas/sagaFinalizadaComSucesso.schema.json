@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oficina.example.com/contracts/events/schemas/sagaFinalizadaComSucesso.schema.json",
+  "title": "sagaFinalizadaComSucesso",
+  "type": "object",
+  "x-topic": "oficina.saga.saga-finalizada-com-sucesso",
+  "allOf": [
+    {
+      "$ref": "./common.schema.json#/$defs/eventEnvelope"
+    }
+  ],
+  "properties": {
+    "eventType": {
+      "const": "sagaFinalizadaComSucesso"
+    },
+    "eventVersion": {
+      "const": 1
+    },
+    "producer": {
+      "const": "oficina-os-service"
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "sagaId",
+        "ordemServicoId",
+        "finalizadaEm"
+      ],
+      "properties": {
+        "sagaId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "ordemServicoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "finalizadaEm": {
+          "$ref": "./common.schema.json#/$defs/dateTime"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "eventId": "e9d66516-aab3-41d6-bd1e-2bca96b8b85e",
+      "eventType": "sagaFinalizadaComSucesso",
+      "eventVersion": 1,
+      "occurredAt": "2026-06-23T19:35:00Z",
+      "producer": "oficina-os-service",
+      "aggregateId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+      "payload": {
+        "sagaId": "6c0e1384-4efa-47a8-a92e-081c8b4e77bc",
+        "ordemServicoId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+        "finalizadaEm": "2026-06-23T19:35:00Z"
+      }
+    }
+  ]
+}

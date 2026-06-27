@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oficina.example.com/contracts/events/schemas/common.schema.json",
+  "title": "Tipos compartilhados dos eventos da plataforma oficina",
+  "$defs": {
+    "eventEnvelope": {
+      "type": "object",
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "occurredAt",
+        "producer",
+        "aggregateId",
+        "payload"
+      ],
+      "properties": {
+        "eventId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "eventType": {
+          "type": "string"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "occurredAt": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "producer": {
+          "enum": [
+            "oficina-os-service",
+            "oficina-billing-service",
+            "oficina-execution-service"
+          ]
+        },
+        "aggregateId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "payload": {
+          "type": "object"
+        }
+      }
+    },
+    "uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "money": {
+      "type": "number",
+      "minimum": 0
+    },
+    "quantity": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "estadoOrdemServico": {
+      "type": "string",
+      "enum": [
+        "RECEBIDA",
+        "EM_DIAGNOSTICO",
+        "AGUARDANDO_APROVACAO",
+        "EM_EXECUCAO",
+        "FINALIZADA",
+        "ENTREGUE"
+      ]
+    },
+    "statusOrcamento": {
+      "type": "string",
+      "enum": [
+        "GERADO",
+        "APROVADO",
+        "RECUSADO"
+      ]
+    },
+    "statusPagamento": {
+      "type": "string",
+      "enum": [
+        "CRIADO",
+        "CONFIRMADO",
+        "RECUSADO",
+        "CANCELADO"
+      ]
+    },
+    "metodoPagamento": {
+      "type": "string",
+      "enum": [
+        "PIX",
+        "CARTAO_CREDITO",
+        "CARTAO_DEBITO",
+        "DINHEIRO"
+      ]
+    },
+    "statusExecucao": {
+      "type": "string",
+      "enum": [
+        "CRIADA",
+        "EM_DIAGNOSTICO",
+        "DIAGNOSTICO_CONCLUIDO",
+        "EM_REPARO",
+        "REPARO_CONCLUIDO",
+        "CANCELADA"
+      ]
+    },
+    "tipoMovimentoEstoque": {
+      "type": "string",
+      "enum": [
+        "ENTRADA",
+        "RESERVA",
+        "CONSUMO",
+        "ESTORNO"
+      ]
+    },
+    "itemServico": {
+      "type": "object",
+      "required": [
+        "servicoId",
+        "quantidade",
+        "valorUnitario",
+        "valorTotal"
+      ],
+      "properties": {
+        "servicoId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "nome": {
+          "type": "string"
+        },
+        "quantidade": {
+          "$ref": "#/$defs/quantity"
+        },
+        "valorUnitario": {
+          "$ref": "#/$defs/money"
+        },
+        "valorTotal": {
+          "$ref": "#/$defs/money"
+        }
+      },
+      "additionalProperties": false
+    },
+    "itemPeca": {
+      "type": "object",
+      "required": [
+        "pecaId",
+        "quantidade",
+        "valorUnitario",
+        "valorTotal"
+      ],
+      "properties": {
+        "pecaId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "nome": {
+          "type": "string"
+        },
+        "quantidade": {
+          "$ref": "#/$defs/quantity"
+        },
+        "valorUnitario": {
+          "$ref": "#/$defs/money"
+        },
+        "valorTotal": {
+          "$ref": "#/$defs/money"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

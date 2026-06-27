@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oficina.example.com/contracts/events/schemas/estoqueBaixado.schema.json",
+  "title": "estoqueBaixado",
+  "type": "object",
+  "x-topic": "oficina.execution.estoque-baixado",
+  "allOf": [
+    {
+      "$ref": "./common.schema.json#/$defs/eventEnvelope"
+    }
+  ],
+  "properties": {
+    "eventType": {
+      "const": "estoqueBaixado"
+    },
+    "eventVersion": {
+      "const": 1
+    },
+    "producer": {
+      "const": "oficina-execution-service"
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "movimentoId",
+        "pecaId",
+        "ordemServicoId",
+        "tipo",
+        "quantidade",
+        "movimentadoEm"
+      ],
+      "properties": {
+        "movimentoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "pecaId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "ordemServicoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "tipo": {
+          "enum": [
+            "RESERVA",
+            "CONSUMO"
+          ]
+        },
+        "quantidade": {
+          "$ref": "./common.schema.json#/$defs/quantity"
+        },
+        "observacao": {
+          "type": "string"
+        },
+        "movimentadoEm": {
+          "$ref": "./common.schema.json#/$defs/dateTime"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "eventId": "8c4186f7-3597-40b4-9964-68ac2015247d",
+      "eventType": "estoqueBaixado",
+      "eventVersion": 1,
+      "occurredAt": "2026-06-23T17:10:00Z",
+      "producer": "oficina-execution-service",
+      "aggregateId": "bb3eb9a2-d19d-46b4-a3b3-729b67ff3795",
+      "payload": {
+        "movimentoId": "f9a13e14-35bd-428f-b614-e7931f0ff2fb",
+        "pecaId": "bb3eb9a2-d19d-46b4-a3b3-729b67ff3795",
+        "ordemServicoId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+        "tipo": "CONSUMO",
+        "quantidade": 1,
+        "observacao": "Consumo na execucao da OS",
+        "movimentadoEm": "2026-06-23T17:10:00Z"
+      }
+    }
+  ]
+}

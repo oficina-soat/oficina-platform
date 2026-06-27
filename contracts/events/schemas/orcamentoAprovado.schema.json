@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oficina.example.com/contracts/events/schemas/orcamentoAprovado.schema.json",
+  "title": "orcamentoAprovado",
+  "type": "object",
+  "x-topic": "oficina.billing.orcamento-aprovado",
+  "allOf": [
+    {
+      "$ref": "./common.schema.json#/$defs/eventEnvelope"
+    }
+  ],
+  "properties": {
+    "eventType": {
+      "const": "orcamentoAprovado"
+    },
+    "eventVersion": {
+      "const": 1
+    },
+    "producer": {
+      "const": "oficina-billing-service"
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "orcamentoId",
+        "ordemServicoId",
+        "valorTotal",
+        "status",
+        "aprovadoEm"
+      ],
+      "properties": {
+        "orcamentoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "ordemServicoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "valorTotal": {
+          "$ref": "./common.schema.json#/$defs/money"
+        },
+        "status": {
+          "const": "APROVADO"
+        },
+        "motivo": {
+          "type": "string"
+        },
+        "aprovadoEm": {
+          "$ref": "./common.schema.json#/$defs/dateTime"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "eventId": "4e82439c-6a0e-41c3-b392-ea0caa70be66",
+      "eventType": "orcamentoAprovado",
+      "eventVersion": 1,
+      "occurredAt": "2026-06-23T16:30:00Z",
+      "producer": "oficina-billing-service",
+      "aggregateId": "53c52fe8-13cf-4568-9a64-d4f548134b8b",
+      "payload": {
+        "orcamentoId": "53c52fe8-13cf-4568-9a64-d4f548134b8b",
+        "ordemServicoId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+        "valorTotal": 400.0,
+        "status": "APROVADO",
+        "aprovadoEm": "2026-06-23T16:30:00Z"
+      }
+    }
+  ]
+}

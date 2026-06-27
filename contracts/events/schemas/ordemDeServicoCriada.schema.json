@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oficina.example.com/contracts/events/schemas/ordemDeServicoCriada.schema.json",
+  "title": "ordemDeServicoCriada",
+  "type": "object",
+  "x-topic": "oficina.os.ordem-de-servico-criada",
+  "allOf": [
+    {
+      "$ref": "./common.schema.json#/$defs/eventEnvelope"
+    }
+  ],
+  "properties": {
+    "eventType": {
+      "const": "ordemDeServicoCriada"
+    },
+    "eventVersion": {
+      "const": 1
+    },
+    "producer": {
+      "const": "oficina-os-service"
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "ordemServicoId",
+        "clienteId",
+        "veiculoId",
+        "estadoAtual",
+        "criadoEm"
+      ],
+      "properties": {
+        "ordemServicoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "clienteId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "veiculoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "descricaoProblema": {
+          "type": "string"
+        },
+        "estadoAtual": {
+          "const": "RECEBIDA"
+        },
+        "criadoEm": {
+          "$ref": "./common.schema.json#/$defs/dateTime"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "eventId": "0d828bd2-dc65-4d9a-9fc0-1fa2428d9365",
+      "eventType": "ordemDeServicoCriada",
+      "eventVersion": 1,
+      "occurredAt": "2026-06-23T15:30:00Z",
+      "producer": "oficina-os-service",
+      "aggregateId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+      "payload": {
+        "ordemServicoId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+        "clienteId": "a3f0f8bc-47c5-493f-b580-e30f0e907cb0",
+        "veiculoId": "7b1f1a8d-7f4a-4f25-8e74-27d50210a61e",
+        "descricaoProblema": "Veiculo nao liga",
+        "estadoAtual": "RECEBIDA",
+        "criadoEm": "2026-06-23T15:30:00Z"
+      }
+    }
+  ]
+}

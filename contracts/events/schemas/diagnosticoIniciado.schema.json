@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oficina.example.com/contracts/events/schemas/diagnosticoIniciado.schema.json",
+  "title": "diagnosticoIniciado",
+  "type": "object",
+  "x-topic": "oficina.execution.diagnostico-iniciado",
+  "allOf": [
+    {
+      "$ref": "./common.schema.json#/$defs/eventEnvelope"
+    }
+  ],
+  "properties": {
+    "eventType": {
+      "const": "diagnosticoIniciado"
+    },
+    "eventVersion": {
+      "const": 1
+    },
+    "producer": {
+      "const": "oficina-execution-service"
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "execucaoId",
+        "ordemServicoId",
+        "statusExecucao",
+        "iniciadoEm"
+      ],
+      "properties": {
+        "execucaoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "ordemServicoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "statusExecucao": {
+          "const": "EM_DIAGNOSTICO"
+        },
+        "iniciadoEm": {
+          "$ref": "./common.schema.json#/$defs/dateTime"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "eventId": "db32a16d-8eee-4f5e-9dfd-4d6ca9e84904",
+      "eventType": "diagnosticoIniciado",
+      "eventVersion": 1,
+      "occurredAt": "2026-06-23T15:35:00Z",
+      "producer": "oficina-execution-service",
+      "aggregateId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+      "payload": {
+        "execucaoId": "9de93dbf-0f40-4ad4-85a1-462a345a1cb0",
+        "ordemServicoId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+        "statusExecucao": "EM_DIAGNOSTICO",
+        "iniciadoEm": "2026-06-23T15:35:00Z"
+      }
+    }
+  ]
+}

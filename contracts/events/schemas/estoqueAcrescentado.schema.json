@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oficina.example.com/contracts/events/schemas/estoqueAcrescentado.schema.json",
+  "title": "estoqueAcrescentado",
+  "type": "object",
+  "x-topic": "oficina.execution.estoque-acrescentado",
+  "allOf": [
+    {
+      "$ref": "./common.schema.json#/$defs/eventEnvelope"
+    }
+  ],
+  "properties": {
+    "eventType": {
+      "const": "estoqueAcrescentado"
+    },
+    "eventVersion": {
+      "const": 1
+    },
+    "producer": {
+      "const": "oficina-execution-service"
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "movimentoId",
+        "pecaId",
+        "tipo",
+        "quantidade",
+        "movimentadoEm"
+      ],
+      "properties": {
+        "movimentoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "pecaId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "tipo": {
+          "const": "ENTRADA"
+        },
+        "quantidade": {
+          "$ref": "./common.schema.json#/$defs/quantity"
+        },
+        "observacao": {
+          "type": "string"
+        },
+        "movimentadoEm": {
+          "$ref": "./common.schema.json#/$defs/dateTime"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "eventId": "3b0d7d73-9351-4807-bb36-75aa0c466862",
+      "eventType": "estoqueAcrescentado",
+      "eventVersion": 1,
+      "occurredAt": "2026-06-23T14:00:00Z",
+      "producer": "oficina-execution-service",
+      "aggregateId": "bb3eb9a2-d19d-46b4-a3b3-729b67ff3795",
+      "payload": {
+        "movimentoId": "da9a6781-a2a6-453c-b519-c768711802ae",
+        "pecaId": "bb3eb9a2-d19d-46b4-a3b3-729b67ff3795",
+        "tipo": "ENTRADA",
+        "quantidade": 10,
+        "observacao": "Entrada inicial",
+        "movimentadoEm": "2026-06-23T14:00:00Z"
+      }
+    }
+  ]
+}

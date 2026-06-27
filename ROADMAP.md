@@ -66,9 +66,9 @@ contracts/openapi/oficina-execution-service.yaml
 
 ### 2. Schemas formais dos eventos
 
-**Situação atual:** existem arquivos Markdown individuais para eventos, mas eles ainda não possuem payload obrigatório, schema validável e tópico canônico associado.
+**Situação atual:** existem arquivos Markdown individuais para eventos e schemas JSON iniciais em `contracts/events/schemas/`.
 
-**Definição faltante:** criar schemas JSON por evento, mantendo compatibilidade com o envelope definido no contrato de mensageria.
+**Definição faltante:** evoluir os schemas conforme novos campos forem estabilizados nos contratos REST, Saga e implementações dos microsserviços, preservando compatibilidade ou incrementando `eventVersion` quando houver mudança incompatível.
 
 **Artefatos sugeridos:**
 
@@ -291,7 +291,7 @@ contracts/idempotency.md
 
 - [x] Revisar divergências entre eventos de domínio e tópicos de mensageria.
 - [x] Criar tabela canônica `evento -> tópico -> produtor -> consumidores`.
-- [ ] Criar schemas JSON para eventos fundamentais.
+- [x] Criar schemas JSON para eventos fundamentais.
 - [x] Criar OpenAPI do `oficina-os-service`.
 - [x] Criar OpenAPI do `oficina-billing-service`.
 - [x] Criar OpenAPI do `oficina-execution-service`.

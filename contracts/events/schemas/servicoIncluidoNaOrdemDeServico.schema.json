@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oficina.example.com/contracts/events/schemas/servicoIncluidoNaOrdemDeServico.schema.json",
+  "title": "servicoIncluidoNaOrdemDeServico",
+  "type": "object",
+  "x-topic": "oficina.os.servico-incluido-na-ordem-de-servico",
+  "allOf": [
+    {
+      "$ref": "./common.schema.json#/$defs/eventEnvelope"
+    }
+  ],
+  "properties": {
+    "eventType": {
+      "const": "servicoIncluidoNaOrdemDeServico"
+    },
+    "eventVersion": {
+      "const": 1
+    },
+    "producer": {
+      "const": "oficina-os-service"
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "ordemServicoId",
+        "servico"
+      ],
+      "properties": {
+        "ordemServicoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "servico": {
+          "$ref": "./common.schema.json#/$defs/itemServico"
+        },
+        "incluidoEm": {
+          "$ref": "./common.schema.json#/$defs/dateTime"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "eventId": "a64e9d29-7bd8-40cc-bd7a-6a49f7cc407b",
+      "eventType": "servicoIncluidoNaOrdemDeServico",
+      "eventVersion": 1,
+      "occurredAt": "2026-06-23T15:42:00Z",
+      "producer": "oficina-os-service",
+      "aggregateId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+      "payload": {
+        "ordemServicoId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+        "servico": {
+          "servicoId": "f0db68e2-9f06-4d3e-9eb7-67992b10b0c2",
+          "nome": "Troca de bateria",
+          "quantidade": 1,
+          "valorUnitario": 80.0,
+          "valorTotal": 80.0
+        },
+        "incluidoEm": "2026-06-23T15:42:00Z"
+      }
+    }
+  ]
+}

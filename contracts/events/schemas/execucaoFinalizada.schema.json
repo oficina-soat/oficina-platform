@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oficina.example.com/contracts/events/schemas/execucaoFinalizada.schema.json",
+  "title": "execucaoFinalizada",
+  "type": "object",
+  "x-topic": "oficina.execution.execucao-finalizada",
+  "allOf": [
+    {
+      "$ref": "./common.schema.json#/$defs/eventEnvelope"
+    }
+  ],
+  "properties": {
+    "eventType": {
+      "const": "execucaoFinalizada"
+    },
+    "eventVersion": {
+      "const": 1
+    },
+    "producer": {
+      "const": "oficina-execution-service"
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "execucaoId",
+        "ordemServicoId",
+        "statusExecucao",
+        "finalizadaEm"
+      ],
+      "properties": {
+        "execucaoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "ordemServicoId": {
+          "$ref": "./common.schema.json#/$defs/uuid"
+        },
+        "statusExecucao": {
+          "const": "REPARO_CONCLUIDO"
+        },
+        "observacoes": {
+          "type": "string"
+        },
+        "finalizadaEm": {
+          "$ref": "./common.schema.json#/$defs/dateTime"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "eventId": "ff96ccbc-dc01-44b0-b21b-979d181e87d0",
+      "eventType": "execucaoFinalizada",
+      "eventVersion": 1,
+      "occurredAt": "2026-06-23T18:00:00Z",
+      "producer": "oficina-execution-service",
+      "aggregateId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+      "payload": {
+        "execucaoId": "9de93dbf-0f40-4ad4-85a1-462a345a1cb0",
+        "ordemServicoId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+        "statusExecucao": "REPARO_CONCLUIDO",
+        "observacoes": "Bateria substituida e teste eletrico realizado",
+        "finalizadaEm": "2026-06-23T18:00:00Z"
+      }
+    }
+  ]
+}

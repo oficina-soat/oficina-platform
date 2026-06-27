@@ -20,6 +20,7 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
   - `oficina-billing-service`;
   - `oficina-execution-service`.
 - Destino do `oficina-app` definido: o código existente será decomposto e migrado para os três novos microsserviços conforme suas responsabilidades, sem manter o `oficina-app` como backend monolítico da Fase 4.
+- Destino do `oficina-auth-lambda` definido: o repositório continuará existindo como componente serverless independente, mantendo a responsabilidade atual de autenticação conforme a ADR-003, sem ser absorvido pelos três microsserviços.
 - Comunicação definida como híbrida, combinando APIs REST e mensageria assíncrona.
 - Saga Pattern definido como orquestrado pelo `oficina-os-service`.
 - Persistência poliglota definida por microsserviço.

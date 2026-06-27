@@ -19,6 +19,7 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
   - `oficina-os-service`;
   - `oficina-billing-service`;
   - `oficina-execution-service`.
+- Destino do `oficina-app` definido: o código existente será decomposto e migrado para os três novos microsserviços conforme suas responsabilidades, sem manter o `oficina-app` como backend monolítico da Fase 4.
 - Comunicação definida como híbrida, combinando APIs REST e mensageria assíncrona.
 - Saga Pattern definido como orquestrado pelo `oficina-os-service`.
 - Persistência poliglota definida por microsserviço.
@@ -100,7 +101,28 @@ docs/service-ownership.md
 
 **Critério de pronto:** um agente deve conseguir identificar rapidamente onde implementar uma regra sem consultar todas as ADRs.
 
-### 5. Fluxos da Saga em formato executável para implementação
+### 5. Plano de decomposição do `oficina-app`
+
+**Situação atual:** o `oficina-app` representa a base de código existente que será usada como referência e origem da migração para a arquitetura de microsserviços da Fase 4.
+
+**Decisão:** o código do `oficina-app` será dividido entre `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, respeitando os limites de responsabilidade, contratos REST, eventos, bancos e regras de ownership definidos neste repositório.
+
+**Definições faltantes:**
+
+- Mapear controllers, services, entidades, DTOs, repositories, migrations e testes do `oficina-app` para o microsserviço destino.
+- Definir quais partes do `oficina-app` serão removidas, arquivadas ou mantidas apenas como referência após a migração.
+- Definir a estratégia de migração de dados do modelo atual para `oficina_os`, `oficina_billing` e DynamoDB.
+- Definir como o front-end ou consumidores atuais deixarão de chamar o `oficina-app` e passarão a chamar os novos endpoints dos microsserviços.
+
+**Artefato sugerido:**
+
+```text
+docs/oficina-app-decomposition.md
+```
+
+**Critério de pronto:** cada componente relevante do `oficina-app` deve possuir destino explícito, estratégia de migração e critério de descarte ou retenção como referência.
+
+### 6. Fluxos da Saga em formato executável para implementação
 
 **Situação atual:** a estratégia de Saga está documentada conceitualmente.
 
@@ -115,7 +137,7 @@ contracts/saga/oficina-os-saga-v1.md
 
 **Critério de pronto:** cada etapa deve informar acionador, serviço responsável, operação síncrona ou assíncrona, evento de sucesso, evento de falha e compensação.
 
-### 6. Padrões técnicos para repositórios de microsserviços
+### 7. Padrões técnicos para repositórios de microsserviços
 
 **Situação atual:** há decisões sobre CI/CD, deploy independente e governança, mas ainda faltam templates práticos para agentes criarem os repositórios.
 
@@ -131,7 +153,7 @@ templates/kubernetes/base/
 
 **Critério de pronto:** um agente deve conseguir criar um novo microsserviço consistente usando o template sem reinterpretar a arquitetura.
 
-### 7. Repositório unificado de infraestrutura
+### 8. Repositório unificado de infraestrutura
 
 **Situação atual:** os repositórios `oficina-infra-db` e `oficina-infra-k8s` existem como referências separadas para banco de dados e Kubernetes.
 
@@ -139,7 +161,7 @@ templates/kubernetes/base/
 
 **Critério de pronto:** o novo repositório deve concentrar os artefatos de infraestrutura compartilhada da suíte, mantendo nomes de ambientes, secrets, variáveis, manifests, migrations e padrões de deploy compatíveis com os contratos e decisões deste repositório.
 
-### 8. Isolamento dos bancos PostgreSQL na Fase 4
+### 9. Isolamento dos bancos PostgreSQL na Fase 4
 
 **Situação atual:** o enunciado exige banco de dados próprio por microsserviço, pelo menos um banco SQL, pelo menos um banco NoSQL e proíbe acesso direto ao banco de outro serviço.
 
@@ -168,7 +190,7 @@ Amazon DynamoDB
 
 **Critério de pronto:** a infraestrutura deve criar databases, usuários, permissões, secrets e connection strings separados por microsserviço, demonstrando ownership e isolamento lógico mesmo com instância RDS compartilhada.
 
-### 9. Padrão de observabilidade distribuída
+### 10. Padrão de observabilidade distribuída
 
 **Situação atual:** observabilidade é requisito recorrente nas ADRs, mas falta contrato operacional detalhado.
 
@@ -182,7 +204,7 @@ docs/observability.md
 
 **Critério de pronto:** todos os serviços devem expor o mesmo conjunto mínimo de sinais e propagar `correlationId` em HTTP, eventos e logs.
 
-### 10. Padrão de erros e idempotência
+### 11. Padrão de erros e idempotência
 
 **Situação atual:** o contrato REST cita idempotência para criação, mas faltam respostas de erro padronizadas e regras de reprocessamento.
 
@@ -223,12 +245,13 @@ contracts/idempotency.md
 **Entregas:**
 
 1. Criar matriz de ownership por serviço.
-2. Criar template Quarkus de microsserviço.
-3. Criar pipeline padrão de CI/CD.
-4. Criar manifests Kubernetes base.
-5. Criar documentação local padrão para cada repositório.
-6. Definir o escopo do novo repositório unificado de infraestrutura que substituirá a separação entre `oficina-infra-db` e `oficina-infra-k8s`.
-7. Criar padrão de provisionamento para o RDS PostgreSQL compartilhado com databases, usuários, secrets e migrations isolados por microsserviço.
+2. Criar plano de decomposição do `oficina-app` para os três microsserviços.
+3. Criar template Quarkus de microsserviço.
+4. Criar pipeline padrão de CI/CD.
+5. Criar manifests Kubernetes base.
+6. Criar documentação local padrão para cada repositório.
+7. Definir o escopo do novo repositório unificado de infraestrutura que substituirá a separação entre `oficina-infra-db` e `oficina-infra-k8s`.
+8. Criar padrão de provisionamento para o RDS PostgreSQL compartilhado com databases, usuários, secrets e migrations isolados por microsserviço.
 
 **Resultado esperado:** agentes conseguem criar ou evoluir repositórios de serviço seguindo o mesmo padrão.
 
@@ -278,6 +301,8 @@ contracts/idempotency.md
 
 - [x] Criar repositórios independentes `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`.
 - [ ] Criar matriz de ownership por microsserviço.
+- [ ] Criar plano de decomposição do `oficina-app` por componente e microsserviço destino.
+- [ ] Definir estratégia de migração ou descarte do `oficina-app` após a decomposição.
 - [ ] Criar template base Quarkus.
 - [ ] Criar padrão de configuração por ambiente.
 - [ ] Criar padrão de health checks.

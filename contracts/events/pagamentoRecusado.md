@@ -7,12 +7,17 @@ Indica que o pagamento foi recusado ou não autorizado.
 ## Emissor
 
 ```text
-Billing Service
+oficina-billing-service
+```
+
+## Tópico canônico
+
+```text
+oficina.billing.pagamento-recusado
 ```
 
 ## Consumidores potenciais
 
 ```text
-OS Service
-Saga
+oficina-os-service
 ```

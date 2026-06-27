@@ -7,12 +7,17 @@ Indica que o pagamento foi confirmado pelo provedor de pagamentos.
 ## Emissor
 
 ```text
-Billing Service
+oficina-billing-service
+```
+
+## Tópico canônico
+
+```text
+oficina.billing.pagamento-confirmado
 ```
 
 ## Consumidores potenciais
 
 ```text
-OS Service
-Saga
+oficina-os-service
 ```

@@ -7,12 +7,17 @@ Indica que o orçamento foi recusado pelo cliente.
 ## Emissor
 
 ```text
-Billing Service
+oficina-billing-service
+```
+
+## Tópico canônico
+
+```text
+oficina.billing.orcamento-recusado
 ```
 
 ## Consumidores potenciais
 
 ```text
-OS Service
-Saga
+oficina-os-service
 ```

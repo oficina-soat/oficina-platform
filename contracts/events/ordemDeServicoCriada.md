@@ -7,13 +7,18 @@ Indica que uma nova Ordem de Serviço foi aberta.
 ## Emissor
 
 ```text
-OS Service
+oficina-os-service
+```
+
+## Tópico canônico
+
+```text
+oficina.os.ordem-de-servico-criada
 ```
 
 ## Consumidores potenciais
 
 ```text
-Billing Service
-Execution Service
-Observabilidade
+oficina-billing-service
+oficina-execution-service
 ```

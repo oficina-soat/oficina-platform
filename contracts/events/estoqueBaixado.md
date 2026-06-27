@@ -7,13 +7,17 @@ Indica saída de itens do estoque.
 ## Emissor
 
 ```text
-Inventory Service
+oficina-execution-service
+```
+
+## Tópico canônico
+
+```text
+oficina.execution.estoque-baixado
 ```
 
 ## Consumidores potenciais
 
 ```text
-Execution Service
-Billing Service
-Observabilidade
+oficina-billing-service
 ```

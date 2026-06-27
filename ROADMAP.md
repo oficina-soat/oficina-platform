@@ -50,9 +50,9 @@ As ADRs e contratos fundamentais estão suficientes para iniciar a decomposiçã
 
 ### 1. Contratos OpenAPI formais
 
-**Situação atual:** há um contrato REST em Markdown com rotas e responsabilidades principais.
+**Situação atual:** há um contrato REST em Markdown com rotas e responsabilidades principais e já existem especificações OpenAPI iniciais para os três microsserviços.
 
-**Definição faltante:** criar especificações OpenAPI versionadas por microsserviço.
+**Definição faltante:** revisar continuamente as especificações OpenAPI para manter coerência com o contrato REST, com o modelo de erros e com as regras de idempotência.
 
 **Artefatos sugeridos:**
 
@@ -62,7 +62,7 @@ contracts/openapi/oficina-billing-service.yaml
 contracts/openapi/oficina-execution-service.yaml
 ```
 
-**Critério de pronto:** cada arquivo deve conter endpoints, schemas de request/response, códigos HTTP esperados, erros padronizados, autenticação e exemplos mínimos.
+**Critério de pronto:** cada arquivo deve conter endpoints, schemas de request/response, códigos HTTP esperados, erros padronizados, autenticação e exemplos mínimos, sem divergência em relação a `contracts/Contrato de APIs REST.md`.
 
 ### 2. Schemas formais dos eventos
 
@@ -80,18 +80,13 @@ contracts/events/schemas/<nome-do-evento>.schema.json
 
 ### 3. Normalização entre eventos e tópicos
 
-**Situação atual:** há divergências de nomenclatura entre alguns eventos de domínio e tópicos de mensageria.
+**Situação atual:** eventos e tópicos foram normalizados em torno dos nomes lógicos camelCase dos eventos e tópicos kebab-case por domínio do produtor.
 
-**Exemplos a revisar:**
+**Decisão tomada:** os nomes lógicos camelCase dos arquivos em `contracts/events/` são a referência para `eventType`; os tópicos usam kebab-case no domínio do produtor; e os produtores devem usar os nomes canônicos dos microsserviços (`oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`).
 
-- `diagnosticoFinalizado` versus `diagnostico-concluido`;
-- `execucaoFinalizada` versus `reparo-concluido`;
-- `pagamentoSolicitado` versus `pagamento-criado`;
-- eventos de estoque com emissor `Inventory Service`, enquanto a divisão atual prevê estoque dentro do `oficina-execution-service`.
+**Definição faltante:** manter a tabela canônica `evento -> tópico -> produtor -> consumidores` como referência para criação dos schemas JSON e para implementação dos produtores/consumidores.
 
-**Definição faltante:** escolher uma nomenclatura canônica e refletir a decisão nos contratos de eventos, tópicos e APIs.
-
-**Critério de pronto:** todo evento fundamental deve possuir exatamente um tópico canônico e um produtor compatível com os microsserviços definidos.
+**Critério de pronto:** todo evento fundamental deve possuir exatamente um tópico canônico, um produtor compatível com os microsserviços definidos e consumidores explícitos quando houver integração entre serviços.
 
 ### 4. Catálogo de responsabilidades por microsserviço
 
@@ -237,7 +232,7 @@ contracts/idempotency.md
 
 1. Normalizar eventos e tópicos.
 2. Criar schemas JSON dos eventos fundamentais.
-3. Criar OpenAPI inicial dos três microsserviços.
+3. Revisar OpenAPI inicial dos três microsserviços contra erros padronizados e idempotência.
 4. Definir modelo de erro e idempotência.
 
 **Resultado esperado:** agentes conseguem gerar código de controllers, DTOs, produtores e consumidores com menor ambiguidade.
@@ -294,8 +289,8 @@ contracts/idempotency.md
 
 ### Épico A — Contratos
 
-- [ ] Revisar divergências entre eventos de domínio e tópicos de mensageria.
-- [ ] Criar tabela canônica `evento -> tópico -> produtor -> consumidores`.
+- [x] Revisar divergências entre eventos de domínio e tópicos de mensageria.
+- [x] Criar tabela canônica `evento -> tópico -> produtor -> consumidores`.
 - [ ] Criar schemas JSON para eventos fundamentais.
 - [x] Criar OpenAPI do `oficina-os-service`.
 - [x] Criar OpenAPI do `oficina-billing-service`.

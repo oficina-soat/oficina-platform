@@ -7,5 +7,17 @@ Indica que o diagnóstico da Ordem de Serviço foi iniciado.
 ## Emissor
 
 ```text
-OS Service
+oficina-execution-service
+```
+
+## Tópico canônico
+
+```text
+oficina.execution.diagnostico-iniciado
+```
+
+## Consumidores potenciais
+
+```text
+oficina-os-service
 ```

@@ -31,7 +31,7 @@ Exemplos:
 ```text
 oficina.os.ordem-de-servico-criada
 oficina.billing.orcamento-aprovado
-oficina.execution.reparo-concluido
+oficina.execution.execucao-finalizada
 ```
 
 ### Versionamento
@@ -84,8 +84,10 @@ Todos os eventos publicados na plataforma devem seguir a seguinte estrutura:
 
 ```text
 oficina.os.ordem-de-servico-criada
-oficina.os.estado-da-ordem-de-servico-alterado
-oficina.os.ordem-de-servico-cancelada
+oficina.os.peca-incluida-na-ordem-de-servico
+oficina.os.servico-incluido-na-ordem-de-servico
+oficina.os.ordem-de-servico-finalizada
+oficina.os.ordem-de-servico-entregue
 ```
 
 ---
@@ -103,10 +105,9 @@ oficina.billing.orcamento-recusado
 ## Pagamentos
 
 ```text
-oficina.billing.pagamento-criado
+oficina.billing.pagamento-solicitado
 oficina.billing.pagamento-confirmado
 oficina.billing.pagamento-recusado
-oficina.billing.pagamento-cancelado
 ```
 
 ---
@@ -116,21 +117,17 @@ oficina.billing.pagamento-cancelado
 ## Execução
 
 ```text
-oficina.execution.execucao-criada
 oficina.execution.diagnostico-iniciado
-oficina.execution.diagnostico-concluido
-oficina.execution.reparo-iniciado
-oficina.execution.reparo-concluido
-oficina.execution.execucao-cancelada
+oficina.execution.diagnostico-finalizado
+oficina.execution.execucao-iniciada
+oficina.execution.execucao-finalizada
 ```
 
 ## Estoque
 
 ```text
-oficina.execution.estoque-reservado
-oficina.execution.estoque-consumido
-oficina.execution.estoque-estornado
-oficina.execution.estoque-insuficiente-identificado
+oficina.execution.estoque-acrescentado
+oficina.execution.estoque-baixado
 ```
 
 ---
@@ -140,8 +137,8 @@ oficina.execution.estoque-insuficiente-identificado
 Para permitir padronização de rollback distribuído e evolução futura da arquitetura de Saga, a plataforma reserva os seguintes tópicos:
 
 ```text
-oficina.saga.compensacao-iniciada
-oficina.saga.compensacao-concluida
+oficina.saga.saga-compensada
+oficina.saga.saga-finalizada-com-sucesso
 ```
 
 Esses tópicos podem ser utilizados por implementações futuras de Saga híbrida ou orquestrada sem necessidade de alteração dos contratos existentes.
@@ -159,18 +156,46 @@ orcamentoGerado
         ↓
 orcamentoAprovado
         ↓
-execucaoCriada
+execucaoIniciada
         ↓
-diagnosticoConcluido
+diagnosticoFinalizado
         ↓
-reparoConcluido
+execucaoFinalizada
         ↓
-pagamentoCriado
+pagamentoSolicitado
         ↓
 pagamentoConfirmado
         ↓
-estadoDaOrdemDeServicoAlterado(FINALIZADA)
+ordemDeServicoFinalizada
 ```
+
+---
+
+# Tabela Canônica de Roteamento
+
+Esta tabela deve ser mantida coerente com `contracts/Contrato de Eventos de Domínio.md` e com os schemas JSON de eventos.
+
+| Evento | Tópico canônico | Produtor | Consumidores |
+|---|---|---|---|
+| `ordemDeServicoCriada` | `oficina.os.ordem-de-servico-criada` | `oficina-os-service` | `oficina-billing-service`, `oficina-execution-service` |
+| `diagnosticoIniciado` | `oficina.execution.diagnostico-iniciado` | `oficina-execution-service` | `oficina-os-service` |
+| `pecaIncluidaNaOrdemDeServico` | `oficina.os.peca-incluida-na-ordem-de-servico` | `oficina-os-service` | `oficina-billing-service`, `oficina-execution-service` |
+| `servicoIncluidoNaOrdemDeServico` | `oficina.os.servico-incluido-na-ordem-de-servico` | `oficina-os-service` | `oficina-billing-service`, `oficina-execution-service` |
+| `diagnosticoFinalizado` | `oficina.execution.diagnostico-finalizado` | `oficina-execution-service` | `oficina-os-service`, `oficina-billing-service` |
+| `orcamentoGerado` | `oficina.billing.orcamento-gerado` | `oficina-billing-service` | `oficina-os-service` |
+| `orcamentoAprovado` | `oficina.billing.orcamento-aprovado` | `oficina-billing-service` | `oficina-os-service`, `oficina-execution-service` |
+| `orcamentoRecusado` | `oficina.billing.orcamento-recusado` | `oficina-billing-service` | `oficina-os-service` |
+| `execucaoIniciada` | `oficina.execution.execucao-iniciada` | `oficina-execution-service` | `oficina-os-service` |
+| `execucaoFinalizada` | `oficina.execution.execucao-finalizada` | `oficina-execution-service` | `oficina-os-service`, `oficina-billing-service` |
+| `ordemDeServicoFinalizada` | `oficina.os.ordem-de-servico-finalizada` | `oficina-os-service` | `oficina-billing-service`, `oficina-execution-service` |
+| `ordemDeServicoEntregue` | `oficina.os.ordem-de-servico-entregue` | `oficina-os-service` | `oficina-billing-service` |
+| `pagamentoSolicitado` | `oficina.billing.pagamento-solicitado` | `oficina-billing-service` | `oficina-os-service` |
+| `pagamentoConfirmado` | `oficina.billing.pagamento-confirmado` | `oficina-billing-service` | `oficina-os-service` |
+| `pagamentoRecusado` | `oficina.billing.pagamento-recusado` | `oficina-billing-service` | `oficina-os-service` |
+| `estoqueAcrescentado` | `oficina.execution.estoque-acrescentado` | `oficina-execution-service` | `oficina-billing-service` |
+| `estoqueBaixado` | `oficina.execution.estoque-baixado` | `oficina-execution-service` | `oficina-billing-service` |
+| `sagaCompensada` | `oficina.saga.saga-compensada` | `oficina-os-service` | `oficina-billing-service`, `oficina-execution-service` |
+| `sagaFinalizadaComSucesso` | `oficina.saga.saga-finalizada-com-sucesso` | `oficina-os-service` | `oficina-billing-service`, `oficina-execution-service` |
 
 ---
 

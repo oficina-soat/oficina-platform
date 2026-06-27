@@ -7,12 +7,17 @@ Indica que os serviços da Ordem de Serviço começaram a ser executados.
 ## Emissor
 
 ```text
-Execution Service
+oficina-execution-service
+```
+
+## Tópico canônico
+
+```text
+oficina.execution.execucao-iniciada
 ```
 
 ## Consumidores potenciais
 
 ```text
-OS Service
-Observabilidade
+oficina-os-service
 ```

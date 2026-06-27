@@ -7,13 +7,18 @@ Indica que os serviços da Ordem de Serviço foram concluídos.
 ## Emissor
 
 ```text
-Execution Service
+oficina-execution-service
+```
+
+## Tópico canônico
+
+```text
+oficina.execution.execucao-finalizada
 ```
 
 ## Consumidores potenciais
 
 ```text
-OS Service
-Billing Service
-Saga
+oficina-os-service
+oficina-billing-service
 ```

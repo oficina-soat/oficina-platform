@@ -7,11 +7,18 @@ Indica que o diagnóstico foi concluído e que a OS passou a aguardar aprovaçã
 ## Emissor
 
 ```text
-OS Service
+oficina-execution-service
+```
+
+## Tópico canônico
+
+```text
+oficina.execution.diagnostico-finalizado
 ```
 
 ## Consumidores potenciais
 
 ```text
-Billing Service
+oficina-os-service
+oficina-billing-service
 ```

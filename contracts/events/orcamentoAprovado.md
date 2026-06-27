@@ -7,13 +7,18 @@ Indica que o orçamento foi aprovado pelo cliente.
 ## Emissor
 
 ```text
-Billing Service
+oficina-billing-service
+```
+
+## Tópico canônico
+
+```text
+oficina.billing.orcamento-aprovado
 ```
 
 ## Consumidores potenciais
 
 ```text
-Execution Service
-OS Service
-Saga
+oficina-os-service
+oficina-execution-service
 ```

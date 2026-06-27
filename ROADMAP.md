@@ -23,6 +23,7 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
 - Saga Pattern definido como orquestrado pelo `oficina-os-service`.
 - Persistência poliglota definida por microsserviço.
 - Estratégia de CI/CD independente definida por microsserviço.
+- Decisão de separar o código de infraestrutura em um novo repositório unificado, a ser criado, consolidando as responsabilidades hoje distribuídas entre `oficina-infra-db` e `oficina-infra-k8s`.
 - Contratos fundamentais criados para:
   - APIs REST;
   - eventos de domínio;
@@ -125,7 +126,15 @@ templates/kubernetes/base/
 
 **Critério de pronto:** um agente deve conseguir criar um novo microsserviço consistente usando o template sem reinterpretar a arquitetura.
 
-### 7. Padrão de observabilidade distribuída
+### 7. Repositório unificado de infraestrutura
+
+**Situação atual:** os repositórios `oficina-infra-db` e `oficina-infra-k8s` existem como referências separadas para banco de dados e Kubernetes.
+
+**Definição faltante:** criar um novo repositório de infraestrutura que unifique as responsabilidades atualmente separadas entre `oficina-infra-db` e `oficina-infra-k8s`.
+
+**Critério de pronto:** o novo repositório deve concentrar os artefatos de infraestrutura compartilhada da suíte, mantendo nomes de ambientes, secrets, variáveis, manifests, migrations e padrões de deploy compatíveis com os contratos e decisões deste repositório.
+
+### 8. Padrão de observabilidade distribuída
 
 **Situação atual:** observabilidade é requisito recorrente nas ADRs, mas falta contrato operacional detalhado.
 
@@ -139,7 +148,7 @@ docs/observability.md
 
 **Critério de pronto:** todos os serviços devem expor o mesmo conjunto mínimo de sinais e propagar `correlationId` em HTTP, eventos e logs.
 
-### 8. Padrão de erros e idempotência
+### 9. Padrão de erros e idempotência
 
 **Situação atual:** o contrato REST cita idempotência para criação, mas faltam respostas de erro padronizadas e regras de reprocessamento.
 
@@ -184,6 +193,7 @@ contracts/idempotency.md
 3. Criar pipeline padrão de CI/CD.
 4. Criar manifests Kubernetes base.
 5. Criar documentação local padrão para cada repositório.
+6. Definir o escopo do novo repositório unificado de infraestrutura que substituirá a separação entre `oficina-infra-db` e `oficina-infra-k8s`.
 
 **Resultado esperado:** agentes conseguem criar ou evoluir repositórios de serviço seguindo o mesmo padrão.
 
@@ -239,6 +249,7 @@ contracts/idempotency.md
 - [ ] Criar padrão de migrations para PostgreSQL.
 - [ ] Criar padrão de tabelas/streams para DynamoDB.
 - [ ] Criar padrão Outbox por serviço.
+- [ ] Definir escopo e responsabilidades do novo repositório unificado de infraestrutura.
 
 ### Épico C — Saga
 
@@ -257,6 +268,7 @@ contracts/idempotency.md
 - [ ] Criar propagação de `correlationId`.
 - [ ] Criar manifests Kubernetes base.
 - [ ] Criar pipeline padrão de CI/CD.
+- [ ] Planejar a migração de `oficina-infra-db` e `oficina-infra-k8s` para o novo repositório unificado de infraestrutura.
 - [ ] Criar checklist de deploy independente.
 - [ ] Criar runbooks mínimos.
 

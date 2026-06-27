@@ -65,6 +65,8 @@ Operações de criação que possam ser repetidas por falhas de rede devem aceit
 X-Idempotency-Key
 ```
 
+O comportamento esperado para retries, duplicidade, timeout, Saga e consumidores de eventos é definido em `contracts/idempotency.md`.
+
 ### Erros
 
 Todas as respostas de erro devem seguir o contrato padronizado em `contracts/error-model.md`, incluindo `correlationId` para rastreabilidade entre HTTP, eventos, logs e traces.
@@ -211,7 +213,7 @@ POST /api/v1/orcamentos
 
 Solicita a geração de um orçamento para uma Ordem de Serviço já existente.
 
-O `billing-service` não deve receber a lista completa de itens no payload. Os itens de peças e serviços devem ser obtidos a partir da Ordem de Serviço, por consulta síncrona ao `oficina-os-service` ou por projeção local alimentada por eventos.
+O `oficina-billing-service` não deve receber a lista completa de itens no payload. Os itens de peças e serviços devem ser obtidos a partir da Ordem de Serviço, por consulta síncrona ao `oficina-os-service` ou por projeção local alimentada por eventos.
 
 Exemplo:
 
@@ -490,7 +492,7 @@ Mudanças de estado relevantes devem gerar eventos de domínio publicados por me
 Os eventos são definidos no documento:
 
 ```text
-contratos/eventos-dominio.md
+contracts/Contrato de Eventos de Domínio.md
 ```
 
 ## Compatibilidade

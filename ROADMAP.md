@@ -207,9 +207,9 @@ docs/observability.md
 
 ### 11. Padrão de erros e idempotência
 
-**Situação atual:** o contrato REST cita idempotência para criação, mas faltam respostas de erro padronizadas e regras de reprocessamento.
+**Situação atual:** existem contratos formais para respostas de erro REST e idempotência, referenciados pelo contrato REST e refletidos nas especificações OpenAPI iniciais.
 
-**Definição faltante:** documentar formato único de erro, códigos HTTP, chaves de idempotência, tratamento de duplicidade e comportamento esperado para consumidores de eventos.
+**Definição faltante:** manter as OpenAPI e as implementações dos microsserviços coerentes com o formato único de erro, os códigos HTTP, as chaves de idempotência, o tratamento de duplicidade e o comportamento esperado para consumidores de eventos.
 
 **Artefatos sugeridos:**
 
@@ -296,7 +296,7 @@ contracts/idempotency.md
 - [x] Criar OpenAPI do `oficina-billing-service`.
 - [x] Criar OpenAPI do `oficina-execution-service`.
 - [x] Criar contrato de erros REST.
-- [ ] Criar contrato de idempotência.
+- [x] Criar contrato de idempotência.
 
 ### Épico B — Microsserviços
 
@@ -368,4 +368,4 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é criar o contrato de idempotência antes de evoluir os repositórios dos microsserviços. Essa etapa complementa o modelo de erros REST e define comportamento esperado para retries, duplicidade, timeout e reprocessamento.
+O próximo passo mais importante é criar a matriz de ownership por microsserviço. Essa etapa inicia o Marco 2 e permite que agentes identifiquem rapidamente onde implementar entidades, APIs, eventos, bancos, jobs/outbox e integrações externas.

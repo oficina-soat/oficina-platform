@@ -156,6 +156,8 @@ O campo `details` deve ser usado para erros `400` ou `422` quando múltiplos cam
 | `RESOURCE_NOT_FOUND` | 404 | Entidade inexistente. |
 | `DUPLICATE_RESOURCE` | 409 | Tentativa de criar recurso já existente. |
 | `INVALID_STATE_TRANSITION` | 409 | Operação incompatível com o estado atual da entidade. |
+| `IDEMPOTENCY_KEY_REQUIRED` | 400 | Operação crítica exige `X-Idempotency-Key`. |
+| `IDEMPOTENCY_IN_PROGRESS` | 409 | Chave já aceita e ainda em processamento. |
 | `IDEMPOTENCY_CONFLICT` | 409 | Reuso de `X-Idempotency-Key` com payload divergente. |
 | `BUSINESS_RULE_VIOLATION` | 422 | Regra de negócio rejeitou a operação. |
 | `RATE_LIMIT_EXCEEDED` | 429 | Limite de taxa excedido. |

@@ -406,6 +406,7 @@ components:
       name: X-Idempotency-Key
       in: header
       required: false
+      description: Chave opcional para retries seguros conforme contracts/idempotency.md.
       schema:
         type: string
         minLength: 8

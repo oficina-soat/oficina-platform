@@ -22,8 +22,13 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
 - Comunicação definida como híbrida, combinando APIs REST e mensageria assíncrona.
 - Saga Pattern definido como orquestrado pelo `oficina-os-service`.
 - Persistência poliglota definida por microsserviço.
+- Estratégia de PostgreSQL definida para a Fase 4 como uma única instância Amazon RDS compartilhada, com databases independentes por microsserviço relacional:
+  - `oficina_os`, acessado apenas pelo `oficina-os-service`;
+  - `oficina_billing`, acessado apenas pelo `oficina-billing-service`.
+- Uso de Amazon DynamoDB definido para o `oficina-execution-service`, atendendo ao requisito de banco não relacional.
 - Estratégia de CI/CD independente definida por microsserviço.
 - Decisão de separar o código de infraestrutura em um novo repositório unificado, a ser criado, consolidando as responsabilidades hoje distribuídas entre `oficina-infra-db` e `oficina-infra-k8s`.
+- Enunciado da Fase 4 incluído como referência normativa em `docs/Enunciado Fase 4.md`.
 - Contratos fundamentais criados para:
   - APIs REST;
   - eventos de domínio;
@@ -134,7 +139,36 @@ templates/kubernetes/base/
 
 **Critério de pronto:** o novo repositório deve concentrar os artefatos de infraestrutura compartilhada da suíte, mantendo nomes de ambientes, secrets, variáveis, manifests, migrations e padrões de deploy compatíveis com os contratos e decisões deste repositório.
 
-### 8. Padrão de observabilidade distribuída
+### 8. Isolamento dos bancos PostgreSQL na Fase 4
+
+**Situação atual:** o enunciado exige banco de dados próprio por microsserviço, pelo menos um banco SQL, pelo menos um banco NoSQL e proíbe acesso direto ao banco de outro serviço.
+
+**Decisão:** para reduzir custo e complexidade operacional na Fase 4, `oficina-os-service` e `oficina-billing-service` usarão uma única instância Amazon RDS for PostgreSQL compartilhada, mas com databases independentes, usuários independentes, credenciais independentes e migrações independentes por serviço.
+
+**Configuração canônica:**
+
+```text
+Amazon RDS for PostgreSQL
++-- database: oficina_os
+|   +-- owner: oficina_os_user
++-- database: oficina_billing
+    +-- owner: oficina_billing_user
+
+Amazon DynamoDB
++-- tabelas do oficina-execution-service
+```
+
+**Restrições obrigatórias:**
+
+- O `oficina-os-service` não pode acessar o database `oficina_billing`.
+- O `oficina-billing-service` não pode acessar o database `oficina_os`.
+- Nenhum serviço pode executar joins, queries ou migrations sobre estruturas pertencentes a outro microsserviço.
+- A comunicação entre serviços deve ocorrer exclusivamente por APIs REST e eventos de domínio.
+- O `oficina-execution-service` permanece em Amazon DynamoDB para atender ao requisito de banco não relacional.
+
+**Critério de pronto:** a infraestrutura deve criar databases, usuários, permissões, secrets e connection strings separados por microsserviço, demonstrando ownership e isolamento lógico mesmo com instância RDS compartilhada.
+
+### 9. Padrão de observabilidade distribuída
 
 **Situação atual:** observabilidade é requisito recorrente nas ADRs, mas falta contrato operacional detalhado.
 
@@ -148,7 +182,7 @@ docs/observability.md
 
 **Critério de pronto:** todos os serviços devem expor o mesmo conjunto mínimo de sinais e propagar `correlationId` em HTTP, eventos e logs.
 
-### 9. Padrão de erros e idempotência
+### 10. Padrão de erros e idempotência
 
 **Situação atual:** o contrato REST cita idempotência para criação, mas faltam respostas de erro padronizadas e regras de reprocessamento.
 
@@ -194,6 +228,7 @@ contracts/idempotency.md
 4. Criar manifests Kubernetes base.
 5. Criar documentação local padrão para cada repositório.
 6. Definir o escopo do novo repositório unificado de infraestrutura que substituirá a separação entre `oficina-infra-db` e `oficina-infra-k8s`.
+7. Criar padrão de provisionamento para o RDS PostgreSQL compartilhado com databases, usuários, secrets e migrations isolados por microsserviço.
 
 **Resultado esperado:** agentes conseguem criar ou evoluir repositórios de serviço seguindo o mesmo padrão.
 
@@ -250,6 +285,7 @@ contracts/idempotency.md
 - [ ] Criar padrão de tabelas/streams para DynamoDB.
 - [ ] Criar padrão Outbox por serviço.
 - [ ] Definir escopo e responsabilidades do novo repositório unificado de infraestrutura.
+- [ ] Criar padrão de isolamento para `oficina_os` e `oficina_billing` no RDS PostgreSQL compartilhado.
 
 ### Épico C — Saga
 
@@ -269,6 +305,7 @@ contracts/idempotency.md
 - [ ] Criar manifests Kubernetes base.
 - [ ] Criar pipeline padrão de CI/CD.
 - [ ] Planejar a migração de `oficina-infra-db` e `oficina-infra-k8s` para o novo repositório unificado de infraestrutura.
+- [ ] Provisionar RDS PostgreSQL compartilhado com databases e usuários independentes para OS e Billing.
 - [ ] Criar checklist de deploy independente.
 - [ ] Criar runbooks mínimos.
 

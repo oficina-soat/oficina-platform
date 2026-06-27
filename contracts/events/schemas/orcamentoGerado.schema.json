@@ -24,6 +24,7 @@
       "required": [
         "orcamentoId",
         "ordemServicoId",
+        "itens",
         "valorTotal",
         "status",
         "geradoEm"
@@ -41,16 +42,11 @@
         "status": {
           "const": "GERADO"
         },
-        "servicos": {
+        "itens": {
           "type": "array",
+          "minItems": 1,
           "items": {
-            "$ref": "./common.schema.json#/$defs/itemServico"
-          }
-        },
-        "pecas": {
-          "type": "array",
-          "items": {
-            "$ref": "./common.schema.json#/$defs/itemPeca"
+            "$ref": "./common.schema.json#/$defs/itemOrcamento"
           }
         },
         "geradoEm": {
@@ -72,6 +68,26 @@
       "payload": {
         "orcamentoId": "53c52fe8-13cf-4568-9a64-d4f548134b8b",
         "ordemServicoId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+        "itens": [
+          {
+            "tipo": "PECA",
+            "itemId": "19fdd9ab-cf1f-4074-a96b-80ae86fba7b0",
+            "referenciaCatalogoId": "c173a8b6-90c1-4532-bfc5-1866c506b1fe",
+            "nome": "Volante",
+            "quantidade": 2.0,
+            "valorUnitario": 50.0,
+            "valorTotal": 100.0
+          },
+          {
+            "tipo": "SERVICO",
+            "itemId": "b96e7e7f-b1f7-4c55-b42a-61c53ab06caa",
+            "referenciaCatalogoId": "8e75c272-c0ac-4afa-8b41-6a1be6f40356",
+            "nome": "Troca de oleo",
+            "quantidade": 1.0,
+            "valorUnitario": 300.0,
+            "valorTotal": 300.0
+          }
+        ],
         "valorTotal": 400.0,
         "status": "GERADO",
         "geradoEm": "2026-06-23T16:05:00Z"

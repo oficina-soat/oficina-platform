@@ -229,10 +229,32 @@ Resposta esperada:
 {
   "orcamentoId": "uuid",
   "ordemServicoId": "uuid",
+  "itens": [
+    {
+      "tipo": "PECA",
+      "itemId": "uuid",
+      "referenciaCatalogoId": "uuid",
+      "nome": "Volante",
+      "quantidade": 2.000,
+      "valorUnitario": 50.00,
+      "valorTotal": 100.00
+    },
+    {
+      "tipo": "SERVICO",
+      "itemId": "uuid",
+      "referenciaCatalogoId": "uuid",
+      "nome": "Troca de oleo",
+      "quantidade": 1.000,
+      "valorUnitario": 250.00,
+      "valorTotal": 250.00
+    }
+  ],
   "valorTotal": 350.00,
   "status": "GERADO"
 }
 ```
+
+Os itens do orçamento são snapshots financeiros calculados e persistidos pelo `oficina-billing-service` a partir dos itens da Ordem de Serviço. Eles devem preservar a composição usada para aprovação e pagamento, sem criar ownership do catálogo técnico no Billing.
 
 ### Consultar orçamento
 

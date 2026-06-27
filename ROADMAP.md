@@ -125,6 +125,12 @@ docs/oficina-app-decomposition.md
 
 **Definição faltante:** detalhar, durante a implementação dos microsserviços, os mapeamentos finais de classes, testes, migrations e seeds executáveis conforme cada repositório evoluir.
 
+Uma proposta inicial para as baselines PostgreSQL decompostas de `oficina-os-service` e `oficina-billing-service` foi registrada em:
+
+```text
+docs/postgres-migrations-decomposition.md
+```
+
 **Critério de pronto:** cada componente relevante do `oficina-app` deve possuir destino explícito, estratégia de seed ou descarte, e critério de retenção apenas como referência.
 
 ### 6. Fluxos da Saga em formato executável para implementação
@@ -308,6 +314,7 @@ contracts/idempotency.md
 - [x] Criar matriz de ownership por microsserviço.
 - [x] Criar plano de decomposição do `oficina-app` por componente e microsserviço destino.
 - [x] Definir estratégia de migração ou descarte do `oficina-app` após a decomposição.
+- [x] Criar proposta inicial de migrations PostgreSQL decompostas para OS e Billing.
 - [ ] Criar template base Quarkus.
 - [ ] Criar padrão de configuração por ambiente.
 - [ ] Criar padrão de health checks.
@@ -372,4 +379,4 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é criar o plano de decomposição do `oficina-app` por componente e microsserviço destino. Essa etapa usa a matriz de ownership para orientar a migração de controllers, services, entidades, DTOs, repositories, migrations e testes para os três microsserviços.
+O próximo passo mais importante é avaliar a proposta de migrations PostgreSQL decompostas em `docs/postgres-migrations-decomposition.md` e, após os ajustes de modelagem, criar o template base Quarkus dos microsserviços preservando a estrutura do `oficina-app`.

@@ -40,6 +40,19 @@ paths:
                   value:
                     orcamentoId: 53c52fe8-13cf-4568-9a64-d4f548134b8b
                     ordemServicoId: d290f1ee-6c54-4b01-90e6-d701748f0851
+                    itens:
+                      - tipo: PECA
+                        itemId: 19fdd9ab-cf1f-4074-a96b-80ae86fba7b0
+                        nome: Volante
+                        quantidade: 2.0
+                        valorUnitario: 50.0
+                        valorTotal: 100.0
+                      - tipo: SERVICO
+                        itemId: b96e7e7f-b1f7-4c55-b42a-61c53ab06caa
+                        nome: Troca de oleo
+                        quantidade: 1.0
+                        valorUnitario: 250.0
+                        valorTotal: 250.0
                     valorTotal: 350.0
                     status: GERADO
                     criadoEm: "2026-06-23T15:30:00Z"
@@ -385,7 +398,7 @@ components:
           type: string
     Orcamento:
       type: object
-      required: [orcamentoId, ordemServicoId, valorTotal, status, criadoEm, atualizadoEm]
+      required: [orcamentoId, ordemServicoId, itens, valorTotal, status, criadoEm, atualizadoEm]
       properties:
         orcamentoId:
           type: string
@@ -393,6 +406,11 @@ components:
         ordemServicoId:
           type: string
           format: uuid
+        itens:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/ItemOrcamento"
         valorTotal:
           type: number
           format: decimal
@@ -408,6 +426,37 @@ components:
     StatusOrcamento:
       type: string
       enum: [GERADO, APROVADO, RECUSADO]
+    ItemOrcamento:
+      type: object
+      required: [tipo, itemId, nome, quantidade, valorUnitario, valorTotal]
+      properties:
+        tipo:
+          $ref: "#/components/schemas/TipoItemOrcamento"
+        itemId:
+          type: string
+          format: uuid
+          description: Identificador do item de peca ou servico na Ordem de Servico.
+        referenciaCatalogoId:
+          type: string
+          format: uuid
+          description: Identificador opcional do item no catalogo tecnico do execution service.
+        nome:
+          type: string
+        quantidade:
+          type: number
+          format: decimal
+          exclusiveMinimum: 0
+        valorUnitario:
+          type: number
+          format: decimal
+          minimum: 0
+        valorTotal:
+          type: number
+          format: decimal
+          minimum: 0
+    TipoItemOrcamento:
+      type: string
+      enum: [PECA, SERVICO]
     PagamentoCreateRequest:
       type: object
       required: [ordemServicoId, orcamentoId, valor, metodo]

@@ -116,6 +116,48 @@
         "ESTORNO"
       ]
     },
+    "tipoItemOrcamento": {
+      "type": "string",
+      "enum": [
+        "PECA",
+        "SERVICO"
+      ]
+    },
+    "itemOrcamento": {
+      "type": "object",
+      "required": [
+        "tipo",
+        "itemId",
+        "nome",
+        "quantidade",
+        "valorUnitario",
+        "valorTotal"
+      ],
+      "properties": {
+        "tipo": {
+          "$ref": "#/$defs/tipoItemOrcamento"
+        },
+        "itemId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "referenciaCatalogoId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "nome": {
+          "type": "string"
+        },
+        "quantidade": {
+          "$ref": "#/$defs/quantity"
+        },
+        "valorUnitario": {
+          "$ref": "#/$defs/money"
+        },
+        "valorTotal": {
+          "$ref": "#/$defs/money"
+        }
+      },
+      "additionalProperties": false
+    },
     "itemServico": {
       "type": "object",
       "required": [

@@ -29,6 +29,11 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
   - `oficina_billing`, acessado apenas pelo `oficina-billing-service`.
 - Uso de Amazon DynamoDB definido para o `oficina-execution-service`, atendendo ao requisito de banco não relacional.
 - Estratégia de CI/CD independente definida por microsserviço.
+- Conta, regiao e ambiente AWS canonicos definidos em `docs/aws-environments.md`:
+  - conta AWS `415459106622`;
+  - regiao `us-east-1`;
+  - ambiente `lab`;
+  - infraestrutura compartilhada `eks-lab`.
 - Decisão de separar o código de infraestrutura em um novo repositório unificado, a ser criado, consolidando as responsabilidades hoje distribuídas entre `oficina-infra-db` e `oficina-infra-k8s`.
 - Enunciado da Fase 4 incluído como referência normativa em `docs/Enunciado Fase 4.md`.
 - Contratos fundamentais criados para:
@@ -330,6 +335,7 @@ contracts/idempotency.md
 - [ ] Criar propagação de `correlationId`.
 - [ ] Criar manifests Kubernetes base.
 - [ ] Criar pipeline padrão de CI/CD.
+- [ ] Normalizar valores legados de conta, região e ambiente AWS nos repositórios antigos conforme `docs/aws-environments.md`.
 - [ ] Planejar a migração de `oficina-infra-db` e `oficina-infra-k8s` para o novo repositório unificado de infraestrutura.
 - [ ] Provisionar RDS PostgreSQL compartilhado com databases e usuários independentes para OS e Billing.
 - [ ] Criar checklist de deploy independente.

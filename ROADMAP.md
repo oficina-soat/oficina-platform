@@ -104,24 +104,28 @@ docs/service-ownership.md
 
 ### 5. Plano de decomposição do `oficina-app`
 
-**Situação atual:** o `oficina-app` representa a base de código existente que será usada como referência e origem da migração para a arquitetura de microsserviços da Fase 4.
+**Situação atual:** o plano inicial de decomposição foi criado em `docs/oficina-app-decomposition.md`, usando o `oficina-app` como referência de código, testes e seed funcional para a arquitetura de microsserviços da Fase 4.
 
 **Decisão:** o código do `oficina-app` será dividido entre `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, respeitando os limites de responsabilidade, contratos REST, eventos, bancos e regras de ownership definidos neste repositório.
 
-**Definições faltantes:**
+Também foi definido que:
 
-- Mapear controllers, services, entidades, DTOs, repositories, migrations e testes do `oficina-app` para o microsserviço destino.
-- Definir quais partes do `oficina-app` serão removidas, arquivadas ou mantidas apenas como referência após a migração.
-- Definir a estratégia de migração de dados do modelo atual para `oficina_os`, `oficina_billing` e DynamoDB.
-- Definir como o front-end ou consumidores atuais deixarão de chamar o `oficina-app` e passarão a chamar os novos endpoints dos microsserviços.
+- `Pessoa` e `Usuario` pertencem ao `oficina-os-service`;
+- não será criada biblioteca `common` compartilhada entre os microsserviços;
+- não haverá migração histórica de dados;
+- a massa inicial da Fase 4 será criada por seed limpo, reaproveitando os dados funcionais do `import.sql` atual do `oficina-app`;
+- não há front-end ou consumidores externos a migrar neste cenário;
+- após a decomposição, o `oficina-app` fica apenas como referência histórica.
 
-**Artefato sugerido:**
+**Artefato:**
 
 ```text
 docs/oficina-app-decomposition.md
 ```
 
-**Critério de pronto:** cada componente relevante do `oficina-app` deve possuir destino explícito, estratégia de migração e critério de descarte ou retenção como referência.
+**Definição faltante:** detalhar, durante a implementação dos microsserviços, os mapeamentos finais de classes, testes, migrations e seeds executáveis conforme cada repositório evoluir.
+
+**Critério de pronto:** cada componente relevante do `oficina-app` deve possuir destino explícito, estratégia de seed ou descarte, e critério de retenção apenas como referência.
 
 ### 6. Fluxos da Saga em formato executável para implementação
 
@@ -302,8 +306,8 @@ contracts/idempotency.md
 
 - [x] Criar repositórios independentes `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`.
 - [x] Criar matriz de ownership por microsserviço.
-- [ ] Criar plano de decomposição do `oficina-app` por componente e microsserviço destino.
-- [ ] Definir estratégia de migração ou descarte do `oficina-app` após a decomposição.
+- [x] Criar plano de decomposição do `oficina-app` por componente e microsserviço destino.
+- [x] Definir estratégia de migração ou descarte do `oficina-app` após a decomposição.
 - [ ] Criar template base Quarkus.
 - [ ] Criar padrão de configuração por ambiente.
 - [ ] Criar padrão de health checks.

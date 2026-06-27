@@ -26,7 +26,7 @@ Esta matriz deve ser usada por agentes e desenvolvedores para decidir onde imple
 
 | Serviço | Dono de | Banco | Papel na Saga |
 |---|---|---|---|
-| `oficina-os-service` | Clientes, veículos, Ordem de Serviço, itens da OS, histórico de estados e estado da Saga | PostgreSQL database `oficina_os` | Orquestrador |
+| `oficina-os-service` | Pessoas, usuários, clientes, veículos, Ordem de Serviço, itens da OS, histórico de estados e estado da Saga | PostgreSQL database `oficina_os` | Orquestrador |
 | `oficina-billing-service` | Orçamentos, aprovações, recusas, pagamentos e integração financeira | PostgreSQL database `oficina_billing` | Participante financeiro |
 | `oficina-execution-service` | Catálogo técnico de peças e serviços, estoque, diagnóstico, execução e reparo | Amazon DynamoDB | Participante operacional |
 
@@ -38,7 +38,7 @@ Esta matriz deve ser usada por agentes e desenvolvedores para decidir onde imple
 
 | Dimensão | Responsabilidade |
 |---|---|
-| Entidades próprias | Cliente, Veículo, Ordem de Serviço, item de peça da OS, item de serviço da OS, histórico de estados, estado da Saga. |
+| Entidades próprias | Pessoa, Usuário, Cliente, Veículo, Ordem de Serviço, item de peça da OS, item de serviço da OS, histórico de estados, estado da Saga. |
 | Banco de dados | Amazon RDS for PostgreSQL, database `oficina_os`, usuário `oficina_os_user`. |
 | APIs REST | `/api/v1/clientes`, `/api/v1/clientes/{clienteId}`, `/api/v1/clientes/{clienteId}/veiculos`, `/api/v1/veiculos/{veiculoId}`, `/api/v1/ordens-servico`, `/api/v1/ordens-servico/{ordemServicoId}`, `/api/v1/ordens-servico/{ordemServicoId}/historico`, `/api/v1/ordens-servico/{ordemServicoId}/estado`, `/api/v1/ordens-servico/{ordemServicoId}/cancelamento`. |
 | Eventos produzidos | `ordemDeServicoCriada`, `pecaIncluidaNaOrdemDeServico`, `servicoIncluidoNaOrdemDeServico`, `ordemDeServicoFinalizada`, `ordemDeServicoEntregue`, `sagaCompensada`, `sagaFinalizadaComSucesso`. |
@@ -128,6 +128,8 @@ O `oficina-execution-service` não deve:
 
 | Entidade ou conceito | Serviço dono | Observação |
 |---|---|---|
+| Pessoa | `oficina-os-service` | Cadastro operacional herdado do `oficina-app`, usado por usuários e clientes. |
+| Usuário | `oficina-os-service` | Usuários e papéis operacionais da oficina. |
 | Cliente | `oficina-os-service` | Usado na abertura e consulta da OS. |
 | Veículo | `oficina-os-service` | Associado ao cliente e à OS. |
 | Ordem de Serviço | `oficina-os-service` | Agregado central do fluxo. |
@@ -207,4 +209,3 @@ Critérios usados:
 - `contracts/Contrato de Eventos de Domínio.md`
 - `contracts/Contrato de Tópicos de Mensageria.md`
 - `contracts/openapi/`
-

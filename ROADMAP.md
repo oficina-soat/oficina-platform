@@ -29,8 +29,8 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
   - `oficina_billing`, acessado apenas pelo `oficina-billing-service`.
 - Uso de Amazon DynamoDB definido para o `oficina-execution-service`, atendendo ao requisito de banco não relacional.
 - Estratégia de CI/CD independente definida por microsserviço.
-- Conta, regiao e ambiente AWS canonicos definidos em `docs/aws-environments.md`:
-  - conta AWS `415459106622`;
+- Conta, regiao e ambiente AWS definidos em `docs/aws-environments.md`:
+  - conta AWS parametrizada por `AWS_ACCOUNT_ID`, sem numero fixo canonico;
   - regiao `us-east-1`;
   - ambiente `lab`;
   - infraestrutura compartilhada `eks-lab`.

@@ -6,25 +6,31 @@ Os valores abaixo foram consolidados a partir dos repositórios já existentes d
 
 ---
 
-## Conta AWS canonica
+## Conta AWS
 
-Para a Fase 4, a conta AWS canonica da suite é:
+A conta AWS nao deve ser tratada como valor canonico fixo da arquitetura. Em ambientes academicos e laboratoriais, o numero da conta pode mudar entre execucoes, turmas ou credenciais temporarias.
 
-```text
-415459106622
-```
-
-Essa conta aparece nos ARNs de laboratório usados pelos manifests e exemplos de Terraform da infraestrutura Kubernetes.
-
-Exemplos de roles já usadas:
+O valor deve ser resolvido em tempo de deploy por:
 
 ```text
-arn:aws:iam::415459106622:role/c207442a5275926l14475550t1w415459-LabEksClusterRole-ZJrT0UsVDXGR
-arn:aws:iam::415459106622:role/c207442a5275926l14475550t1w415459106-LabEksNodeRole-o7WajVdYdjUf
-arn:aws:iam::415459106622:role/voclabs
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 ```
 
-Qualquer valor antigo apontando para outra conta deve ser tratado como legado e normalizado antes de novos deployments.
+Variavel padronizada:
+
+```text
+AWS_ACCOUNT_ID=<aws-account-id>
+```
+
+ARNs, buckets e referencias IAM devem ser parametrizados com `<aws-account-id>`:
+
+```text
+arn:aws:iam::<aws-account-id>:role/<lab-eks-cluster-role>
+arn:aws:iam::<aws-account-id>:role/<lab-eks-node-role>
+arn:aws:iam::<aws-account-id>:role/voclabs
+```
+
+Valores numericos de conta encontrados em repositórios antigos devem ser tratados como exemplos ou legados locais. Novos artefatos nao devem depender de uma conta AWS hardcoded.
 
 ---
 
@@ -99,7 +105,7 @@ Recursos derivados:
 ```text
 VPC: eks-lab-vpc
 HTTP API Gateway: eks-lab-http-api
-Terraform shared bucket: tf-shared-eks-lab-415459106622-us-east-1
+Terraform shared bucket: tf-shared-eks-lab-<aws-account-id>-us-east-1
 ```
 
 ---
@@ -109,7 +115,7 @@ Terraform shared bucket: tf-shared-eks-lab-415459106622-us-east-1
 Bucket compartilhado canonico:
 
 ```text
-tf-shared-eks-lab-415459106622-us-east-1
+tf-shared-eks-lab-<aws-account-id>-us-east-1
 ```
 
 Chaves de state usadas por escopo:
@@ -125,8 +131,8 @@ oficina/lab/database/terraform.tfstate
 Variáveis padronizadas:
 
 ```text
-TF_STATE_BUCKET=tf-shared-eks-lab-415459106622-us-east-1
-TERRAFORM_SHARED_DATA_BUCKET_NAME=tf-shared-eks-lab-415459106622-us-east-1
+TF_STATE_BUCKET=tf-shared-eks-lab-<aws-account-id>-us-east-1
+TERRAFORM_SHARED_DATA_BUCKET_NAME=tf-shared-eks-lab-<aws-account-id>-us-east-1
 TF_STATE_REGION=us-east-1
 ```
 
@@ -170,7 +176,7 @@ APP_SECRET_NAME=oficina/lab/database/app
 
 Antes de evoluir o novo repositório unificado de infraestrutura, revisar e normalizar os seguintes pontos encontrados nos repositórios antigos:
 
-- Remover ou substituir defaults antigos de IAM roles que apontem para conta diferente de `415459106622`.
+- Remover ou parametrizar contas AWS hardcoded em ARNs, nomes de buckets e exemplos de Terraform.
 - Normalizar qualquer ocorrência local de `simple-eks` para `eks-lab`, quando o valor representar o cluster EKS da suite.
 - Atualizar contratos de secrets de banco para refletir a separação futura entre `oficina_os` e `oficina_billing`.
 - Garantir que os três microsserviços novos usem `DEPLOYMENT_ENVIRONMENT=lab` e `deployment.environment=lab` em logs, métricas e traces.

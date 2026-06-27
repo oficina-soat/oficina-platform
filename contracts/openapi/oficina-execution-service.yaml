@@ -814,3 +814,36 @@ components:
         correlationId:
           type: string
           example: 7f4d0c4b6b8a4bb8a2f49bb8f06e1c3d
+        requestId:
+          type: string
+          format: uuid
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        traceId:
+          type: string
+          example: 4bf92f3577b34da6a3ce929d0e0e4736
+        spanId:
+          type: string
+          example: 00f067aa0ba902b7
+        service:
+          type: string
+          example: oficina-execution-service
+        logReference:
+          type: string
+          example: oficina-execution-service/2026-06-23/7f4d0c4b6b8a4bb8a2f49bb8f06e1c3d
+        details:
+          type: array
+          items:
+            $ref: "#/components/schemas/ErrorDetail"
+    ErrorDetail:
+      type: object
+      required: [code, message]
+      properties:
+        field:
+          type: string
+          example: pecaId
+        code:
+          type: string
+          example: REQUIRED
+        message:
+          type: string
+          example: Campo obrigatorio.

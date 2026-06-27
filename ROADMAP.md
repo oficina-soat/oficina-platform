@@ -295,7 +295,7 @@ contracts/idempotency.md
 - [x] Criar OpenAPI do `oficina-os-service`.
 - [x] Criar OpenAPI do `oficina-billing-service`.
 - [x] Criar OpenAPI do `oficina-execution-service`.
-- [ ] Criar contrato de erros REST.
+- [x] Criar contrato de erros REST.
 - [ ] Criar contrato de idempotência.
 
 ### Épico B — Microsserviços
@@ -368,4 +368,4 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é normalizar eventos e tópicos antes de evoluir os repositórios dos microsserviços. Essa etapa reduz inconsistências de vocabulário e evita que agentes propaguem nomes divergentes para implementações, testes e pipelines.
+O próximo passo mais importante é criar o contrato de idempotência antes de evoluir os repositórios dos microsserviços. Essa etapa complementa o modelo de erros REST e define comportamento esperado para retries, duplicidade, timeout e reprocessamento.

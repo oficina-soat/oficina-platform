@@ -65,6 +65,10 @@ Operações de criação que possam ser repetidas por falhas de rede devem aceit
 X-Idempotency-Key
 ```
 
+### Erros
+
+Todas as respostas de erro devem seguir o contrato padronizado em `contracts/error-model.md`, incluindo `correlationId` para rastreabilidade entre HTTP, eventos, logs e traces.
+
 ---
 
 # Microsserviço: oficina-os-service

@@ -27,7 +27,11 @@ Na decomposicao da Fase 4:
 - Manter a estrutura atual do `oficina-app` como referencia de nomes e dominios, mas separar ownership por servico.
 - Usar snapshots para itens da Ordem de Servico no `oficina-os-service`, sem FK para catalogo tecnico.
 - Persistir itens financeiros do orcamento no `oficina-billing-service`, alinhados ao OpenAPI e ao evento `orcamentoGerado`.
+- Em `orcamento_item`, `item_id` deve referenciar o item da Ordem de Servico; `referencia_catalogo_id` deve guardar opcionalmente a referencia ao catalogo tecnico.
+- Itens do orcamento devem ser imutaveis apos o status `GERADO`; qualquer alteracao de composicao deve gerar novo orcamento ou novo fluxo explicito de substituicao.
+- Cada orcamento deve possuir no maximo um pagamento na Fase 4, usando restricao unica em `pagamento.orcamento_id`.
 - Criar Outbox em cada database PostgreSQL para publicacao confiavel dos eventos de dominio.
+- A Outbox PostgreSQL deve usar apenas os estados `PENDING`, `PUBLISHED` e `FAILED`, sem estado intermediario `PROCESSING`; concorrencia deve ser controlada pelo publicador com lock transacional.
 
 ## oficina-os-service
 
@@ -162,6 +166,10 @@ CREATE INDEX ix_orcamento_ordem_servico ON orcamento (ordem_de_servico_id);
 
 Os itens do orcamento devem ser persistidos pelo Billing como composicao financeira aprovada ou recusada pelo cliente.
 
+O campo `item_id` deve referenciar o item da Ordem de Servico, nao o item do catalogo. Quando existir referencia ao catalogo tecnico, ela deve ser persistida em `referencia_catalogo_id`.
+
+Depois que o orcamento for gerado, os itens devem ser tratados como imutaveis. Mudancas de composicao ou valores devem gerar novo orcamento ou fluxo explicito de substituicao, preservando auditoria sobre o que foi apresentado ao cliente.
+
 ```sql
 CREATE TABLE dominio_tipo_item_orcamento (
   codigo varchar(20) PRIMARY KEY,
@@ -243,6 +251,7 @@ CREATE TABLE pagamento (
   CONSTRAINT fk_pagamento_status
     FOREIGN KEY (status)
     REFERENCES dominio_status_pagamento (codigo),
+  CONSTRAINT uk_pagamento_orcamento UNIQUE (orcamento_id),
   CONSTRAINT ck_pagamento_valor_positivo CHECK (valor > 0)
 );
 
@@ -253,6 +262,8 @@ CREATE INDEX ix_pagamento_orcamento ON pagamento (orcamento_id);
 ## Outbox PostgreSQL
 
 A mesma estrutura pode ser usada em `oficina_os` e `oficina_billing`, dentro do database de cada servico.
+
+Os estados da Outbox devem permanecer restritos a `PENDING`, `PUBLISHED` e `FAILED`. O publicador deve controlar concorrencia com lock transacional, evitando a necessidade de um estado `PROCESSING`.
 
 ```sql
 CREATE TABLE outbox_event (
@@ -280,9 +291,10 @@ CREATE INDEX ix_outbox_event_aggregate
   ON outbox_event (aggregate_id, occurred_at);
 ```
 
-## Pontos para avaliacao
+## Decisoes aprovadas
 
-- Confirmar se `orcamento_item.item_id` deve referenciar o item da OS ou o item do catalogo. A proposta usa item da OS e deixa `referencia_catalogo_id` opcional.
-- Confirmar se os itens do orcamento devem ser imutaveis apos `GERADO`.
-- Confirmar se o pagamento deve permitir mais de um registro por orcamento ou se deve haver restricao unica por `orcamento_id`.
-- Confirmar se a Outbox deve usar `PENDING`, `PUBLISHED`, `FAILED` ou incluir estados intermediarios como `PROCESSING`.
+- `orcamento_item.item_id` referencia o item da OS.
+- `referencia_catalogo_id` e opcional e referencia o catalogo tecnico quando disponivel.
+- Itens do orcamento sao imutaveis apos `GERADO`.
+- `pagamento.orcamento_id` deve ser unico na Fase 4.
+- Outbox usa apenas `PENDING`, `PUBLISHED` e `FAILED`.

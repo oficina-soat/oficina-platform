@@ -90,9 +90,9 @@ contracts/events/schemas/<nome-do-evento>.schema.json
 
 ### 4. Catálogo de responsabilidades por microsserviço
 
-**Situação atual:** as responsabilidades principais estão definidas nas ADRs e contratos, mas ainda não há uma matriz operacional única para agentes.
+**Situação atual:** as responsabilidades principais estão definidas nas ADRs e contratos, e a matriz operacional única para agentes foi criada em `docs/service-ownership.md`.
 
-**Definição faltante:** criar uma matriz de ownership contendo entidades, APIs, eventos produzidos, eventos consumidos, banco de dados, jobs/outbox e integrações externas por microsserviço.
+**Definição faltante:** manter a matriz de ownership atualizada sempre que APIs, eventos, bancos, jobs/outbox, integrações externas ou limites de responsabilidade forem alterados.
 
 **Artefato sugerido:**
 
@@ -301,7 +301,7 @@ contracts/idempotency.md
 ### Épico B — Microsserviços
 
 - [x] Criar repositórios independentes `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`.
-- [ ] Criar matriz de ownership por microsserviço.
+- [x] Criar matriz de ownership por microsserviço.
 - [ ] Criar plano de decomposição do `oficina-app` por componente e microsserviço destino.
 - [ ] Definir estratégia de migração ou descarte do `oficina-app` após a decomposição.
 - [ ] Criar template base Quarkus.
@@ -368,4 +368,4 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é criar a matriz de ownership por microsserviço. Essa etapa inicia o Marco 2 e permite que agentes identifiquem rapidamente onde implementar entidades, APIs, eventos, bancos, jobs/outbox e integrações externas.
+O próximo passo mais importante é criar o plano de decomposição do `oficina-app` por componente e microsserviço destino. Essa etapa usa a matriz de ownership para orientar a migração de controllers, services, entidades, DTOs, repositories, migrations e testes para os três microsserviços.

@@ -134,8 +134,11 @@ Responsável pelo ciclo de vida da Ordem de Serviço.
 
 Responsabilidades principais:
 
+* cadastro de clientes;
+* cadastro de veículos;
 * abertura de ordem de serviço;
 * consulta de ordem de serviço;
+* inclusão de peças e serviços na ordem de serviço com snapshot dos dados selecionados;
 * atualização de status;
 * manutenção do histórico de estados;
 * controle do estado global da OS;
@@ -168,6 +171,9 @@ Responsável pela execução operacional da ordem de serviço.
 
 Responsabilidades principais:
 
+* catálogo técnico de serviços;
+* catálogo técnico de peças;
+* controle de estoque de peças;
 * gerenciamento da fila de execução;
 * registro de diagnóstico;
 * registro do andamento dos reparos;

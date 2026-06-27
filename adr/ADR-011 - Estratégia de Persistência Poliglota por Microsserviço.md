@@ -127,8 +127,6 @@ Responsável por armazenar:
 
 * clientes;
 * veículos;
-* peças;
-* serviços;
 * ordens de serviço;
 * itens da ordem de serviço;
 * histórico de estados;
@@ -141,7 +139,9 @@ Motivos:
 * manutenção do estado global da ordem de serviço;
 * rastreabilidade e auditoria do processo de negócio.
 
-Nesta fase, os cadastros de clientes, veículos, peças e serviços permanecerão neste microsserviço para evitar decomposição excessiva da solução.
+Nesta fase, os cadastros de clientes e veículos permanecerão neste microsserviço por estarem diretamente ligados à abertura e ao ciclo de vida da Ordem de Serviço.
+
+Os itens da Ordem de Serviço devem armazenar snapshots dos dados de peças e serviços selecionados no momento da inclusão, preservando auditoria mesmo quando o catálogo técnico for alterado posteriormente.
 
 ---
 
@@ -179,6 +179,9 @@ Amazon DynamoDB
 
 Responsável por armazenar:
 
+* catálogo de serviços;
+* catálogo de peças;
+* saldo e movimentações de estoque;
 * fila de execução;
 * diagnósticos;
 * registros operacionais;
@@ -190,6 +193,7 @@ Responsável por armazenar:
 Motivos:
 
 * modelo flexível de dados;
+* forte relação entre catálogo técnico, disponibilidade de peças, execução e baixa de estoque;
 * escalabilidade automática;
 * arquitetura serverless;
 * baixo custo operacional;
@@ -291,7 +295,8 @@ Além disso:
 * PostgreSQL permanece nos domínios que exigem forte consistência transacional;
 * Amazon DynamoDB atende ao requisito de banco não relacional com baixo custo operacional;
 * DynamoDB elimina a necessidade de administrar infraestrutura dedicada para o banco NoSQL;
-* a concentração dos cadastros de clientes, veículos, peças e serviços no OS Service reduz a complexidade da solução sem comprometer os objetivos da Fase 4.
+* clientes e veículos permanecem no OS Service por estarem ligados à abertura da Ordem de Serviço;
+* peças, serviços e estoque permanecem no Execution Service por estarem ligados ao catálogo técnico, disponibilidade operacional e execução dos reparos.
 
 ---
 

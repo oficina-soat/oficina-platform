@@ -8,8 +8,8 @@ Os microsserviços canônicos da plataforma possuem repositórios independentes 
 | Repositório | Responsabilidade |
 | --- | --- |
 | `../oficina-os-service` | Gestão da Ordem de Serviço, cadastros principais e orquestração da Saga. |
-| `../oficina-billing-service` | Cobrança, pagamentos, notas fiscais e integrações financeiras. |
-| `../oficina-execution-service` | Diagnóstico, execução, alocação técnica, estoque operacional e finalização do serviço. |
+| `../oficina-billing-service` | Cobrança, pagamentos e integrações financeiras. |
+| `../oficina-execution-service` | Catálogo técnico de peças e serviços, diagnóstico, execução, estoque operacional e finalização do serviço. |
 
 Os repositórios remotos verificados seguem a organização `oficina-soat` no GitHub:
 

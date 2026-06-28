@@ -146,9 +146,9 @@ contracts/saga/oficina-os-saga-v1.md
 
 ### 7. Padrões técnicos para repositórios de microsserviços
 
-**Situação atual:** há decisões sobre CI/CD, deploy independente e governança; o template base Quarkus foi criado em [templates/quarkus-service/](templates/quarkus-service/); e o padrão DynamoDB do `oficina-execution-service` foi definido em [Padrão DynamoDB do oficina-execution-service](docs/dynamodb-execution-service.md).
+**Situação atual:** há decisões sobre CI/CD, deploy independente e governança; o template base Quarkus foi criado em [Template Quarkus de Microsserviço](templates/quarkus-service/README.md); os manifests Kubernetes base foram criados em [Template Kubernetes Base](templates/kubernetes/base/README.md); e o padrão DynamoDB do `oficina-execution-service` foi definido em [Padrão DynamoDB do oficina-execution-service](docs/dynamodb-execution-service.md).
 
-**Definição faltante:** evoluir o template com pipeline, Dockerfile, Kubernetes manifests e documentação local específica quando esses padrões forem fechados.
+**Definição faltante:** evoluir o template com pipeline, Dockerfile e documentação local específica quando esses padrões forem fechados.
 
 **Artefatos sugeridos:**
 
@@ -335,7 +335,7 @@ contracts/idempotency.md
 - [x] Criar padrão de observabilidade.
 - [x] Criar padrão de logs estruturados.
 - [x] Criar propagação de `correlationId`.
-- [ ] Criar manifests Kubernetes base.
+- [x] Criar manifests Kubernetes base.
 - [ ] Criar pipeline padrão de CI/CD.
 - [ ] Normalizar valores legados de conta, região e ambiente AWS nos repositórios antigos conforme [Conta, região e ambientes AWS](docs/aws-environments.md).
 - [ ] Planejar a migração de `oficina-infra-db` e `oficina-infra-k8s` para o novo repositório unificado de infraestrutura.
@@ -375,4 +375,4 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é criar manifests Kubernetes base para os três microsserviços, mantendo coerência com o [Padrão de Observabilidade Distribuída](docs/observability.md), [Conta, região e ambientes AWS](docs/aws-environments.md), [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md) e [Template Quarkus de Microsserviço](templates/quarkus-service/README.md).
+O próximo passo mais importante é criar o pipeline padrão de CI/CD para os três microsserviços, mantendo coerência com a [ADR-012 - Estratégia de CI/CD e Deploy Independente](adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md), [Conta, região e ambientes AWS](docs/aws-environments.md), [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md), [Template Quarkus de Microsserviço](templates/quarkus-service/README.md) e [Template Kubernetes Base](templates/kubernetes/base/README.md).

@@ -22,10 +22,10 @@ Essa decisão reduz custo operacional no ambiente `lab` sem permitir banco compa
 
 ## Databases e usuários
 
-| Microsserviço | Database | Usuário owner | Secret AWS |
-|---|---|---|---|
-| `oficina-os-service` | `oficina_os` | `oficina_os_user` | `oficina/lab/database/oficina-os-service` |
-| `oficina-billing-service` | `oficina_billing` | `oficina_billing_user` | `oficina/lab/database/oficina-billing-service` |
+| Microsserviço | Database | Usuário owner | Secret AWS | Secret Kubernetes |
+|---|---|---|---|---|
+| `oficina-os-service` | `oficina_os` | `oficina_os_user` | `oficina/lab/database/oficina-os-service` | `oficina-os-service-database-env` |
+| `oficina-billing-service` | `oficina_billing` | `oficina_billing_user` | `oficina/lab/database/oficina-billing-service` | `oficina-billing-service-database-env` |
 
 O usuário administrativo do RDS deve ser usado apenas pelo bootstrap de infraestrutura. Workloads Kubernetes, pipelines dos microsserviços, jobs de migrations e aplicações não devem usar a credencial administrativa.
 
@@ -122,6 +122,7 @@ Antes de aplicar ou revisar infraestrutura, confirmar:
 - os usuários `oficina_os_user` e `oficina_billing_user` existem;
 - cada usuário conecta apenas no próprio database;
 - os secrets `oficina/lab/database/oficina-os-service` e `oficina/lab/database/oficina-billing-service` existem sem valores sensíveis em Git;
+- os secrets Kubernetes `oficina-os-service-database-env` e `oficina-billing-service-database-env` materializam apenas as variáveis do próprio serviço;
 - nenhum workload novo usa o secret legado `oficina/lab/database/app`;
 - migrations de domínio permanecem nos repositórios dos microsserviços.
 

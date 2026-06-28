@@ -29,6 +29,8 @@ Copiar o conteúdo deste diretório para o repositório do microsserviço destin
 - perfil de persistência
 - migrations, seeds e configurações específicas do serviço
 
+Para deploy em Kubernetes, usar também o [Template Kubernetes Base](../kubernetes/base/README.md) como referência de `Deployment`, `Service`, `ServiceAccount`, `ConfigMap`, probes, observabilidade e variáveis de runtime.
+
 Comandos esperados:
 
 ```bash

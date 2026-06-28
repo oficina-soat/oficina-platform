@@ -284,20 +284,43 @@ Impacto prático:
 - Streams com `NEW_AND_OLD_IMAGES` facilitam outbox, auditoria e integrações futuras, aumentando o volume de dados processados.
 - Deletion protection `false` facilita teardown do ambiente `lab`; em ambiente permanente, o valor deveria ser `true`.
 
-### IAM e Kubernetes do oficina-execution-service
+### Kubernetes dos microsserviços
 
 Nomes canônicos:
 
 ```text
+Kubernetes Deployment: oficina-os-service
+Kubernetes Service: oficina-os-service
+Kubernetes ServiceAccount: oficina-os-service
+ConfigMap: oficina-os-service-config
+Kubernetes database secret: oficina-os-service-database-env
+
+Kubernetes Deployment: oficina-billing-service
+Kubernetes Service: oficina-billing-service
+Kubernetes ServiceAccount: oficina-billing-service
+ConfigMap: oficina-billing-service-config
+Kubernetes database secret: oficina-billing-service-database-env
+
 Kubernetes Deployment: oficina-execution-service
 Kubernetes Service: oficina-execution-service
 Kubernetes ServiceAccount: oficina-execution-service
 ConfigMap: oficina-execution-service-config
+```
+
+Os manifests base ficam em [Template Kubernetes Base](../templates/kubernetes/base/README.md).
+
+O nome completo dos microsserviços deve ser preservado nos recursos Kubernetes. Secrets Kubernetes materializados no cluster usam nomes sem ambiente quando já estão isolados pelo cluster/namespace. O `oficina-execution-service` não usa secret de banco PostgreSQL.
+
+### IAM do oficina-execution-service
+
+Nomes canônicos:
+
+```text
 IAM role: oficina-execution-service-lab
 IAM policy: oficina-execution-service-lab-dynamodb
 ```
 
-O nome completo `oficina-execution-service` deve ser preservado nos recursos Kubernetes. O sufixo `lab` deve ser usado em recursos AWS globais ou regionais do ambiente de laboratório.
+O sufixo `lab` deve ser usado em recursos AWS globais ou regionais do ambiente de laboratório.
 
 ### State Terraform do novo oficina-infra
 

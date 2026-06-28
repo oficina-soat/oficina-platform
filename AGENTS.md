@@ -163,10 +163,10 @@ git commit -m "<tipo>: <resumo>"
 
 Exemplos válidos:
 
-- `docs: adiciona orientações para agentes do repositorio`
-- `docs: normaliza contratos de eventos e topicos`
-- `docs: adiciona contrato de idempotencia`
-- `chore: adiciona template base de microsservico`
+- `docs: adiciona orientações para agentes do repositório`
+- `docs: normaliza contratos de eventos e tópicos`
+- `docs: adiciona contrato de idempotência`
+- `chore: adiciona template base de microsserviço`
 
 Prefira mensagens curtas, objetivas e diretamente relacionadas à alteração.
 

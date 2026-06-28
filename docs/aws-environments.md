@@ -1,8 +1,8 @@
-# Conta, regiao e ambientes AWS
+# Conta, região e ambientes AWS
 
-Este documento define os valores canonicos de conta, regiao e ambientes AWS da suite da oficina para a Fase 4.
+Este documento define os valores canônicos de conta, região e ambientes AWS da suíte da oficina para a Fase 4.
 
-Os valores abaixo foram consolidados a partir dos repositórios já existentes da suite, especialmente `oficina-infra-k8s`, `oficina-infra-db`, `oficina-app` e `oficina-auth-lambda`.
+Os valores abaixo foram consolidados a partir dos repositórios já existentes da suíte, especialmente `oficina-infra-k8s`, `oficina-infra-db`, `oficina-app` e `oficina-auth-lambda`.
 
 Os nomes detalhados de runtime, secrets, variáveis e padrões de infraestrutura estão consolidados em [infra-runtime-naming.md](infra-runtime-naming.md).
 
@@ -10,7 +10,7 @@ Os nomes detalhados de runtime, secrets, variáveis e padrões de infraestrutura
 
 ## Conta AWS
 
-A conta AWS nao deve ser tratada como valor canonico fixo da arquitetura. Em ambientes academicos e laboratoriais, o numero da conta pode mudar entre execucoes, turmas ou credenciais temporarias.
+A conta AWS não deve ser tratada como valor canônico fixo da arquitetura. Em ambientes acadêmicos e laboratoriais, o número da conta pode mudar entre execuções, turmas ou credenciais temporárias.
 
 O valor deve ser resolvido em tempo de deploy por:
 
@@ -18,13 +18,13 @@ O valor deve ser resolvido em tempo de deploy por:
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 ```
 
-Variavel padronizada:
+Variável padronizada:
 
 ```text
 AWS_ACCOUNT_ID=<aws-account-id>
 ```
 
-ARNs, buckets e referencias IAM devem ser parametrizados com `<aws-account-id>`:
+ARNs, buckets e referências IAM devem ser parametrizados com `<aws-account-id>`:
 
 ```text
 arn:aws:iam::<aws-account-id>:role/<lab-eks-cluster-role>
@@ -32,13 +32,13 @@ arn:aws:iam::<aws-account-id>:role/<lab-eks-node-role>
 arn:aws:iam::<aws-account-id>:role/voclabs
 ```
 
-Valores numericos de conta encontrados em repositórios antigos devem ser tratados como exemplos ou legados locais. Novos artefatos nao devem depender de uma conta AWS hardcoded.
+Valores numéricos de conta encontrados em repositórios antigos devem ser tratados como exemplos ou legados locais. Novos artefatos não devem depender de uma conta AWS hardcoded.
 
 ---
 
-## Regiao AWS canonica
+## Região AWS canônica
 
-A regiao AWS canonica da suite é:
+A região AWS canônica da suíte é:
 
 ```text
 us-east-1
@@ -56,7 +56,7 @@ Novos repositórios, pipelines, scripts e manifests devem usar `us-east-1`, salv
 
 ---
 
-## Ambiente AWS canonico
+## Ambiente AWS canônico
 
 Para a Fase 4, será mantido um único ambiente AWS principal:
 
@@ -87,7 +87,7 @@ A criação de ambientes AWS adicionais, como `dev`, `staging`, `homolog` ou `pr
 
 ## Infraestrutura compartilhada
 
-Nome canonico da infraestrutura compartilhada:
+Nome canônico da infraestrutura compartilhada:
 
 ```text
 eks-lab
@@ -114,7 +114,7 @@ Terraform shared bucket: tf-shared-eks-lab-<aws-account-id>-us-east-1
 
 ## State remoto Terraform
 
-Bucket compartilhado canonico:
+Bucket compartilhado canônico:
 
 ```text
 tf-shared-eks-lab-<aws-account-id>-us-east-1
@@ -174,13 +174,13 @@ APP_SECRET_NAME=oficina/lab/database/app
 
 ---
 
-## Pendencias de normalizacao
+## Pendências de normalização
 
 Antes de evoluir o novo repositório unificado de infraestrutura, revisar e normalizar os seguintes pontos encontrados nos repositórios antigos:
 
 - Remover ou parametrizar contas AWS hardcoded em ARNs, nomes de buckets e exemplos de Terraform.
-- Normalizar qualquer ocorrência local de `simple-eks` para `eks-lab`, quando o valor representar o cluster EKS da suite.
+- Normalizar qualquer ocorrência local de `simple-eks` para `eks-lab`, quando o valor representar o cluster EKS da suíte.
 - Atualizar contratos de secrets de banco para refletir a separação futura entre `oficina_os` e `oficina_billing`.
 - Garantir que os três microsserviços novos usem `DEPLOYMENT_ENVIRONMENT=lab` e `deployment.environment=lab` em logs, métricas e traces.
 
-Essas pendências não mudam a decisão canonica deste documento; elas apenas registram ajustes necessários nos repositórios que ainda carregam valores históricos.
+Essas pendências não mudam a decisão canônica deste documento; elas apenas registram ajustes necessários nos repositórios que ainda carregam valores históricos.

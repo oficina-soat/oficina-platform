@@ -1,33 +1,33 @@
-# Template Quarkus de Microsservico
+# Template Quarkus de Microsserviço
 
 ## Objetivo
 
-Template base para criar ou normalizar os repositorios:
+Template base para criar ou normalizar os repositórios:
 
 - `oficina-os-service`
 - `oficina-billing-service`
 - `oficina-execution-service`
 
-O template preserva a estrutura do `oficina-app`, usando Quarkus e extensoes Quarkus. Dependencias que variam por tipo de persistencia ficam separadas por perfil Maven.
+O template preserva a estrutura do `oficina-app`, usando Quarkus e extensões Quarkus. Dependências que variam por tipo de persistência ficam separadas por perfil Maven.
 
-## Versoes
+## Versões
 
 - Quarkus Platform: `3.37.0`
 - Quarkiverse Amazon Services: `3.19.0`
 - Java: `25`
 
-As versoes foram verificadas no Maven Central em 2026-06-28.
+As versões foram verificadas no Maven Central em 2026-06-28.
 
 ## Como usar
 
-Copiar o conteudo deste diretorio para o repositorio do microsservico destino e ajustar:
+Copiar o conteúdo deste diretório para o repositório do microsserviço destino e ajustar:
 
 - `artifactId`
 - `version`
 - `quarkus.application.name`
 - pacote Java base
-- perfil de persistencia
-- migrations, seeds e configuracoes especificas do servico
+- perfil de persistência
+- migrations, seeds e configurações específicas do serviço
 
 Comandos esperados:
 
@@ -37,7 +37,7 @@ Comandos esperados:
 ./mvnw package
 ```
 
-Enquanto o wrapper Maven nao existir no repositorio destino, usar:
+Enquanto o wrapper Maven não existir no repositório destino, usar:
 
 ```bash
 mvn test
@@ -71,7 +71,7 @@ src/main/resources/
 
 ### Base
 
-Usado por todos os servicos:
+Usado por todos os serviços:
 
 - REST
 - Jackson
@@ -122,36 +122,36 @@ Inclui:
 - Quarkiverse Amazon DynamoDB
 - Quarkiverse Amazon DynamoDB Enhanced
 
-## Configuracoes
+## Configurações
 
-`application.properties` contem somente configuracoes comuns, derivadas do `oficina-app`:
+`application.properties` contém somente configurações comuns, derivadas do `oficina-app`:
 
-- nome da aplicacao via `OTEL_SERVICE_NAME`
+- nome da aplicação via `OTEL_SERVICE_NAME`
 - Swagger UI
 - logs JSON
-- metricas Prometheus em `/q/metrics`
+- métricas Prometheus em `/q/metrics`
 - traces OpenTelemetry
 - health checks SmallRye
 - JWT com issuer/audience atuais
 
-Para servicos PostgreSQL, incorporar os valores de `application-postgresql.properties.example`.
+Para serviços PostgreSQL, incorporar os valores de `application-postgresql.properties.example`.
 
 Para o `oficina-execution-service`, incorporar os valores de `application-dynamodb.properties.example`.
 
 ## Health checks
 
-O template mantem o padrao atual do `oficina-app`:
+O template mantém o padrão atual do `oficina-app`:
 
-- extensao `quarkus-smallrye-health`
-- endpoints padrao do Quarkus em `/q/health`, `/q/health/live` e `/q/health/ready`
+- extensão `quarkus-smallrye-health`
+- endpoints padrão do Quarkus em `/q/health`, `/q/health/live` e `/q/health/ready`
 - health fora do OpenAPI por `quarkus.smallrye-health.openapi.included=false`
-- health excluido de traces por `quarkus.otel.traces.suppress-application-uris`
+- health excluído de traces por `quarkus.otel.traces.suppress-application-uris`
 
-Health checks customizados devem ser adicionados apenas quando o servico tiver dependencia operacional que precise de verificacao explicita.
+Health checks customizados devem ser adicionados apenas quando o serviço tiver dependência operacional que precise de verificação explícita.
 
 ## Migrations
 
-Servicos PostgreSQL devem usar Flyway com scripts em:
+Serviços PostgreSQL devem usar Flyway com scripts em:
 
 ```text
 src/main/resources/db/migration/
@@ -161,11 +161,11 @@ Baselines propostas:
 
 - `docs/postgres-migrations-decomposition.md`
 
-O `oficina-execution-service` nao usa migrations PostgreSQL.
+O `oficina-execution-service` não usa migrations PostgreSQL.
 
 ## Limites
 
-- Nao criar biblioteca Java compartilhada entre microsservicos.
-- Nao mover codigo de aplicacao para o `oficina-platform`.
-- Nao acessar banco de outro microsservico.
-- Nao adicionar extensoes que nao sejam Quarkus ou Quarkiverse sem nova decisao documentada.
+- Não criar biblioteca Java compartilhada entre microsserviços.
+- Não mover código de aplicação para o `oficina-platform`.
+- Não acessar banco de outro microsserviço.
+- Não adicionar extensões que não sejam Quarkus ou Quarkiverse sem nova decisão documentada.

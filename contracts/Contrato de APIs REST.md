@@ -243,7 +243,7 @@ Resposta esperada:
       "tipo": "SERVICO",
       "itemId": "uuid",
       "referenciaCatalogoId": "uuid",
-      "nome": "Troca de oleo",
+      "nome": "Troca de óleo",
       "quantidade": 1.000,
       "valorUnitario": 250.00,
       "valorTotal": 250.00

@@ -83,7 +83,7 @@ O header `traceparent` deve seguir o padrão W3C Trace Context quando suportado 
     {
       "field": "clienteId",
       "code": "REQUIRED",
-      "message": "Campo obrigatorio."
+      "message": "Campo obrigatório."
     }
   ]
 }
@@ -115,7 +115,7 @@ O campo `details` deve ser usado para erros `400` ou `422` quando múltiplos cam
 {
   "field": "descricaoProblema",
   "code": "REQUIRED",
-  "message": "Campo obrigatorio."
+  "message": "Campo obrigatório."
 }
 ```
 
@@ -252,7 +252,7 @@ Todo erro retornado ao cliente deve gerar log estruturado contendo, no mínimo:
     {
       "field": "documento",
       "code": "REQUIRED",
-      "message": "Campo obrigatorio."
+      "message": "Campo obrigatório."
     }
   ]
 }
@@ -266,7 +266,7 @@ Todo erro retornado ao cliente deve gerar log estruturado contendo, no mínimo:
   "status": 409,
   "error": "Conflict",
   "code": "INVALID_STATE_TRANSITION",
-  "message": "A Ordem de Servico nao pode ser alterada a partir do estado atual.",
+  "message": "A Ordem de Serviço não pode ser alterada a partir do estado atual.",
   "path": "/api/v1/ordens-servico/d290f1ee-6c54-4b01-90e6-d701748f0851/estado",
   "correlationId": "7f4d0c4b6b8a4bb8a2f49bb8f06e1c3d",
   "traceId": "4bf92f3577b34da6a3ce929d0e0e4736",

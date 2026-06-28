@@ -1,29 +1,29 @@
-# Plano de Decomposicao do oficina-app
+# Plano de Decomposição do oficina-app
 
 ## Objetivo
 
-Definir como o codigo existente do `oficina-app` deve ser decomposto nos microsservicos da Fase 4:
+Definir como o código existente do `oficina-app` deve ser decomposto nos microsserviços da Fase 4:
 
 - `oficina-os-service`;
 - `oficina-billing-service`;
 - `oficina-execution-service`.
 
-Este plano deve orientar agentes e desenvolvedores durante a criacao dos novos repositorios, preservando o maximo possivel da estrutura original em Clean Architecture e evitando acoplamento runtime entre microsservicos.
+Este plano deve orientar agentes e desenvolvedores durante a criação dos novos repositórios, preservando o máximo possível da estrutura original em Clean Architecture e evitando acoplamento runtime entre microsserviços.
 
 ## Premissas
 
-- Os novos repositorios dos microsservicos existem apenas com `README.md` placeholder.
-- O `oficina-app` sera usado como origem de migracao de codigo e referencia funcional, mas nao sera mantido como backend monolitico da Fase 4.
-- Nao ha consumidores externos ou front-end que precisem ser migrados durante esta decomposicao.
-- Nao ha necessidade de preservar historico ou dados existentes de ambiente.
-- A massa inicial deve reaproveitar os dados do seed atual do `oficina-app`, pois eles ja sao conhecidos e funcionais.
+- Os novos repositórios dos microsserviços existem apenas com `README.md` placeholder.
+- O `oficina-app` será usado como origem de migração de código e referência funcional, mas não será mantido como backend monolítico da Fase 4.
+- Não há consumidores externos ou front-end que precisem ser migrados durante esta decomposição.
+- Não há necessidade de preservar histórico ou dados existentes de ambiente.
+- A massa inicial deve reaproveitar os dados do seed atual do `oficina-app`, pois eles já são conhecidos e funcionais.
 - `Pessoa` e `Usuario` pertencem ao `oficina-os-service`.
-- Nao deve ser criada biblioteca `common` compartilhada entre microsservicos.
-- Compartilhamento entre servicos deve ocorrer por contratos, nao por codigo Java comum.
+- Não deve ser criada biblioteca `common` compartilhada entre microsserviços.
+- Compartilhamento entre serviços deve ocorrer por contratos, não por código Java comum.
 
-## Estrategia Geral
+## Estratégia Geral
 
-Cada microsservico deve manter uma estrutura inspirada na Clean Architecture ja existente no `oficina-app`:
+Cada microsserviço deve manter uma estrutura inspirada na Clean Architecture já existente no `oficina-app`:
 
 ```text
 src/main/java/br/com/oficina/<dominio>/
@@ -41,76 +41,76 @@ src/main/java/br/com/oficina/<dominio>/
     web/
 ```
 
-A nomenclatura interna pode ser ajustada por servico, mas as responsabilidades, rotas, eventos e bancos devem seguir os contratos deste repositorio.
+A nomenclatura interna pode ser ajustada por serviço, mas as responsabilidades, rotas, eventos e bancos devem seguir os contratos deste repositório.
 
-## Decisao Sobre common
+## Decisão Sobre common
 
-Nao criar modulo, pacote ou biblioteca compartilhada `common` entre os microsservicos.
+Não criar módulo, pacote ou biblioteca compartilhada `common` entre os microsserviços.
 
 Motivos:
 
-- evita acoplamento entre repositorios independentes;
+- evita acoplamento entre repositórios independentes;
 - evita versionamento cruzado de bibliotecas internas;
-- impede vazamento de regras de dominio entre servicos;
-- mantem cada servico autonomo para build, deploy, testes e evolucao.
+- impede vazamento de regras de domínio entre serviços;
+- mantém cada serviço autônomo para build, deploy, testes e evolução.
 
-O compartilhamento permitido deve ficar neste repositorio, por meio de:
+O compartilhamento permitido deve ficar neste repositório, por meio de:
 
 - contratos OpenAPI;
 - schemas JSON de eventos;
 - contrato de erros REST;
-- contrato de idempotencia;
-- padroes de observabilidade;
-- templates futuros de microsservico.
+- contrato de idempotência;
+- padrões de observabilidade;
+- templates futuros de microsserviço.
 
-Codigo pequeno e estavel, como paginacao, filtros de `correlationId`, mappers de erro e configuracoes de observabilidade, pode ser copiado seletivamente para cada microsservico. Caso a repeticao se torne relevante, ela deve virar template em `templates/quarkus-service/`, nao dependencia runtime compartilhada.
+Código pequeno e estável, como paginação, filtros de `correlationId`, mappers de erro e configurações de observabilidade, pode ser copiado seletivamente para cada microsserviço. Caso a repetição se torne relevante, ela deve virar template em `templates/quarkus-service/`, não dependência runtime compartilhada.
 
-## Mapeamento por Modulo do oficina-app
+## Mapeamento por Módulo do oficina-app
 
-| Origem no `oficina-app` | Destino | Acao |
+| Origem no `oficina-app` | Destino | Ação |
 |---|---|---|
-| `br.com.oficina.atendimento.core.entities.cliente` | `oficina-os-service` | Migrar como dominio de cliente, ajustando IDs para UUID quando necessario. |
-| `br.com.oficina.atendimento.core.entities.veiculo` | `oficina-os-service` | Migrar como dominio de veiculo. |
-| `br.com.oficina.atendimento.core.entities.ordem_de_servico` | `oficina-os-service` | Migrar como agregado central da OS, mantendo estados e historico coerentes com `contracts/Contrato de Estados da Ordem de Serviço.md`. |
+| `br.com.oficina.atendimento.core.entities.cliente` | `oficina-os-service` | Migrar como domínio de cliente, ajustando IDs para UUID quando necessário. |
+| `br.com.oficina.atendimento.core.entities.veiculo` | `oficina-os-service` | Migrar como domínio de veículo. |
+| `br.com.oficina.atendimento.core.entities.ordem_de_servico` | `oficina-os-service` | Migrar como agregado central da OS, mantendo estados e histórico coerentes com `contracts/Contrato de Estados da Ordem de Serviço.md`. |
 | `br.com.oficina.atendimento.core.usecases.cliente` | `oficina-os-service` | Migrar e alinhar com rotas `/api/v1/clientes`. |
 | `br.com.oficina.atendimento.core.usecases.veiculo` | `oficina-os-service` | Migrar e alinhar com rotas `/api/v1/clientes/{clienteId}/veiculos` e `/api/v1/veiculos/{veiculoId}`. |
-| `br.com.oficina.atendimento.core.usecases.ordem_de_servico` | `oficina-os-service` | Migrar apenas regras de OS, estado global, historico e orquestracao. Separar a execucao tecnica e o financeiro para os servicos participantes. |
+| `br.com.oficina.atendimento.core.usecases.ordem_de_servico` | `oficina-os-service` | Migrar apenas regras de OS, estado global, histórico e orquestração. Separar a execução técnica e o financeiro para os serviços participantes. |
 | `br.com.oficina.atendimento.framework.db` | `oficina-os-service` | Migrar entidades/adapters relacionais para PostgreSQL database `oficina_os`. |
-| `br.com.oficina.atendimento.framework.web` | `oficina-os-service` | Migrar recursos REST compativeis com `contracts/openapi/oficina-os-service.yaml`. |
-| `br.com.oficina.atendimento.interfaces` | `oficina-os-service` | Migrar controllers e presenters necessarios para OS, cliente e veiculo. |
-| `br.com.oficina.common.core.entities.Pessoa` e relacionados | `oficina-os-service` | Migrar para o dominio de OS/atendimento. |
-| `br.com.oficina.common.core.entities.Usuario` e relacionados | `oficina-os-service` | Migrar para o dominio de OS/atendimento, preservando papeis operacionais do seed. |
-| `br.com.oficina.common.framework.db.pessoa` | `oficina-os-service` | Migrar para persistencia relacional em `oficina_os`. |
-| `br.com.oficina.common.framework.db.usuario` | `oficina-os-service` | Migrar para persistencia relacional em `oficina_os`. |
-| `br.com.oficina.common.framework.web.pessoa` | `oficina-os-service` | Migrar se as APIs forem mantidas internamente no OS Service; caso contrario, manter apenas como referencia para dados operacionais. |
-| `br.com.oficina.common.framework.web.usuario` | `oficina-os-service` | Migrar se as APIs forem mantidas internamente no OS Service; caso contrario, manter apenas como referencia para autenticacao/autorizacao local. |
-| `br.com.oficina.common.framework.observability` | Todos os servicos | Copiar seletivamente para cada servico ou reaproveitar no template futuro. Nao criar dependencia compartilhada. |
-| `br.com.oficina.common.web` | Todos os servicos, se necessario | Copiar apenas constantes ou helpers realmente usados. Evitar pacote comum entre repositorios. |
-| `br.com.oficina.gestao_de_pecas.core.entities.catalogo` | `oficina-execution-service` | Migrar como catalogo tecnico de pecas e servicos. |
-| `br.com.oficina.gestao_de_pecas.core.entities.estoque` | `oficina-execution-service` | Migrar como dominio de estoque e movimentos. |
-| `br.com.oficina.gestao_de_pecas.core.usecases` | `oficina-execution-service` | Migrar e expandir para diagnostico, execucao e reparo conforme contratos. |
-| `br.com.oficina.gestao_de_pecas.framework.db` | `oficina-execution-service` | Reimplementar para Amazon DynamoDB. Nao migrar Panache/PostgreSQL diretamente. |
+| `br.com.oficina.atendimento.framework.web` | `oficina-os-service` | Migrar recursos REST compatíveis com `contracts/openapi/oficina-os-service.yaml`. |
+| `br.com.oficina.atendimento.interfaces` | `oficina-os-service` | Migrar controllers e presenters necessários para OS, cliente e veículo. |
+| `br.com.oficina.common.core.entities.Pessoa` e relacionados | `oficina-os-service` | Migrar para o domínio de OS/atendimento. |
+| `br.com.oficina.common.core.entities.Usuario` e relacionados | `oficina-os-service` | Migrar para o domínio de OS/atendimento, preservando papéis operacionais do seed. |
+| `br.com.oficina.common.framework.db.pessoa` | `oficina-os-service` | Migrar para persistência relacional em `oficina_os`. |
+| `br.com.oficina.common.framework.db.usuario` | `oficina-os-service` | Migrar para persistência relacional em `oficina_os`. |
+| `br.com.oficina.common.framework.web.pessoa` | `oficina-os-service` | Migrar se as APIs forem mantidas internamente no OS Service; caso contrário, manter apenas como referência para dados operacionais. |
+| `br.com.oficina.common.framework.web.usuario` | `oficina-os-service` | Migrar se as APIs forem mantidas internamente no OS Service; caso contrário, manter apenas como referência para autenticação/autorização local. |
+| `br.com.oficina.common.framework.observability` | Todos os serviços | Copiar seletivamente para cada serviço ou reaproveitar no template futuro. Não criar dependência compartilhada. |
+| `br.com.oficina.common.web` | Todos os serviços, se necessário | Copiar apenas constantes ou helpers realmente usados. Evitar pacote comum entre repositórios. |
+| `br.com.oficina.gestao_de_pecas.core.entities.catalogo` | `oficina-execution-service` | Migrar como catálogo técnico de peças e serviços. |
+| `br.com.oficina.gestao_de_pecas.core.entities.estoque` | `oficina-execution-service` | Migrar como domínio de estoque e movimentos. |
+| `br.com.oficina.gestao_de_pecas.core.usecases` | `oficina-execution-service` | Migrar e expandir para diagnóstico, execução e reparo conforme contratos. |
+| `br.com.oficina.gestao_de_pecas.framework.db` | `oficina-execution-service` | Reimplementar para Amazon DynamoDB. Não migrar Panache/PostgreSQL diretamente. |
 | `br.com.oficina.gestao_de_pecas.framework.web` | `oficina-execution-service` | Migrar recursos REST e alinhar com `contracts/openapi/oficina-execution-service.yaml`. |
-| `br.com.oficina.gestao_de_pecas.interfaces` | `oficina-execution-service` | Migrar controllers e presenters de catalogo e estoque. |
-| Modulo financeiro inexistente no `oficina-app` | `oficina-billing-service` | Criar implementacao nova orientada por contratos de orcamento, aprovacao, recusa e pagamento. |
+| `br.com.oficina.gestao_de_pecas.interfaces` | `oficina-execution-service` | Migrar controllers e presenters de catálogo e estoque. |
+| Módulo financeiro inexistente no `oficina-app` | `oficina-billing-service` | Criar implementação nova orientada por contratos de orçamento, aprovação, recusa e pagamento. |
 
-## Mapeamento por Microsservico
+## Mapeamento por Microsserviço
 
 ### oficina-os-service
 
 Responsabilidades migradas ou criadas:
 
 - Pessoa;
-- Usuario;
-- papeis operacionais;
+- Usuário;
+- papéis operacionais;
 - Cliente;
-- Veiculo;
-- Ordem de Servico;
-- item de peca da OS como snapshot;
-- item de servico da OS como snapshot;
-- historico de estados;
+- Veículo;
+- Ordem de Serviço;
+- item de peça da OS como snapshot;
+- item de serviço da OS como snapshot;
+- histórico de estados;
 - estado global da OS;
-- orquestracao da Saga.
+- orquestração da Saga.
 
 Banco:
 
@@ -147,23 +147,23 @@ Eventos consumidos:
 
 Responsabilidades migradas ou criadas:
 
-- catalogo tecnico de pecas;
-- catalogo tecnico de servicos;
+- catálogo técnico de peças;
+- catálogo técnico de serviços;
 - saldo de estoque;
 - movimentos de estoque;
-- diagnostico;
-- execucao;
+- diagnóstico;
+- execução;
 - reparo;
-- historico operacional.
+- histórico operacional.
 
 Banco:
 
 ```text
 Amazon DynamoDB
-tabelas proprias do oficina-execution-service
+tabelas próprias do oficina-execution-service
 ```
 
-Observacao: os adapters PostgreSQL/Panache atuais do modulo `gestao_de_pecas` devem ser tratados como referencia de comportamento, nao como codigo a mover diretamente. A persistencia deve ser reimplementada para DynamoDB.
+Observação: os adapters PostgreSQL/Panache atuais do módulo `gestao_de_pecas` devem ser tratados como referência de comportamento, não como código a mover diretamente. A persistência deve ser reimplementada para DynamoDB.
 
 Eventos produzidos:
 
@@ -188,13 +188,13 @@ Eventos consumidos:
 
 Responsabilidades criadas:
 
-- orcamento;
-- itens financeiros do orcamento;
-- aprovacao de orcamento;
-- recusa de orcamento;
+- orçamento;
+- itens financeiros do orçamento;
+- aprovação de orçamento;
+- recusa de orçamento;
 - pagamento;
-- confirmacao, recusa e cancelamento de pagamento;
-- integracao com provedor financeiro quando aplicavel.
+- confirmação, recusa e cancelamento de pagamento;
+- integração com provedor financeiro quando aplicável.
 
 Banco:
 
@@ -204,10 +204,10 @@ database: oficina_billing
 usuario: oficina_billing_user
 ```
 
-Origem de codigo:
+Origem de código:
 
-- nao ha modulo financeiro equivalente no `oficina-app`;
-- criar implementacao nova a partir de `contracts/Contrato de APIs REST.md`, `contracts/openapi/oficina-billing-service.yaml`, eventos e ownership.
+- não há módulo financeiro equivalente no `oficina-app`;
+- criar implementação nova a partir de `contracts/Contrato de APIs REST.md`, `contracts/openapi/oficina-billing-service.yaml`, eventos e ownership.
 
 Eventos produzidos:
 
@@ -232,11 +232,11 @@ Eventos consumidos:
 - `sagaCompensada`;
 - `sagaFinalizadaComSucesso`.
 
-## Estrategia de Dados
+## Estratégia de Dados
 
-Nao havera migracao historica de dados.
+Não haverá migração histórica de dados.
 
-A estrategia oficial para a Fase 4 e seed limpo por microsservico, usando o `import.sql` atual do `oficina-app` como referencia funcional.
+A estratégia oficial para a Fase 4 é seed limpo por microsserviço, usando o `import.sql` atual do `oficina-app` como referência funcional.
 
 ### Seed do oficina-os-service
 
@@ -255,11 +255,11 @@ Origem no seed atual:
 
 Regras:
 
-- preservar os nomes de pessoas, papeis, usuarios, clientes e emails do seed atual;
-- preservar os UUIDs das ordens de servico ja existentes para facilitar testes e rastreabilidade;
-- ajustar timestamps para ISO-8601 nos contratos e manter formato compativel com PostgreSQL nas migrations;
+- preservar os nomes de pessoas, papéis, usuários, clientes e emails do seed atual;
+- preservar os UUIDs das ordens de serviço já existentes para facilitar testes e rastreabilidade;
+- ajustar timestamps para ISO-8601 nos contratos e manter formato compatível com PostgreSQL nas migrations;
 - manter `RECEBIDA`, `EM_DIAGNOSTICO`, `AGUARDANDO_APROVACAO`, `EM_EXECUCAO` e `FINALIZADA` como massa inicial, pois cobrem diferentes pontos do fluxo;
-- armazenar itens da OS como snapshots, incluindo identificador de catalogo, nome, quantidade, valor unitario e valor total quando esses campos estiverem disponiveis.
+- armazenar itens da OS como snapshots, incluindo identificador de catálogo, nome, quantidade, valor unitário e valor total quando esses campos estiverem disponíveis.
 
 ### Seed do oficina-execution-service
 
@@ -272,65 +272,65 @@ Origem no seed atual:
 
 Regras:
 
-- reaproveitar as pecas `Volante`, `Pneu` e `Tapete`;
-- reaproveitar o servico `Troca de oleo`;
-- reaproveitar o saldo de estoque da peca `Volante` com quantidade `50.000`;
-- criar registros DynamoDB equivalentes ao dominio do servico, sem depender das tabelas relacionais antigas;
-- quando necessario, criar movimentos iniciais de estoque para explicar o saldo inicial.
+- reaproveitar as peças `Volante`, `Pneu` e `Tapete`;
+- reaproveitar o serviço `Troca de óleo`;
+- reaproveitar o saldo de estoque da peça `Volante` com quantidade `50.000`;
+- criar registros DynamoDB equivalentes ao domínio do serviço, sem depender das tabelas relacionais antigas;
+- quando necessário, criar movimentos iniciais de estoque para explicar o saldo inicial.
 
 ### Seed do oficina-billing-service
 
 Origem no seed atual:
 
-- nao ha tabelas financeiras equivalentes.
+- não há tabelas financeiras equivalentes.
 
 Regras:
 
-- iniciar sem dados financeiros historicos;
-- opcionalmente criar dados demonstrativos de orcamento e pagamento apenas quando os contratos do `oficina-billing-service` estiverem implementados;
-- qualquer dado demonstrativo deve referenciar ordens de servico do seed do `oficina-os-service` por UUID.
+- iniciar sem dados financeiros históricos;
+- opcionalmente criar dados demonstrativos de orçamento e pagamento apenas quando os contratos do `oficina-billing-service` estiverem implementados;
+- qualquer dado demonstrativo deve referenciar ordens de serviço do seed do `oficina-os-service` por UUID.
 
-## Estrategia de Descarte do oficina-app
+## Estratégia de Descarte do oficina-app
 
-Durante a decomposicao:
+Durante a decomposição:
 
-- usar `oficina-app` como fonte de codigo, testes e seed;
-- nao adicionar novas responsabilidades ao `oficina-app`;
-- nao adaptar o `oficina-app` para coexistencia com os microsservicos;
-- nao implementar dupla escrita;
-- nao criar rotas de compatibilidade.
+- usar `oficina-app` como fonte de código, testes e seed;
+- não adicionar novas responsabilidades ao `oficina-app`;
+- não adaptar o `oficina-app` para coexistência com os microsserviços;
+- não implementar dupla escrita;
+- não criar rotas de compatibilidade.
 
-Apos a migracao dos componentes relevantes:
+Após a migração dos componentes relevantes:
 
-- manter `oficina-app` apenas como referencia historica;
-- considerar removidos do caminho de evolucao os pacotes ja migrados;
-- evoluir apenas os repositorios dos microsservicos e este repositorio de governanca.
+- manter `oficina-app` apenas como referência histórica;
+- considerar removidos do caminho de evolução os pacotes já migrados;
+- evoluir apenas os repositórios dos microsserviços e este repositório de governança.
 
-## Ordem Recomendada de Execucao
+## Ordem Recomendada de Execução
 
-1. Criar a estrutura base Quarkus de cada microsservico preservando Clean Architecture.
-2. Migrar `oficina-os-service` com Pessoa, Usuario, Cliente, Veiculo, OS, estados e historico.
+1. Criar a estrutura base Quarkus de cada microsserviço preservando Clean Architecture.
+2. Migrar `oficina-os-service` com Pessoa, Usuário, Cliente, Veículo, OS, estados e histórico.
 3. Criar seed PostgreSQL do `oficina-os-service` a partir do `import.sql` atual.
-4. Migrar `oficina-execution-service` com catalogo de pecas, catalogo de servicos e estoque.
-5. Criar seed DynamoDB do `oficina-execution-service` a partir dos dados atuais de pecas, servicos e estoque.
-6. Criar `oficina-billing-service` orientado por contratos, sem dependencia de codigo legado financeiro.
-7. Implementar eventos e Outbox nos servicos produtores.
+4. Migrar `oficina-execution-service` com catálogo de peças, catálogo de serviços e estoque.
+5. Criar seed DynamoDB do `oficina-execution-service` a partir dos dados atuais de peças, serviços e estoque.
+6. Criar `oficina-billing-service` orientado por contratos, sem dependência de código legado financeiro.
+7. Implementar eventos e Outbox nos serviços produtores.
 8. Implementar consumidores idempotentes conforme `contracts/idempotency.md`.
-9. Implementar observabilidade, logs estruturados e propagacao de `correlationId` em cada servico.
-10. Remover dependencia operacional do `oficina-app`.
+9. Implementar observabilidade, logs estruturados e propagação de `correlationId` em cada serviço.
+10. Remover dependência operacional do `oficina-app`.
 
-## Criterios de Pronto
+## Critérios de Pronto
 
-- Cada pacote relevante do `oficina-app` possui destino explicito neste plano.
-- Os tres microsservicos preservam independencia de build, deploy e banco.
-- Nao existe biblioteca `common` compartilhada entre os microsservicos.
-- Pessoa e Usuario estao sob ownership do `oficina-os-service`.
-- O seed da Fase 4 usa os dados funcionais do `import.sql` atual como referencia.
-- `oficina-billing-service` nasce de contratos, nao de codigo legado inexistente.
-- Rotas, eventos, topicos e bancos permanecem coerentes com `docs/service-ownership.md`, `contracts/Contrato de APIs REST.md`, `contracts/Contrato de Eventos de Domínio.md` e `contracts/Contrato de Tópicos de Mensageria.md`.
-- O `oficina-app` fica apenas como referencia apos a decomposicao.
+- Cada pacote relevante do `oficina-app` possui destino explícito neste plano.
+- Os três microsserviços preservam independência de build, deploy e banco.
+- Não existe biblioteca `common` compartilhada entre os microsserviços.
+- Pessoa e Usuário estão sob ownership do `oficina-os-service`.
+- O seed da Fase 4 usa os dados funcionais do `import.sql` atual como referência.
+- `oficina-billing-service` nasce de contratos, não de código legado inexistente.
+- Rotas, eventos, tópicos e bancos permanecem coerentes com `docs/service-ownership.md`, `contracts/Contrato de APIs REST.md`, `contracts/Contrato de Eventos de Domínio.md` e `contracts/Contrato de Tópicos de Mensageria.md`.
+- O `oficina-app` fica apenas como referência após a decomposição.
 
-## Referencias
+## Referências
 
 - `ROADMAP.md`
 - `docs/service-ownership.md`

@@ -27,11 +27,11 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
 - Estratégia de PostgreSQL definida para a Fase 4 como uma única instância Amazon RDS compartilhada, com databases independentes por microsserviço relacional:
   - `oficina_os`, acessado apenas pelo `oficina-os-service`;
   - `oficina_billing`, acessado apenas pelo `oficina-billing-service`.
-- Uso de Amazon DynamoDB definido para o `oficina-execution-service`, atendendo ao requisito de banco não relacional, com padrao de tabelas, chaves, indices, seeds e streams registrado em `docs/dynamodb-execution-service.md`.
+- Uso de Amazon DynamoDB definido para o `oficina-execution-service`, atendendo ao requisito de banco não relacional, com padrão de tabelas, chaves, índices, seeds e streams registrado em `docs/dynamodb-execution-service.md`.
 - Estratégia de CI/CD independente definida por microsserviço.
-- Conta, regiao e ambiente AWS definidos em `docs/aws-environments.md`:
-  - conta AWS parametrizada por `AWS_ACCOUNT_ID`, sem numero fixo canonico;
-  - regiao `us-east-1`;
+- Conta, região e ambiente AWS definidos em `docs/aws-environments.md`:
+  - conta AWS parametrizada por `AWS_ACCOUNT_ID`, sem número fixo canônico;
+  - região `us-east-1`;
   - ambiente `lab`;
   - infraestrutura compartilhada `eks-lab`.
 - Decisão de separar o código de infraestrutura em um novo repositório unificado, a ser criado, consolidando as responsabilidades hoje distribuídas entre `oficina-infra-db` e `oficina-infra-k8s`.
@@ -150,7 +150,7 @@ contracts/saga/oficina-os-saga-v1.md
 
 ### 7. Padrões técnicos para repositórios de microsserviços
 
-**Situação atual:** há decisões sobre CI/CD, deploy independente e governança; o template base Quarkus foi criado em `templates/quarkus-service/`; e o padrao DynamoDB do `oficina-execution-service` foi definido em `docs/dynamodb-execution-service.md`.
+**Situação atual:** há decisões sobre CI/CD, deploy independente e governança; o template base Quarkus foi criado em `templates/quarkus-service/`; e o padrão DynamoDB do `oficina-execution-service` foi definido em `docs/dynamodb-execution-service.md`.
 
 **Definição faltante:** evoluir o template com pipeline, Dockerfile, Kubernetes manifests e documentação local específica quando esses padrões forem fechados.
 

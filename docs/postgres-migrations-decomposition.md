@@ -2,36 +2,36 @@
 
 ## Objetivo
 
-Definir a baseline sugerida de migrations PostgreSQL para os microsservicos relacionais da Fase 4, usando como ponto de partida as migrations atuais em `../oficina-infra-db/sql/migrations/`.
+Definir a baseline sugerida de migrations PostgreSQL para os microsserviços relacionais da Fase 4, usando como ponto de partida as migrations atuais em `../oficina-infra-db/sql/migrations/`.
 
-Esta proposta nao altera o repositorio `oficina-infra-db` nem cria migrations executaveis nos repositorios dos microsservicos. O objetivo e registrar a modelagem sugerida para avaliacao antes da implementacao.
+Esta proposta não altera o repositório `oficina-infra-db` nem cria migrations executáveis nos repositórios dos microsserviços. O objetivo é registrar a modelagem sugerida para avaliação antes da implementação.
 
 ## Origem
 
-As migrations atuais do `oficina-infra-db` misturam responsabilidades hoje destinadas a servicos diferentes:
+As migrations atuais do `oficina-infra-db` misturam responsabilidades hoje destinadas a serviços diferentes:
 
-- dados de atendimento, cliente, veiculo, OS, pessoa e usuario;
-- catalogo de pecas e servicos;
+- dados de atendimento, cliente, veículo, OS, pessoa e usuário;
+- catálogo de peças e serviços;
 - estoque;
-- estrutura relacional historica do `oficina-app`.
+- estrutura relacional histórica do `oficina-app`.
 
-Na decomposicao da Fase 4:
+Na decomposição da Fase 4:
 
 - `oficina-os-service` usa PostgreSQL database `oficina_os`;
 - `oficina-billing-service` usa PostgreSQL database `oficina_billing`;
-- `oficina-execution-service` usa DynamoDB e nao deve receber as tabelas relacionais de catalogo e estoque.
+- `oficina-execution-service` usa DynamoDB e não deve receber as tabelas relacionais de catálogo e estoque.
 
-## Decisoes
+## Decisões
 
-- Usar baseline limpa por microsservico, iniciando em `V1`, pois nao havera migracao historica de dados.
-- Manter a estrutura atual do `oficina-app` como referencia de nomes e dominios, mas separar ownership por servico.
-- Usar snapshots para itens da Ordem de Servico no `oficina-os-service`, sem FK para catalogo tecnico.
-- Persistir itens financeiros do orcamento no `oficina-billing-service`, alinhados ao OpenAPI e ao evento `orcamentoGerado`.
-- Em `orcamento_item`, `item_id` deve referenciar o item da Ordem de Servico; `referencia_catalogo_id` deve guardar opcionalmente a referencia ao catalogo tecnico.
-- Itens do orcamento devem ser imutaveis apos o status `GERADO`; qualquer alteracao de composicao deve gerar novo orcamento ou novo fluxo explicito de substituicao.
-- Cada orcamento deve possuir no maximo um pagamento na Fase 4, usando restricao unica em `pagamento.orcamento_id`.
-- Criar Outbox em cada database PostgreSQL para publicacao confiavel dos eventos de dominio.
-- A Outbox PostgreSQL deve usar apenas os estados `PENDING`, `PUBLISHED` e `FAILED`, sem estado intermediario `PROCESSING`; concorrencia deve ser controlada pelo publicador com lock transacional.
+- Usar baseline limpa por microsserviço, iniciando em `V1`, pois não haverá migração histórica de dados.
+- Manter a estrutura atual do `oficina-app` como referência de nomes e domínios, mas separar ownership por serviço.
+- Usar snapshots para itens da Ordem de Serviço no `oficina-os-service`, sem FK para catálogo técnico.
+- Persistir itens financeiros do orçamento no `oficina-billing-service`, alinhados ao OpenAPI e ao evento `orcamentoGerado`.
+- Em `orcamento_item`, `item_id` deve referenciar o item da Ordem de Serviço; `referencia_catalogo_id` deve guardar opcionalmente a referência ao catálogo técnico.
+- Itens do orçamento devem ser imutáveis após o status `GERADO`; qualquer alteração de composição deve gerar novo orçamento ou novo fluxo explícito de substituição.
+- Cada orçamento deve possuir no máximo um pagamento na Fase 4, usando restrição única em `pagamento.orcamento_id`.
+- Criar Outbox em cada database PostgreSQL para publicação confiável dos eventos de domínio.
+- A Outbox PostgreSQL deve usar apenas os estados `PENDING`, `PUBLISHED` e `FAILED`, sem estado intermediário `PROCESSING`; concorrência deve ser controlada pelo publicador com lock transacional.
 
 ## oficina-os-service
 
@@ -58,7 +58,7 @@ Tabelas herdadas e mantidas do estado final das migrations atuais:
 - `os_item_servico`
 - `outbox_event`
 
-Tabelas que nao devem ir para o PostgreSQL do OS Service:
+Tabelas que não devem ir para o PostgreSQL do OS Service:
 
 - `peca`
 - `servico`
@@ -133,7 +133,7 @@ Tabelas novas sugeridas:
 - `pagamento`
 - `outbox_event`
 
-### Orcamento
+### Orçamento
 
 ```sql
 CREATE TABLE dominio_status_orcamento (
@@ -162,13 +162,13 @@ CREATE TABLE orcamento (
 CREATE INDEX ix_orcamento_ordem_servico ON orcamento (ordem_de_servico_id);
 ```
 
-### Itens do orcamento
+### Itens do orçamento
 
-Os itens do orcamento devem ser persistidos pelo Billing como composicao financeira aprovada ou recusada pelo cliente.
+Os itens do orçamento devem ser persistidos pelo Billing como composição financeira aprovada ou recusada pelo cliente.
 
-O campo `item_id` deve referenciar o item da Ordem de Servico, nao o item do catalogo. Quando existir referencia ao catalogo tecnico, ela deve ser persistida em `referencia_catalogo_id`.
+O campo `item_id` deve referenciar o item da Ordem de Serviço, não o item do catálogo. Quando existir referência ao catálogo técnico, ela deve ser persistida em `referencia_catalogo_id`.
 
-Depois que o orcamento for gerado, os itens devem ser tratados como imutaveis. Mudancas de composicao ou valores devem gerar novo orcamento ou fluxo explicito de substituicao, preservando auditoria sobre o que foi apresentado ao cliente.
+Depois que o orçamento for gerado, os itens devem ser tratados como imutáveis. Mudanças de composição ou valores devem gerar novo orçamento ou fluxo explícito de substituição, preservando auditoria sobre o que foi apresentado ao cliente.
 
 ```sql
 CREATE TABLE dominio_tipo_item_orcamento (
@@ -177,8 +177,8 @@ CREATE TABLE dominio_tipo_item_orcamento (
 );
 
 INSERT INTO dominio_tipo_item_orcamento (codigo, descricao) VALUES
-  ('PECA', 'Peca'),
-  ('SERVICO', 'Servico');
+  ('PECA', 'Peça'),
+  ('SERVICO', 'Serviço');
 
 CREATE TABLE orcamento_item (
   id bigint GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
@@ -215,8 +215,8 @@ CREATE TABLE dominio_metodo_pagamento (
 
 INSERT INTO dominio_metodo_pagamento (codigo, descricao) VALUES
   ('PIX', 'Pix'),
-  ('CARTAO_CREDITO', 'Cartao de credito'),
-  ('CARTAO_DEBITO', 'Cartao de debito'),
+  ('CARTAO_CREDITO', 'Cartão de crédito'),
+  ('CARTAO_DEBITO', 'Cartão de débito'),
   ('DINHEIRO', 'Dinheiro');
 
 CREATE TABLE dominio_status_pagamento (
@@ -261,9 +261,9 @@ CREATE INDEX ix_pagamento_orcamento ON pagamento (orcamento_id);
 
 ## Outbox PostgreSQL
 
-A mesma estrutura pode ser usada em `oficina_os` e `oficina_billing`, dentro do database de cada servico.
+A mesma estrutura pode ser usada em `oficina_os` e `oficina_billing`, dentro do database de cada serviço.
 
-Os estados da Outbox devem permanecer restritos a `PENDING`, `PUBLISHED` e `FAILED`. O publicador deve controlar concorrencia com lock transacional, evitando a necessidade de um estado `PROCESSING`.
+Os estados da Outbox devem permanecer restritos a `PENDING`, `PUBLISHED` e `FAILED`. O publicador deve controlar concorrência com lock transacional, evitando a necessidade de um estado `PROCESSING`.
 
 ```sql
 CREATE TABLE outbox_event (
@@ -291,10 +291,10 @@ CREATE INDEX ix_outbox_event_aggregate
   ON outbox_event (aggregate_id, occurred_at);
 ```
 
-## Decisoes aprovadas
+## Decisões aprovadas
 
 - `orcamento_item.item_id` referencia o item da OS.
-- `referencia_catalogo_id` e opcional e referencia o catalogo tecnico quando disponivel.
-- Itens do orcamento sao imutaveis apos `GERADO`.
-- `pagamento.orcamento_id` deve ser unico na Fase 4.
+- `referencia_catalogo_id` é opcional e referencia o catálogo técnico quando disponível.
+- Itens do orçamento são imutáveis após `GERADO`.
+- `pagamento.orcamento_id` deve ser único na Fase 4.
 - Outbox usa apenas `PENDING`, `PUBLISHED` e `FAILED`.

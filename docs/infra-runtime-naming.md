@@ -243,6 +243,33 @@ OFICINA_DYNAMODB_IDEMPOTENCIA_TABLE=oficina-execution-lab-idempotencia
 
 `OFICINA_DYNAMODB_TABLE_PREFIX` é a configuração principal. Os nomes individuais permitem override operacional quando for necessário isolar testes, migrações, restaurações ou ambientes temporários sem alterar código.
 
+Variáveis canônicas de infraestrutura para GitHub Actions/Terraform do novo `oficina-infra`:
+
+```text
+EXECUTION_DYNAMODB_TABLE_PREFIX=oficina-execution-lab
+EXECUTION_DYNAMODB_BILLING_MODE=PAY_PER_REQUEST
+EXECUTION_DYNAMODB_POINT_IN_TIME_RECOVERY_ENABLED=true
+EXECUTION_DYNAMODB_STREAM_VIEW_TYPE=NEW_AND_OLD_IMAGES
+EXECUTION_DYNAMODB_DELETION_PROTECTION_ENABLED=false
+```
+
+Termos:
+
+- `EXECUTION_DYNAMODB_TABLE_PREFIX`: prefixo usado pelo Terraform para nomear todas as tabelas do `oficina-execution-service`.
+- `EXECUTION_DYNAMODB_BILLING_MODE`: modo de cobrança/capacidade do DynamoDB.
+- `PAY_PER_REQUEST`: cobrança sob demanda; não exige configurar capacidade de leitura/escrita e é adequado para carga variável ou ambiente `lab`.
+- `EXECUTION_DYNAMODB_POINT_IN_TIME_RECOVERY_ENABLED`: liga Point-in-Time Recovery, permitindo restaurar uma tabela para um momento recente dentro da janela suportada pelo DynamoDB.
+- `EXECUTION_DYNAMODB_STREAM_VIEW_TYPE`: define quais dados aparecem no DynamoDB Streams quando um item muda.
+- `NEW_AND_OLD_IMAGES`: cada evento de stream carrega a versão anterior e a nova versão do item, útil para auditoria, publicação de eventos e depuração.
+- `EXECUTION_DYNAMODB_DELETION_PROTECTION_ENABLED`: impede exclusão acidental da tabela quando habilitado.
+
+Impacto prático:
+
+- `PAY_PER_REQUEST` reduz configuração e risco de throttling por capacidade mal dimensionada no laboratório.
+- Point-in-Time Recovery aumenta segurança operacional, com possível custo adicional.
+- Streams com `NEW_AND_OLD_IMAGES` facilitam outbox, auditoria e integrações futuras, aumentando o volume de dados processados.
+- Deletion protection `false` facilita teardown do ambiente `lab`; em ambiente permanente, o valor deveria ser `true`.
+
 ### IAM e Kubernetes do oficina-execution-service
 
 Nomes canônicos:
@@ -291,45 +318,4 @@ Após a substituição integral de `oficina-infra-k8s` e `oficina-infra-db`, a s
 
 ## Sugestões pendentes de avaliação
 
-Os pontos abaixo ainda precisam de avaliação antes de virar contrato canônico.
-
-### Variáveis de infraestrutura DynamoDB
-
-Sugestão para GitHub Actions/Terraform do novo `oficina-infra`:
-
-```text
-EXECUTION_DYNAMODB_TABLE_PREFIX=oficina-execution-lab
-EXECUTION_DYNAMODB_BILLING_MODE=PAY_PER_REQUEST
-EXECUTION_DYNAMODB_POINT_IN_TIME_RECOVERY_ENABLED=true
-EXECUTION_DYNAMODB_STREAM_VIEW_TYPE=NEW_AND_OLD_IMAGES
-EXECUTION_DYNAMODB_DELETION_PROTECTION_ENABLED=false
-```
-
-Termos:
-
-- `EXECUTION_DYNAMODB_TABLE_PREFIX`: prefixo usado pelo Terraform para nomear todas as tabelas do `oficina-execution-service`.
-- `EXECUTION_DYNAMODB_BILLING_MODE`: modo de cobrança/capacidade do DynamoDB.
-- `PAY_PER_REQUEST`: cobrança sob demanda; não exige configurar capacidade de leitura/escrita e é mais simples para carga variável ou ambiente `lab`.
-- `EXECUTION_DYNAMODB_POINT_IN_TIME_RECOVERY_ENABLED`: liga Point-in-Time Recovery, permitindo restaurar uma tabela para um momento recente dentro da janela suportada pelo DynamoDB.
-- `EXECUTION_DYNAMODB_STREAM_VIEW_TYPE`: define quais dados aparecem no DynamoDB Streams quando um item muda.
-- `NEW_AND_OLD_IMAGES`: cada evento de stream carrega a versão anterior e a nova versão do item, útil para auditoria, publicação de eventos e depuração.
-- `EXECUTION_DYNAMODB_DELETION_PROTECTION_ENABLED`: impede exclusão acidental da tabela quando habilitado.
-
-Impacto prático:
-
-- `PAY_PER_REQUEST` reduz configuração e risco de throttling por capacidade mal dimensionada no laboratório.
-- Point-in-Time Recovery aumenta segurança operacional, mas pode gerar custo adicional.
-- Streams com `NEW_AND_OLD_IMAGES` facilitam outbox, auditoria e integrações futuras, mas aumentam volume de dados processados.
-- Deletion protection `false` facilita teardown do ambiente `lab`; em ambiente permanente, o valor deveria ser `true`.
-
-Recomendação mantida:
-
-```text
-EXECUTION_DYNAMODB_TABLE_PREFIX=oficina-execution-lab
-EXECUTION_DYNAMODB_BILLING_MODE=PAY_PER_REQUEST
-EXECUTION_DYNAMODB_POINT_IN_TIME_RECOVERY_ENABLED=true
-EXECUTION_DYNAMODB_STREAM_VIEW_TYPE=NEW_AND_OLD_IMAGES
-EXECUTION_DYNAMODB_DELETION_PROTECTION_ENABLED=false
-```
-
-Essa recomendação deve ser aprovada antes de fechar o padrão de provisionamento DynamoDB.
+Não há pendências de avaliação neste escopo após a decisão sobre as variáveis de infraestrutura DynamoDB.

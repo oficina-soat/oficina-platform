@@ -48,6 +48,7 @@ Quando esses repositórios estiverem disponíveis, eles devem ser consultados pa
 - Ao alterar uma decisão compartilhada, atualize todos os artefatos afetados no mesmo escopo da mudança.
 - Quando houver divergência entre documentação conceitual e contratos implementáveis, explicite a decisão e normalize os artefatos relacionados.
 - Quando houver dúvida sobre nomes que precisam ser iguais entre plataforma, aplicação, autenticação, banco e infraestrutura, consulte os repositórios irmãos antes de definir novos valores.
+- Quando houver ponto de decisão não tomado, incerto ou ambíguo que possa mudar arquitetura, contrato, ownership, nome canônico, prioridade, compatibilidade, infraestrutura, segurança ou operação, consulte o usuário antes de decidir. A consulta deve apresentar as opções possíveis, a recomendação quando houver, e explicar objetivamente como cada opção influencia a decisão, os artefatos afetados e os riscos de divergência.
 - Em arquivos Markdown, use links relativos sempre que citar artefatos do próprio repositório, como ADRs, contratos, OpenAPI, schemas, templates, documentos em `docs/` e itens do roadmap. Prefira texto descritivo com link, por exemplo `[Contrato de APIs REST](contracts/Contrato%20de%20APIs%20REST.md)`, em vez de apenas citar o caminho em texto solto.
 - Ao criar ou alterar um artefato Markdown, inclua links para os documentos diretamente relacionados sempre que isso ajudar um agente a navegar pela decisão sem procurar manualmente. Preserve caminhos em monospace apenas quando o caminho for valor técnico, comando, exemplo de estrutura ou parte de um contrato.
 - Em textos Markdown em português, use acentuação correta e revise termos comuns sem acento antes de encerrar a alteração. Preserve sem acento identificadores técnicos, nomes de campos, rotas, tópicos, eventos, variáveis, comandos, trechos de código e valores canônicos quando essa for a forma contratada.
@@ -138,6 +139,7 @@ Checklist mínimo de revisão antes da resposta final:
 - confirmar se nomes de serviços, eventos, tópicos e rotas batem com os contratos relacionados;
 - confirmar se mudanças em um contrato exigem atualização de OpenAPI, schema, ADR ou roadmap;
 - confirmar se o [README.md](README.md) ou o [ROADMAP.md](ROADMAP.md) precisam ser atualizados;
+- confirmar se algum ponto de decisão incerto, ambíguo ou ainda não tomado exige consulta ao usuário antes de concluir;
 - confirmar se links Markdown foram usados para documentos relacionados sempre que possível;
 - confirmar se a revisão anti-divergência foi executada antes do commit;
 - registrar claramente qualquer validação que não pôde ser executada.

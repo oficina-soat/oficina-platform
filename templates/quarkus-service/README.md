@@ -31,6 +31,8 @@ Copiar o conteúdo deste diretório para o repositório do microsserviço destin
 
 Para deploy em Kubernetes, usar também o [Template Kubernetes Base](../kubernetes/base/README.md) como referência de `Deployment`, `Service`, `ServiceAccount`, `ConfigMap`, probes, observabilidade e variáveis de runtime.
 
+Para CI/CD, usar o [Template GitHub Actions para Microsserviços](../github-actions/README.md), que assume o `Dockerfile` deste diretório para publicar imagens versionadas no Amazon ECR, criar release GitHub e atualizar o `Deployment` do serviço no Amazon EKS.
+
 Comandos esperados:
 
 ```bash
@@ -46,6 +48,8 @@ mvn test
 mvn verify
 mvn package
 ```
+
+Para usar o [Template GitHub Actions para Microsserviços](../github-actions/README.md) e o `Dockerfile`, o repositório destino deve possuir Maven Wrapper (`mvnw` e `.mvn/wrapper/`). Esse requisito mantém o mesmo padrão operacional do `oficina-app`, em que os workflows e o build de imagem executam `./mvnw`.
 
 ## Estrutura
 

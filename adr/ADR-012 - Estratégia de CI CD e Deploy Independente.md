@@ -379,7 +379,7 @@ Define os componentes de persistência que serão implantados e utilizados pelos
 
 ## Próximos Passos
 
-* Criar template padrão de GitHub Actions;
+* Aplicar o template padrão de GitHub Actions nos repositórios dos microsserviços;
 * Configurar SonarCloud para os repositórios;
 * Configurar Amazon ECR;
 * Configurar deploy automatizado para o Amazon EKS;

@@ -341,7 +341,11 @@ contracts/idempotency.md
 - [x] Criar pipeline padrão de CI/CD.
 - [ ] Normalizar valores legados de conta, região e ambiente AWS nos repositórios antigos conforme [Conta, região e ambientes AWS](docs/aws-environments.md). Item adiado: por enquanto, `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` serão usados apenas como fonte de cópia; ajustes necessários no `oficina-auth-lambda` podem ser feitos diretamente nele.
 - [x] Planejar a migração de `oficina-infra-db` e `oficina-infra-k8s` para o novo repositório unificado de infraestrutura.
-- [ ] Provisionar RDS PostgreSQL compartilhado com databases e usuários independentes para OS e Billing.
+- [x] Criar baseline executável do RDS PostgreSQL compartilhado no `oficina-infra`, com Terraform e bootstrap de databases, usuários e secrets independentes para OS e Billing.
+- [ ] Aplicar o RDS PostgreSQL compartilhado em AWS usando VPC, subnets e security groups reais do ambiente `lab`.
+- [ ] Migrar e adaptar EKS, ECR, API Gateway e Kubernetes compartilhado de `oficina-infra-k8s` para `oficina-infra`, removendo dependências operacionais do `oficina-app`.
+- [ ] Adicionar DynamoDB do `oficina-execution-service` e mensageria da Fase 4 ao `oficina-infra`.
+- [ ] Migrar workflows e scripts operacionais úteis de `oficina-infra-db` e `oficina-infra-k8s` para `oficina-infra`, normalizando state, secrets, conta, região e ambiente.
 - [ ] Criar checklist de deploy independente.
 - [ ] Criar runbooks mínimos.
 
@@ -377,4 +381,11 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é provisionar, no repositório `oficina-infra`, o RDS PostgreSQL compartilhado com databases, usuários, permissões e secrets independentes para `oficina-os-service` e `oficina-billing-service`, conforme o [Padrão de isolamento PostgreSQL no RDS compartilhado](docs/rds-postgresql-isolation.md) e o [Plano de migração para o repositório unificado de infraestrutura](docs/infrastructure-migration-plan.md).
+O próximo passo mais importante é continuar a consolidação do repositório `oficina-infra`, migrando e adaptando os artefatos ainda úteis de `oficina-infra-k8s` e `oficina-infra-db` conforme o [Plano de migração para o repositório unificado de infraestrutura](docs/infrastructure-migration-plan.md).
+
+A ordem recomendada é:
+
+1. aplicar o baseline do RDS PostgreSQL compartilhado em AWS quando `vpc_id`, subnets e security groups reais do ambiente `lab` estiverem disponíveis;
+2. migrar EKS, ECR, API Gateway e Kubernetes compartilhado para `oficina-infra`, removendo dependências operacionais do `oficina-app`;
+3. adicionar DynamoDB do `oficina-execution-service` e mensageria conforme os contratos da plataforma;
+4. migrar workflows e scripts operacionais úteis, normalizando state, secrets, conta, região e ambiente.

@@ -94,7 +94,7 @@ Essa estrutura é recomendada para reduzir ambiguidade. Ajustes são permitidos 
 
 ## Migração dos Repositórios Legados
 
-O plano operacional de cópia e adaptação dos repositórios legados está definido em [Plano de migração para o repositório unificado de infraestrutura](infrastructure-migration-plan.md). Os repositórios `oficina-infra-db` e `oficina-infra-k8s` devem ser tratados como fontes históricas; correções e normalizações da Fase 4 devem acontecer no destino `oficina-infra`.
+O plano operacional de cópia e adaptação dos repositórios legados está definido em [Plano de migração para o repositório unificado de infraestrutura](infrastructure-migration-plan.md). Os repositórios `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` devem ser tratados como fontes históricas sem alteração durante a migração; correções e normalizações da Fase 4 devem acontecer nos destinos canônicos. O `oficina-auth-lambda` continua ativo e pode receber ajustes diretos quando a mudança pertencer aos fluxos de autenticação ou notificações.
 
 | Origem | Migrar para `oficina-infra` | Observação |
 |---|---|---|

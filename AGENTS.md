@@ -48,6 +48,8 @@ Quando esses repositórios estiverem disponíveis, eles devem ser consultados pa
 - Ao alterar uma decisão compartilhada, atualize todos os artefatos afetados no mesmo escopo da mudança.
 - Quando houver divergência entre documentação conceitual e contratos implementáveis, explicite a decisão e normalize os artefatos relacionados.
 - Quando houver dúvida sobre nomes que precisam ser iguais entre plataforma, aplicação, autenticação, banco e infraestrutura, consulte os repositórios irmãos antes de definir novos valores.
+- Em arquivos Markdown, use links relativos sempre que citar artefatos do próprio repositório, como ADRs, contratos, OpenAPI, schemas, templates, documentos em `docs/` e itens do roadmap. Prefira texto descritivo com link, por exemplo `[Contrato de APIs REST](contracts/Contrato%20de%20APIs%20REST.md)`, em vez de apenas citar o caminho em texto solto.
+- Ao criar ou alterar um artefato Markdown, inclua links para os documentos diretamente relacionados sempre que isso ajudar um agente a navegar pela decisão sem procurar manualmente. Preserve caminhos em monospace apenas quando o caminho for valor técnico, comando, exemplo de estrutura ou parte de um contrato.
 - Em textos Markdown em português, use acentuação correta e revise termos comuns sem acento antes de encerrar a alteração. Preserve sem acento identificadores técnicos, nomes de campos, rotas, tópicos, eventos, variáveis, comandos, trechos de código e valores canônicos quando essa for a forma contratada.
 
 ## Implementação
@@ -118,12 +120,26 @@ find contracts/events -name '*.schema.json' -print
 
 Use validações adicionais quando houver ferramentas disponíveis no repositório ou quando a mudança afetar contratos executáveis, exemplos JSON, OpenAPI, schemas de eventos, templates, CI/CD ou Kubernetes.
 
+Antes de criar commit, execute uma revisão anti-divergência proporcional ao escopo da alteração. O objetivo é garantir que a mudança não introduziu divergência nova em relação ao estado anterior sem também resolvê-la no mesmo commit.
+
+Regras para a revisão anti-divergência:
+
+- compare os arquivos alterados com seus artefatos correlatos antes do stage final;
+- ao alterar Markdown que referencia contratos, confirme se OpenAPI, schemas JSON, ADRs, README ou ROADMAP precisam ser atualizados;
+- ao alterar OpenAPI, confirme coerência com o contrato REST, modelo de erros, idempotência, rotas e nomes de schemas;
+- ao alterar eventos, confirme coerência entre Markdown individual, schema JSON, tabela canônica de eventos, tópicos, produtores e consumidores;
+- ao alterar tópicos, produtores, consumidores, rotas, estados, nomes de banco, secrets, variáveis ou recursos de infraestrutura, procure o mesmo nome nos documentos relacionados com `rg` e normalize as ocorrências no mesmo escopo;
+- quando houver script, parser ou ferramenta disponível para validar a relação entre artefatos, execute antes do commit;
+- se uma divergência pré-existente for encontrada fora do escopo, registre na resposta final ou atualize o ROADMAP, mas não deixe uma divergência nova criada pela tarefa sem correção.
+
 Checklist mínimo de revisão antes da resposta final:
 
 - confirmar se o artefato criado está no diretório correto;
 - confirmar se nomes de serviços, eventos, tópicos e rotas batem com os contratos relacionados;
 - confirmar se mudanças em um contrato exigem atualização de OpenAPI, schema, ADR ou roadmap;
 - confirmar se o [README.md](README.md) ou o [ROADMAP.md](ROADMAP.md) precisam ser atualizados;
+- confirmar se links Markdown foram usados para documentos relacionados sempre que possível;
+- confirmar se a revisão anti-divergência foi executada antes do commit;
 - registrar claramente qualquer validação que não pôde ser executada.
 
 ## Versionamento e Build
@@ -154,6 +170,8 @@ Antes de criar o commit:
 - não inclua arquivos locais ou não relacionados, como metadados de IDE
 - verifique `git status --short` antes de fazer stage
 - use `git diff -- <arquivo>` para revisar o conteúdo que será commitado quando houver mudanças pré-existentes no repositório
+- execute a revisão anti-divergência descrita em [Validação](#validação) e resolva divergências novas antes do commit
+- revise o diff staged com `git diff --cached` quando a tarefa alterar mais de um arquivo ou quando houver risco de inconsistência entre contratos
 
 Ao criar o commit, use mensagens em português seguindo Conventional Commits:
 

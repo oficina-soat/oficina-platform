@@ -343,6 +343,7 @@ contracts/idempotency.md
 - [x] Criar baseline Quarkus executável em `oficina-os-service`, com estrutura, dependências, health checks, configuração por ambiente, autenticação JWT, erro padronizado, idempotência e observabilidade.
 - [x] Criar baseline Quarkus executável em `oficina-billing-service`, com estrutura, dependências, health checks, configuração por ambiente, autenticação JWT, erro padronizado, idempotência e observabilidade.
 - [x] Criar baseline Quarkus executável em `oficina-execution-service`, com estrutura, dependências, health checks, configuração por ambiente, autenticação JWT, erro padronizado, idempotência e observabilidade.
+- [x] Criar diretivas locais para agentes, README operacional e backlog local nos três repositórios de microsserviços antes de iniciar a migração de domínio.
 - [ ] Copiar e adaptar para `oficina-os-service` o domínio de Pessoa, Usuário, Cliente, Veículo e Ordem de Serviço do `oficina-app`, conforme [Plano de Decomposição do oficina-app](docs/oficina-app-decomposition.md).
 - [ ] Copiar e adaptar para `oficina-os-service` controllers, presenters, DTOs, validações, testes e seed de atendimento do `oficina-app`, alinhando rotas com a [OpenAPI do oficina-os-service](contracts/openapi/oficina-os-service.yaml).
 - [ ] Criar migrations e seed limpo do `oficina-os-service` para o database `oficina_os`, preservando isolamento de acesso e ownership.
@@ -356,7 +357,7 @@ contracts/idempotency.md
 - [ ] Implementar no `oficina-billing-service` cálculo e snapshot financeiro de itens, fluxo de aprovação/recusa, pagamento, producers e consumers definidos nos contratos de eventos.
 - [ ] Criar testes unitários e de integração mínimos nos três microsserviços para controllers, use cases, persistência, idempotência, eventos e cenários principais da Saga.
 - [ ] Validar os três microsserviços contra contratos OpenAPI, schemas JSON de eventos, [Contrato de Erros REST](contracts/error-model.md), [Contrato de Idempotência](contracts/idempotency.md) e [Contrato de Saga do oficina-os-service](contracts/saga/oficina-os-saga-v1.md).
-- [ ] Atualizar a documentação local dos três repositórios de microsserviços com setup, variáveis de ambiente, execução local, testes, build, Docker e deploy.
+- [ ] Atualizar continuamente a documentação local dos três repositórios de microsserviços com setup, variáveis de ambiente, execução local, testes, build, Docker, deploy e decisões específicas que surgirem durante a implementação.
 - [ ] Marcar o `oficina-app` como referência histórica após a decomposição, sem aplicar adaptações da Fase 4 diretamente nele.
 
 ### Épico C — Saga
@@ -425,10 +426,11 @@ O próximo passo mais importante é abrir duas frentes paralelas e controladas: 
 A ordem recomendada é:
 
 1. criar baseline Quarkus executável nos três microsserviços;
-2. copiar e adaptar o domínio de OS/atendimento para `oficina-os-service`;
-3. copiar e adaptar catálogo, peças, serviços e estoque para `oficina-execution-service`, reimplementando DynamoDB;
-4. criar do zero orçamento, aprovação, recusa e pagamento no `oficina-billing-service`;
-5. aplicar o baseline do RDS PostgreSQL compartilhado em AWS quando `vpc_id`, subnets e security groups reais do ambiente `lab` estiverem disponíveis;
-6. adicionar DynamoDB do `oficina-execution-service` e mensageria conforme os contratos da plataforma;
-7. definir rotas reais do API Gateway quando os endpoints dos microsserviços estiverem publicados;
-8. revisar checklists de deploy independente e runbooks mínimos.
+2. criar diretivas locais para agentes, README operacional e backlog local nos três repositórios de microsserviços;
+3. copiar e adaptar o domínio de OS/atendimento para `oficina-os-service`;
+4. copiar e adaptar catálogo, peças, serviços e estoque para `oficina-execution-service`, reimplementando DynamoDB;
+5. criar do zero orçamento, aprovação, recusa e pagamento no `oficina-billing-service`;
+6. aplicar o baseline do RDS PostgreSQL compartilhado em AWS quando `vpc_id`, subnets e security groups reais do ambiente `lab` estiverem disponíveis;
+7. adicionar DynamoDB do `oficina-execution-service` e mensageria conforme os contratos da plataforma;
+8. definir rotas reais do API Gateway quando os endpoints dos microsserviços estiverem publicados;
+9. revisar checklists de deploy independente e runbooks mínimos.

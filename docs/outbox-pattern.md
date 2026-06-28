@@ -6,12 +6,12 @@ Definir o padrão de Outbox para publicação confiável de eventos nos microsse
 
 Este documento complementa:
 
-- `contracts/Contrato de Eventos de Domínio.md`;
-- `contracts/Contrato de Tópicos de Mensageria.md`;
-- `contracts/idempotency.md`;
-- `docs/service-ownership.md`;
-- `docs/postgres-migrations-decomposition.md`;
-- `docs/dynamodb-execution-service.md`.
+- [Contrato de Eventos de Domínio](../contracts/Contrato%20de%20Eventos%20de%20Domínio.md);
+- [Contrato de Tópicos de Mensageria](../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md);
+- [Contrato de Idempotência](../contracts/idempotency.md);
+- [Matriz de Ownership por Microsserviço](service-ownership.md);
+- [Proposta de Migrations PostgreSQL Decompostas](postgres-migrations-decomposition.md);
+- [Padrão DynamoDB do oficina-execution-service](dynamodb-execution-service.md).
 
 O padrão é obrigatório para `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`.
 
@@ -29,7 +29,7 @@ A publicação direta no broker durante a operação de negócio não é permiti
 | `oficina-billing-service` | PostgreSQL database `oficina_billing` | Tabela `outbox_event` | Eventos financeiros |
 | `oficina-execution-service` | Amazon DynamoDB | Tabela `oficina-execution-outbox` | Eventos operacionais e de estoque |
 
-Cada serviço deve publicar apenas eventos em que aparece como produtor na tabela canônica de `contracts/Contrato de Eventos de Domínio.md`.
+Cada serviço deve publicar apenas eventos em que aparece como produtor na tabela canônica do [Contrato de Eventos de Domínio](../contracts/Contrato%20de%20Eventos%20de%20Domínio.md).
 
 ## Envelope Persistido
 
@@ -118,7 +118,7 @@ O publicador PostgreSQL deve selecionar eventos elegíveis com lock transacional
 
 ## DynamoDB
 
-`oficina-execution-service` deve usar a tabela `oficina-execution-outbox`, conforme `docs/dynamodb-execution-service.md`.
+`oficina-execution-service` deve usar a tabela `oficina-execution-outbox`, conforme o [Padrão DynamoDB do oficina-execution-service](dynamodb-execution-service.md).
 
 Chaves canônicas:
 
@@ -158,7 +158,7 @@ Eventos `FAILED` não devem ser descartados automaticamente. Reprocessamento man
 
 ## DLQ
 
-A DLQ pertence ao lado consumidor do tópico, conforme `contracts/Contrato de Tópicos de Mensageria.md`.
+A DLQ pertence ao lado consumidor do tópico, conforme o [Contrato de Tópicos de Mensageria](../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md).
 
 A Outbox trata falha de publicação pelo produtor. A DLQ trata falha de processamento pelo consumidor.
 
@@ -175,7 +175,7 @@ A idempotência da publicação deve considerar:
 - `aggregateId`;
 - transação local que originou o evento.
 
-Consumidores devem registrar `eventId` processado conforme `contracts/idempotency.md`.
+Consumidores devem registrar `eventId` processado conforme o [Contrato de Idempotência](../contracts/idempotency.md).
 
 Reprocessar o mesmo evento no mesmo consumidor deve ser sucesso idempotente ou retornar a resposta gravada anteriormente, sem duplicar efeito colateral.
 

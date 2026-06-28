@@ -30,7 +30,7 @@ Os repositórios legados permanecem como referência histórica até que seus ar
 | Terraform AWS | Provisionar recursos compartilhados da suíte no ambiente `lab`. |
 | State remoto | Usar o bucket `tf-shared-eks-lab-<aws-account-id>-us-east-1` e a key `oficina/lab/infra/terraform.tfstate`. |
 | Kubernetes compartilhado | Manter namespaces, secrets materializados, config maps compartilhados, ingress ou rotas comuns e integrações com o cluster `eks-lab`. |
-| Banco relacional | Provisionar a instância RDS PostgreSQL compartilhada e preparar isolamento lógico para `oficina_os` e `oficina_billing`. |
+| Banco relacional | Provisionar a instância RDS PostgreSQL compartilhada e preparar isolamento lógico para `oficina_os` e `oficina_billing`, conforme o [Padrão de isolamento PostgreSQL no RDS compartilhado](rds-postgresql-isolation.md). |
 | DynamoDB | Provisionar tabelas do `oficina-execution-service` com prefixo `oficina-execution-lab`. |
 | Mensageria | Provisionar tópicos, filas, DLQs e permissões conforme contratos de eventos e tópicos. |
 | ECR | Provisionar ou padronizar repositórios de imagem dos microsserviços. |
@@ -119,6 +119,7 @@ O `oficina-infra` estará alinhado com a governança quando:
 
 - [Nomes de runtime, secrets e infraestrutura](infra-runtime-naming.md)
 - [Conta, região e ambientes AWS](aws-environments.md)
+- [Padrão de isolamento PostgreSQL no RDS compartilhado](rds-postgresql-isolation.md)
 - [Padrão DynamoDB do oficina-execution-service](dynamodb-execution-service.md)
 - [Proposta de Migrations PostgreSQL Decompostas](postgres-migrations-decomposition.md)
 - [Matriz de Ownership por Microsserviço](service-ownership.md)

@@ -251,7 +251,7 @@ As migrações serão independentes entre serviços.
 
 Nenhum microsserviço poderá alterar estruturas pertencentes a outro domínio.
 
-Para os serviços baseados em PostgreSQL, as migrações serão executadas sobre instâncias independentes do Amazon RDS.
+Para os serviços baseados em PostgreSQL, as migrações serão executadas sobre databases independentes dentro da instância Amazon RDS PostgreSQL compartilhada da Fase 4, conforme o [Padrão de isolamento PostgreSQL no RDS compartilhado](../docs/rds-postgresql-isolation.md).
 
 ---
 

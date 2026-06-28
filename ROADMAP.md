@@ -318,7 +318,7 @@ contracts/idempotency.md
 - [x] Criar padrão de tabelas/streams para DynamoDB.
 - [x] Criar padrão Outbox por serviço.
 - [x] Definir escopo e responsabilidades do novo repositório unificado de infraestrutura.
-- [ ] Criar padrão de isolamento para `oficina_os` e `oficina_billing` no RDS PostgreSQL compartilhado.
+- [x] Criar padrão de isolamento para `oficina_os` e `oficina_billing` no RDS PostgreSQL compartilhado.
 
 ### Épico C — Saga
 
@@ -375,4 +375,4 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é criar o padrão de isolamento para `oficina_os` e `oficina_billing` no RDS PostgreSQL compartilhado.
+O próximo passo mais importante é detalhar a Saga orquestrada do `oficina-os-service`, incluindo fluxo feliz, recusa de orçamento, pagamento recusado, falhas de execução, compensações, timeouts, retentativas e testes de contrato.

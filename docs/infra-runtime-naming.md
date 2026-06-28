@@ -189,7 +189,21 @@ APP_SECRET_NAME=oficina/lab/database/app
 OFICINA_DB_APP_SECRET_ID=oficina/lab/database/app
 ```
 
-Esses valores descrevem o modelo atual/legado. Para a Fase 4, a decisão canônica continua sendo uma instância RDS PostgreSQL compartilhada com databases, usuários, secrets e migrations isolados para `oficina-os-service` e `oficina-billing-service`, conforme [ROADMAP.md](../ROADMAP.md) e [Conta, região e ambientes AWS](aws-environments.md).
+Esses valores descrevem o modelo atual/legado. Para a Fase 4, a decisão canônica continua sendo uma instância RDS PostgreSQL compartilhada com databases, usuários, secrets e migrations isolados para `oficina-os-service` e `oficina-billing-service`, conforme [ROADMAP.md](../ROADMAP.md), [Conta, região e ambientes AWS](aws-environments.md) e [Padrão de isolamento PostgreSQL no RDS compartilhado](rds-postgresql-isolation.md).
+
+Valores canônicos da Fase 4:
+
+```text
+DB_IDENTIFIER=oficina-postgres-lab
+
+OFICINA_OS_DB_NAME=oficina_os
+OFICINA_OS_DB_USER=oficina_os_user
+OFICINA_OS_DB_SECRET_ID=oficina/lab/database/oficina-os-service
+
+OFICINA_BILLING_DB_NAME=oficina_billing
+OFICINA_BILLING_DB_USER=oficina_billing_user
+OFICINA_BILLING_DB_SECRET_ID=oficina/lab/database/oficina-billing-service
+```
 
 ### DynamoDB do oficina-execution-service
 

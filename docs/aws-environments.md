@@ -150,6 +150,8 @@ DB_IDENTIFIER=oficina-postgres-lab
 
 Para a Fase 4, esse RDS deve ser ajustado para o padrão definido no roadmap: uma instância PostgreSQL compartilhada com databases independentes para `oficina-os-service` e `oficina-billing-service`.
 
+O isolamento lógico, os databases, usuários, secrets e variáveis de runtime estão definidos no [Padrão de isolamento PostgreSQL no RDS compartilhado](rds-postgresql-isolation.md).
+
 Lambdas:
 
 ```text
@@ -180,7 +182,7 @@ Antes de evoluir o novo repositório unificado de infraestrutura, revisar e norm
 
 - Remover ou parametrizar contas AWS hardcoded em ARNs, nomes de buckets e exemplos de Terraform.
 - Normalizar qualquer ocorrência local de `simple-eks` para `eks-lab`, quando o valor representar o cluster EKS da suíte.
-- Atualizar contratos de secrets de banco para refletir a separação futura entre `oficina_os` e `oficina_billing`.
+- Aplicar os secrets de banco definidos no [Padrão de isolamento PostgreSQL no RDS compartilhado](rds-postgresql-isolation.md), substituindo o uso operacional do secret legado `oficina/lab/database/app` nos novos microsserviços.
 - Garantir que os três microsserviços novos usem `DEPLOYMENT_ENVIRONMENT=lab` e `deployment.environment=lab` em logs, métricas e traces.
 
 Essas pendências não mudam a decisão canônica deste documento; elas apenas registram ajustes necessários nos repositórios que ainda carregam valores históricos.

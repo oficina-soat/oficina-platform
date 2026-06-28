@@ -27,7 +27,7 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
 - Estratégia de PostgreSQL definida para a Fase 4 como uma única instância Amazon RDS compartilhada, com databases independentes por microsserviço relacional:
   - `oficina_os`, acessado apenas pelo `oficina-os-service`;
   - `oficina_billing`, acessado apenas pelo `oficina-billing-service`.
-- Uso de Amazon DynamoDB definido para o `oficina-execution-service`, atendendo ao requisito de banco não relacional.
+- Uso de Amazon DynamoDB definido para o `oficina-execution-service`, atendendo ao requisito de banco não relacional, com padrao de tabelas, chaves, indices, seeds e streams registrado em `docs/dynamodb-execution-service.md`.
 - Estratégia de CI/CD independente definida por microsserviço.
 - Conta, regiao e ambiente AWS definidos em `docs/aws-environments.md`:
   - conta AWS parametrizada por `AWS_ACCOUNT_ID`, sem numero fixo canonico;
@@ -150,7 +150,7 @@ contracts/saga/oficina-os-saga-v1.md
 
 ### 7. Padrões técnicos para repositórios de microsserviços
 
-**Situação atual:** há decisões sobre CI/CD, deploy independente e governança, e o template base Quarkus foi criado em `templates/quarkus-service/`.
+**Situação atual:** há decisões sobre CI/CD, deploy independente e governança; o template base Quarkus foi criado em `templates/quarkus-service/`; e o padrao DynamoDB do `oficina-execution-service` foi definido em `docs/dynamodb-execution-service.md`.
 
 **Definição faltante:** evoluir o template com pipeline, Dockerfile, Kubernetes manifests e documentação local específica quando esses padrões forem fechados.
 
@@ -319,7 +319,7 @@ contracts/idempotency.md
 - [x] Criar padrão de configuração por ambiente.
 - [x] Criar padrão de health checks.
 - [x] Criar padrão de migrations para PostgreSQL.
-- [ ] Criar padrão de tabelas/streams para DynamoDB.
+- [x] Criar padrão de tabelas/streams para DynamoDB.
 - [ ] Criar padrão Outbox por serviço.
 - [ ] Definir escopo e responsabilidades do novo repositório unificado de infraestrutura.
 - [ ] Criar padrão de isolamento para `oficina_os` e `oficina_billing` no RDS PostgreSQL compartilhado.
@@ -379,4 +379,4 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é definir o padrão de tabelas, chaves, índices, seeds e streams DynamoDB do `oficina-execution-service`, alinhado ao contrato de eventos, ao catálogo técnico, ao estoque e aos fluxos de execução.
+O próximo passo mais importante é criar o padrão Outbox por serviço, alinhando PostgreSQL, DynamoDB, publicação de eventos, retentativas, DLQ, idempotência e observabilidade.

@@ -103,7 +103,7 @@ O `oficina-billing-service` não deve:
 | Dimensão | Responsabilidade |
 |---|---|
 | Entidades próprias | Serviço técnico, peça, saldo de estoque, movimento de estoque, execução, diagnóstico, reparo, histórico operacional. |
-| Banco de dados | Amazon DynamoDB, com tabelas de catálogo técnico, estoque, execução e histórico operacional a serem detalhadas no padrão DynamoDB. |
+| Banco de dados | Amazon DynamoDB, com tabelas de catálogo técnico, estoque, execução, histórico operacional, Outbox e idempotência definidas em `docs/dynamodb-execution-service.md`. |
 | APIs REST | `/api/v1/servicos`, `/api/v1/servicos/{servicoId}`, `/api/v1/pecas`, `/api/v1/pecas/{pecaId}`, `/api/v1/estoques/pecas/{pecaId}/saldo`, `/api/v1/estoques/movimentos`, `/api/v1/estoques/movimentos/entrada`, `/api/v1/estoques/movimentos/reserva`, `/api/v1/estoques/movimentos/consumo`, `/api/v1/estoques/movimentos/estorno`, `/api/v1/execucoes`, `/api/v1/execucoes/{execucaoId}`, `/api/v1/ordens-servico/{ordemServicoId}/execucao`, `/api/v1/execucoes/{execucaoId}/diagnostico/inicio`, `/api/v1/execucoes/{execucaoId}/diagnostico/conclusao`, `/api/v1/execucoes/{execucaoId}/reparo/inicio`, `/api/v1/execucoes/{execucaoId}/reparo/conclusao`, `/api/v1/execucoes/{execucaoId}/cancelamento`. |
 | Eventos produzidos | `diagnosticoIniciado`, `diagnosticoFinalizado`, `execucaoIniciada`, `execucaoFinalizada`, `estoqueAcrescentado`, `estoqueBaixado`. |
 | Eventos consumidos | `ordemDeServicoCriada`, `pecaIncluidaNaOrdemDeServico`, `servicoIncluidoNaOrdemDeServico`, `orcamentoAprovado`, `ordemDeServicoFinalizada`, `sagaCompensada`, `sagaFinalizadaComSucesso`. |

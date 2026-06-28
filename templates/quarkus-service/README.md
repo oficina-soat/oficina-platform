@@ -132,9 +132,11 @@ Inclui:
 - Swagger UI
 - logs JSON
 - métricas Prometheus em `/q/metrics`
-- traces OpenTelemetry
+- traces OpenTelemetry exportáveis por OTLP para Datadog
 - health checks SmallRye
 - JWT com issuer/audience atuais
+
+No ambiente compartilhado, o backend canônico de observabilidade é Datadog, conforme o [Padrão de Observabilidade Distribuída](../../docs/observability.md). O serviço deve manter `QUARKUS_OTEL_TRACES_EXPORTER=cdi` para usar o exportador OTLP gerenciado pelo Quarkus e `OTEL_EXPORTER_OTLP_ENDPOINT` apontando para o Datadog Agent ou collector definido pelo repositório de infraestrutura. Para execução local, o exportador pode permanecer `none`.
 
 Para serviços PostgreSQL, incorporar os valores de `application-postgresql.properties.example`.
 

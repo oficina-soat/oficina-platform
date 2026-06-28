@@ -42,6 +42,7 @@ Para aplicar em um cluster, o repositório de infraestrutura deve substituir:
 - `IMAGE_PLACEHOLDER` pela imagem publicada no ECR do serviço;
 - `OFICINA_AUTH_ISSUER_PLACEHOLDER` pelo issuer canônico do ambiente;
 - `OFICINA_AUTH_JWKS_URI_PLACEHOLDER` pela localização JWKS do ambiente;
+- `OTEL_EXPORTER_OTLP_ENDPOINT_PLACEHOLDER` pelo endpoint OTLP do Datadog Agent ou collector do ambiente;
 - secrets Kubernetes de banco dos serviços PostgreSQL;
 - permissões IAM ou anotações de `ServiceAccount` quando necessárias pelo ambiente.
 
@@ -52,6 +53,7 @@ Para aplicar em um cluster, o repositório de infraestrutura deve substituir:
 - Os `Service` são `ClusterIP` por padrão. Exposição via API Gateway, NLB, Ingress ou `NodePort` pertence ao repositório de infraestrutura.
 - As probes usam os endpoints Quarkus definidos no [Padrão de Observabilidade Distribuída](../../../docs/observability.md): `/q/health/live` e `/q/health/ready`.
 - As métricas ficam disponíveis em `/q/metrics`.
+- Os traces OpenTelemetry usam `QUARKUS_OTEL_TRACES_EXPORTER=cdi` para acionar o exportador OTLP gerenciado pelo Quarkus e devem ser enviados para o Datadog Agent ou collector configurado no ambiente.
 - O secret `oficina-jwt-keys` é montado em `/jwt`, mantendo compatibilidade com a autenticação da suíte.
 - `oficina-os-service` e `oficina-billing-service` usam secrets Kubernetes separados para materializar `JDBC_DATABASE_URL`, `REACTIVE_DATABASE_URL`, `DB_USERNAME` e `DB_PASSWORD`.
 - `oficina-execution-service` usa as variáveis DynamoDB canônicas do ambiente `lab`.

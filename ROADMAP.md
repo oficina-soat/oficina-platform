@@ -199,9 +199,9 @@ Amazon DynamoDB
 
 ### 10. Padrão de observabilidade distribuída
 
-**Situação atual:** o padrão operacional foi criado em [Padrão de Observabilidade Distribuída](docs/observability.md), consolidando logs estruturados, métricas, traces, health checks, dashboards, alertas e propagação de `correlationId`.
+**Situação atual:** o padrão operacional foi criado em [Padrão de Observabilidade Distribuída](docs/observability.md), consolidando logs estruturados, métricas, traces, health checks, dashboards e alertas no Datadog, além da propagação de `correlationId`.
 
-**Definição faltante:** manter o padrão coerente com os manifests Kubernetes, pipelines e implementações dos microsserviços conforme esses artefatos forem evoluídos.
+**Definição faltante:** manter o padrão coerente com os manifests Kubernetes, pipelines, instalação do Datadog Agent ou collector no repositório de infraestrutura e implementações dos microsserviços conforme esses artefatos forem evoluídos.
 
 **Artefato sugerido:**
 

@@ -46,7 +46,18 @@ EKS_CLUSTER_NAME=eks-lab
 K8S_NAMESPACE=default
 DEPLOYMENT_ENVIRONMENT=lab
 OTEL_RESOURCE_ATTRIBUTES=service.namespace=oficina,deployment.environment=lab
+OTEL_EXPORTER_OTLP_ENDPOINT=<endpoint-otlp-do-datadog-agent-ou-collector>
+OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+QUARKUS_OTEL_TRACES_EXPORTER=cdi
+OTEL_METRICS_EXPORTER=none
+OTEL_LOGS_EXPORTER=none
 ```
+
+### Observabilidade Datadog
+
+O backend canônico para dashboards, alertas, logs, métricas e traces dos microsserviços é Datadog, conforme o [Padrão de Observabilidade Distribuída](observability.md).
+
+O valor real de `OTEL_EXPORTER_OTLP_ENDPOINT`, a instalação do Datadog Agent ou collector e os secrets de integração com Datadog devem ser definidos no repositório de infraestrutura. Este repositório mantém apenas os nomes de runtime esperados pelos microsserviços.
 
 ### Credenciais AWS do GitHub Actions
 

@@ -34,7 +34,7 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
   - região `us-east-1`;
   - ambiente `lab`;
   - infraestrutura compartilhada `eks-lab`.
-- Decisão de separar o código de infraestrutura em um novo repositório unificado, a ser criado, consolidando as responsabilidades hoje distribuídas entre `oficina-infra-db` e `oficina-infra-k8s`.
+- Decisão de separar o código de infraestrutura no repositório unificado `oficina-infra`, consolidando as responsabilidades hoje distribuídas entre `oficina-infra-db` e `oficina-infra-k8s`, conforme [Escopo do Repositório Unificado de Infraestrutura](docs/infrastructure-repository-scope.md).
 - Enunciado da Fase 4 incluído como referência normativa em [Enunciado Fase 4](docs/Enunciado%20Fase%204.md).
 - Contratos fundamentais criados para:
   - APIs REST;
@@ -162,9 +162,9 @@ templates/kubernetes/base/
 
 ### 8. Repositório unificado de infraestrutura
 
-**Situação atual:** os repositórios `oficina-infra-db` e `oficina-infra-k8s` existem como referências separadas para banco de dados e Kubernetes.
+**Situação atual:** os repositórios `oficina-infra-db` e `oficina-infra-k8s` existem como referências separadas para banco de dados e Kubernetes, e o repositório unificado `oficina-infra` já existe como destino canônico da Fase 4.
 
-**Definição faltante:** criar um novo repositório de infraestrutura que unifique as responsabilidades atualmente separadas entre `oficina-infra-db` e `oficina-infra-k8s`.
+**Definição fechada:** o escopo e as responsabilidades do `oficina-infra` foram definidos em [Escopo do Repositório Unificado de Infraestrutura](docs/infrastructure-repository-scope.md).
 
 **Critério de pronto:** o novo repositório deve concentrar os artefatos de infraestrutura compartilhada da suíte, mantendo nomes de ambientes, secrets, variáveis, manifests, migrations e padrões de deploy compatíveis com os contratos e decisões deste repositório.
 
@@ -317,7 +317,7 @@ contracts/idempotency.md
 - [x] Criar padrão de migrations para PostgreSQL.
 - [x] Criar padrão de tabelas/streams para DynamoDB.
 - [x] Criar padrão Outbox por serviço.
-- [ ] Definir escopo e responsabilidades do novo repositório unificado de infraestrutura.
+- [x] Definir escopo e responsabilidades do novo repositório unificado de infraestrutura.
 - [ ] Criar padrão de isolamento para `oficina_os` e `oficina_billing` no RDS PostgreSQL compartilhado.
 
 ### Épico C — Saga
@@ -375,4 +375,4 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é definir o escopo e as responsabilidades do novo repositório unificado de infraestrutura que substituirá a separação entre `oficina-infra-db` e `oficina-infra-k8s`.
+O próximo passo mais importante é criar o padrão de isolamento para `oficina_os` e `oficina_billing` no RDS PostgreSQL compartilhado.

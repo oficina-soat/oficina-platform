@@ -27,17 +27,19 @@ O `oficina-execution-service` é o único serviço autorizado a acessar diretame
 
 ## Tabelas canônicas
 
+Para a Fase 4, o ambiente canônico é `lab` e o prefixo materializado é `oficina-execution-lab`, conforme [Nomes de runtime, secrets e infraestrutura](infra-runtime-naming.md). O nome lógico de cada tabela deve ser preservado pelo sufixo após esse prefixo.
+
 | Tabela | Propósito | Stream | Retenção |
 |---|---|---|---|
-| `oficina-execution-catalog` | Catálogo técnico de peças e serviços | Desabilitado | Indefinida |
-| `oficina-execution-stock` | Saldos e movimentos de estoque | Habilitado com `NEW_AND_OLD_IMAGES` | Indefinida |
-| `oficina-execution-work` | Execuções, diagnósticos, reparos e histórico operacional | Habilitado com `NEW_AND_OLD_IMAGES` | Indefinida |
-| `oficina-execution-outbox` | Eventos pendentes de publicação | Habilitado com `NEW_AND_OLD_IMAGES` | TTL após publicação |
-| `oficina-execution-idempotency` | Controle de idempotência REST e consumo de eventos | Desabilitado | TTL obrigatório |
+| `oficina-execution-lab-catalogo` | Catálogo técnico de peças e serviços | Desabilitado | Indefinida |
+| `oficina-execution-lab-estoque` | Saldos e movimentos de estoque | Habilitado com `NEW_AND_OLD_IMAGES` | Indefinida |
+| `oficina-execution-lab-execucoes` | Execuções, diagnósticos, reparos e histórico operacional | Habilitado com `NEW_AND_OLD_IMAGES` | Indefinida |
+| `oficina-execution-lab-outbox` | Eventos pendentes de publicação | Habilitado com `NEW_AND_OLD_IMAGES` | TTL após publicação |
+| `oficina-execution-lab-idempotencia` | Controle de idempotência REST e consumo de eventos | Desabilitado | TTL obrigatório |
 
-Os nomes acima são nomes lógicos por ambiente. A infraestrutura pode prefixar ou sufixar ambiente conforme [Nomes de runtime, secrets e infraestrutura](infra-runtime-naming.md), desde que preserve o nome lógico e o ownership.
+Os nomes acima são os nomes materializados canônicos do ambiente `lab`. Em ambientes futuros, a infraestrutura pode trocar apenas o componente de ambiente do prefixo, preservando ownership, sufixo lógico e variáveis runtime equivalentes.
 
-## `oficina-execution-catalog`
+## `oficina-execution-lab-catalogo`
 
 Tabela do catálogo técnico de peças e serviços.
 
@@ -80,7 +82,7 @@ Tabela do catálogo técnico de peças e serviços.
 - Atualizações de valor não alteram snapshots já persistidos pelo `oficina-os-service`.
 - Alterações de catálogo não publicam eventos no contrato fundamental da Fase 4.
 
-## `oficina-execution-stock`
+## `oficina-execution-lab-estoque`
 
 Tabela de saldo e movimentos de estoque.
 
@@ -134,7 +136,7 @@ Tabela de saldo e movimentos de estoque.
 - `estoqueAcrescentado` deve ser publicado para `ENTRADA`.
 - `estoqueBaixado` deve ser publicado para `RESERVA` e `CONSUMO`, conforme schema atual.
 
-## `oficina-execution-work`
+## `oficina-execution-lab-execucoes`
 
 Tabela de execuções, diagnósticos, reparos e histórico operacional.
 
@@ -190,7 +192,7 @@ Tabela de execuções, diagnósticos, reparos e histórico operacional.
 - `execucaoFinalizada` deve ser publicado ao entrar em `REPARO_CONCLUIDO`.
 - Cancelamentos não possuem evento fundamental próprio na Fase 4; efeitos distribuídos devem ocorrer por `sagaCompensada` quando orquestrados pelo `oficina-os-service`.
 
-## `oficina-execution-outbox`
+## `oficina-execution-lab-outbox`
 
 Tabela de Outbox local para publicação confiável de eventos.
 
@@ -236,7 +238,7 @@ Tabela de Outbox local para publicação confiável de eventos.
 - Falhas definitivas devem marcar `FAILED` e exigir análise operacional.
 - TTL deve ser aplicado apenas depois de `PUBLISHED`, nunca enquanto o evento estiver `PENDING` ou `FAILED`.
 
-## `oficina-execution-idempotency`
+## `oficina-execution-lab-idempotencia`
 
 Tabela de idempotência para comandos REST e consumo de eventos.
 
@@ -272,9 +274,9 @@ Tabela de idempotência para comandos REST e consumo de eventos.
 
 | Tabela | Stream | Consumidor previsto |
 |---|---|---|
-| `oficina-execution-stock` | `NEW_AND_OLD_IMAGES` | Auditoria operacional ou projeções internas futuras |
-| `oficina-execution-work` | `NEW_AND_OLD_IMAGES` | Auditoria operacional ou projeções internas futuras |
-| `oficina-execution-outbox` | `NEW_AND_OLD_IMAGES` | Publicador de eventos do próprio serviço |
+| `oficina-execution-lab-estoque` | `NEW_AND_OLD_IMAGES` | Auditoria operacional ou projeções internas futuras |
+| `oficina-execution-lab-execucoes` | `NEW_AND_OLD_IMAGES` | Auditoria operacional ou projeções internas futuras |
+| `oficina-execution-lab-outbox` | `NEW_AND_OLD_IMAGES` | Publicador de eventos do próprio serviço |
 
 Streams não substituem a Outbox. A Outbox continua sendo a origem de publicação dos eventos externos para os tópicos canônicos.
 

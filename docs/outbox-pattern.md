@@ -27,7 +27,7 @@ A publicação direta no broker durante a operação de negócio não é permiti
 |---|---|---|---|
 | `oficina-os-service` | PostgreSQL database `oficina_os` | Tabela `outbox_event` | Eventos de OS e Saga |
 | `oficina-billing-service` | PostgreSQL database `oficina_billing` | Tabela `outbox_event` | Eventos financeiros |
-| `oficina-execution-service` | Amazon DynamoDB | Tabela `oficina-execution-outbox` | Eventos operacionais e de estoque |
+| `oficina-execution-service` | Amazon DynamoDB | Tabela `oficina-execution-lab-outbox` | Eventos operacionais e de estoque |
 
 Cada serviço deve publicar apenas eventos em que aparece como produtor na tabela canônica do [Contrato de Eventos de Domínio](../contracts/Contrato%20de%20Eventos%20de%20Domínio.md).
 
@@ -118,7 +118,7 @@ O publicador PostgreSQL deve selecionar eventos elegíveis com lock transacional
 
 ## DynamoDB
 
-`oficina-execution-service` deve usar a tabela `oficina-execution-outbox`, conforme o [Padrão DynamoDB do oficina-execution-service](dynamodb-execution-service.md).
+`oficina-execution-service` deve usar a tabela `oficina-execution-lab-outbox` no ambiente canônico `lab`, conforme o [Padrão DynamoDB do oficina-execution-service](dynamodb-execution-service.md).
 
 Chaves canônicas:
 

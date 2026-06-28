@@ -3,14 +3,20 @@ info:
   title: oficina-os-service API
   version: 1.0.0
   description: Contrato REST v1 para clientes, veiculos, ordens de servico, estados e historico da OS.
+  license:
+    name: Internal
+    identifier: LicenseRef-Internal
 servers:
   - url: /api/v1
 security:
   - bearerAuth: []
 tags:
   - name: Clientes
+    description: Operacoes de cadastro e consulta de clientes.
   - name: Veiculos
+    description: Operacoes de cadastro e consulta de veiculos.
   - name: Ordens de Servico
+    description: Operacoes de abertura, consulta, estado e historico de ordens de servico.
 paths:
   /clientes:
     post:

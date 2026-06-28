@@ -3,13 +3,18 @@ info:
   title: oficina-billing-service API
   version: 1.0.0
   description: Contrato REST v1 para orcamentos, aprovacoes, recusas e pagamentos.
+  license:
+    name: Internal
+    identifier: LicenseRef-Internal
 servers:
   - url: /api/v1
 security:
   - bearerAuth: []
 tags:
   - name: Orcamentos
+    description: Operacoes de geracao, consulta, aprovacao e recusa de orcamentos.
   - name: Pagamentos
+    description: Operacoes de registro, consulta, confirmacao, recusa e cancelamento de pagamentos.
 paths:
   /orcamentos:
     post:

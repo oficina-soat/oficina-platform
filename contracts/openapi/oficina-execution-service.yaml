@@ -3,15 +3,22 @@ info:
   title: oficina-execution-service API
   version: 1.0.0
   description: Contrato REST v1 para catalogo de servicos, pecas, estoque, diagnostico, execucao e reparo.
+  license:
+    name: Internal
+    identifier: LicenseRef-Internal
 servers:
   - url: /api/v1
 security:
   - bearerAuth: []
 tags:
   - name: Servicos
+    description: Operacoes de catalogo tecnico de servicos.
   - name: Pecas
+    description: Operacoes de catalogo tecnico de pecas.
   - name: Estoque
+    description: Operacoes de saldo e movimentos de estoque.
   - name: Execucoes
+    description: Operacoes de diagnostico, execucao e reparo.
 paths:
   /servicos:
     post:

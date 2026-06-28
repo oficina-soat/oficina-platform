@@ -123,9 +123,9 @@ Também foi definido que:
 docs/oficina-app-decomposition.md
 ```
 
-**Definição faltante:** detalhar, durante a implementação dos microsserviços, os mapeamentos finais de classes, testes, migrations e seeds executáveis conforme cada repositório evoluir.
+**Definição faltante:** detalhar, durante a implementação dos microsserviços, os mapeamentos finais de classes, testes e seeds executáveis conforme cada repositório evoluir.
 
-Uma proposta inicial para as baselines PostgreSQL decompostas de `oficina-os-service` e `oficina-billing-service` foi registrada em:
+As decisões para as baselines PostgreSQL decompostas de `oficina-os-service` e `oficina-billing-service` foram registradas em:
 
 ```text
 docs/postgres-migrations-decomposition.md
@@ -150,9 +150,9 @@ contracts/saga/oficina-os-saga-v1.md
 
 ### 7. Padrões técnicos para repositórios de microsserviços
 
-**Situação atual:** há decisões sobre CI/CD, deploy independente e governança, mas ainda faltam templates práticos para agentes criarem os repositórios.
+**Situação atual:** há decisões sobre CI/CD, deploy independente e governança, e o template base Quarkus foi criado em `templates/quarkus-service/`.
 
-**Definição faltante:** criar um template mínimo de serviço com estrutura, comandos padrão, pipeline, Dockerfile, Kubernetes manifests, observabilidade e documentação local.
+**Definição faltante:** evoluir o template com pipeline, Dockerfile, Kubernetes manifests e documentação local específica quando esses padrões forem fechados.
 
 **Artefatos sugeridos:**
 
@@ -315,10 +315,10 @@ contracts/idempotency.md
 - [x] Criar plano de decomposição do `oficina-app` por componente e microsserviço destino.
 - [x] Definir estratégia de migração ou descarte do `oficina-app` após a decomposição.
 - [x] Criar proposta inicial de migrations PostgreSQL decompostas para OS e Billing.
-- [ ] Criar template base Quarkus.
-- [ ] Criar padrão de configuração por ambiente.
-- [ ] Criar padrão de health checks.
-- [ ] Criar padrão de migrations para PostgreSQL.
+- [x] Criar template base Quarkus.
+- [x] Criar padrão de configuração por ambiente.
+- [x] Criar padrão de health checks.
+- [x] Criar padrão de migrations para PostgreSQL.
 - [ ] Criar padrão de tabelas/streams para DynamoDB.
 - [ ] Criar padrão Outbox por serviço.
 - [ ] Definir escopo e responsabilidades do novo repositório unificado de infraestrutura.
@@ -379,4 +379,4 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é avaliar a proposta de migrations PostgreSQL decompostas em `docs/postgres-migrations-decomposition.md` e, após os ajustes de modelagem, criar o template base Quarkus dos microsserviços preservando a estrutura do `oficina-app`.
+O próximo passo mais importante é definir o padrão de tabelas, chaves, índices, seeds e streams DynamoDB do `oficina-execution-service`, alinhado ao contrato de eventos, ao catálogo técnico, ao estoque e aos fluxos de execução.

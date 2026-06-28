@@ -142,11 +142,18 @@ JWT_SECRET_PUBLIC_KEY_FIELD=publicKeyPem
 ROTATE_JWT_SECRET=false
 OFICINA_AUTH_ISSUER=<issuer-resolvido-no-deploy>
 OFICINA_AUTH_JWKS_URI=<jwks-resolvido-no-deploy>
-OFICINA_AUTH_AUDIENCE=oficina-app
 MP_JWT_VERIFY_PUBLICKEY_LOCATION=<jwks-ou-arquivo-montado>
 ```
 
-Para os novos microsserviços, a audience deve ser revisada antes da implementação final. O valor `oficina-app` é legado e ainda aparece nos templates por compatibilidade com o backend atual.
+Audience JWT canônica por microsserviço:
+
+```text
+oficina-os-service
+oficina-billing-service
+oficina-execution-service
+```
+
+Cada microsserviço deve configurar `OFICINA_AUTH_AUDIENCE` com o próprio nome canônico. O valor `oficina-app` é legado e deve continuar apenas como referência histórica para o backend monolítico atual.
 
 ### Lambda de autenticação e notificações
 
@@ -205,6 +212,69 @@ Uso esperado:
 - `DYNAMODB_ENDPOINT_OVERRIDE` deve ser usado apenas em `dev` e `test`.
 - `OFICINA_DYNAMODB_TABLE_PREFIX` deve prefixar tabelas próprias do `oficina-execution-service`.
 
+Tabelas canônicas:
+
+```text
+oficina-execution-lab-catalogo
+oficina-execution-lab-estoque
+oficina-execution-lab-execucoes
+oficina-execution-lab-outbox
+oficina-execution-lab-idempotencia
+```
+
+Responsabilidades:
+
+- `catalogo`: peças e serviços técnicos.
+- `estoque`: saldo, reservas e movimentos.
+- `execucoes`: execução, diagnóstico, reparo e histórico operacional.
+- `outbox`: eventos produzidos pelo serviço antes da publicação.
+- `idempotencia`: controle de comandos REST, Saga e consumidores de eventos.
+
+Variáveis runtime canônicas:
+
+```text
+OFICINA_DYNAMODB_TABLE_PREFIX=oficina-execution-lab
+OFICINA_DYNAMODB_CATALOGO_TABLE=oficina-execution-lab-catalogo
+OFICINA_DYNAMODB_ESTOQUE_TABLE=oficina-execution-lab-estoque
+OFICINA_DYNAMODB_EXECUCOES_TABLE=oficina-execution-lab-execucoes
+OFICINA_DYNAMODB_OUTBOX_TABLE=oficina-execution-lab-outbox
+OFICINA_DYNAMODB_IDEMPOTENCIA_TABLE=oficina-execution-lab-idempotencia
+```
+
+`OFICINA_DYNAMODB_TABLE_PREFIX` é a configuração principal. Os nomes individuais permitem override operacional quando for necessário isolar testes, migrações, restaurações ou ambientes temporários sem alterar código.
+
+### IAM e Kubernetes do oficina-execution-service
+
+Nomes canônicos:
+
+```text
+Kubernetes Deployment: oficina-execution-service
+Kubernetes Service: oficina-execution-service
+Kubernetes ServiceAccount: oficina-execution-service
+ConfigMap: oficina-execution-service-config
+IAM role: oficina-execution-service-lab
+IAM policy: oficina-execution-service-lab-dynamodb
+```
+
+O nome completo `oficina-execution-service` deve ser preservado nos recursos Kubernetes. O sufixo `lab` deve ser usado em recursos AWS globais ou regionais do ambiente de laboratório.
+
+### State Terraform do novo oficina-infra
+
+Chave canônica durante a transição para o repositório unificado:
+
+```text
+oficina/lab/infra/terraform.tfstate
+```
+
+Essa key evita colisão com os states legados:
+
+```text
+oficina/lab/terraform.tfstate
+oficina/lab/database/terraform.tfstate
+```
+
+Após a substituição integral de `oficina-infra-k8s` e `oficina-infra-db`, a suíte pode avaliar uma migração de state para simplificar o nome.
+
 ---
 
 ## Padrões de infraestrutura fechados
@@ -221,45 +291,7 @@ Uso esperado:
 
 ## Sugestões pendentes de avaliação
 
-Os pontos abaixo ainda não existem de forma fechada nos repositórios irmãos. Eles são necessários para completar o padrão DynamoDB do `oficina-execution-service`, mas devem ser avaliados antes de virarem contrato canônico.
-
-### Secrets e variáveis dos novos microsserviços
-
-Sugestão para audiência JWT por microsserviço:
-
-```text
-OFICINA_AUTH_AUDIENCE=oficina-os-service
-OFICINA_AUTH_AUDIENCE=oficina-billing-service
-OFICINA_AUTH_AUDIENCE=oficina-execution-service
-```
-
-Alternativa mais simples para laboratório:
-
-```text
-OFICINA_AUTH_AUDIENCE=oficina-services
-```
-
-Recomendação: usar audience por microsserviço se o API Gateway ou os tokens puderem diferenciar consumidores; usar `oficina-services` apenas se a simplicidade do laboratório for prioridade.
-
-### Tabelas DynamoDB
-
-Sugestão de nomes usando o prefixo já existente:
-
-```text
-oficina-execution-lab-catalogo
-oficina-execution-lab-estoque
-oficina-execution-lab-execucoes
-oficina-execution-lab-outbox
-oficina-execution-lab-idempotencia
-```
-
-Racional:
-
-- `catalogo`: peças e serviços técnicos.
-- `estoque`: saldo, reservas e movimentos.
-- `execucoes`: execução, diagnóstico, reparo e histórico operacional.
-- `outbox`: eventos produzidos pelo serviço antes da publicação.
-- `idempotencia`: controle de comandos REST, Saga e consumidores de eventos.
+Os pontos abaixo ainda precisam de avaliação antes de virar contrato canônico.
 
 ### Variáveis de infraestrutura DynamoDB
 
@@ -273,46 +305,31 @@ EXECUTION_DYNAMODB_STREAM_VIEW_TYPE=NEW_AND_OLD_IMAGES
 EXECUTION_DYNAMODB_DELETION_PROTECTION_ENABLED=false
 ```
 
-Sugestão para runtime do `oficina-execution-service`:
+Termos:
+
+- `EXECUTION_DYNAMODB_TABLE_PREFIX`: prefixo usado pelo Terraform para nomear todas as tabelas do `oficina-execution-service`.
+- `EXECUTION_DYNAMODB_BILLING_MODE`: modo de cobrança/capacidade do DynamoDB.
+- `PAY_PER_REQUEST`: cobrança sob demanda; não exige configurar capacidade de leitura/escrita e é mais simples para carga variável ou ambiente `lab`.
+- `EXECUTION_DYNAMODB_POINT_IN_TIME_RECOVERY_ENABLED`: liga Point-in-Time Recovery, permitindo restaurar uma tabela para um momento recente dentro da janela suportada pelo DynamoDB.
+- `EXECUTION_DYNAMODB_STREAM_VIEW_TYPE`: define quais dados aparecem no DynamoDB Streams quando um item muda.
+- `NEW_AND_OLD_IMAGES`: cada evento de stream carrega a versão anterior e a nova versão do item, útil para auditoria, publicação de eventos e depuração.
+- `EXECUTION_DYNAMODB_DELETION_PROTECTION_ENABLED`: impede exclusão acidental da tabela quando habilitado.
+
+Impacto prático:
+
+- `PAY_PER_REQUEST` reduz configuração e risco de throttling por capacidade mal dimensionada no laboratório.
+- Point-in-Time Recovery aumenta segurança operacional, mas pode gerar custo adicional.
+- Streams com `NEW_AND_OLD_IMAGES` facilitam outbox, auditoria e integrações futuras, mas aumentam volume de dados processados.
+- Deletion protection `false` facilita teardown do ambiente `lab`; em ambiente permanente, o valor deveria ser `true`.
+
+Recomendação mantida:
 
 ```text
-OFICINA_DYNAMODB_TABLE_PREFIX=oficina-execution-lab
-OFICINA_DYNAMODB_CATALOGO_TABLE=oficina-execution-lab-catalogo
-OFICINA_DYNAMODB_ESTOQUE_TABLE=oficina-execution-lab-estoque
-OFICINA_DYNAMODB_EXECUCOES_TABLE=oficina-execution-lab-execucoes
-OFICINA_DYNAMODB_OUTBOX_TABLE=oficina-execution-lab-outbox
-OFICINA_DYNAMODB_IDEMPOTENCIA_TABLE=oficina-execution-lab-idempotencia
+EXECUTION_DYNAMODB_TABLE_PREFIX=oficina-execution-lab
+EXECUTION_DYNAMODB_BILLING_MODE=PAY_PER_REQUEST
+EXECUTION_DYNAMODB_POINT_IN_TIME_RECOVERY_ENABLED=true
+EXECUTION_DYNAMODB_STREAM_VIEW_TYPE=NEW_AND_OLD_IMAGES
+EXECUTION_DYNAMODB_DELETION_PROTECTION_ENABLED=false
 ```
 
-Recomendação: manter `OFICINA_DYNAMODB_TABLE_PREFIX` como configuração principal e permitir sobrescrever nomes individuais apenas quando houver necessidade operacional.
-
-### IAM e Kubernetes para o execution service
-
-Sugestão de nomes:
-
-```text
-Kubernetes Deployment: oficina-execution-service
-Kubernetes Service: oficina-execution-service
-Kubernetes ServiceAccount: oficina-execution-service
-IAM role: oficina-execution-service-lab
-IAM policy: oficina-execution-service-lab-dynamodb
-ConfigMap: oficina-execution-service-config
-```
-
-Recomendação: manter o nome canônico do microsserviço em todos os recursos Kubernetes e usar sufixo `lab` apenas em recursos AWS globais ou regionais.
-
-### State Terraform do novo repositório unificado
-
-Sugestão para o novo `oficina-infra`:
-
-```text
-oficina/lab/infra/terraform.tfstate
-```
-
-Alternativa:
-
-```text
-oficina/lab/terraform.tfstate
-```
-
-Recomendação: usar `oficina/lab/infra/terraform.tfstate` se a migração mantiver temporariamente os states legados; usar `oficina/lab/terraform.tfstate` apenas se o novo repositório substituir integralmente o state atual do `oficina-infra-k8s`.
+Essa recomendação deve ser aprovada antes de fechar o padrão de provisionamento DynamoDB.

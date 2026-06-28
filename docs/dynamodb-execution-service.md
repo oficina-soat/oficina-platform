@@ -10,7 +10,8 @@ Este documento é normativo para implementação do repositório `oficina-execut
 - `contracts/openapi/oficina-execution-service.yaml`;
 - `contracts/Contrato de Eventos de Domínio.md`;
 - `contracts/Contrato de Tópicos de Mensageria.md`;
-- `contracts/idempotency.md`.
+- `contracts/idempotency.md`;
+- `docs/outbox-pattern.md`.
 
 O `oficina-execution-service` é o único serviço autorizado a acessar diretamente estas tabelas. Outros serviços devem integrar por REST ou eventos.
 
@@ -332,3 +333,4 @@ Consumidores devem ser idempotentes e não podem alterar dados de outros micross
 - `contracts/events/schemas/execucaoFinalizada.schema.json`
 - `contracts/events/schemas/estoqueAcrescentado.schema.json`
 - `contracts/events/schemas/estoqueBaixado.schema.json`
+- `docs/outbox-pattern.md`

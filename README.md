@@ -27,4 +27,5 @@ O planejamento incremental da plataforma, incluindo lacunas restantes e backlog 
 
 - [Conta, região e ambientes AWS](docs/aws-environments.md)
 - [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md)
+- [Padrão Outbox por serviço](docs/outbox-pattern.md)
 - [Padrão DynamoDB do oficina-execution-service](docs/dynamodb-execution-service.md)

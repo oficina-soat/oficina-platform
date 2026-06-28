@@ -208,4 +208,5 @@ Critérios usados:
 - `contracts/Contrato de APIs REST.md`
 - `contracts/Contrato de Eventos de Domínio.md`
 - `contracts/Contrato de Tópicos de Mensageria.md`
+- `docs/outbox-pattern.md`
 - `contracts/openapi/`

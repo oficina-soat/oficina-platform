@@ -280,12 +280,13 @@ CREATE TABLE outbox_event (
   created_at timestamptz NOT NULL,
   published_at timestamptz,
   attempts integer NOT NULL DEFAULT 0,
+  next_attempt_at timestamptz,
   last_error text,
   CONSTRAINT ck_outbox_event_status CHECK (status IN ('PENDING', 'PUBLISHED', 'FAILED'))
 );
 
-CREATE INDEX ix_outbox_event_status_created
-  ON outbox_event (status, created_at);
+CREATE INDEX ix_outbox_event_status_next_attempt
+  ON outbox_event (status, next_attempt_at, created_at);
 
 CREATE INDEX ix_outbox_event_aggregate
   ON outbox_event (aggregate_id, occurred_at);
@@ -298,3 +299,4 @@ CREATE INDEX ix_outbox_event_aggregate
 - Itens do orçamento são imutáveis após `GERADO`.
 - `pagamento.orcamento_id` deve ser único na Fase 4.
 - Outbox usa apenas `PENDING`, `PUBLISHED` e `FAILED`.
+- O padrão transversal da Outbox está definido em `docs/outbox-pattern.md`.

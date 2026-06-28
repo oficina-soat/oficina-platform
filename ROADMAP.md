@@ -320,7 +320,7 @@ contracts/idempotency.md
 - [x] Criar padrão de health checks.
 - [x] Criar padrão de migrations para PostgreSQL.
 - [x] Criar padrão de tabelas/streams para DynamoDB.
-- [ ] Criar padrão Outbox por serviço.
+- [x] Criar padrão Outbox por serviço.
 - [ ] Definir escopo e responsabilidades do novo repositório unificado de infraestrutura.
 - [ ] Criar padrão de isolamento para `oficina_os` e `oficina_billing` no RDS PostgreSQL compartilhado.
 
@@ -379,4 +379,4 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é criar o padrão Outbox por serviço, alinhando PostgreSQL, DynamoDB, publicação de eventos, retentativas, DLQ, idempotência e observabilidade.
+O próximo passo mais importante é definir o escopo e as responsabilidades do novo repositório unificado de infraestrutura que substituirá a separação entre `oficina-infra-db` e `oficina-infra-k8s`.

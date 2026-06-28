@@ -257,6 +257,8 @@ A idempotência da publicação deve considerar:
 
 Retries do publicador Outbox não devem criar novo `eventId` para o mesmo evento lógico já persistido.
 
+O padrão operacional de tabelas, estados, retentativas, DLQ e observabilidade da Outbox está definido em `docs/outbox-pattern.md`.
+
 ---
 
 ## Saga

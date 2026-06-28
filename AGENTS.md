@@ -48,6 +48,7 @@ Quando esses repositórios estiverem disponíveis, eles devem ser consultados pa
 - Ao alterar uma decisão compartilhada, atualize todos os artefatos afetados no mesmo escopo da mudança.
 - Quando houver divergência entre documentação conceitual e contratos implementáveis, explicite a decisão e normalize os artefatos relacionados.
 - Quando houver dúvida sobre nomes que precisam ser iguais entre plataforma, aplicação, autenticação, banco e infraestrutura, consulte os repositórios irmãos antes de definir novos valores.
+- Em textos Markdown em português, use acentuação correta e revise termos comuns sem acento antes de encerrar a alteração. Preserve sem acento identificadores técnicos, nomes de campos, rotas, tópicos, eventos, variáveis, comandos, trechos de código e valores canônicos quando essa for a forma contratada.
 
 ## Implementação
 

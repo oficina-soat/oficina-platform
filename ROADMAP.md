@@ -228,6 +228,55 @@ contracts/idempotency.md
 
 **Critério de pronto:** APIs e consumidores devem ter comportamento previsível em retry, duplicidade, timeout e conflito de estado.
 
+### 12. BDD, cobertura e qualidade de código
+
+**Situação atual:** o enunciado exige testes unitários em todos os microsserviços, pelo menos um fluxo completo testado com BDD, cobertura mínima de 80% por serviço e validação de qualidade via SonarQube ou similar no CI.
+
+**Definição faltante:** definir e implementar o padrão BDD dos microsserviços, incluindo ferramenta, estrutura de features, fluxo completo coberto e integração ao pipeline de CI/CD. Também é necessário aplicar a meta de cobertura mínima de 80% por serviço e garantir Quality Gate obrigatório via SonarCloud ou equivalente nos três repositórios.
+
+**Artefatos sugeridos:**
+
+```text
+docs/bdd-testing.md
+templates/quarkus-service/src/test/resources/features/
+templates/github-actions/service-ci.yml
+```
+
+**Critério de pronto:** os três microsserviços devem executar testes unitários, integração e contrato no CI; pelo menos um fluxo completo da OS deve ter cenário BDD automatizado; cada serviço deve publicar evidência de cobertura mínima de 80%; e o pipeline deve falhar quando o Quality Gate configurado não for atendido.
+
+### 13. Evidências e entregáveis finais da Fase 4
+
+**Situação atual:** o enunciado exige evidências de cobertura, documentação de arquitetura do serviço, Swagger ou collection Postman atualizada, vídeo de demonstração de até 15 minutos e PDF com links, diagrama geral, estratégia de Saga e justificativas.
+
+**Definição faltante:** criar checklist consolidado dos entregáveis finais, incluindo onde registrar links de cobertura, Swagger/OpenAPI, vídeo, PDF e diagrama de arquitetura.
+
+**Artefatos sugeridos:**
+
+```text
+docs/phase-4-delivery-checklist.md
+docs/architecture-diagram.md
+```
+
+**Critério de pronto:** cada repositório de microsserviço deve possuir README com link de cobertura e Swagger/OpenAPI; a plataforma deve possuir checklist final da entrega; e o PDF/vídeo devem demonstrar fluxo completo da OS, Saga com falha/compensação, deploy automatizado e observabilidade distribuída.
+
+### 14. Manifestos Kubernetes como entregável por microsserviço
+
+**Situação atual:** a governança da suíte definiu o repositório `oficina-infra` como destino canônico da infraestrutura executável, mas o enunciado da Fase 4 lista manifestos Kubernetes como entregável dos repositórios de microsserviço.
+
+**Definição faltante:** decidir se os manifestos Kubernetes específicos de cada serviço serão copiados para os repositórios dos microsserviços, mantidos apenas no `oficina-infra` com links e evidências nos READMEs dos serviços, ou mantidos em ambos com uma fonte canônica explícita.
+
+**Opção recomendada:** manter `oficina-infra` como fonte canônica de deploy e registrar nos READMEs dos microsserviços links diretos para os manifestos aplicáveis, evitando divergência operacional. Se a avaliação exigir manifestos dentro de cada repositório, copiar versões de referência e documentar que o deploy real continua no `oficina-infra`.
+
+**Artefatos sugeridos:**
+
+```text
+../oficina-infra/
+templates/kubernetes/base/
+README.md dos microsserviços
+```
+
+**Critério de pronto:** a entrega deve demonstrar onde estão os manifestos Kubernetes de cada serviço, qual repositório é a fonte canônica de deploy e como evitar divergência entre cópias ou referências.
+
 ---
 
 ## Priorização recomendada
@@ -276,7 +325,8 @@ contracts/idempotency.md
 4. Criar a implementação nova do `oficina-billing-service`, sem origem equivalente no `oficina-app`, a partir do [Contrato de APIs REST](contracts/Contrato%20de%20APIs%20REST.md), da [OpenAPI do oficina-billing-service](contracts/openapi/oficina-billing-service.yaml), dos eventos e da [Matriz de Ownership por Microsserviço](docs/service-ownership.md).
 5. Separar seeds e migrations executáveis por serviço, preservando seed limpo e isolamento de banco conforme [Proposta de Migrations PostgreSQL Decompostas](docs/postgres-migrations-decomposition.md) e [Padrão de isolamento PostgreSQL no RDS compartilhado](docs/rds-postgresql-isolation.md).
 6. Implementar producers, consumers, Outbox, idempotência, tratamento de erros, autenticação JWT e propagação de `correlationId` nos três microsserviços.
-7. Criar testes unitários, de contrato e de integração por serviço, incluindo validação mínima das OpenAPI, eventos e fluxos de Saga.
+7. Criar testes unitários, de contrato, de integração e BDD por serviço, incluindo validação mínima das OpenAPI, eventos, fluxos de Saga e cobertura mínima de 80%.
+8. Aplicar os workflows de CI/CD nos três repositórios de microsserviços, com build, testes, relatório de cobertura, Quality Gate SonarCloud ou equivalente, publicação de imagem e deploy automatizado em Kubernetes.
 
 **Resultado esperado:** os três microsserviços deixam de ser placeholders e passam a executar as capacidades mínimas da Fase 4, sem manter dependência runtime do `oficina-app`.
 
@@ -290,6 +340,7 @@ contracts/idempotency.md
 2. Documentar compensações e timeouts.
 3. Definir contratos de comandos/eventos usados pela Saga.
 4. Definir estratégia de testes de integração entre serviços.
+5. Definir cenário BDD do fluxo completo da OS passando por OS, Billing e Execution, incluindo ao menos um caso de falha com compensação.
 
 **Resultado esperado:** agentes conseguem implementar o fluxo distribuído sem decisões ad hoc sobre sequência, compensação ou ownership.
 
@@ -304,6 +355,7 @@ contracts/idempotency.md
 3. Definir runbooks operacionais.
 4. Criar checklist de release por serviço.
 5. Criar checklist de revisão de contratos.
+6. Criar checklist dos entregáveis finais da Fase 4, incluindo evidências de cobertura, Swagger/OpenAPI, vídeo, PDF e diagrama de arquitetura.
 
 **Resultado esperado:** a plataforma fica pronta para operação, demonstração e evolução controlada.
 
@@ -355,8 +407,17 @@ contracts/idempotency.md
 - [ ] Criar do zero no `oficina-billing-service` o domínio de orçamento, aprovação, recusa, pagamento e integração financeira, porque não há módulo equivalente no `oficina-app`.
 - [ ] Criar migrations e seed limpo do `oficina-billing-service` para o database `oficina_billing`, preservando isolamento de acesso e ownership.
 - [ ] Implementar no `oficina-billing-service` cálculo e snapshot financeiro de itens, fluxo de aprovação/recusa, pagamento, producers e consumers definidos nos contratos de eventos.
+- [ ] Implementar integração de pagamentos com Mercado Pago no `oficina-billing-service`, incluindo configuração, adapter, tratamento de falhas, testes e documentação operacional.
+- [ ] Implementar fila de execução da OS no `oficina-execution-service`, incluindo priorização mínima, consulta de fila, início/finalização de diagnóstico e reparo, e eventos correspondentes.
 - [ ] Criar testes unitários e de integração mínimos nos três microsserviços para controllers, use cases, persistência, idempotência, eventos e cenários principais da Saga.
+- [ ] Criar cenário BDD automatizado para pelo menos um fluxo completo da OS atravessando `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, incluindo evidência de execução no CI.
+- [ ] Configurar cobertura mínima de 80% por serviço, com relatório JaCoCo publicado no CI e link ou evidência registrada no README de cada microsserviço.
 - [ ] Validar os três microsserviços contra contratos OpenAPI, schemas JSON de eventos, [Contrato de Erros REST](contracts/error-model.md), [Contrato de Idempotência](contracts/idempotency.md) e [Contrato de Saga do oficina-os-service](contracts/saga/oficina-os-saga-v1.md).
+- [ ] Copiar e adaptar workflows de CI/CD para os três repositórios de microsserviços, garantindo build, testes, Quality Gate SonarCloud ou equivalente, publicação de imagem e deploy automatizado em Kubernetes.
+- [ ] Configurar proteção da branch `main` nos três repositórios de microsserviços, com PR obrigatório e checagens automáticas exigidas antes de merge.
+- [ ] Registrar Swagger/OpenAPI ou collection Postman atualizada no README de cada microsserviço, com link para o contrato canônico correspondente.
+- [ ] Registrar nos READMEs dos três microsserviços a escolha da Saga orquestrada pelo `oficina-os-service`, com justificativa e links para ADR, contrato e fluxos.
+- [ ] Resolver e documentar a estratégia de entrega dos manifestos Kubernetes por microsserviço, conciliando a exigência do enunciado com o repositório canônico `oficina-infra`.
 - [ ] Atualizar continuamente a documentação local dos três repositórios de microsserviços com setup, variáveis de ambiente, execução local, testes, build, Docker, deploy e decisões específicas que surgirem durante a implementação.
 - [ ] Marcar o `oficina-app` como referência histórica após a decomposição, sem aplicar adaptações da Fase 4 diretamente nele.
 
@@ -369,6 +430,7 @@ contracts/idempotency.md
 - [x] Definir eventos de compensação.
 - [x] Definir timeouts e retentativas.
 - [x] Definir testes de contrato da Saga.
+- [ ] Definir e implementar cenário BDD do fluxo completo da Saga, incluindo um caminho feliz e pelo menos uma falha compensada.
 
 ### Épico D — Plataforma e operação
 
@@ -386,6 +448,10 @@ contracts/idempotency.md
 - [x] Migrar workflows e scripts operacionais úteis de `oficina-infra-db` e `oficina-infra-k8s` para `oficina-infra`, normalizando state, secrets, conta, região e ambiente.
 - [ ] Criar checklist de deploy independente.
 - [ ] Criar runbooks mínimos.
+- [ ] Criar checklist final de entrega da Fase 4, cobrindo repositórios, cobertura, Swagger/OpenAPI, vídeo, PDF, diagrama geral, estratégia de Saga, justificativa de microsserviços e tecnologias.
+- [ ] Registrar data de entrega da Fase 4, participantes, links dos repositórios e link do vídeo no checklist final ou no documento de entrega.
+- [ ] Criar diagrama geral da arquitetura final com microsserviços, bancos, mensageria, Kubernetes, observabilidade e integração Mercado Pago.
+- [ ] Preparar roteiro e evidências do vídeo de demonstração de até 15 minutos, incluindo fluxo completo da OS, Saga com falha/compensação, deploy automatizado e rastreamento distribuído.
 
 ---
 
@@ -413,9 +479,10 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 - Matriz de ownership por microsserviço.
 - Fluxo da Saga com compensações.
 - Padrões de erro, idempotência e observabilidade.
+- Padrão BDD e meta de cobertura mínima de 80% por microsserviço.
 - Templates mínimos de serviço, pipeline e deploy.
 - Backlog explícito para cópia controlada do `oficina-app`, criação das implementações novas da Fase 4 e validação dos microsserviços contra contratos.
-- Checklists de revisão de contrato e release.
+- Checklists de revisão de contrato, release e entrega final da Fase 4.
 
 ---
 
@@ -430,7 +497,10 @@ A ordem recomendada é:
 3. copiar e adaptar o domínio de OS/atendimento para `oficina-os-service`;
 4. copiar e adaptar catálogo, peças, serviços e estoque para `oficina-execution-service`, reimplementando DynamoDB;
 5. criar do zero orçamento, aprovação, recusa e pagamento no `oficina-billing-service`;
-6. aplicar o baseline do RDS PostgreSQL compartilhado em AWS quando `vpc_id`, subnets e security groups reais do ambiente `lab` estiverem disponíveis;
-7. adicionar DynamoDB do `oficina-execution-service` e mensageria conforme os contratos da plataforma;
-8. definir rotas reais do API Gateway quando os endpoints dos microsserviços estiverem publicados;
-9. revisar checklists de deploy independente e runbooks mínimos.
+6. implementar BDD, cobertura mínima de 80% e Quality Gate nos três microsserviços;
+7. aplicar os workflows de CI/CD e configurar proteção da branch `main` nos três repositórios;
+8. aplicar o baseline do RDS PostgreSQL compartilhado em AWS quando `vpc_id`, subnets e security groups reais do ambiente `lab` estiverem disponíveis;
+9. adicionar DynamoDB do `oficina-execution-service` e mensageria conforme os contratos da plataforma;
+10. definir rotas reais do API Gateway quando os endpoints dos microsserviços estiverem publicados;
+11. resolver a estratégia de evidência dos manifestos Kubernetes por microsserviço;
+12. revisar checklists de deploy independente, runbooks mínimos e entregáveis finais da Fase 4.

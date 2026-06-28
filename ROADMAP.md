@@ -27,15 +27,15 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
 - Estratégia de PostgreSQL definida para a Fase 4 como uma única instância Amazon RDS compartilhada, com databases independentes por microsserviço relacional:
   - `oficina_os`, acessado apenas pelo `oficina-os-service`;
   - `oficina_billing`, acessado apenas pelo `oficina-billing-service`.
-- Uso de Amazon DynamoDB definido para o `oficina-execution-service`, atendendo ao requisito de banco não relacional, com padrão de tabelas, chaves, índices, seeds e streams registrado em `docs/dynamodb-execution-service.md`.
+- Uso de Amazon DynamoDB definido para o `oficina-execution-service`, atendendo ao requisito de banco não relacional, com padrão de tabelas, chaves, índices, seeds e streams registrado em [Padrão DynamoDB do oficina-execution-service](docs/dynamodb-execution-service.md).
 - Estratégia de CI/CD independente definida por microsserviço.
-- Conta, região e ambiente AWS definidos em `docs/aws-environments.md`:
+- Conta, região e ambiente AWS definidos em [Conta, região e ambientes AWS](docs/aws-environments.md):
   - conta AWS parametrizada por `AWS_ACCOUNT_ID`, sem número fixo canônico;
   - região `us-east-1`;
   - ambiente `lab`;
   - infraestrutura compartilhada `eks-lab`.
 - Decisão de separar o código de infraestrutura em um novo repositório unificado, a ser criado, consolidando as responsabilidades hoje distribuídas entre `oficina-infra-db` e `oficina-infra-k8s`.
-- Enunciado da Fase 4 incluído como referência normativa em `docs/Enunciado Fase 4.md`.
+- Enunciado da Fase 4 incluído como referência normativa em [Enunciado Fase 4](docs/Enunciado%20Fase%204.md).
 - Contratos fundamentais criados para:
   - APIs REST;
   - eventos de domínio;
@@ -62,11 +62,11 @@ contracts/openapi/oficina-billing-service.yaml
 contracts/openapi/oficina-execution-service.yaml
 ```
 
-**Critério de pronto:** cada arquivo deve conter endpoints, schemas de request/response, códigos HTTP esperados, erros padronizados, autenticação e exemplos mínimos, sem divergência em relação a `contracts/Contrato de APIs REST.md`.
+**Critério de pronto:** cada arquivo deve conter endpoints, schemas de request/response, códigos HTTP esperados, erros padronizados, autenticação e exemplos mínimos, sem divergência em relação ao [Contrato de APIs REST](contracts/Contrato%20de%20APIs%20REST.md).
 
 ### 2. Schemas formais dos eventos
 
-**Situação atual:** existem arquivos Markdown individuais para eventos e schemas JSON iniciais em `contracts/events/schemas/`.
+**Situação atual:** existem arquivos Markdown individuais para eventos e schemas JSON iniciais em [contracts/events/schemas/](contracts/events/schemas/).
 
 **Definição faltante:** evoluir os schemas conforme novos campos forem estabilizados nos contratos REST, Saga e implementações dos microsserviços, preservando compatibilidade ou incrementando `eventVersion` quando houver mudança incompatível.
 
@@ -82,7 +82,7 @@ contracts/events/schemas/<nome-do-evento>.schema.json
 
 **Situação atual:** eventos e tópicos foram normalizados em torno dos nomes lógicos camelCase dos eventos e tópicos kebab-case por domínio do produtor.
 
-**Decisão tomada:** os nomes lógicos camelCase dos arquivos em `contracts/events/` são a referência para `eventType`; os tópicos usam kebab-case no domínio do produtor; e os produtores devem usar os nomes canônicos dos microsserviços (`oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`).
+**Decisão tomada:** os nomes lógicos camelCase dos arquivos em [contracts/events/](contracts/events/) são a referência para `eventType`; os tópicos usam kebab-case no domínio do produtor; e os produtores devem usar os nomes canônicos dos microsserviços (`oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`).
 
 **Definição faltante:** manter a tabela canônica `evento -> tópico -> produtor -> consumidores` como referência para criação dos schemas JSON e para implementação dos produtores/consumidores.
 
@@ -90,7 +90,7 @@ contracts/events/schemas/<nome-do-evento>.schema.json
 
 ### 4. Catálogo de responsabilidades por microsserviço
 
-**Situação atual:** as responsabilidades principais estão definidas nas ADRs e contratos, e a matriz operacional única para agentes foi criada em `docs/service-ownership.md`.
+**Situação atual:** as responsabilidades principais estão definidas nas ADRs e contratos, e a matriz operacional única para agentes foi criada em [Matriz de Ownership por Microsserviço](docs/service-ownership.md).
 
 **Definição faltante:** manter a matriz de ownership atualizada sempre que APIs, eventos, bancos, jobs/outbox, integrações externas ou limites de responsabilidade forem alterados.
 
@@ -104,7 +104,7 @@ docs/service-ownership.md
 
 ### 5. Plano de decomposição do `oficina-app`
 
-**Situação atual:** o plano inicial de decomposição foi criado em `docs/oficina-app-decomposition.md`, usando o `oficina-app` como referência de código, testes e seed funcional para a arquitetura de microsserviços da Fase 4.
+**Situação atual:** o plano inicial de decomposição foi criado em [Plano de Decomposição do oficina-app](docs/oficina-app-decomposition.md), usando o `oficina-app` como referência de código, testes e seed funcional para a arquitetura de microsserviços da Fase 4.
 
 **Decisão:** o código do `oficina-app` será dividido entre `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, respeitando os limites de responsabilidade, contratos REST, eventos, bancos e regras de ownership definidos neste repositório.
 
@@ -125,11 +125,7 @@ docs/oficina-app-decomposition.md
 
 **Definição faltante:** detalhar, durante a implementação dos microsserviços, os mapeamentos finais de classes, testes e seeds executáveis conforme cada repositório evoluir.
 
-As decisões para as baselines PostgreSQL decompostas de `oficina-os-service` e `oficina-billing-service` foram registradas em:
-
-```text
-docs/postgres-migrations-decomposition.md
-```
+As decisões para as baselines PostgreSQL decompostas de `oficina-os-service` e `oficina-billing-service` foram registradas em [Proposta de Migrations PostgreSQL Decompostas](docs/postgres-migrations-decomposition.md).
 
 **Critério de pronto:** cada componente relevante do `oficina-app` deve possuir destino explícito, estratégia de seed ou descarte, e critério de retenção apenas como referência.
 
@@ -150,7 +146,7 @@ contracts/saga/oficina-os-saga-v1.md
 
 ### 7. Padrões técnicos para repositórios de microsserviços
 
-**Situação atual:** há decisões sobre CI/CD, deploy independente e governança; o template base Quarkus foi criado em `templates/quarkus-service/`; e o padrão DynamoDB do `oficina-execution-service` foi definido em `docs/dynamodb-execution-service.md`.
+**Situação atual:** há decisões sobre CI/CD, deploy independente e governança; o template base Quarkus foi criado em [templates/quarkus-service/](templates/quarkus-service/); e o padrão DynamoDB do `oficina-execution-service` foi definido em [Padrão DynamoDB do oficina-execution-service](docs/dynamodb-execution-service.md).
 
 **Definição faltante:** evoluir o template com pipeline, Dockerfile, Kubernetes manifests e documentação local específica quando esses padrões forem fechados.
 
@@ -341,7 +337,7 @@ contracts/idempotency.md
 - [ ] Criar propagação de `correlationId`.
 - [ ] Criar manifests Kubernetes base.
 - [ ] Criar pipeline padrão de CI/CD.
-- [ ] Normalizar valores legados de conta, região e ambiente AWS nos repositórios antigos conforme `docs/aws-environments.md`.
+- [ ] Normalizar valores legados de conta, região e ambiente AWS nos repositórios antigos conforme [Conta, região e ambientes AWS](docs/aws-environments.md).
 - [ ] Planejar a migração de `oficina-infra-db` e `oficina-infra-k8s` para o novo repositório unificado de infraestrutura.
 - [ ] Provisionar RDS PostgreSQL compartilhado com databases e usuários independentes para OS e Billing.
 - [ ] Criar checklist de deploy independente.

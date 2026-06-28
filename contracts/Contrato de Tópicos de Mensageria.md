@@ -173,7 +173,7 @@ ordemDeServicoFinalizada
 
 # Tabela Canônica de Roteamento
 
-Esta tabela deve ser mantida coerente com `contracts/Contrato de Eventos de Domínio.md` e com os schemas JSON de eventos.
+Esta tabela deve ser mantida coerente com o [Contrato de Eventos de Domínio](Contrato%20de%20Eventos%20de%20Domínio.md) e com os schemas JSON de eventos.
 
 | Evento | Tópico canônico | Produtor | Consumidores |
 |---|---|---|---|

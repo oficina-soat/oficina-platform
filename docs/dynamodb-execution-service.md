@@ -6,12 +6,12 @@ Definir a baseline de tabelas, chaves, índices, seeds e streams DynamoDB do `of
 
 Este documento é normativo para implementação do repositório `oficina-execution-service` e complementa:
 
-- `docs/service-ownership.md`;
-- `contracts/openapi/oficina-execution-service.yaml`;
-- `contracts/Contrato de Eventos de Domínio.md`;
-- `contracts/Contrato de Tópicos de Mensageria.md`;
-- `contracts/idempotency.md`;
-- `docs/outbox-pattern.md`.
+- [Matriz de Ownership por Microsserviço](service-ownership.md);
+- [OpenAPI do oficina-execution-service](../contracts/openapi/oficina-execution-service.yaml);
+- [Contrato de Eventos de Domínio](../contracts/Contrato%20de%20Eventos%20de%20Domínio.md);
+- [Contrato de Tópicos de Mensageria](../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md);
+- [Contrato de Idempotência](../contracts/idempotency.md);
+- [Padrão Outbox por Serviço](outbox-pattern.md).
 
 O `oficina-execution-service` é o único serviço autorizado a acessar diretamente estas tabelas. Outros serviços devem integrar por REST ou eventos.
 
@@ -35,7 +35,7 @@ O `oficina-execution-service` é o único serviço autorizado a acessar diretame
 | `oficina-execution-outbox` | Eventos pendentes de publicação | Habilitado com `NEW_AND_OLD_IMAGES` | TTL após publicação |
 | `oficina-execution-idempotency` | Controle de idempotência REST e consumo de eventos | Desabilitado | TTL obrigatório |
 
-Os nomes acima são nomes lógicos por ambiente. A infraestrutura pode prefixar ou sufixar ambiente conforme `docs/infra-runtime-naming.md`, desde que preserve o nome lógico e o ownership.
+Os nomes acima são nomes lógicos por ambiente. A infraestrutura pode prefixar ou sufixar ambiente conforme [Nomes de runtime, secrets e infraestrutura](infra-runtime-naming.md), desde que preserve o nome lógico e o ownership.
 
 ## `oficina-execution-catalog`
 
@@ -263,7 +263,7 @@ Tabela de idempotência para comandos REST e consumo de eventos.
 
 ### Regras
 
-- Comandos REST com efeito colateral devem seguir `contracts/idempotency.md`.
+- Comandos REST com efeito colateral devem seguir o [Contrato de Idempotência](../contracts/idempotency.md).
 - Consumo de eventos deve registrar `eventId` antes de aplicar mudanças.
 - Reprocessamento do mesmo `eventId` deve ser tratado como sucesso idempotente.
 - Reuso da mesma chave REST com corpo diferente deve retornar conflito.
@@ -308,7 +308,7 @@ Regras:
 | Entrada de estoque | `estoqueAcrescentado` | `oficina.execution.estoque-acrescentado` |
 | Reserva ou consumo de estoque | `estoqueBaixado` | `oficina.execution.estoque-baixado` |
 
-Os payloads devem seguir os schemas JSON em `contracts/events/schemas/`.
+Os payloads devem seguir os schemas JSON em [contracts/events/schemas/](../contracts/events/schemas/).
 
 ## Eventos consumidos
 
@@ -326,11 +326,11 @@ Consumidores devem ser idempotentes e não podem alterar dados de outros micross
 
 ## Referências
 
-- `contracts/openapi/oficina-execution-service.yaml`
-- `contracts/events/schemas/diagnosticoIniciado.schema.json`
-- `contracts/events/schemas/diagnosticoFinalizado.schema.json`
-- `contracts/events/schemas/execucaoIniciada.schema.json`
-- `contracts/events/schemas/execucaoFinalizada.schema.json`
-- `contracts/events/schemas/estoqueAcrescentado.schema.json`
-- `contracts/events/schemas/estoqueBaixado.schema.json`
-- `docs/outbox-pattern.md`
+- [OpenAPI do oficina-execution-service](../contracts/openapi/oficina-execution-service.yaml)
+- [diagnosticoIniciado.schema.json](../contracts/events/schemas/diagnosticoIniciado.schema.json)
+- [diagnosticoFinalizado.schema.json](../contracts/events/schemas/diagnosticoFinalizado.schema.json)
+- [execucaoIniciada.schema.json](../contracts/events/schemas/execucaoIniciada.schema.json)
+- [execucaoFinalizada.schema.json](../contracts/events/schemas/execucaoFinalizada.schema.json)
+- [estoqueAcrescentado.schema.json](../contracts/events/schemas/estoqueAcrescentado.schema.json)
+- [estoqueBaixado.schema.json](../contracts/events/schemas/estoqueBaixado.schema.json)
+- [Padrão Outbox por Serviço](outbox-pattern.md)

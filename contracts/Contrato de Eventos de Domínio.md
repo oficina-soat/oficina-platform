@@ -101,7 +101,7 @@ contracts/events/schemas/
 
 Cada schema de evento deve validar o envelope padrão de mensageria e fixar `eventType`, `eventVersion`, `producer`, tópico canônico e payload obrigatório do evento.
 
-O arquivo `contracts/events/schemas/common.schema.json` concentra tipos compartilhados extraídos dos contratos REST atuais e da comunicação existente no `oficina-app`, como identificadores, datas, estados da Ordem de Serviço, status de execução, status de orçamento, status de pagamento, itens de peça, itens de serviço e movimentos de estoque.
+O arquivo [common.schema.json](events/schemas/common.schema.json) concentra tipos compartilhados extraídos dos contratos REST atuais e da comunicação existente no `oficina-app`, como identificadores, datas, estados da Ordem de Serviço, status de execução, status de orçamento, status de pagamento, itens de peça, itens de serviço e movimentos de estoque.
 
 ---
 

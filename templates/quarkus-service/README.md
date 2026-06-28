@@ -159,7 +159,7 @@ src/main/resources/db/migration/
 
 Baselines propostas:
 
-- `docs/postgres-migrations-decomposition.md`
+- [Proposta de Migrations PostgreSQL Decompostas](../../docs/postgres-migrations-decomposition.md)
 
 O `oficina-execution-service` não usa migrations PostgreSQL.
 

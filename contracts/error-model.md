@@ -306,7 +306,7 @@ O código funcional padrão para payload divergente com a mesma chave é:
 IDEMPOTENCY_CONFLICT
 ```
 
-Reprocessamento válido de uma operação idempotente não deve retornar erro apenas por repetição da chave. O comportamento detalhado deve ser definido em `contracts/idempotency.md`.
+Reprocessamento válido de uma operação idempotente não deve retornar erro apenas por repetição da chave. O comportamento detalhado deve ser definido no [Contrato de Idempotência](idempotency.md).
 
 ---
 

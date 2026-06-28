@@ -6,11 +6,11 @@ Este repositório é a fonte oficial de governança da plataforma da oficina mec
 
 Stack e escopo atual do projeto:
 
-- ADRs em `adr/`
-- contratos REST, eventos, mensageria e estados em `contracts/`
-- especificações OpenAPI em `contracts/openapi/`
-- roadmap incremental em `ROADMAP.md`
-- documentação geral em `README.md`
+- ADRs em [adr/](adr/)
+- contratos REST, eventos, mensageria e estados em [contracts/](contracts/)
+- especificações OpenAPI em [contracts/openapi/](contracts/openapi/)
+- roadmap incremental em [ROADMAP.md](ROADMAP.md)
+- documentação geral em [README.md](README.md)
 
 Os microsserviços definidos para a plataforma são:
 
@@ -41,8 +41,8 @@ Quando esses repositórios estiverem disponíveis, eles devem ser consultados pa
 ## Diretrizes Gerais
 
 - Trate este repositório como fonte normativa da plataforma. Mudanças em ADRs, contratos e padrões devem reduzir ambiguidade para implementação em outros repositórios.
-- Preserve a estrutura já usada no projeto: decisões em `adr/`, contratos em `contracts/`, eventos individuais em `contracts/events/` e OpenAPI por microsserviço em `contracts/openapi/`.
-- Use o `ROADMAP.md` como referência de prioridade e critério de pronto para novas alterações.
+- Preserve a estrutura já usada no projeto: decisões em [adr/](adr/), contratos em [contracts/](contracts/), eventos individuais em [contracts/events/](contracts/events/) e OpenAPI por microsserviço em [contracts/openapi/](contracts/openapi/).
+- Use o [ROADMAP.md](ROADMAP.md) como referência de prioridade e critério de pronto para novas alterações.
 - Prefira mudanças pequenas, objetivas e compatíveis com os contratos já existentes.
 - Evite criar novos padrões, diretórios, microsserviços, tópicos ou formatos de contrato sem necessidade clara.
 - Ao alterar uma decisão compartilhada, atualize todos os artefatos afetados no mesmo escopo da mudança.
@@ -58,8 +58,8 @@ Quando esses repositórios estiverem disponíveis, eles devem ser consultados pa
 - Preserve a estratégia de comunicação híbrida: REST para integrações síncronas e mensageria assíncrona para eventos de domínio.
 - Preserve a Saga Pattern orquestrada pelo `oficina-os-service`, salvo mudança arquitetural documentada por ADR.
 - Preserve persistência poliglota por microsserviço conforme ADRs e padrões existentes.
-- Ao mexer em contratos REST, mantenha coerência entre `contracts/Contrato de APIs REST.md` e os arquivos em `contracts/openapi/`.
-- Ao mexer em eventos, mantenha coerência entre `contracts/Contrato de Eventos de Domínio.md`, `contracts/events/`, `contracts/Contrato de Tópicos de Mensageria.md` e eventuais schemas JSON.
+- Ao mexer em contratos REST, mantenha coerência entre [Contrato de APIs REST](contracts/Contrato%20de%20APIs%20REST.md) e os arquivos em [contracts/openapi/](contracts/openapi/).
+- Ao mexer em eventos, mantenha coerência entre [Contrato de Eventos de Domínio](contracts/Contrato%20de%20Eventos%20de%20Domínio.md), [contracts/events/](contracts/events/), [Contrato de Tópicos de Mensageria](contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md) e eventuais schemas JSON.
 - Ao mexer em estados de Ordem de Serviço, mantenha coerência com os fluxos REST, eventos e Saga.
 - Ao criar contratos OpenAPI, inclua endpoints, schemas de request e response, códigos HTTP esperados, erros padronizados, autenticação e exemplos mínimos.
 - Ao criar schemas de eventos, use o envelope padrão de mensageria com `eventId`, `eventType`, `eventVersion`, `occurredAt`, `producer`, `aggregateId` e `payload`.
@@ -68,7 +68,7 @@ Quando esses repositórios estiverem disponíveis, eles devem ser consultados pa
 
 ## Prioridades
 
-Siga a priorização do `ROADMAP.md` para orientar alterações incrementais.
+Siga a priorização do [ROADMAP.md](ROADMAP.md) para orientar alterações incrementais.
 
 Prioridade atual recomendada:
 
@@ -123,7 +123,7 @@ Checklist mínimo de revisão antes da resposta final:
 - confirmar se o artefato criado está no diretório correto;
 - confirmar se nomes de serviços, eventos, tópicos e rotas batem com os contratos relacionados;
 - confirmar se mudanças em um contrato exigem atualização de OpenAPI, schema, ADR ou roadmap;
-- confirmar se o `README.md` ou o `ROADMAP.md` precisam ser atualizados;
+- confirmar se o [README.md](README.md) ou o [ROADMAP.md](ROADMAP.md) precisam ser atualizados;
 - registrar claramente qualquer validação que não pôde ser executada.
 
 ## Versionamento e Build

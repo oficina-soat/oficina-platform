@@ -4,7 +4,7 @@
 
 Definir o comportamento padronizado de idempotência para APIs REST, consumidores de eventos e operações de Saga da plataforma da oficina mecânica.
 
-Este contrato complementa `contracts/error-model.md` e deve ser usado por `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service` para tornar retries, duplicidades, timeouts e reprocessamentos previsíveis.
+Este contrato complementa o [Contrato de Erros REST](error-model.md) e deve ser usado por `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service` para tornar retries, duplicidades, timeouts e reprocessamentos previsíveis.
 
 ---
 
@@ -172,7 +172,7 @@ Com `code`:
 IDEMPOTENCY_CONFLICT
 ```
 
-O corpo deve seguir `contracts/error-model.md`.
+O corpo deve seguir o [Contrato de Erros REST](error-model.md).
 
 ### Ausência de Chave
 
@@ -257,7 +257,7 @@ A idempotência da publicação deve considerar:
 
 Retries do publicador Outbox não devem criar novo `eventId` para o mesmo evento lógico já persistido.
 
-O padrão operacional de tabelas, estados, retentativas, DLQ e observabilidade da Outbox está definido em `docs/outbox-pattern.md`.
+O padrão operacional de tabelas, estados, retentativas, DLQ e observabilidade da Outbox está definido no [Padrão Outbox por Serviço](../docs/outbox-pattern.md).
 
 ---
 
@@ -287,7 +287,7 @@ saga:<sagaId>:compensar-estoque:<aggregateId>
 
 ## Relação com Erros
 
-Erros de idempotência devem seguir `contracts/error-model.md`.
+Erros de idempotência devem seguir o [Contrato de Erros REST](error-model.md).
 
 | Situação | HTTP | `code` |
 |---|---:|---|

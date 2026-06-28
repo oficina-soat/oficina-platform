@@ -14,8 +14,8 @@ Esta matriz deve ser usada por agentes e desenvolvedores para decidir onde imple
 - Nenhum microsserviço pode acessar diretamente o banco de outro microsserviço.
 - Integrações entre microsserviços devem ocorrer apenas por APIs REST ou eventos de domínio.
 - Eventos devem ser publicados após persistência local bem-sucedida, usando Outbox.
-- Chamadas com efeito colateral devem seguir `contracts/idempotency.md`.
-- Respostas de erro REST devem seguir `contracts/error-model.md`.
+- Chamadas com efeito colateral devem seguir o [Contrato de Idempotência](../contracts/idempotency.md).
+- Respostas de erro REST devem seguir o [Contrato de Erros REST](../contracts/error-model.md).
 - O `oficina-os-service` é a autoridade sobre o estado global da Ordem de Serviço e a orquestração da Saga.
 - O `oficina-execution-service` é a autoridade sobre catálogo técnico de peças e serviços, estoque e execução operacional.
 - O `oficina-billing-service` é a autoridade sobre orçamento, aprovação, recusa, pagamento e integrações financeiras.
@@ -103,7 +103,7 @@ O `oficina-billing-service` não deve:
 | Dimensão | Responsabilidade |
 |---|---|
 | Entidades próprias | Serviço técnico, peça, saldo de estoque, movimento de estoque, execução, diagnóstico, reparo, histórico operacional. |
-| Banco de dados | Amazon DynamoDB, com tabelas de catálogo técnico, estoque, execução, histórico operacional, Outbox e idempotência definidas em `docs/dynamodb-execution-service.md`. |
+| Banco de dados | Amazon DynamoDB, com tabelas de catálogo técnico, estoque, execução, histórico operacional, Outbox e idempotência definidas no [Padrão DynamoDB do oficina-execution-service](dynamodb-execution-service.md). |
 | APIs REST | `/api/v1/servicos`, `/api/v1/servicos/{servicoId}`, `/api/v1/pecas`, `/api/v1/pecas/{pecaId}`, `/api/v1/estoques/pecas/{pecaId}/saldo`, `/api/v1/estoques/movimentos`, `/api/v1/estoques/movimentos/entrada`, `/api/v1/estoques/movimentos/reserva`, `/api/v1/estoques/movimentos/consumo`, `/api/v1/estoques/movimentos/estorno`, `/api/v1/execucoes`, `/api/v1/execucoes/{execucaoId}`, `/api/v1/ordens-servico/{ordemServicoId}/execucao`, `/api/v1/execucoes/{execucaoId}/diagnostico/inicio`, `/api/v1/execucoes/{execucaoId}/diagnostico/conclusao`, `/api/v1/execucoes/{execucaoId}/reparo/inicio`, `/api/v1/execucoes/{execucaoId}/reparo/conclusao`, `/api/v1/execucoes/{execucaoId}/cancelamento`. |
 | Eventos produzidos | `diagnosticoIniciado`, `diagnosticoFinalizado`, `execucaoIniciada`, `execucaoFinalizada`, `estoqueAcrescentado`, `estoqueBaixado`. |
 | Eventos consumidos | `ordemDeServicoCriada`, `pecaIncluidaNaOrdemDeServico`, `servicoIncluidoNaOrdemDeServico`, `orcamentoAprovado`, `ordemDeServicoFinalizada`, `sagaCompensada`, `sagaFinalizadaComSucesso`. |
@@ -202,11 +202,11 @@ Critérios usados:
 
 ## Referências
 
-- `adr/ADR-010 - Estratégia de Divisão dos Microsserviços.md`
-- `adr/ADR-011 - Estratégia de Persistência Poliglota por Microsserviço.md`
-- `adr/ADR-009 - Estratégia de Saga Pattern.md`
-- `contracts/Contrato de APIs REST.md`
-- `contracts/Contrato de Eventos de Domínio.md`
-- `contracts/Contrato de Tópicos de Mensageria.md`
-- `docs/outbox-pattern.md`
-- `contracts/openapi/`
+- [ADR-010 - Estratégia de Divisão dos Microsserviços](../adr/ADR-010%20-%20Estratégia%20de%20Divisão%20dos%20Microsserviços.md)
+- [ADR-011 - Estratégia de Persistência Poliglota por Microsserviço](../adr/ADR-011%20-%20Estratégia%20de%20Persistência%20Poliglota%20por%20Microsserviço.md)
+- [ADR-009 - Estratégia de Saga Pattern](../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md)
+- [Contrato de APIs REST](../contracts/Contrato%20de%20APIs%20REST.md)
+- [Contrato de Eventos de Domínio](../contracts/Contrato%20de%20Eventos%20de%20Domínio.md)
+- [Contrato de Tópicos de Mensageria](../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md)
+- [Padrão Outbox por Serviço](outbox-pattern.md)
+- [contracts/openapi/](../contracts/openapi/)

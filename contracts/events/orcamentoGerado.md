@@ -37,4 +37,4 @@ Campos mínimos:
 - `status`
 - `geradoEm`
 
-Os itens devem seguir o schema `itemOrcamento` em `contracts/events/schemas/common.schema.json`.
+Os itens devem seguir o schema `itemOrcamento` em [common.schema.json](schemas/common.schema.json).

@@ -65,11 +65,11 @@ Operações de criação que possam ser repetidas por falhas de rede devem aceit
 X-Idempotency-Key
 ```
 
-O comportamento esperado para retries, duplicidade, timeout, Saga e consumidores de eventos é definido em `contracts/idempotency.md`.
+O comportamento esperado para retries, duplicidade, timeout, Saga e consumidores de eventos é definido no [Contrato de Idempotência](idempotency.md).
 
 ### Erros
 
-Todas as respostas de erro devem seguir o contrato padronizado em `contracts/error-model.md`, incluindo `correlationId` para rastreabilidade entre HTTP, eventos, logs e traces.
+Todas as respostas de erro devem seguir o contrato padronizado em [Contrato de Erros REST](error-model.md), incluindo `correlationId` para rastreabilidade entre HTTP, eventos, logs e traces.
 
 ---
 
@@ -511,11 +511,7 @@ APIs REST devem ser utilizadas somente para:
 
 Mudanças de estado relevantes devem gerar eventos de domínio publicados por mensageria.
 
-Os eventos são definidos no documento:
-
-```text
-contracts/Contrato de Eventos de Domínio.md
-```
+Os eventos são definidos no [Contrato de Eventos de Domínio](Contrato%20de%20Eventos%20de%20Domínio.md).
 
 ## Compatibilidade
 

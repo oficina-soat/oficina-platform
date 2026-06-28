@@ -199,9 +199,9 @@ Amazon DynamoDB
 
 ### 10. Padrão de observabilidade distribuída
 
-**Situação atual:** observabilidade é requisito recorrente nas ADRs, mas falta contrato operacional detalhado.
+**Situação atual:** o padrão operacional foi criado em [Padrão de Observabilidade Distribuída](docs/observability.md), consolidando logs estruturados, métricas, traces, health checks, dashboards, alertas e propagação de `correlationId`.
 
-**Definição faltante:** padronizar logs, métricas, traces, correlation IDs, dashboards mínimos e alertas.
+**Definição faltante:** manter o padrão coerente com os manifests Kubernetes, pipelines e implementações dos microsserviços conforme esses artefatos forem evoluídos.
 
 **Artefato sugerido:**
 
@@ -332,9 +332,9 @@ contracts/idempotency.md
 
 ### Épico D — Plataforma e operação
 
-- [ ] Criar padrão de observabilidade.
-- [ ] Criar padrão de logs estruturados.
-- [ ] Criar propagação de `correlationId`.
+- [x] Criar padrão de observabilidade.
+- [x] Criar padrão de logs estruturados.
+- [x] Criar propagação de `correlationId`.
 - [ ] Criar manifests Kubernetes base.
 - [ ] Criar pipeline padrão de CI/CD.
 - [ ] Normalizar valores legados de conta, região e ambiente AWS nos repositórios antigos conforme [Conta, região e ambientes AWS](docs/aws-environments.md).
@@ -375,4 +375,4 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é criar o padrão de observabilidade distribuída, incluindo logs estruturados, métricas, traces e propagação de `correlationId`.
+O próximo passo mais importante é criar manifests Kubernetes base para os três microsserviços, mantendo coerência com o [Padrão de Observabilidade Distribuída](docs/observability.md), [Conta, região e ambientes AWS](docs/aws-environments.md), [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md) e [Template Quarkus de Microsserviço](templates/quarkus-service/README.md).

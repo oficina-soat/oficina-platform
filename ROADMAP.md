@@ -264,7 +264,23 @@ contracts/idempotency.md
 
 **Resultado esperado:** agentes conseguem criar ou evoluir repositórios de serviço seguindo o mesmo padrão.
 
-### Marco 3 — Saga e integração distribuída
+### Marco 3 — Implementação dos microsserviços da Fase 4
+
+**Objetivo:** transformar os contratos e planos já definidos em baselines executáveis nos três repositórios de microsserviços.
+
+**Entregas:**
+
+1. Criar baseline Quarkus nos repositórios `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, usando [Template Quarkus de Microsserviço](templates/quarkus-service/README.md), [Template GitHub Actions para Microsserviços](templates/github-actions/README.md) e [Template Kubernetes Base](templates/kubernetes/base/README.md).
+2. Copiar e adaptar o domínio de atendimento do `oficina-app` para o `oficina-os-service`, conforme [Plano de Decomposição do oficina-app](docs/oficina-app-decomposition.md).
+3. Copiar e adaptar o domínio de peças, serviços e estoque do `oficina-app` para o `oficina-execution-service`, reimplementando a persistência em DynamoDB conforme [Padrão DynamoDB do oficina-execution-service](docs/dynamodb-execution-service.md).
+4. Criar a implementação nova do `oficina-billing-service`, sem origem equivalente no `oficina-app`, a partir do [Contrato de APIs REST](contracts/Contrato%20de%20APIs%20REST.md), da [OpenAPI do oficina-billing-service](contracts/openapi/oficina-billing-service.yaml), dos eventos e da [Matriz de Ownership por Microsserviço](docs/service-ownership.md).
+5. Separar seeds e migrations executáveis por serviço, preservando seed limpo e isolamento de banco conforme [Proposta de Migrations PostgreSQL Decompostas](docs/postgres-migrations-decomposition.md) e [Padrão de isolamento PostgreSQL no RDS compartilhado](docs/rds-postgresql-isolation.md).
+6. Implementar producers, consumers, Outbox, idempotência, tratamento de erros, autenticação JWT e propagação de `correlationId` nos três microsserviços.
+7. Criar testes unitários, de contrato e de integração por serviço, incluindo validação mínima das OpenAPI, eventos e fluxos de Saga.
+
+**Resultado esperado:** os três microsserviços deixam de ser placeholders e passam a executar as capacidades mínimas da Fase 4, sem manter dependência runtime do `oficina-app`.
+
+### Marco 4 — Saga e integração distribuída
 
 **Objetivo:** detalhar o fluxo distribuído principal e seus cenários alternativos.
 
@@ -277,7 +293,7 @@ contracts/idempotency.md
 
 **Resultado esperado:** agentes conseguem implementar o fluxo distribuído sem decisões ad hoc sobre sequência, compensação ou ownership.
 
-### Marco 4 — Operação e entrega
+### Marco 5 — Operação e entrega
 
 **Objetivo:** fechar requisitos de execução em Kubernetes, observabilidade e governança operacional.
 
@@ -322,6 +338,27 @@ contracts/idempotency.md
 - [x] Definir escopo e responsabilidades do novo repositório unificado de infraestrutura.
 - [x] Criar padrão de isolamento para `oficina_os` e `oficina_billing` no RDS PostgreSQL compartilhado.
 
+### Épico B2 — Implementações da Fase 4
+
+- [ ] Criar baseline Quarkus executável em `oficina-os-service`, com estrutura, dependências, health checks, configuração por ambiente, autenticação JWT, erro padronizado, idempotência e observabilidade.
+- [ ] Criar baseline Quarkus executável em `oficina-billing-service`, com estrutura, dependências, health checks, configuração por ambiente, autenticação JWT, erro padronizado, idempotência e observabilidade.
+- [ ] Criar baseline Quarkus executável em `oficina-execution-service`, com estrutura, dependências, health checks, configuração por ambiente, autenticação JWT, erro padronizado, idempotência e observabilidade.
+- [ ] Copiar e adaptar para `oficina-os-service` o domínio de Pessoa, Usuário, Cliente, Veículo e Ordem de Serviço do `oficina-app`, conforme [Plano de Decomposição do oficina-app](docs/oficina-app-decomposition.md).
+- [ ] Copiar e adaptar para `oficina-os-service` controllers, presenters, DTOs, validações, testes e seed de atendimento do `oficina-app`, alinhando rotas com a [OpenAPI do oficina-os-service](contracts/openapi/oficina-os-service.yaml).
+- [ ] Criar migrations e seed limpo do `oficina-os-service` para o database `oficina_os`, preservando isolamento de acesso e ownership.
+- [ ] Implementar no `oficina-os-service` a orquestração da Saga, histórico de estados, Outbox, publicação dos eventos de OS e consumo dos eventos de Billing e Execution.
+- [ ] Copiar e adaptar para `oficina-execution-service` o domínio de catálogo técnico, peças, serviços e estoque do `oficina-app`, conforme [Plano de Decomposição do oficina-app](docs/oficina-app-decomposition.md).
+- [ ] Reimplementar no `oficina-execution-service` a persistência de catálogo, estoque, execução, Outbox e idempotência em DynamoDB, sem migrar diretamente adapters PostgreSQL/Panache do `oficina-app`.
+- [ ] Implementar no `oficina-execution-service` diagnóstico, execução, reparo, movimentação de estoque, producers e consumers definidos nos contratos de eventos.
+- [ ] Criar seed limpo do `oficina-execution-service` para tabelas DynamoDB, reaproveitando apenas os dados funcionais aplicáveis do `import.sql` do `oficina-app`.
+- [ ] Criar do zero no `oficina-billing-service` o domínio de orçamento, aprovação, recusa, pagamento e integração financeira, porque não há módulo equivalente no `oficina-app`.
+- [ ] Criar migrations e seed limpo do `oficina-billing-service` para o database `oficina_billing`, preservando isolamento de acesso e ownership.
+- [ ] Implementar no `oficina-billing-service` cálculo e snapshot financeiro de itens, fluxo de aprovação/recusa, pagamento, producers e consumers definidos nos contratos de eventos.
+- [ ] Criar testes unitários e de integração mínimos nos três microsserviços para controllers, use cases, persistência, idempotência, eventos e cenários principais da Saga.
+- [ ] Validar os três microsserviços contra contratos OpenAPI, schemas JSON de eventos, [Contrato de Erros REST](contracts/error-model.md), [Contrato de Idempotência](contracts/idempotency.md) e [Contrato de Saga do oficina-os-service](contracts/saga/oficina-os-saga-v1.md).
+- [ ] Atualizar a documentação local dos três repositórios de microsserviços com setup, variáveis de ambiente, execução local, testes, build, Docker e deploy.
+- [ ] Marcar o `oficina-app` como referência histórica após a decomposição, sem aplicar adaptações da Fase 4 diretamente nele.
+
 ### Épico C — Saga
 
 - [x] Detalhar fluxo feliz da Saga.
@@ -356,8 +393,9 @@ contracts/idempotency.md
 1. **Agente de contratos:** normalizar eventos, tópicos e schemas.
 2. **Agente de APIs:** gerar OpenAPI por microsserviço a partir do contrato REST.
 3. **Agente de plataforma:** criar templates de repositório, CI/CD e Kubernetes.
-4. **Agente de integração:** detalhar Saga, comandos, eventos e compensações.
-5. **Agente de operação:** documentar observabilidade, runbooks e checklists.
+4. **Agente de decomposição:** copiar e adaptar o código do `oficina-app` para `oficina-os-service` e `oficina-execution-service`, criando do zero o `oficina-billing-service` conforme os contratos.
+5. **Agente de integração:** implementar Saga, producers, consumers, Outbox, idempotência e testes distribuídos.
+6. **Agente de operação:** documentar observabilidade, runbooks e checklists.
 
 Essa ordem evita que agentes implementem templates ou código antes de os contratos canônicos estarem fechados.
 
@@ -375,17 +413,22 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 - Fluxo da Saga com compensações.
 - Padrões de erro, idempotência e observabilidade.
 - Templates mínimos de serviço, pipeline e deploy.
+- Backlog explícito para cópia controlada do `oficina-app`, criação das implementações novas da Fase 4 e validação dos microsserviços contra contratos.
 - Checklists de revisão de contrato e release.
 
 ---
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é continuar a consolidação do repositório `oficina-infra`, migrando e adaptando os artefatos ainda úteis de `oficina-infra-k8s` e `oficina-infra-db` conforme o [Plano de migração para o repositório unificado de infraestrutura](docs/infrastructure-migration-plan.md).
+O próximo passo mais importante é abrir duas frentes paralelas e controladas: consolidar o repositório `oficina-infra`, migrando e adaptando os artefatos ainda úteis de `oficina-infra-k8s` e `oficina-infra-db` conforme o [Plano de migração para o repositório unificado de infraestrutura](docs/infrastructure-migration-plan.md), e iniciar as baselines executáveis dos três microsserviços conforme o [Plano de Decomposição do oficina-app](docs/oficina-app-decomposition.md).
 
 A ordem recomendada é:
 
-1. aplicar o baseline do RDS PostgreSQL compartilhado em AWS quando `vpc_id`, subnets e security groups reais do ambiente `lab` estiverem disponíveis;
-2. adicionar DynamoDB do `oficina-execution-service` e mensageria conforme os contratos da plataforma;
-3. definir rotas reais do API Gateway quando os endpoints dos microsserviços estiverem publicados;
-4. revisar checklists de deploy independente e runbooks mínimos.
+1. criar baseline Quarkus executável nos três microsserviços;
+2. copiar e adaptar o domínio de OS/atendimento para `oficina-os-service`;
+3. copiar e adaptar catálogo, peças, serviços e estoque para `oficina-execution-service`, reimplementando DynamoDB;
+4. criar do zero orçamento, aprovação, recusa e pagamento no `oficina-billing-service`;
+5. aplicar o baseline do RDS PostgreSQL compartilhado em AWS quando `vpc_id`, subnets e security groups reais do ambiente `lab` estiverem disponíveis;
+6. adicionar DynamoDB do `oficina-execution-service` e mensageria conforme os contratos da plataforma;
+7. definir rotas reais do API Gateway quando os endpoints dos microsserviços estiverem publicados;
+8. revisar checklists de deploy independente e runbooks mínimos.

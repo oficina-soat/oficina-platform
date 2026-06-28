@@ -205,17 +205,23 @@ A divisão dos microsserviços foi definida considerando o fluxo principal da Sa
 ```text
 Criar OS
     ↓
+Iniciar diagnóstico
+    ↓
+Finalizar diagnóstico
+    ↓
 Gerar orçamento
     ↓
 Aguardar aprovação
-    ↓
-Confirmar pagamento
     ↓
 Iniciar execução
     ↓
 Finalizar execução
     ↓
-Encerrar OS
+Encerrar tecnicamente a OS
+    ↓
+Confirmar pagamento
+    ↓
+Entregar veículo e encerrar Saga
 ```
 
 O `oficina-os-service` coordenará a Saga.

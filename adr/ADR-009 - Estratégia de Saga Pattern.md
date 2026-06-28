@@ -137,6 +137,8 @@ O fluxo principal da Ordem de Serviço será executado conforme a sequência aba
 ```text
 Criar OS
         ↓
+Diagnóstico
+        ↓
 Gerar orçamento
         ↓
 Aguardar aprovação
@@ -145,8 +147,12 @@ Iniciar execução
         ↓
 Finalizar execução
         ↓
-Encerrar OS
+Confirmar pagamento
+        ↓
+Entregar veículo
 ```
+
+O fluxo detalhado, incluindo compensações, timeouts, retentativas e testes de contrato, está definido em [Fluxos da Saga da Ordem de Serviço](../docs/saga-flows.md) e no [Contrato de Saga do oficina-os-service](../contracts/saga/oficina-os-saga-v1.md).
 
 Participantes:
 

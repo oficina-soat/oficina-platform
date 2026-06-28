@@ -152,21 +152,27 @@ O fluxo principal esperado para uma Ordem de Serviço é:
 ```text
 ordemDeServicoCriada
         ↓
+diagnosticoIniciado
+        ↓
+diagnosticoFinalizado
+        ↓
 orcamentoGerado
         ↓
 orcamentoAprovado
         ↓
 execucaoIniciada
         ↓
-diagnosticoFinalizado
-        ↓
 execucaoFinalizada
+        ↓
+ordemDeServicoFinalizada
         ↓
 pagamentoSolicitado
         ↓
 pagamentoConfirmado
         ↓
-ordemDeServicoFinalizada
+ordemDeServicoEntregue
+        ↓
+sagaFinalizadaComSucesso
 ```
 
 ---

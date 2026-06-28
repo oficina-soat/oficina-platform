@@ -131,9 +131,9 @@ As decisões para as baselines PostgreSQL decompostas de `oficina-os-service` e 
 
 ### 6. Fluxos da Saga em formato executável para implementação
 
-**Situação atual:** a estratégia de Saga está documentada conceitualmente.
+**Situação atual:** a estratégia de Saga está documentada conceitualmente na ADR-009, os fluxos implementáveis foram detalhados em [Fluxos da Saga da Ordem de Serviço](docs/saga-flows.md) e o contrato operacional foi criado em [Contrato de Saga do oficina-os-service](contracts/saga/oficina-os-saga-v1.md).
 
-**Definição faltante:** detalhar a máquina de estados da Saga, comandos, eventos esperados, compensações, timeouts e cenários de erro.
+**Definição faltante:** evoluir os fluxos conforme a implementação dos microsserviços estabilizar payloads, endpoints auxiliares ou novas compensações.
 
 **Artefatos sugeridos:**
 
@@ -322,13 +322,13 @@ contracts/idempotency.md
 
 ### Épico C — Saga
 
-- [ ] Detalhar fluxo feliz da Saga.
-- [ ] Detalhar fluxo de recusa de orçamento.
-- [ ] Detalhar fluxo de pagamento recusado.
-- [ ] Detalhar falha de estoque/execução.
-- [ ] Definir eventos de compensação.
-- [ ] Definir timeouts e retentativas.
-- [ ] Definir testes de contrato da Saga.
+- [x] Detalhar fluxo feliz da Saga.
+- [x] Detalhar fluxo de recusa de orçamento.
+- [x] Detalhar fluxo de pagamento recusado.
+- [x] Detalhar falha de estoque/execução.
+- [x] Definir eventos de compensação.
+- [x] Definir timeouts e retentativas.
+- [x] Definir testes de contrato da Saga.
 
 ### Épico D — Plataforma e operação
 
@@ -375,4 +375,4 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é detalhar a Saga orquestrada do `oficina-os-service`, incluindo fluxo feliz, recusa de orçamento, pagamento recusado, falhas de execução, compensações, timeouts, retentativas e testes de contrato.
+O próximo passo mais importante é criar o padrão de observabilidade distribuída, incluindo logs estruturados, métricas, traces e propagação de `correlationId`.

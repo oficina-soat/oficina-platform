@@ -94,6 +94,8 @@ Essa estrutura é recomendada para reduzir ambiguidade. Ajustes são permitidos 
 
 ## Migração dos Repositórios Legados
 
+O plano operacional de cópia e adaptação dos repositórios legados está definido em [Plano de migração para o repositório unificado de infraestrutura](infrastructure-migration-plan.md). Os repositórios `oficina-infra-db` e `oficina-infra-k8s` devem ser tratados como fontes históricas; correções e normalizações da Fase 4 devem acontecer no destino `oficina-infra`.
+
 | Origem | Migrar para `oficina-infra` | Observação |
 |---|---|---|
 | `oficina-infra-db` | Terraform de RDS, scripts de bootstrap, padrões de secrets e workflows úteis. | Migrations legadas do `oficina-app` devem ficar apenas como referência para decomposição. |
@@ -119,6 +121,7 @@ O `oficina-infra` estará alinhado com a governança quando:
 
 - [Nomes de runtime, secrets e infraestrutura](infra-runtime-naming.md)
 - [Conta, região e ambientes AWS](aws-environments.md)
+- [Plano de migração para o repositório unificado de infraestrutura](infrastructure-migration-plan.md)
 - [Padrão de isolamento PostgreSQL no RDS compartilhado](rds-postgresql-isolation.md)
 - [Padrão DynamoDB do oficina-execution-service](dynamodb-execution-service.md)
 - [Proposta de Migrations PostgreSQL Decompostas](postgres-migrations-decomposition.md)

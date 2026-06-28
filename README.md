@@ -28,6 +28,7 @@ O planejamento incremental da plataforma, incluindo lacunas restantes e backlog 
 - [Conta, região e ambientes AWS](docs/aws-environments.md)
 - [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md)
 - [Escopo do repositório unificado de infraestrutura](docs/infrastructure-repository-scope.md)
+- [Plano de migração para o repositório unificado de infraestrutura](docs/infrastructure-migration-plan.md)
 - [Padrão de isolamento PostgreSQL no RDS compartilhado](docs/rds-postgresql-isolation.md)
 - [Padrão de observabilidade distribuída](docs/observability.md)
 - [Padrão Outbox por serviço](docs/outbox-pattern.md)

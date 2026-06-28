@@ -339,8 +339,8 @@ contracts/idempotency.md
 - [x] Criar propagação de `correlationId`.
 - [x] Criar manifests Kubernetes base.
 - [x] Criar pipeline padrão de CI/CD.
-- [ ] Normalizar valores legados de conta, região e ambiente AWS nos repositórios antigos conforme [Conta, região e ambientes AWS](docs/aws-environments.md).
-- [ ] Planejar a migração de `oficina-infra-db` e `oficina-infra-k8s` para o novo repositório unificado de infraestrutura.
+- [ ] Normalizar valores legados de conta, região e ambiente AWS nos repositórios antigos conforme [Conta, região e ambientes AWS](docs/aws-environments.md). Item adiado: por enquanto, os repositórios antigos serão usados apenas como fonte de cópia para o `oficina-infra`.
+- [x] Planejar a migração de `oficina-infra-db` e `oficina-infra-k8s` para o novo repositório unificado de infraestrutura.
 - [ ] Provisionar RDS PostgreSQL compartilhado com databases e usuários independentes para OS e Billing.
 - [ ] Criar checklist de deploy independente.
 - [ ] Criar runbooks mínimos.
@@ -377,4 +377,4 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é normalizar valores legados de conta, região e ambiente AWS nos repositórios antigos conforme [Conta, região e ambientes AWS](docs/aws-environments.md), preservando os nomes canônicos consolidados em [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
+O próximo passo mais importante é provisionar, no repositório `oficina-infra`, o RDS PostgreSQL compartilhado com databases, usuários, permissões e secrets independentes para `oficina-os-service` e `oficina-billing-service`, conforme o [Padrão de isolamento PostgreSQL no RDS compartilhado](docs/rds-postgresql-isolation.md) e o [Plano de migração para o repositório unificado de infraestrutura](docs/infrastructure-migration-plan.md).

@@ -4,6 +4,8 @@ Este documento define os valores canonicos de conta, regiao e ambientes AWS da s
 
 Os valores abaixo foram consolidados a partir dos repositórios já existentes da suite, especialmente `oficina-infra-k8s`, `oficina-infra-db`, `oficina-app` e `oficina-auth-lambda`.
 
+Os nomes detalhados de runtime, secrets, variáveis e padrões de infraestrutura estão consolidados em [infra-runtime-naming.md](infra-runtime-naming.md).
+
 ---
 
 ## Conta AWS

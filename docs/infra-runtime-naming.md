@@ -1,0 +1,318 @@
+# Nomes de runtime, secrets e infraestrutura
+
+Este documento consolida os nomes de runtime, secrets, variáveis e padrões de infraestrutura identificados nos repositórios irmãos da suíte.
+
+Fontes consultadas:
+
+- `../oficina-infra`
+- `../oficina-infra-db`
+- `../oficina-infra-k8s`
+- `../oficina-execution-service`
+- `../oficina-app`
+- `../oficina-auth-lambda`
+
+O objetivo é evitar novos nomes implícitos ao evoluir os microsserviços e o novo repositório unificado de infraestrutura.
+
+---
+
+## Valores fechados
+
+Os valores abaixo já aparecem nos repositórios irmãos ou nos templates atuais deste repositório e devem ser tratados como canônicos para a Fase 4.
+
+### Ambiente AWS
+
+| Item | Valor |
+|---|---|
+| Região AWS | `us-east-1` |
+| Environment GitHub Actions | `lab` |
+| Nome lógico do ambiente | `lab` |
+| Projeto | `oficina` |
+| Prefixo de secrets | `oficina/lab` |
+| Infraestrutura compartilhada | `eks-lab` |
+| Cluster EKS | `eks-lab` |
+| Namespace Kubernetes default | `default` |
+
+Variáveis padronizadas:
+
+```text
+AWS_REGION=us-east-1
+AWS_DEFAULT_REGION=us-east-1
+OFICINA_PROJECT_NAME=oficina
+OFICINA_ENVIRONMENT_NAME=lab
+OFICINA_ENVIRONMENT=lab
+OFICINA_SECRET_PREFIX=oficina/lab
+SHARED_INFRA_NAME=eks-lab
+EKS_CLUSTER_NAME=eks-lab
+K8S_NAMESPACE=default
+DEPLOYMENT_ENVIRONMENT=lab
+OTEL_RESOURCE_ATTRIBUTES=service.namespace=oficina,deployment.environment=lab
+```
+
+### Credenciais AWS do GitHub Actions
+
+Secrets obrigatórios no GitHub Environment `lab`:
+
+```text
+AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY
+AWS_SESSION_TOKEN
+```
+
+A conta AWS não é valor canônico fixo. Quando necessário, deve ser resolvida em tempo de deploy:
+
+```bash
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+```
+
+### Terraform remoto
+
+Bucket compartilhado canônico:
+
+```text
+tf-shared-eks-lab-<aws-account-id>-us-east-1
+```
+
+Chaves de state já usadas:
+
+```text
+oficina/lab/terraform.tfstate
+oficina/lab/database/terraform.tfstate
+```
+
+Variáveis padronizadas:
+
+```text
+TF_STATE_BUCKET=tf-shared-eks-lab-<aws-account-id>-us-east-1
+TERRAFORM_SHARED_DATA_BUCKET_NAME=tf-shared-eks-lab-<aws-account-id>-us-east-1
+TF_STATE_REGION=us-east-1
+TF_STATE_DYNAMODB_TABLE=<opcional>
+```
+
+Quando `TF_STATE_BUCKET` não for informado, os scripts legados derivam o bucket a partir de `eks-lab`, conta AWS e região.
+
+### Kubernetes
+
+Secrets Kubernetes já usados:
+
+```text
+oficina-database-env
+oficina-jwt-keys
+```
+
+Variáveis relacionadas:
+
+```text
+K8S_DATABASE_SECRET_ID=oficina/lab/database/app
+K8S_JWT_SECRET_ID=oficina/lab/jwt
+K8S_JWT_SECRET_KMS_KEY_ID=<opcional>
+FETCH_RUNTIME_SECRETS_FROM_AWS=true
+```
+
+ConfigMaps e nomes legados do backend monolítico:
+
+```text
+oficina-app-config
+oficina-app
+```
+
+Esses nomes continuam válidos apenas como referência histórica para `oficina-app`. Novos microsserviços devem usar o próprio nome canônico do serviço.
+
+### JWT e autenticação
+
+Secret compartilhado no AWS Secrets Manager:
+
+```text
+oficina/lab/jwt
+```
+
+Campos do secret:
+
+```text
+privateKeyPem
+publicKeyPem
+```
+
+Variáveis padronizadas:
+
+```text
+JWT_SECRET_SOURCE=aws-secrets-manager
+JWT_SECRET_NAME=oficina/lab/jwt
+JWT_SECRET_PRIVATE_KEY_FIELD=privateKeyPem
+JWT_SECRET_PUBLIC_KEY_FIELD=publicKeyPem
+ROTATE_JWT_SECRET=false
+OFICINA_AUTH_ISSUER=<issuer-resolvido-no-deploy>
+OFICINA_AUTH_JWKS_URI=<jwks-resolvido-no-deploy>
+OFICINA_AUTH_AUDIENCE=oficina-app
+MP_JWT_VERIFY_PUBLICKEY_LOCATION=<jwks-ou-arquivo-montado>
+```
+
+Para os novos microsserviços, a audience deve ser revisada antes da implementação final. O valor `oficina-app` é legado e ainda aparece nos templates por compatibilidade com o backend atual.
+
+### Lambda de autenticação e notificações
+
+Nomes canônicos já usados:
+
+```text
+OFICINA_AUTH_LAMBDA_NAME=oficina-auth-lambda
+OFICINA_NOTIFICACAO_LAMBDA_NAME=oficina-notificacao-lambda
+OFICINA_AUTH_LAMBDA_FUNCTION_NAME=oficina-auth-lambda-lab
+OFICINA_NOTIFICACAO_LAMBDA_FUNCTION_NAME=oficina-notificacao-lambda-lab
+```
+
+Secrets e artefatos:
+
+```text
+AUTH_DB_SECRET_NAME=oficina/lab/database/auth-lambda
+OFICINA_AUTH_DB_SECRET_ID=oficina/lab/database/auth-lambda
+OFICINA_AUTH_LAMBDA_ARTIFACT_PREFIX=oficina/lab/lambda/oficina-auth-lambda
+OFICINA_NOTIFICACAO_LAMBDA_ARTIFACT_PREFIX=oficina/lab/lambda/oficina-notificacao-lambda
+```
+
+### PostgreSQL legado e transição Fase 4
+
+Valores encontrados nos repositórios de infraestrutura legados:
+
+```text
+DB_IDENTIFIER=oficina-postgres-lab
+DB_NAME=app
+DB_USERNAME=oficina_master
+APP_DB_USER=oficina_app
+DB_SSLMODE=require
+APP_SECRET_NAME=oficina/lab/database/app
+OFICINA_DB_APP_SECRET_ID=oficina/lab/database/app
+```
+
+Esses valores descrevem o modelo atual/legado. Para a Fase 4, a decisão canônica continua sendo uma instância RDS PostgreSQL compartilhada com databases, usuários, secrets e migrations isolados para `oficina-os-service` e `oficina-billing-service`, conforme `ROADMAP.md` e `docs/aws-environments.md`.
+
+### DynamoDB do oficina-execution-service
+
+Valor já presente no template Quarkus deste repositório:
+
+```text
+OFICINA_DYNAMODB_TABLE_PREFIX=oficina-execution-lab
+```
+
+Variáveis já previstas para runtime local e testes:
+
+```text
+AWS_REGION=us-east-1
+DYNAMODB_ENDPOINT_OVERRIDE=http://localhost:8000
+```
+
+Uso esperado:
+
+- `AWS_REGION` aponta para DynamoDB gerenciado na AWS em runtime real.
+- `DYNAMODB_ENDPOINT_OVERRIDE` deve ser usado apenas em `dev` e `test`.
+- `OFICINA_DYNAMODB_TABLE_PREFIX` deve prefixar tabelas próprias do `oficina-execution-service`.
+
+---
+
+## Padrões de infraestrutura fechados
+
+- O GitHub Environment canônico é `lab`.
+- O deploy de infraestrutura opera com AWS credentials temporárias armazenadas como secrets do GitHub Environment.
+- O state remoto Terraform usa S3, com lock DynamoDB opcional via `TF_STATE_DYNAMODB_TABLE`.
+- O bucket de state é compartilhado por escopo, mas cada repositório usa sua própria key.
+- Secrets runtime compartilhados ficam no AWS Secrets Manager sob `oficina/lab/...`.
+- Secrets Kubernetes materializados no cluster usam nomes sem ambiente quando já estão isolados pelo cluster/namespace, como `oficina-database-env` e `oficina-jwt-keys`.
+- O novo `oficina-infra` deve substituir a divisão `oficina-infra-db` + `oficina-infra-k8s`, preservando os nomes canônicos acima.
+
+---
+
+## Sugestões pendentes de avaliação
+
+Os pontos abaixo ainda não existem de forma fechada nos repositórios irmãos. Eles são necessários para completar o padrão DynamoDB do `oficina-execution-service`, mas devem ser avaliados antes de virarem contrato canônico.
+
+### Secrets e variáveis dos novos microsserviços
+
+Sugestão para audiência JWT por microsserviço:
+
+```text
+OFICINA_AUTH_AUDIENCE=oficina-os-service
+OFICINA_AUTH_AUDIENCE=oficina-billing-service
+OFICINA_AUTH_AUDIENCE=oficina-execution-service
+```
+
+Alternativa mais simples para laboratório:
+
+```text
+OFICINA_AUTH_AUDIENCE=oficina-services
+```
+
+Recomendação: usar audience por microsserviço se o API Gateway ou os tokens puderem diferenciar consumidores; usar `oficina-services` apenas se a simplicidade do laboratório for prioridade.
+
+### Tabelas DynamoDB
+
+Sugestão de nomes usando o prefixo já existente:
+
+```text
+oficina-execution-lab-catalogo
+oficina-execution-lab-estoque
+oficina-execution-lab-execucoes
+oficina-execution-lab-outbox
+oficina-execution-lab-idempotencia
+```
+
+Racional:
+
+- `catalogo`: peças e serviços técnicos.
+- `estoque`: saldo, reservas e movimentos.
+- `execucoes`: execução, diagnóstico, reparo e histórico operacional.
+- `outbox`: eventos produzidos pelo serviço antes da publicação.
+- `idempotencia`: controle de comandos REST, Saga e consumidores de eventos.
+
+### Variáveis de infraestrutura DynamoDB
+
+Sugestão para GitHub Actions/Terraform do novo `oficina-infra`:
+
+```text
+EXECUTION_DYNAMODB_TABLE_PREFIX=oficina-execution-lab
+EXECUTION_DYNAMODB_BILLING_MODE=PAY_PER_REQUEST
+EXECUTION_DYNAMODB_POINT_IN_TIME_RECOVERY_ENABLED=true
+EXECUTION_DYNAMODB_STREAM_VIEW_TYPE=NEW_AND_OLD_IMAGES
+EXECUTION_DYNAMODB_DELETION_PROTECTION_ENABLED=false
+```
+
+Sugestão para runtime do `oficina-execution-service`:
+
+```text
+OFICINA_DYNAMODB_TABLE_PREFIX=oficina-execution-lab
+OFICINA_DYNAMODB_CATALOGO_TABLE=oficina-execution-lab-catalogo
+OFICINA_DYNAMODB_ESTOQUE_TABLE=oficina-execution-lab-estoque
+OFICINA_DYNAMODB_EXECUCOES_TABLE=oficina-execution-lab-execucoes
+OFICINA_DYNAMODB_OUTBOX_TABLE=oficina-execution-lab-outbox
+OFICINA_DYNAMODB_IDEMPOTENCIA_TABLE=oficina-execution-lab-idempotencia
+```
+
+Recomendação: manter `OFICINA_DYNAMODB_TABLE_PREFIX` como configuração principal e permitir sobrescrever nomes individuais apenas quando houver necessidade operacional.
+
+### IAM e Kubernetes para o execution service
+
+Sugestão de nomes:
+
+```text
+Kubernetes Deployment: oficina-execution-service
+Kubernetes Service: oficina-execution-service
+Kubernetes ServiceAccount: oficina-execution-service
+IAM role: oficina-execution-service-lab
+IAM policy: oficina-execution-service-lab-dynamodb
+ConfigMap: oficina-execution-service-config
+```
+
+Recomendação: manter o nome canônico do microsserviço em todos os recursos Kubernetes e usar sufixo `lab` apenas em recursos AWS globais ou regionais.
+
+### State Terraform do novo repositório unificado
+
+Sugestão para o novo `oficina-infra`:
+
+```text
+oficina/lab/infra/terraform.tfstate
+```
+
+Alternativa:
+
+```text
+oficina/lab/terraform.tfstate
+```
+
+Recomendação: usar `oficina/lab/infra/terraform.tfstate` se a migração mantiver temporariamente os states legados; usar `oficina/lab/terraform.tfstate` apenas se o novo repositório substituir integralmente o state atual do `oficina-infra-k8s`.

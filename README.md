@@ -22,3 +22,8 @@ Este repositório continua sendo a fonte normativa para ADRs, contratos, OpenAPI
 ## Roadmap
 
 O planejamento incremental da plataforma, incluindo lacunas restantes e backlog orientado a agentes, está documentado em [ROADMAP.md](ROADMAP.md).
+
+## Governança operacional
+
+- [Conta, regiao e ambientes AWS](docs/aws-environments.md)
+- [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md)

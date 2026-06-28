@@ -343,9 +343,9 @@ contracts/idempotency.md
 - [x] Planejar a migração de `oficina-infra-db` e `oficina-infra-k8s` para o novo repositório unificado de infraestrutura.
 - [x] Criar baseline executável do RDS PostgreSQL compartilhado no `oficina-infra`, com Terraform e bootstrap de databases, usuários e secrets independentes para OS e Billing.
 - [ ] Aplicar o RDS PostgreSQL compartilhado em AWS usando VPC, subnets e security groups reais do ambiente `lab`.
-- [ ] Migrar e adaptar EKS, ECR, API Gateway e Kubernetes compartilhado de `oficina-infra-k8s` para `oficina-infra`, removendo dependências operacionais do `oficina-app`.
+- [x] Migrar e adaptar EKS, ECR, API Gateway e Kubernetes compartilhado de `oficina-infra-k8s` para `oficina-infra`, removendo dependências operacionais do `oficina-app`.
 - [ ] Adicionar DynamoDB do `oficina-execution-service` e mensageria da Fase 4 ao `oficina-infra`.
-- [ ] Migrar workflows e scripts operacionais úteis de `oficina-infra-db` e `oficina-infra-k8s` para `oficina-infra`, normalizando state, secrets, conta, região e ambiente.
+- [x] Migrar workflows e scripts operacionais úteis de `oficina-infra-db` e `oficina-infra-k8s` para `oficina-infra`, normalizando state, secrets, conta, região e ambiente.
 - [ ] Criar checklist de deploy independente.
 - [ ] Criar runbooks mínimos.
 
@@ -386,6 +386,6 @@ O próximo passo mais importante é continuar a consolidação do repositório `
 A ordem recomendada é:
 
 1. aplicar o baseline do RDS PostgreSQL compartilhado em AWS quando `vpc_id`, subnets e security groups reais do ambiente `lab` estiverem disponíveis;
-2. migrar EKS, ECR, API Gateway e Kubernetes compartilhado para `oficina-infra`, removendo dependências operacionais do `oficina-app`;
-3. adicionar DynamoDB do `oficina-execution-service` e mensageria conforme os contratos da plataforma;
-4. migrar workflows e scripts operacionais úteis, normalizando state, secrets, conta, região e ambiente.
+2. adicionar DynamoDB do `oficina-execution-service` e mensageria conforme os contratos da plataforma;
+3. definir rotas reais do API Gateway quando os endpoints dos microsserviços estiverem publicados;
+4. revisar checklists de deploy independente e runbooks mínimos.

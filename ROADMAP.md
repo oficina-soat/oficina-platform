@@ -401,9 +401,9 @@ README.md dos microsserviços
 - [x] Criar migrations e seed limpo do `oficina-os-service` para o database `oficina_os`, preservando isolamento de acesso e ownership.
 - [x] Implementar no `oficina-os-service` a orquestração da Saga, histórico de estados, Outbox, publicação dos eventos de OS e consumo dos eventos de Billing e Execution.
 - [x] Copiar e adaptar para `oficina-execution-service` o domínio de catálogo técnico, peças, serviços e estoque do `oficina-app`, conforme [Plano de Decomposição do oficina-app](docs/oficina-app-decomposition.md).
-- [ ] Reimplementar no `oficina-execution-service` a persistência de catálogo, estoque, execução, Outbox e idempotência em DynamoDB, sem migrar diretamente adapters PostgreSQL/Panache do `oficina-app`.
-- [ ] Implementar no `oficina-execution-service` diagnóstico, execução, reparo, movimentação de estoque, producers e consumers definidos nos contratos de eventos.
-- [ ] Criar seed limpo do `oficina-execution-service` para tabelas DynamoDB, reaproveitando apenas os dados funcionais aplicáveis do `import.sql` do `oficina-app`.
+- [x] Reimplementar no `oficina-execution-service` a persistência de catálogo, estoque, execução, Outbox e idempotência em DynamoDB, sem migrar diretamente adapters PostgreSQL/Panache do `oficina-app`.
+- [x] Implementar no `oficina-execution-service` diagnóstico, execução, reparo, movimentação de estoque, producers e consumers definidos nos contratos de eventos.
+- [x] Criar seed limpo do `oficina-execution-service` para tabelas DynamoDB, reaproveitando apenas os dados funcionais aplicáveis do `import.sql` do `oficina-app`.
 - [ ] Criar do zero no `oficina-billing-service` o domínio de orçamento, aprovação, recusa, pagamento e integração financeira, porque não há módulo equivalente no `oficina-app`.
 - [ ] Criar migrations e seed limpo do `oficina-billing-service` para o database `oficina_billing`, preservando isolamento de acesso e ownership.
 - [ ] Implementar no `oficina-billing-service` cálculo e snapshot financeiro de itens, fluxo de aprovação/recusa, pagamento, producers e consumers definidos nos contratos de eventos.

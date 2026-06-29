@@ -246,9 +246,9 @@ templates/github-actions/service-ci.yml
 
 ### 13. Evidências e entregáveis finais da Fase 4
 
-**Situação atual:** o enunciado exige evidências de cobertura, documentação de arquitetura do serviço, Swagger ou collection Postman atualizada, vídeo de demonstração de até 15 minutos e PDF com links, diagrama geral, estratégia de Saga e justificativas.
+**Situação atual:** o checklist consolidado dos entregáveis finais foi criado em [Checklist Final de Entrega da Fase 4](docs/phase-4-delivery-checklist.md), cobrindo evidências por repositório, cobertura, Swagger/OpenAPI, vídeo, PDF, diagrama, Saga, deploy e observabilidade.
 
-**Definição faltante:** criar checklist consolidado dos entregáveis finais, incluindo onde registrar links de cobertura, Swagger/OpenAPI, vídeo, PDF e diagrama de arquitetura.
+**Definição faltante:** preencher os links reais de cobertura, Swagger/OpenAPI, pipelines, vídeo, PDF e diagrama final conforme os repositórios de microsserviço e infraestrutura forem concluídos.
 
 **Artefatos sugeridos:**
 
@@ -448,7 +448,7 @@ README.md dos microsserviços
 - [x] Migrar workflows e scripts operacionais úteis de `oficina-infra-db` e `oficina-infra-k8s` para `oficina-infra`, normalizando state, secrets, conta, região e ambiente.
 - [ ] Criar checklist de deploy independente.
 - [ ] Criar runbooks mínimos.
-- [ ] Criar checklist final de entrega da Fase 4, cobrindo repositórios, cobertura, Swagger/OpenAPI, vídeo, PDF, diagrama geral, estratégia de Saga, justificativa de microsserviços e tecnologias.
+- [x] Criar checklist final de entrega da Fase 4, cobrindo repositórios, cobertura, Swagger/OpenAPI, vídeo, PDF, diagrama geral, estratégia de Saga, justificativa de microsserviços e tecnologias.
 - [ ] Registrar data de entrega da Fase 4, participantes, links dos repositórios e link do vídeo no checklist final ou no documento de entrega.
 - [ ] Criar diagrama geral da arquitetura final com microsserviços, bancos, mensageria, Kubernetes, observabilidade e integração Mercado Pago.
 - [ ] Preparar roteiro e evidências do vídeo de demonstração de até 15 minutos, incluindo fluxo completo da OS, Saga com falha/compensação, deploy automatizado e rastreamento distribuído.

@@ -35,3 +35,4 @@ O planejamento incremental da plataforma, incluindo lacunas restantes e backlog 
 - [Padrão BDD, cobertura e qualidade](docs/bdd-testing.md)
 - [Fluxos da Saga da Ordem de Serviço](docs/saga-flows.md)
 - [Padrão DynamoDB do oficina-execution-service](docs/dynamodb-execution-service.md)
+- [Checklist final de entrega da Fase 4](docs/phase-4-delivery-checklist.md)

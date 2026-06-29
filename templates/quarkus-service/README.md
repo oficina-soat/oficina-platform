@@ -14,9 +14,10 @@ O template preserva a estrutura do `oficina-app`, usando Quarkus e extensões Qu
 
 - Quarkus Platform: `3.37.0`
 - Quarkiverse Amazon Services: `3.19.0`
+- Cucumber JVM: `7.34.4`
 - Java: `25`
 
-As versões foram verificadas no Maven Central em 2026-06-28.
+As versões do Quarkus e Quarkiverse foram verificadas no Maven Central em 2026-06-28. A versão do Cucumber JVM foi verificada no Maven Central em 2026-06-29.
 
 ## Como usar
 
@@ -89,6 +90,10 @@ Usado por todos os serviços:
 - OpenTelemetry
 - REST Client
 - testes Quarkus
+- Cucumber JVM com JUnit Platform
+- JaCoCo com cobertura mínima de 80%
+
+O padrão de testes, BDD, cobertura e Quality Gate está definido em [Padrão BDD, Cobertura e Qualidade](../../docs/bdd-testing.md).
 
 ### PostgreSQL
 

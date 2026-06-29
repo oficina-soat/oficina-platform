@@ -32,5 +32,6 @@ O planejamento incremental da plataforma, incluindo lacunas restantes e backlog 
 - [Padrão de isolamento PostgreSQL no RDS compartilhado](docs/rds-postgresql-isolation.md)
 - [Padrão de observabilidade distribuída](docs/observability.md)
 - [Padrão Outbox por serviço](docs/outbox-pattern.md)
+- [Padrão BDD, cobertura e qualidade](docs/bdd-testing.md)
 - [Fluxos da Saga da Ordem de Serviço](docs/saga-flows.md)
 - [Padrão DynamoDB do oficina-execution-service](docs/dynamodb-execution-service.md)

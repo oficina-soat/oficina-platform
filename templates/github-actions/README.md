@@ -66,9 +66,11 @@ Quando `SERVICE_NAME` não for informado, o workflow deriva o nome do repositór
 Pull Requests executam:
 
 - build Maven;
-- testes;
-- relatório JaCoCo;
+- testes unitários, integração, contrato e BDD;
+- relatório JaCoCo com cobertura mínima de 80%;
 - análise SonarCloud com Quality Gate obrigatório.
+
+O comportamento esperado para BDD, cobertura e evidências de qualidade está definido em [Padrão BDD, Cobertura e Qualidade](../../docs/bdd-testing.md).
 
 Merges na `main` executam também:
 

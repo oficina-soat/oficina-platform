@@ -230,9 +230,9 @@ contracts/idempotency.md
 
 ### 12. BDD, cobertura e qualidade de código
 
-**Situação atual:** o enunciado exige testes unitários em todos os microsserviços, pelo menos um fluxo completo testado com BDD, cobertura mínima de 80% por serviço e validação de qualidade via SonarQube ou similar no CI.
+**Situação atual:** o padrão BDD, cobertura e qualidade foi definido em [Padrão BDD, Cobertura e Qualidade](docs/bdd-testing.md), com Cucumber JVM, JUnit Platform, JaCoCo com mínimo de 80% e Quality Gate SonarCloud obrigatório no CI.
 
-**Definição faltante:** definir e implementar o padrão BDD dos microsserviços, incluindo ferramenta, estrutura de features, fluxo completo coberto e integração ao pipeline de CI/CD. Também é necessário aplicar a meta de cobertura mínima de 80% por serviço e garantir Quality Gate obrigatório via SonarCloud ou equivalente nos três repositórios.
+**Definição faltante:** implementar o padrão nos três repositórios de microsserviços, criando os cenários BDD, evidências de cobertura e configuração real do SonarCloud conforme cada serviço evoluir.
 
 **Artefatos sugeridos:**
 

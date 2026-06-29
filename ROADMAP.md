@@ -277,6 +277,31 @@ README.md dos microsserviços
 
 **Critério de pronto:** a entrega deve demonstrar onde estão os manifestos Kubernetes de cada serviço, qual repositório é a fonte canônica de deploy e como evitar divergência entre cópias ou referências.
 
+### 15. Ambiente local integrado para testes entre microsserviços
+
+**Situação atual:** os repositórios `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service` já possuem baselines executáveis e APIs iniciais, e o ambiente local integrado foi criado no `../oficina-infra` para subir dependências compartilhadas, testar endpoints em portas distintas e preparar a base de mensageria da integração.
+
+**Decisão:** criar o ambiente local executável no repositório canônico `../oficina-infra`, preservando este repositório apenas como fonte de governança. O ambiente local deve ser complementar ao deploy AWS/EKS e não substitui os artefatos Terraform, Kubernetes ou contratos oficiais.
+
+**Etapas:**
+
+1. [x] Criar `compose.local.yml` no `../oficina-infra` com PostgreSQL, DynamoDB Local e LocalStack para SNS/SQS.
+2. [x] Criar bootstrap local de PostgreSQL com os databases `oficina_os` e `oficina_billing`, usuários independentes e permissões compatíveis com o [Padrão de isolamento PostgreSQL no RDS compartilhado](docs/rds-postgresql-isolation.md).
+3. [x] Criar bootstrap local de DynamoDB com as tabelas canônicas do `oficina-execution-service`, conforme o [Padrão DynamoDB do oficina-execution-service](docs/dynamodb-execution-service.md).
+4. [x] Criar bootstrap local de SNS/SQS com tópicos, filas e DLQs alinhados ao [Contrato de Tópicos de Mensageria](contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md).
+5. [x] Adicionar profile opcional no Compose para subir os três microsserviços com portas locais distintas, sem tornar esse profile pré-requisito para validar dependências.
+6. [x] Documentar comandos locais para subir dependências, executar bootstrap, consultar status e desligar o ambiente.
+
+**Artefatos sugeridos:**
+
+```text
+../oficina-infra/compose.local.yml
+../oficina-infra/docs/local-integration.md
+../oficina-infra/scripts/local/
+```
+
+**Critério de pronto:** um agente deve conseguir subir as dependências locais com Docker Compose, preparar bancos, tabelas DynamoDB, tópicos, filas e DLQs, rodar os três microsserviços em portas diferentes e chamar `/api/v1/status` em cada serviço. A validação distribuída completa da Saga continua dependente da implementação de Outbox, producers e consumers nos microsserviços.
+
 ---
 
 ## Priorização recomendada
@@ -356,6 +381,7 @@ README.md dos microsserviços
 4. Criar checklist de release por serviço.
 5. Criar checklist de revisão de contratos.
 6. Criar checklist dos entregáveis finais da Fase 4, incluindo evidências de cobertura, Swagger/OpenAPI, vídeo, PDF e diagrama de arquitetura.
+7. Criar ambiente local integrado no `oficina-infra` para dependências, bootstrap e teste manual dos três microsserviços.
 
 **Resultado esperado:** a plataforma fica pronta para operação, demonstração e evolução controlada.
 
@@ -445,6 +471,7 @@ README.md dos microsserviços
 - [ ] Aplicar o RDS PostgreSQL compartilhado em AWS usando VPC, subnets e security groups reais do ambiente `lab`.
 - [x] Migrar e adaptar EKS, ECR, API Gateway e Kubernetes compartilhado de `oficina-infra-k8s` para `oficina-infra`, removendo dependências operacionais do `oficina-app`.
 - [ ] Adicionar DynamoDB do `oficina-execution-service` e mensageria da Fase 4 ao `oficina-infra`.
+- [x] Criar ambiente local integrado no `oficina-infra` com PostgreSQL, DynamoDB Local, LocalStack SNS/SQS, bootstrap de dependências e profile opcional para os três microsserviços.
 - [x] Migrar workflows e scripts operacionais úteis de `oficina-infra-db` e `oficina-infra-k8s` para `oficina-infra`, normalizando state, secrets, conta, região e ambiente.
 - [ ] Criar checklist de deploy independente.
 - [ ] Criar runbooks mínimos.

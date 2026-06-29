@@ -600,8 +600,8 @@ components:
     IdempotencyKey:
       name: X-Idempotency-Key
       in: header
-      required: false
-      description: Chave opcional para retries seguros conforme contracts/idempotency.md.
+      required: true
+      description: Chave obrigatoria neste servico para retries seguros em operacoes POST ou PATCH com efeito colateral, conforme contracts/idempotency.md.
       schema:
         type: string
         minLength: 8

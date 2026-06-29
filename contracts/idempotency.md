@@ -60,11 +60,11 @@ X-Idempotency-Key: 7c8f5c52-03f3-4f7a-91a3-f3d675c51c4c
 
 ### Obrigatoriedade
 
-Na API v1, `X-Idempotency-Key` permanece opcional para compatibilidade com clientes simples.
+Na API v1, `X-Idempotency-Key` é obrigatório em operações mutáveis com efeito colateral, especialmente `POST` e `PATCH`.
 
-Mesmo assim, clientes, front-ends, Sagas e integrações entre microsserviços devem enviar a chave em todas as operações `POST` ou `PATCH` com efeito colateral.
+Clientes, front-ends, Sagas e integrações entre microsserviços devem enviar a chave em todas as operações `POST` ou `PATCH` com efeito colateral.
 
-Serviços podem rejeitar operações críticas sem chave quando houver risco alto de duplicidade. Nesse caso, devem responder `400 Bad Request` com `code` igual a `IDEMPOTENCY_KEY_REQUIRED`.
+Serviços devem rejeitar operações mutáveis sem chave. Nesse caso, devem responder `400 Bad Request` com `code` igual a `IDEMPOTENCY_KEY_REQUIRED`.
 
 ---
 

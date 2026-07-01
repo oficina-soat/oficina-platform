@@ -21,6 +21,8 @@ tags:
     description: Operacoes de diagnostico, execucao e reparo.
 paths:
   /servicos:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Servicos]
       summary: Criar servico
@@ -68,6 +70,8 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
   /servicos/{servicoId}:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     get:
       tags: [Servicos]
       summary: Consultar servico
@@ -113,6 +117,8 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
   /pecas:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Pecas]
       summary: Criar peca
@@ -160,6 +166,8 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
   /pecas/{pecaId}:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     get:
       tags: [Pecas]
       summary: Consultar peca
@@ -205,6 +213,8 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
   /estoques/pecas/{pecaId}/saldo:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     get:
       tags: [Estoque]
       summary: Consultar saldo
@@ -223,6 +233,8 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
   /estoques/movimentos:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     get:
       tags: [Estoque]
       summary: Consultar movimentacoes
@@ -250,6 +262,8 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
   /estoques/movimentos/entrada:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Estoque]
       summary: Registrar entrada
@@ -274,6 +288,8 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
   /estoques/movimentos/reserva:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Estoque]
       summary: Reservar estoque
@@ -298,6 +314,8 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
   /estoques/movimentos/consumo:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Estoque]
       summary: Consumir estoque
@@ -322,6 +340,8 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
   /estoques/movimentos/estorno:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Estoque]
       summary: Estornar estoque
@@ -346,6 +366,8 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
   /execucoes:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Execucoes]
       summary: Criar execucao
@@ -398,6 +420,8 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
   /execucoes/{execucaoId}:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     get:
       tags: [Execucoes]
       summary: Consultar execucao
@@ -416,6 +440,8 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
   /ordens-servico/{ordemServicoId}/execucao:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     get:
       tags: [Execucoes]
       summary: Consultar execucao da OS
@@ -434,6 +460,8 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
   /execucoes/{execucaoId}/diagnostico/inicio:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Execucoes]
       summary: Iniciar diagnostico
@@ -455,6 +483,8 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
   /execucoes/{execucaoId}/diagnostico/conclusao:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Execucoes]
       summary: Concluir diagnostico
@@ -484,6 +514,8 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
   /execucoes/{execucaoId}/reparo/inicio:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Execucoes]
       summary: Iniciar reparo
@@ -505,6 +537,8 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
   /execucoes/{execucaoId}/reparo/conclusao:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Execucoes]
       summary: Concluir reparo
@@ -534,6 +568,8 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
   /execucoes/{execucaoId}/cancelamento:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Execucoes]
       summary: Cancelar execucao
@@ -569,6 +605,15 @@ components:
       scheme: bearer
       bearerFormat: JWT
   parameters:
+    CorrelationId:
+      name: X-Correlation-Id
+      in: header
+      required: false
+      description: Identificador de correlacao aceito do cliente e propagado em chamadas HTTP, eventos, logs e traces, conforme contracts/error-model.md.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
     ServicoId:
       name: servicoId
       in: path
@@ -606,6 +651,20 @@ components:
         type: string
         minLength: 8
         maxLength: 128
+  headers:
+    CorrelationId:
+      description: Identificador de correlacao retornado em toda resposta de erro.
+      schema:
+        type: string
+    Traceparent:
+      description: Contexto de trace W3C retornado quando houver instrumentacao distribuida.
+      schema:
+        type: string
+    RetryAfter:
+      description: Tempo recomendado para nova tentativa quando a chave de idempotencia ainda estiver em processamento.
+      schema:
+        type: integer
+        minimum: 1
   responses:
     MovimentoEstoqueCriado:
       description: Movimento de estoque registrado.
@@ -615,24 +674,46 @@ components:
             $ref: "#/components/schemas/MovimentoEstoque"
     BadRequest:
       description: Requisicao invalida.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+        traceparent:
+          $ref: "#/components/headers/Traceparent"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
     Unauthorized:
       description: Token JWT ausente, invalido ou expirado.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+        traceparent:
+          $ref: "#/components/headers/Traceparent"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
     NotFound:
       description: Recurso nao encontrado.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+        traceparent:
+          $ref: "#/components/headers/Traceparent"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
     Conflict:
       description: Conflito de estado, duplicidade, saldo ou idempotencia.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+        traceparent:
+          $ref: "#/components/headers/Traceparent"
+        Retry-After:
+          $ref: "#/components/headers/RetryAfter"
       content:
         application/json:
           schema:

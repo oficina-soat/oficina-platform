@@ -17,6 +17,8 @@ tags:
     description: Operacoes de registro, consulta, confirmacao, recusa e cancelamento de pagamentos.
 paths:
   /orcamentos:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Orcamentos]
       summary: Gerar orcamento
@@ -71,6 +73,8 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
   /orcamentos/{orcamentoId}:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     get:
       tags: [Orcamentos]
       summary: Consultar orcamento
@@ -89,6 +93,8 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
   /ordens-servico/{ordemServicoId}/orcamentos:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     get:
       tags: [Orcamentos]
       summary: Consultar orcamento da OS
@@ -109,6 +115,8 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
   /orcamentos/{orcamentoId}/aprovacao:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Orcamentos]
       summary: Aprovar orcamento
@@ -138,6 +146,8 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
   /orcamentos/{orcamentoId}/recusa:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Orcamentos]
       summary: Recusar orcamento
@@ -167,6 +177,8 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
   /pagamentos:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Pagamentos]
       summary: Registrar pagamento
@@ -206,6 +218,8 @@ paths:
         "503":
           $ref: "#/components/responses/ServiceUnavailable"
   /pagamentos/{pagamentoId}:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     get:
       tags: [Pagamentos]
       summary: Consultar pagamento
@@ -224,6 +238,8 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
   /ordens-servico/{ordemServicoId}/pagamentos:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     get:
       tags: [Pagamentos]
       summary: Consultar pagamentos da OS
@@ -244,6 +260,8 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
   /pagamentos/{pagamentoId}/confirmacao:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Pagamentos]
       summary: Confirmar pagamento
@@ -273,6 +291,8 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
   /pagamentos/{pagamentoId}/recusa:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Pagamentos]
       summary: Recusar pagamento
@@ -302,6 +322,8 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
   /pagamentos/{pagamentoId}/cancelamento:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Pagamentos]
       summary: Cancelar pagamento
@@ -337,6 +359,15 @@ components:
       scheme: bearer
       bearerFormat: JWT
   parameters:
+    CorrelationId:
+      name: X-Correlation-Id
+      in: header
+      required: false
+      description: Identificador de correlacao aceito do cliente e propagado em chamadas HTTP, eventos, logs e traces, conforme contracts/error-model.md.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
     OrcamentoId:
       name: orcamentoId
       in: path
@@ -367,39 +398,85 @@ components:
         type: string
         minLength: 8
         maxLength: 128
+  headers:
+    CorrelationId:
+      description: Identificador de correlacao retornado em toda resposta de erro.
+      schema:
+        type: string
+    Traceparent:
+      description: Contexto de trace W3C retornado quando houver instrumentacao distribuida.
+      schema:
+        type: string
+    RetryAfter:
+      description: Tempo recomendado para nova tentativa quando a chave de idempotencia ainda estiver em processamento.
+      schema:
+        type: integer
+        minimum: 1
   responses:
     BadRequest:
       description: Requisicao invalida.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+        traceparent:
+          $ref: "#/components/headers/Traceparent"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
     Unauthorized:
       description: Token JWT ausente, invalido ou expirado.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+        traceparent:
+          $ref: "#/components/headers/Traceparent"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
     NotFound:
       description: Recurso nao encontrado.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+        traceparent:
+          $ref: "#/components/headers/Traceparent"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
     Conflict:
       description: Conflito de estado, duplicidade ou idempotencia.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+        traceparent:
+          $ref: "#/components/headers/Traceparent"
+        Retry-After:
+          $ref: "#/components/headers/RetryAfter"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
     BadGateway:
       description: Falha ao integrar com provedor financeiro externo.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+        traceparent:
+          $ref: "#/components/headers/Traceparent"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
     ServiceUnavailable:
       description: Provedor financeiro externo indisponivel ou configuracao obrigatoria ausente.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+        traceparent:
+          $ref: "#/components/headers/Traceparent"
       content:
         application/json:
           schema:

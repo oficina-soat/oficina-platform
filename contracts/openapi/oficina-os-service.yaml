@@ -19,6 +19,8 @@ tags:
     description: Operacoes de abertura, consulta, estado e historico de ordens de servico.
 paths:
   /clientes:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Clientes]
       summary: Criar cliente
@@ -75,6 +77,8 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
   /clientes/{clienteId}:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     get:
       tags: [Clientes]
       summary: Consultar cliente
@@ -120,6 +124,8 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
   /clientes/{clienteId}/veiculos:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Veiculos]
       summary: Criar veiculo para cliente
@@ -175,6 +181,8 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
   /veiculos/{veiculoId}:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     get:
       tags: [Veiculos]
       summary: Consultar veiculo
@@ -220,6 +228,8 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
   /ordens-servico:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Ordens de Servico]
       summary: Abrir OS
@@ -281,6 +291,8 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
   /ordens-servico/{ordemServicoId}:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     get:
       tags: [Ordens de Servico]
       summary: Consultar OS por id
@@ -299,6 +311,8 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
   /ordens-servico/{ordemServicoId}/historico:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     get:
       tags: [Ordens de Servico]
       summary: Consultar historico
@@ -319,6 +333,8 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
   /ordens-servico/{ordemServicoId}/estado:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     patch:
       tags: [Ordens de Servico]
       summary: Alterar estado
@@ -353,6 +369,8 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
   /ordens-servico/{ordemServicoId}/cancelamento:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
     post:
       tags: [Ordens de Servico]
       summary: Cancelar OS
@@ -388,6 +406,15 @@ components:
       scheme: bearer
       bearerFormat: JWT
   parameters:
+    CorrelationId:
+      name: X-Correlation-Id
+      in: header
+      required: false
+      description: Identificador de correlacao aceito do cliente e propagado em chamadas HTTP, eventos, logs e traces, conforme contracts/error-model.md.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
     ClienteId:
       name: clienteId
       in: path
@@ -433,27 +460,63 @@ components:
         minimum: 1
         maximum: 100
         default: 20
+  headers:
+    CorrelationId:
+      description: Identificador de correlacao retornado em toda resposta de erro.
+      schema:
+        type: string
+    Traceparent:
+      description: Contexto de trace W3C retornado quando houver instrumentacao distribuida.
+      schema:
+        type: string
+    RetryAfter:
+      description: Tempo recomendado para nova tentativa quando a chave de idempotencia ainda estiver em processamento.
+      schema:
+        type: integer
+        minimum: 1
   responses:
     BadRequest:
       description: Requisicao invalida.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+        traceparent:
+          $ref: "#/components/headers/Traceparent"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
     Unauthorized:
       description: Token JWT ausente, invalido ou expirado.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+        traceparent:
+          $ref: "#/components/headers/Traceparent"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
     NotFound:
       description: Recurso nao encontrado.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+        traceparent:
+          $ref: "#/components/headers/Traceparent"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
     Conflict:
       description: Conflito de estado, duplicidade ou idempotencia.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+        traceparent:
+          $ref: "#/components/headers/Traceparent"
+        Retry-After:
+          $ref: "#/components/headers/RetryAfter"
       content:
         application/json:
           schema:

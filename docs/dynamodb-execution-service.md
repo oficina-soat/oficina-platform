@@ -155,11 +155,14 @@ Tabela de execuções, diagnósticos, reparos e histórico operacional.
 | `execucaoId` | Sim | Identificador da execução |
 | `ordemServicoId` | Sim | Identificador da OS |
 | `status` | Sim | `CRIADA`, `EM_DIAGNOSTICO`, `DIAGNOSTICO_CONCLUIDO`, `EM_REPARO`, `REPARO_CONCLUIDO` ou `CANCELADA` |
+| `prioridade` | Sim | Prioridade operacional da fila. Valores menores indicam maior urgência. Valor padrão: `100`. |
 | `diagnostico` | Não | Resultado técnico |
 | `observacoesReparo` | Não | Observações do reparo |
 | `createdAt` | Sim | Criação |
 | `updatedAt` | Sim | Última atualização |
 | `correlationId` | Sim | Correlação HTTP/evento |
+| `filaStatus` | Condicional | Presente apenas para execuções aguardando ação operacional na fila. Valores esperados: `CRIADA` ou `DIAGNOSTICO_CONCLUIDO`. |
+| `prioridadeCriadoEm` | Condicional | Chave de ordenação da fila no formato `<prioridade>#<createdAt>#<execucaoId>`. |
 
 ### Atributos do histórico
 
@@ -181,10 +184,13 @@ Tabela de execuções, diagnósticos, reparos e histórico operacional.
 |---|---|---|---|
 | `GSI1` | `ordemServicoId` | `entityType` | Buscar execução de uma OS |
 | `GSI2` | `status` | `updatedAt` | Listar execuções por status |
+| `GSI3` | `filaStatus` | `prioridadeCriadoEm` | Consultar fila de execução por etapa operacional |
 
 ### Regras
 
 - Deve existir no máximo uma execução ativa por `ordemServicoId`.
+- A consulta de fila deve considerar, por padrão, execuções em `CRIADA` e `DIAGNOSTICO_CONCLUIDO`, ordenando por `prioridade` crescente e `createdAt` crescente.
+- Execuções em `EM_DIAGNOSTICO`, `EM_REPARO`, `REPARO_CONCLUIDO` e `CANCELADA` não devem possuir `filaStatus`.
 - A transição de status deve ser condicional sobre o status atual esperado.
 - `diagnosticoIniciado` deve ser publicado ao entrar em `EM_DIAGNOSTICO`.
 - `diagnosticoFinalizado` deve ser publicado ao entrar em `DIAGNOSTICO_CONCLUIDO`.

@@ -434,7 +434,7 @@ README.md dos microsserviços
 - [x] Criar migrations e seed limpo do `oficina-billing-service` para o database `oficina_billing`, preservando isolamento de acesso e ownership.
 - [x] Implementar no `oficina-billing-service` cálculo e snapshot financeiro de itens, fluxo de aprovação/recusa, pagamento, producers e consumers definidos nos contratos de eventos.
 - [x] Implementar integração de pagamentos com Mercado Pago no `oficina-billing-service`, incluindo configuração, adapter, tratamento de falhas, testes e documentação operacional.
-- [ ] Implementar fila de execução da OS no `oficina-execution-service`, incluindo priorização mínima, consulta de fila, início/finalização de diagnóstico e reparo, e eventos correspondentes.
+- [x] Implementar fila de execução da OS no `oficina-execution-service`, incluindo priorização mínima, consulta de fila, início/finalização de diagnóstico e reparo, e eventos correspondentes.
 - [ ] Criar testes unitários e de integração mínimos nos três microsserviços para controllers, use cases, persistência, idempotência, eventos e cenários principais da Saga.
 - [ ] Criar cenário BDD automatizado para pelo menos um fluxo completo da OS atravessando `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, incluindo evidência de execução no CI.
 - [ ] Configurar cobertura mínima de 80% por serviço, com relatório JaCoCo publicado no CI e link ou evidência registrada no README de cada microsserviço.

@@ -447,6 +447,16 @@ POST /api/v1/execucoes
 GET /api/v1/execucoes
 ```
 
+### Consultar fila de execução
+
+```http
+GET /api/v1/execucoes/fila
+```
+
+A fila retorna execuções pendentes de ação operacional, ordenadas por prioridade crescente e data de criação. Quanto menor o valor de `prioridade`, mais urgente é a execução.
+
+Por padrão, a fila inclui execuções em `CRIADA`, aguardando início de diagnóstico, e `DIAGNOSTICO_CONCLUIDO`, aguardando início de reparo. O consumidor pode filtrar por `status`.
+
 ### Consultar execução
 
 ```http

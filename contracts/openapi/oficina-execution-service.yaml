@@ -419,6 +419,31 @@ paths:
                   $ref: "#/components/schemas/Execucao"
         "401":
           $ref: "#/components/responses/Unauthorized"
+  /execucoes/fila:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
+    get:
+      tags: [Execucoes]
+      summary: Consultar fila de execucao
+      operationId: consultarFilaExecucao
+      description: Retorna execucoes pendentes de acao operacional, ordenadas por prioridade crescente e data de criacao.
+      parameters:
+        - name: status
+          in: query
+          description: Quando ausente, retorna execucoes em CRIADA e DIAGNOSTICO_CONCLUIDO.
+          schema:
+            $ref: "#/components/schemas/StatusExecucao"
+      responses:
+        "200":
+          description: Fila de execucao encontrada.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FilaExecucaoItem"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
   /execucoes/{execucaoId}:
     parameters:
       - $ref: "#/components/parameters/CorrelationId"
@@ -838,11 +863,16 @@ components:
         ordemServicoId:
           type: string
           format: uuid
+        prioridade:
+          type: integer
+          minimum: 0
+          default: 100
+          description: Prioridade operacional da fila. Valores menores indicam maior urgencia.
     Execucao:
       allOf:
         - $ref: "#/components/schemas/ExecucaoCreateRequest"
         - type: object
-          required: [execucaoId, status, criadoEm, atualizadoEm]
+          required: [execucaoId, status, prioridade, criadoEm, atualizadoEm]
           properties:
             execucaoId:
               type: string
@@ -859,6 +889,16 @@ components:
             atualizadoEm:
               type: string
               format: date-time
+    FilaExecucaoItem:
+      allOf:
+        - $ref: "#/components/schemas/Execucao"
+        - type: object
+          required: [posicao]
+          properties:
+            posicao:
+              type: integer
+              minimum: 1
+              description: Posicao calculada na fila retornada, apos filtros e ordenacao por prioridade.
     StatusExecucao:
       type: string
       enum: [CRIADA, EM_DIAGNOSTICO, DIAGNOSTICO_CONCLUIDO, EM_REPARO, REPARO_CONCLUIDO, CANCELADA]

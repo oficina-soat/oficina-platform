@@ -290,6 +290,8 @@ POST /api/v1/orcamentos/{orcamentoId}/recusa
 POST /api/v1/pagamentos
 ```
 
+Quando a integração Mercado Pago estiver habilitada no `oficina-billing-service`, esta operação solicita pagamento PIX no provedor financeiro externo. Falhas de comunicação com o provedor devem retornar `502 Bad Gateway`; configuração obrigatória ausente ou método sem suporte na integração direta deve retornar `503 Service Unavailable`, preservando o [Contrato de Erros REST](error-model.md).
+
 ### Consultar pagamento
 
 ```http

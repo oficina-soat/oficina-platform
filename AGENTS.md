@@ -51,6 +51,7 @@ O `../oficina-auth-lambda` é exceção: quando a mudança pertencer aos fluxos 
 - Trate este repositório como fonte normativa da plataforma. Mudanças em ADRs, contratos e padrões devem reduzir ambiguidade para implementação em outros repositórios.
 - Preserve a estrutura já usada no projeto: decisões em [adr/](adr/), contratos em [contracts/](contracts/), eventos individuais em [contracts/events/](contracts/events/) e OpenAPI por microsserviço em [contracts/openapi/](contracts/openapi/).
 - Use o [ROADMAP.md](ROADMAP.md) como referência de prioridade e critério de pronto para novas alterações.
+- Quando o usuário solicitar a "próxima tarefa", interprete sempre como o próximo item aberto no [ROADMAP.md](ROADMAP.md), mesmo que a mensagem inclua outro arquivo como contexto operacional ou referência complementar.
 - Prefira mudanças pequenas, objetivas e compatíveis com os contratos já existentes.
 - Evite criar novos padrões, diretórios, microsserviços, tópicos ou formatos de contrato sem necessidade clara.
 - Ao alterar uma decisão compartilhada, atualize todos os artefatos afetados no mesmo escopo da mudança.

@@ -263,9 +263,9 @@ docs/architecture-diagram.md
 
 **Situação atual:** a governança da suíte definiu o repositório `oficina-infra` como destino canônico da infraestrutura executável, mas o enunciado da Fase 4 lista manifestos Kubernetes como entregável dos repositórios de microsserviço.
 
-**Definição faltante:** decidir se os manifestos Kubernetes específicos de cada serviço serão copiados para os repositórios dos microsserviços, mantidos apenas no `oficina-infra` com links e evidências nos READMEs dos serviços, ou mantidos em ambos com uma fonte canônica explícita.
+**Decisão:** a estratégia foi fechada em [Estratégia de entrega dos manifestos Kubernetes](docs/kubernetes-manifest-strategy.md). O `oficina-infra` é a fonte canônica dos manifests executáveis; o [Template Kubernetes Base](templates/kubernetes/base/README.md) permanece como referência normativa; e os READMEs dos microsserviços apontam para o template aplicável e para o destino canônico no `oficina-infra`.
 
-**Opção recomendada:** manter `oficina-infra` como fonte canônica de deploy e registrar nos READMEs dos microsserviços links diretos para os manifestos aplicáveis, evitando divergência operacional. Se a avaliação exigir manifestos dentro de cada repositório, copiar versões de referência e documentar que o deploy real continua no `oficina-infra`.
+Se uma avaliação exigir arquivos Kubernetes dentro de cada repositório de microsserviço, as cópias devem ser registradas como referência não canônica. O deploy real continua pertencendo ao `oficina-infra`.
 
 **Artefatos sugeridos:**
 
@@ -273,6 +273,7 @@ docs/architecture-diagram.md
 ../oficina-infra/
 templates/kubernetes/base/
 README.md dos microsserviços
+docs/kubernetes-manifest-strategy.md
 ```
 
 **Critério de pronto:** a entrega deve demonstrar onde estão os manifestos Kubernetes de cada serviço, qual repositório é a fonte canônica de deploy e como evitar divergência entre cópias ou referências.
@@ -443,7 +444,7 @@ README.md dos microsserviços
 - [ ] Configurar proteção da branch `main` nos três repositórios de microsserviços, com PR obrigatório e checagens automáticas exigidas antes de merge. A política canônica foi documentada em [Proteção da branch main dos microsserviços](docs/github-branch-protection.md); a aplicação remota depende de credencial GitHub com permissão administrativa.
 - [x] Registrar Swagger/OpenAPI ou collection Postman atualizada no README de cada microsserviço, com link para o contrato canônico correspondente.
 - [x] Registrar nos READMEs dos três microsserviços a escolha da Saga orquestrada pelo `oficina-os-service`, com justificativa e links para ADR, contrato e fluxos.
-- [ ] Resolver e documentar a estratégia de entrega dos manifestos Kubernetes por microsserviço, conciliando a exigência do enunciado com o repositório canônico `oficina-infra`.
+- [x] Resolver e documentar a estratégia de entrega dos manifestos Kubernetes por microsserviço, conciliando a exigência do enunciado com o repositório canônico `oficina-infra`.
 - [ ] Atualizar continuamente a documentação local dos três repositórios de microsserviços com setup, variáveis de ambiente, execução local, testes, build, Docker, deploy e decisões específicas que surgirem durante a implementação.
 - [ ] Marcar o `oficina-app` como referência histórica após a decomposição, sem aplicar adaptações da Fase 4 diretamente nele.
 
@@ -515,12 +516,12 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é fechar as evidências e controles operacionais que ainda impedem a entrega completa da Fase 4: proteção de branch, estratégia dos manifestos Kubernetes por microsserviço e infraestrutura final de DynamoDB/mensageria no `oficina-infra`.
+O próximo passo mais importante é fechar as evidências e controles operacionais que ainda impedem a entrega completa da Fase 4: proteção de branch, materialização dos manifests Kubernetes no `oficina-infra` e infraestrutura final de DynamoDB/mensageria.
 
 A ordem recomendada é:
 
 1. aplicar no GitHub a [Proteção da branch main dos microsserviços](docs/github-branch-protection.md), usando `service-ci-validate` como checagem obrigatória;
-2. resolver a estratégia de evidência dos manifestos Kubernetes por microsserviço, conciliando a exigência do [Enunciado Fase 4](docs/Enunciado%20Fase%204.md) com o `oficina-infra` como repositório canônico de deploy;
+2. materializar no `oficina-infra` os manifests executáveis definidos pela [Estratégia de entrega dos manifestos Kubernetes](docs/kubernetes-manifest-strategy.md);
 3. adicionar DynamoDB do `oficina-execution-service` e mensageria conforme os contratos da plataforma no `oficina-infra`;
 4. aplicar o baseline do RDS PostgreSQL compartilhado em AWS quando `vpc_id`, subnets e security groups reais do ambiente `lab` estiverem disponíveis;
 5. definir e implementar o cenário BDD do fluxo completo da Saga com pelo menos uma falha compensada;

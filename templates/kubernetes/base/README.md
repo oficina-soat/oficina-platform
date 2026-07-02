@@ -10,6 +10,8 @@ Fornecer manifests Kubernetes base para os três microsserviços canônicos da p
 
 Este template complementa o [Template Quarkus de Microsserviço](../../quarkus-service/README.md), o [Padrão de Observabilidade Distribuída](../../../docs/observability.md), os [Nomes de runtime, secrets e infraestrutura](../../../docs/infra-runtime-naming.md) e a definição de [Conta, região e ambientes AWS](../../../docs/aws-environments.md).
 
+A estratégia de entrega está definida em [Estratégia de entrega dos manifestos Kubernetes](../../../docs/kubernetes-manifest-strategy.md): este diretório é a referência normativa, enquanto o `oficina-infra` é a fonte canônica dos manifests executáveis de deploy.
+
 ## Estrutura
 
 ```text
@@ -29,7 +31,7 @@ templates/kubernetes/base/
 
 ## Uso esperado
 
-O repositório `oficina-infra` deve consumir este template como referência para os manifests base e criar overlays de ambiente, como `lab`, sem alterar os nomes canônicos dos serviços.
+O repositório `oficina-infra` deve consumir este template como referência para os manifests base e criar os manifests executáveis e overlays de ambiente, como `lab`, sem alterar os nomes canônicos dos serviços.
 
 Comando de validação local:
 

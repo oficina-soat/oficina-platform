@@ -30,6 +30,7 @@ Os repositórios legados permanecem como referência histórica até que seus ar
 | Terraform AWS | Provisionar recursos compartilhados da suíte no ambiente `lab`. |
 | State remoto | Usar o bucket `tf-shared-eks-lab-<aws-account-id>-us-east-1` e a key `oficina/lab/infra/terraform.tfstate`. |
 | Kubernetes compartilhado | Manter namespaces, secrets materializados, config maps compartilhados, ingress ou rotas comuns e integrações com o cluster `eks-lab`. |
+| Manifests de microsserviços | Manter os manifests Kubernetes executáveis dos três microsserviços conforme a [Estratégia de entrega dos manifestos Kubernetes](kubernetes-manifest-strategy.md). |
 | Banco relacional | Provisionar a instância RDS PostgreSQL compartilhada e preparar isolamento lógico para `oficina_os` e `oficina_billing`, conforme o [Padrão de isolamento PostgreSQL no RDS compartilhado](rds-postgresql-isolation.md). |
 | DynamoDB | Provisionar tabelas do `oficina-execution-service` com prefixo `oficina-execution-lab`. |
 | Mensageria | Provisionar tópicos, filas, DLQs e permissões conforme contratos de eventos e tópicos. |
@@ -46,7 +47,6 @@ O `oficina-infra` não deve conter:
 - controllers, entidades, regras de negócio ou testes unitários dos serviços;
 - contratos OpenAPI, schemas de eventos ou ADRs normativas, que permanecem no `oficina-platform`;
 - migrations executáveis próprias dos microsserviços, salvo bootstrap estritamente necessário para criar databases, usuários e permissões;
-- manifests específicos que pertençam ao ciclo de vida exclusivo de um microsserviço quando esses manifests estiverem versionados no repositório do próprio serviço;
 - valores hardcoded de conta AWS.
 
 ## Nomes Canônicos
@@ -111,6 +111,7 @@ O `oficina-infra` estará alinhado com a governança quando:
 - usar state remoto na key `oficina/lab/infra/terraform.tfstate`;
 - provisionar RDS compartilhado sem permitir acesso cruzado entre `oficina_os` e `oficina_billing`;
 - provisionar tabelas DynamoDB canônicas do `oficina-execution-service`;
+- manter os manifests Kubernetes executáveis dos três microsserviços sem duplicação nos repositórios dos serviços;
 - materializar secrets sem expor valores sensíveis no Git;
 - criar ou referenciar tópicos, filas e DLQs compatíveis com os contratos de mensageria;
 - permitir deploy independente dos três microsserviços;

@@ -44,7 +44,7 @@ Cada repositório de microsserviço deve possuir:
 - [ ] idempotência conforme [Contrato de Idempotência](../contracts/idempotency.md);
 - [ ] propagação de `correlationId` em HTTP, eventos, logs e traces;
 - [ ] documentação da Saga orquestrada pelo `oficina-os-service`, com links para [ADR-009](../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), [Fluxos da Saga da Ordem de Serviço](saga-flows.md) e [Contrato de Saga do oficina-os-service](../contracts/saga/oficina-os-saga-v1.md);
-- [ ] evidência de manifests Kubernetes aplicáveis, conforme a estratégia final definida para os repositórios de serviço e o `oficina-infra`.
+- [ ] evidência de manifests Kubernetes aplicáveis, conforme a [Estratégia de entrega dos manifestos Kubernetes](kubernetes-manifest-strategy.md).
 
 ## Checklist de Domínio e Contratos
 

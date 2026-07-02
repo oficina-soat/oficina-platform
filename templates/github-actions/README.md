@@ -81,6 +81,8 @@ Pull Requests executam:
 - relatório JaCoCo com cobertura mínima de 80%;
 - análise SonarCloud com Quality Gate obrigatório.
 
+O job obrigatório para proteção da branch `main` chama-se `service-ci-validate`, conforme a política em [Proteção da branch main dos microsserviços](../../docs/github-branch-protection.md).
+
 O comportamento esperado para BDD, cobertura e evidências de qualidade está definido em [Padrão BDD, Cobertura e Qualidade](../../docs/bdd-testing.md).
 
 Merges na `main` podem executar também, quando as variáveis de habilitação estiverem configuradas:

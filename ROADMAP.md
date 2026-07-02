@@ -440,7 +440,7 @@ README.md dos microsserviços
 - [x] Configurar cobertura mínima de 80% por serviço, com relatório JaCoCo publicado no CI e link ou evidência registrada no README de cada microsserviço.
 - [x] Validar os três microsserviços contra contratos OpenAPI, schemas JSON de eventos, [Contrato de Erros REST](contracts/error-model.md), [Contrato de Idempotência](contracts/idempotency.md) e [Contrato de Saga do oficina-os-service](contracts/saga/oficina-os-saga-v1.md).
 - [x] Copiar e adaptar workflows de CI/CD para os três repositórios de microsserviços, garantindo build, testes, Quality Gate SonarCloud ou equivalente, publicação de imagem e deploy automatizado em Kubernetes. A publicação de imagem e o deploy foram mantidos condicionais por variáveis/execução manual até a estratégia de manifestos Kubernetes e infraestrutura final estarem fechadas.
-- [ ] Configurar proteção da branch `main` nos três repositórios de microsserviços, com PR obrigatório e checagens automáticas exigidas antes de merge.
+- [ ] Configurar proteção da branch `main` nos três repositórios de microsserviços, com PR obrigatório e checagens automáticas exigidas antes de merge. A política canônica foi documentada em [Proteção da branch main dos microsserviços](docs/github-branch-protection.md); a aplicação remota depende de credencial GitHub com permissão administrativa.
 - [ ] Registrar Swagger/OpenAPI ou collection Postman atualizada no README de cada microsserviço, com link para o contrato canônico correspondente.
 - [ ] Registrar nos READMEs dos três microsserviços a escolha da Saga orquestrada pelo `oficina-os-service`, com justificativa e links para ADR, contrato e fluxos.
 - [ ] Resolver e documentar a estratégia de entrega dos manifestos Kubernetes por microsserviço, conciliando a exigência do enunciado com o repositório canônico `oficina-infra`.
@@ -519,7 +519,7 @@ O próximo passo mais importante é fechar as evidências e controles operaciona
 
 A ordem recomendada é:
 
-1. configurar proteção da branch `main` nos três repositórios de microsserviços, usando os workflows de CI/CD como checagens obrigatórias;
+1. aplicar no GitHub a [Proteção da branch main dos microsserviços](docs/github-branch-protection.md), usando `service-ci-validate` como checagem obrigatória;
 2. registrar Swagger/OpenAPI ou collection Postman atualizada nos READMEs dos três microsserviços, com links para os contratos canônicos em [contracts/openapi/](contracts/openapi/);
 3. registrar nos READMEs dos três microsserviços a escolha da Saga orquestrada pelo `oficina-os-service`, com links para a ADR, [Fluxos da Saga da Ordem de Serviço](docs/saga-flows.md) e [Contrato de Saga do oficina-os-service](contracts/saga/oficina-os-saga-v1.md);
 4. resolver a estratégia de evidência dos manifestos Kubernetes por microsserviço, conciliando a exigência do [Enunciado Fase 4](docs/Enunciado%20Fase%204.md) com o `oficina-infra` como repositório canônico de deploy;

@@ -439,7 +439,7 @@ README.md dos microsserviços
 - [x] Criar cenário BDD automatizado para pelo menos um fluxo completo da OS atravessando `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, incluindo evidência de execução no CI.
 - [x] Configurar cobertura mínima de 80% por serviço, com relatório JaCoCo publicado no CI e link ou evidência registrada no README de cada microsserviço.
 - [x] Validar os três microsserviços contra contratos OpenAPI, schemas JSON de eventos, [Contrato de Erros REST](contracts/error-model.md), [Contrato de Idempotência](contracts/idempotency.md) e [Contrato de Saga do oficina-os-service](contracts/saga/oficina-os-saga-v1.md).
-- [ ] Copiar e adaptar workflows de CI/CD para os três repositórios de microsserviços, garantindo build, testes, Quality Gate SonarCloud ou equivalente, publicação de imagem e deploy automatizado em Kubernetes.
+- [x] Copiar e adaptar workflows de CI/CD para os três repositórios de microsserviços, garantindo build, testes, Quality Gate SonarCloud ou equivalente, publicação de imagem e deploy automatizado em Kubernetes. A publicação de imagem e o deploy foram mantidos condicionais por variáveis/execução manual até a estratégia de manifestos Kubernetes e infraestrutura final estarem fechadas.
 - [ ] Configurar proteção da branch `main` nos três repositórios de microsserviços, com PR obrigatório e checagens automáticas exigidas antes de merge.
 - [ ] Registrar Swagger/OpenAPI ou collection Postman atualizada no README de cada microsserviço, com link para o contrato canônico correspondente.
 - [ ] Registrar nos READMEs dos três microsserviços a escolha da Saga orquestrada pelo `oficina-os-service`, com justificativa e links para ADR, contrato e fluxos.
@@ -515,19 +515,17 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é abrir duas frentes paralelas e controladas: consolidar o repositório `oficina-infra`, migrando e adaptando os artefatos ainda úteis de `oficina-infra-k8s` e `oficina-infra-db` conforme o [Plano de migração para o repositório unificado de infraestrutura](docs/infrastructure-migration-plan.md), e iniciar as baselines executáveis dos três microsserviços conforme o [Plano de Decomposição do oficina-app](docs/oficina-app-decomposition.md).
+O próximo passo mais importante é fechar as evidências e controles operacionais que ainda impedem a entrega completa da Fase 4: proteção de branch, Swagger/OpenAPI nos READMEs, justificativa explícita da Saga, estratégia dos manifestos Kubernetes por microsserviço e infraestrutura final de DynamoDB/mensageria no `oficina-infra`.
 
 A ordem recomendada é:
 
-1. criar baseline Quarkus executável nos três microsserviços;
-2. criar diretivas locais para agentes, README operacional e backlog local nos três repositórios de microsserviços;
-3. copiar e adaptar o domínio de OS/atendimento para `oficina-os-service`;
-4. copiar e adaptar catálogo, peças, serviços e estoque para `oficina-execution-service`, reimplementando DynamoDB;
-5. criar do zero orçamento, aprovação, recusa e pagamento no `oficina-billing-service`;
-6. implementar BDD, cobertura mínima de 80% e Quality Gate nos três microsserviços;
-7. aplicar os workflows de CI/CD e configurar proteção da branch `main` nos três repositórios;
-8. aplicar o baseline do RDS PostgreSQL compartilhado em AWS quando `vpc_id`, subnets e security groups reais do ambiente `lab` estiverem disponíveis;
-9. adicionar DynamoDB do `oficina-execution-service` e mensageria conforme os contratos da plataforma;
-10. definir rotas reais do API Gateway quando os endpoints dos microsserviços estiverem publicados;
-11. resolver a estratégia de evidência dos manifestos Kubernetes por microsserviço;
-12. revisar checklists de deploy independente, runbooks mínimos e entregáveis finais da Fase 4.
+1. configurar proteção da branch `main` nos três repositórios de microsserviços, usando os workflows de CI/CD como checagens obrigatórias;
+2. registrar Swagger/OpenAPI ou collection Postman atualizada nos READMEs dos três microsserviços, com links para os contratos canônicos em [contracts/openapi/](contracts/openapi/);
+3. registrar nos READMEs dos três microsserviços a escolha da Saga orquestrada pelo `oficina-os-service`, com links para a ADR, [Fluxos da Saga da Ordem de Serviço](docs/saga-flows.md) e [Contrato de Saga do oficina-os-service](contracts/saga/oficina-os-saga-v1.md);
+4. resolver a estratégia de evidência dos manifestos Kubernetes por microsserviço, conciliando a exigência do [Enunciado Fase 4](docs/Enunciado%20Fase%204.md) com o `oficina-infra` como repositório canônico de deploy;
+5. adicionar DynamoDB do `oficina-execution-service` e mensageria conforme os contratos da plataforma no `oficina-infra`;
+6. aplicar o baseline do RDS PostgreSQL compartilhado em AWS quando `vpc_id`, subnets e security groups reais do ambiente `lab` estiverem disponíveis;
+7. definir e implementar o cenário BDD do fluxo completo da Saga com pelo menos uma falha compensada;
+8. definir rotas reais do API Gateway quando os endpoints dos microsserviços estiverem publicados;
+9. revisar checklists de deploy independente, runbooks mínimos e entregáveis finais da Fase 4;
+10. preparar diagrama final, roteiro e evidências do vídeo de demonstração.

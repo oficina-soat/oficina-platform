@@ -8,6 +8,17 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      publish_image:
+        description: Publicar imagem no ECR mesmo com ENABLE_IMAGE_PUBLISH desabilitado.
+        required: false
+        type: boolean
+        default: false
+      deploy:
+        description: Atualizar o Deployment no EKS mesmo com ENABLE_K8S_DEPLOY desabilitado.
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: lab-${{ github.repository }}
@@ -106,7 +117,14 @@ jobs:
           if-no-files-found: ignore
 
   resolve_service_state:
-    if: github.ref_name == 'main'
+    if: >
+      github.ref_name == 'main' &&
+      (
+        vars.ENABLE_IMAGE_PUBLISH == 'true' ||
+        vars.ENABLE_K8S_DEPLOY == 'true' ||
+        github.event.inputs.publish_image == 'true' ||
+        github.event.inputs.deploy == 'true'
+      )
     name: resolve-service-state
     runs-on: ubuntu-latest
     needs: validate
@@ -118,6 +136,7 @@ jobs:
       commit_sha: ${{ steps.state.outputs.commit_sha }}
       current_deployment_image: ${{ steps.state.outputs.current_deployment_image }}
       current_version: ${{ steps.state.outputs.current_version }}
+      deploy_enabled: ${{ steps.state.outputs.deploy_enabled }}
       deployment_exists: ${{ steps.state.outputs.deployment_exists }}
       image_exists: ${{ steps.state.outputs.image_exists }}
       image_ref: ${{ steps.state.outputs.image_ref }}
@@ -125,6 +144,7 @@ jobs:
       need_build: ${{ steps.state.outputs.need_build }}
       need_deploy: ${{ steps.state.outputs.need_deploy }}
       need_release: ${{ steps.state.outputs.need_release }}
+      publish_enabled: ${{ steps.state.outputs.publish_enabled }}
       publish_relevant_change: ${{ steps.state.outputs.publish_relevant_change }}
       release_exists: ${{ steps.state.outputs.release_exists }}
       release_tag: ${{ steps.state.outputs.release_tag }}
@@ -136,10 +156,14 @@ jobs:
       AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
       ECR_REPOSITORY_NAME: ${{ vars.ECR_REPOSITORY_NAME }}
       ECR_REPOSITORY_URL: ${{ vars.ECR_REPOSITORY_URL }}
+      ENABLE_IMAGE_PUBLISH: ${{ vars.ENABLE_IMAGE_PUBLISH || 'false' }}
+      ENABLE_K8S_DEPLOY: ${{ vars.ENABLE_K8S_DEPLOY || 'false' }}
       EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME || 'eks-lab' }}
       K8S_CONTAINER_NAME: ${{ vars.K8S_CONTAINER_NAME }}
       K8S_DEPLOYMENT_NAME: ${{ vars.K8S_DEPLOYMENT_NAME }}
       K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'default' }}
+      MANUAL_DEPLOY: ${{ github.event.inputs.deploy || 'false' }}
+      MANUAL_PUBLISH_IMAGE: ${{ github.event.inputs.publish_image || 'false' }}
       SERVICE_NAME: ${{ vars.SERVICE_NAME }}
     steps:
       - name: Checkout
@@ -220,6 +244,16 @@ jobs:
               ;;
           esac
 
+          publish_enabled=false
+          if [[ "${ENABLE_IMAGE_PUBLISH}" == "true" || "${MANUAL_PUBLISH_IMAGE}" == "true" || "${MANUAL_DEPLOY}" == "true" ]]; then
+            publish_enabled=true
+          fi
+
+          deploy_enabled=false
+          if [[ "${ENABLE_K8S_DEPLOY}" == "true" || "${MANUAL_DEPLOY}" == "true" ]]; then
+            deploy_enabled=true
+          fi
+
           current_version="$(extract_version pom.xml)"
           if [[ -z "${current_version}" ]]; then
             echo "Nao foi possivel identificar project.version em pom.xml" >&2
@@ -282,33 +316,35 @@ jobs:
             image_exists=true
           fi
 
-          aws --region "${AWS_REGION}" eks describe-cluster --name "${EKS_CLUSTER_NAME}" >/dev/null
-          aws eks update-kubeconfig --region "${AWS_REGION}" --name "${EKS_CLUSTER_NAME}"
-
           deployment_exists=false
           current_deployment_image=""
-          if kubectl get deployment "${deployment_name}" --namespace "${K8S_NAMESPACE}" >/dev/null 2>&1; then
-            deployment_exists=true
-            current_deployment_image="$(
-              kubectl get deployment "${deployment_name}" \
-                --namespace "${K8S_NAMESPACE}" \
-                -o jsonpath="{.spec.template.spec.containers[?(@.name=='${container_name}')].image}"
-            )"
+          if [[ "${deploy_enabled}" == true ]]; then
+            aws --region "${AWS_REGION}" eks describe-cluster --name "${EKS_CLUSTER_NAME}" >/dev/null
+            aws eks update-kubeconfig --region "${AWS_REGION}" --name "${EKS_CLUSTER_NAME}"
+
+            if kubectl get deployment "${deployment_name}" --namespace "${K8S_NAMESPACE}" >/dev/null 2>&1; then
+              deployment_exists=true
+              current_deployment_image="$(
+                kubectl get deployment "${deployment_name}" \
+                  --namespace "${K8S_NAMESPACE}" \
+                  -o jsonpath="{.spec.template.spec.containers[?(@.name=='${container_name}')].image}"
+              )"
+            fi
           fi
 
           need_build=false
           need_release=false
           need_deploy=false
 
-          if [[ "${image_exists}" == false ]]; then
+          if [[ "${publish_enabled}" == true && "${image_exists}" == false ]]; then
             need_build=true
           fi
 
-          if [[ "${release_exists}" == false ]]; then
+          if [[ "${publish_enabled}" == true && "${release_exists}" == false ]]; then
             need_release=true
           fi
 
-          if [[ "${deployment_exists}" == false || "${current_deployment_image}" != "${image_ref}" ]]; then
+          if [[ "${deploy_enabled}" == true && ( "${deployment_exists}" == false || "${current_deployment_image}" != "${image_ref}" ) ]]; then
             need_deploy=true
           fi
 
@@ -330,6 +366,7 @@ jobs:
           set_output commit_sha "${commit_sha}"
           set_output current_deployment_image "${current_deployment_image}"
           set_output current_version "${current_version}"
+          set_output deploy_enabled "${deploy_enabled}"
           set_output deployment_exists "${deployment_exists}"
           set_output image_exists "${image_exists}"
           set_output image_ref "${image_ref}"
@@ -337,6 +374,7 @@ jobs:
           set_output need_build "${need_build}"
           set_output need_deploy "${need_deploy}"
           set_output need_release "${need_release}"
+          set_output publish_enabled "${publish_enabled}"
           set_output publish_relevant_change "${publish_relevant_change}"
           set_output release_exists "${release_exists}"
           set_output release_tag "${release_tag}"
@@ -369,7 +407,7 @@ jobs:
           ref: ${{ needs.resolve_service_state.outputs.commit_sha }}
 
       - name: Configure AWS credentials
-        if: needs.resolve_service_state.outputs.need_build == 'true'
+        if: needs.resolve_service_state.outputs.publish_enabled == 'true' && needs.resolve_service_state.outputs.need_build == 'true'
         uses: aws-actions/configure-aws-credentials@v6.1.0
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -378,7 +416,7 @@ jobs:
           aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
 
       - name: Build Docker image
-        if: needs.resolve_service_state.outputs.need_build == 'true'
+        if: needs.resolve_service_state.outputs.publish_enabled == 'true' && needs.resolve_service_state.outputs.need_build == 'true'
         shell: bash
         run: |
           case "${SERVICE_NAME}" in
@@ -400,7 +438,7 @@ jobs:
             .
 
       - name: Push Docker image
-        if: needs.resolve_service_state.outputs.need_build == 'true'
+        if: needs.resolve_service_state.outputs.publish_enabled == 'true' && needs.resolve_service_state.outputs.need_build == 'true'
         shell: bash
         run: |
           registry="${IMAGE_REF%%/*}"
@@ -409,7 +447,7 @@ jobs:
           docker push "${IMAGE_REF}"
 
       - name: Optionally publish latest tag
-        if: needs.resolve_service_state.outputs.need_build == 'true' && env.PUSH_LATEST_IMAGE == 'true'
+        if: needs.resolve_service_state.outputs.publish_enabled == 'true' && needs.resolve_service_state.outputs.need_build == 'true' && env.PUSH_LATEST_IMAGE == 'true'
         shell: bash
         run: |
           latest_ref="${{ needs.resolve_service_state.outputs.repository_url }}:latest"
@@ -417,7 +455,7 @@ jobs:
           docker push "${latest_ref}"
 
       - name: Prepare image metadata
-        if: needs.resolve_service_state.outputs.need_release == 'true'
+        if: needs.resolve_service_state.outputs.publish_enabled == 'true' && needs.resolve_service_state.outputs.need_release == 'true'
         shell: bash
         run: |
           mkdir -p target
@@ -432,7 +470,7 @@ jobs:
           } > "target/${SERVICE_NAME}-image.txt"
 
       - name: Create GitHub release
-        if: needs.resolve_service_state.outputs.need_release == 'true'
+        if: needs.resolve_service_state.outputs.publish_enabled == 'true' && needs.resolve_service_state.outputs.need_release == 'true'
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -449,7 +487,7 @@ jobs:
             --notes "Imagem ${SERVICE_NAME} ${APP_VERSION}: ${IMAGE_REF}"
 
       - name: Upload image metadata
-        if: needs.resolve_service_state.outputs.need_release == 'true'
+        if: needs.resolve_service_state.outputs.publish_enabled == 'true' && needs.resolve_service_state.outputs.need_release == 'true'
         uses: actions/upload-artifact@v6
         with:
           name: ${{ env.SERVICE_NAME }}-image
@@ -457,11 +495,15 @@ jobs:
           if-no-files-found: error
 
       - name: Report no-op publish state
-        if: needs.resolve_service_state.outputs.need_build != 'true' && needs.resolve_service_state.outputs.need_release != 'true'
+        if: needs.resolve_service_state.outputs.publish_enabled == 'true' && needs.resolve_service_state.outputs.need_build != 'true' && needs.resolve_service_state.outputs.need_release != 'true'
         run: echo "Nenhum build, push de imagem ou release necessario para ${APP_VERSION}."
 
+      - name: Report disabled publish state
+        if: needs.resolve_service_state.outputs.publish_enabled != 'true'
+        run: echo "Publicacao de imagem desabilitada; use ENABLE_IMAGE_PUBLISH=true ou workflow_dispatch com publish_image=true."
+
   deploy_service:
-    if: github.ref_name == 'main' && needs.resolve_service_state.outputs.need_deploy == 'true'
+    if: github.ref_name == 'main' && needs.resolve_service_state.outputs.deploy_enabled == 'true' && needs.resolve_service_state.outputs.need_deploy == 'true'
     name: deploy-service
     runs-on: ubuntu-latest
     needs:
@@ -520,6 +562,8 @@ jobs:
   report_noop:
     if: >
       github.ref_name == 'main' &&
+      needs.resolve_service_state.outputs.publish_enabled == 'true' &&
+      needs.resolve_service_state.outputs.deploy_enabled == 'true' &&
       needs.resolve_service_state.outputs.need_build != 'true' &&
       needs.resolve_service_state.outputs.need_release != 'true' &&
       needs.resolve_service_state.outputs.need_deploy != 'true'

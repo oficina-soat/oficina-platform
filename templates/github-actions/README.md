@@ -57,9 +57,20 @@ MAVEN_PROFILE=postgresql|dynamodb
 ECR_REPOSITORY_NAME=<nome-do-repositorio-ecr>
 SONAR_ORGANIZATION=<organizacao-sonarcloud>
 SONAR_PROJECT_KEY=<project-key-sonarcloud>
+ENABLE_IMAGE_PUBLISH=false|true
+ENABLE_K8S_DEPLOY=false|true
 ```
 
 Quando `SERVICE_NAME` não for informado, o workflow deriva o nome do repositório GitHub. Para os três microsserviços canônicos, esse valor deve coincidir com `oficina-os-service`, `oficina-billing-service` ou `oficina-execution-service`.
+
+As variáveis `ENABLE_IMAGE_PUBLISH` e `ENABLE_K8S_DEPLOY` controlam a separação entre CI obrigatório e entrega em AWS:
+
+- com ambas desabilitadas, pull requests e pushes na `main` executam build Maven, testes, JaCoCo, validação de cobertura mínima e Quality Gate, sem acessar ECR ou EKS;
+- com `ENABLE_IMAGE_PUBLISH=true`, o push na `main` também consulta ECR, publica a imagem Docker quando necessário e cria release com metadados da imagem;
+- com `ENABLE_K8S_DEPLOY=true`, o push na `main` também consulta o Deployment no EKS e atualiza a imagem quando houver diferença;
+- em `workflow_dispatch`, os inputs `publish_image` e `deploy` permitem acionar manualmente publicação ou deploy mesmo com as variáveis desabilitadas.
+
+Enquanto a estratégia definitiva de manifestos Kubernetes por microsserviço estiver aberta, mantenha `ENABLE_K8S_DEPLOY=false`. O job de deploy deve ser habilitado somente quando os Deployments, containers, namespace, credenciais AWS e fonte canônica dos manifestos estiverem definidos no `oficina-infra` ou documentados no repositório do serviço.
 
 ## Fluxo
 
@@ -72,7 +83,7 @@ Pull Requests executam:
 
 O comportamento esperado para BDD, cobertura e evidências de qualidade está definido em [Padrão BDD, Cobertura e Qualidade](../../docs/bdd-testing.md).
 
-Merges na `main` executam também:
+Merges na `main` podem executar também, quando as variáveis de habilitação estiverem configuradas:
 
 - consulta do estado atual no ECR, GitHub Releases e Kubernetes;
 - build da imagem Docker apenas quando a tag de `project.version` ainda não existir;

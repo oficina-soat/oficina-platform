@@ -172,7 +172,7 @@ jobs:
             "- Branch origem: ${HEAD_BRANCH}" \
             "- Branch destino: ${BASE_BRANCH}" \
             "- Commit validado: ${GITHUB_SHA}" \
-            "Ao aceitar este PR, o push resultante em ${BASE_BRANCH} vai consultar o estado atual da AWS e executar apenas build, publicacao de imagem, release e deploy que ainda forem necessarios.")"
+            "Ao aceitar este PR, o push resultante em ${BASE_BRANCH} vai executar a validacao obrigatoria e so vai publicar imagem ou fazer deploy quando ENABLE_IMAGE_PUBLISH, ENABLE_K8S_DEPLOY ou os inputs manuais correspondentes estiverem habilitados.")"
 
           existing_pr_number="$(find_existing_pr_number)"
 

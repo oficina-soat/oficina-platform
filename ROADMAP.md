@@ -457,7 +457,7 @@ docs/kubernetes-manifest-strategy.md
 - [x] Definir eventos de compensação.
 - [x] Definir timeouts e retentativas.
 - [x] Definir testes de contrato da Saga.
-- [ ] Definir e implementar cenário BDD do fluxo completo da Saga, incluindo um caminho feliz e pelo menos uma falha compensada.
+- [x] Definir e implementar cenário BDD do fluxo completo da Saga, incluindo um caminho feliz e pelo menos uma falha compensada.
 
 ### Épico D — Plataforma e operação
 

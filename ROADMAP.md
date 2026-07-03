@@ -205,13 +205,28 @@ Amazon DynamoDB
 
 **Definição faltante:** manter o padrão coerente com os manifests Kubernetes, pipelines, instalação do Datadog Agent ou collector no repositório de infraestrutura e implementações dos microsserviços conforme esses artefatos forem evoluídos.
 
+**Etapas para Datadog totalmente operacional:**
+
+1. Definir no `oficina-infra` a forma de coleta oficial para o ambiente `lab`: Datadog Agent no cluster EKS ou collector compatível com OTLP, preservando Datadog como backend canônico.
+2. Criar no `oficina-infra` os manifests, Helm values ou módulos necessários para instalar o agente ou collector no cluster `eks-lab`, incluindo coleta de logs dos pods, métricas Prometheus e traces OTLP.
+3. Definir secrets e variáveis operacionais do Datadog no ambiente `lab`, incluindo chave de API, endpoint OTLP interno e integração com os nomes de runtime descritos em [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
+4. Propagar `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_PROTOCOL`, `OTEL_RESOURCE_ATTRIBUTES`, `DEPLOYMENT_ENVIRONMENT` e `OTEL_SERVICE_NAME` nos manifests dos três microsserviços.
+5. Validar nos três microsserviços a emissão de logs JSON, exposição de `/q/metrics`, health checks Quarkus e traces OpenTelemetry conforme [Padrão de Observabilidade Distribuída](docs/observability.md).
+6. Criar dashboards mínimos no Datadog para `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, filtrando por `service.name`, `service.namespace=oficina` e `deployment.environment=lab`.
+7. Criar visão adicional da Saga no Datadog para o `oficina-os-service`, cobrindo Sagas iniciadas, finalizadas, compensadas, em falha manual e duração por etapa.
+8. Criar monitores mínimos no Datadog para indisponibilidade, erro HTTP elevado, latência elevada, Outbox parada, Outbox com falha, DLQ, Saga em falha manual, pagamento indisponível e banco indisponível.
+9. Executar teste de ponta a ponta no ambiente `lab` gerando uma Ordem de Serviço com caminho feliz e uma falha compensada, confirmando correlação por `correlationId` entre logs, traces, métricas e eventos.
+10. Registrar evidências no checklist final da Fase 4 em [Checklist Final de Entrega da Fase 4](docs/phase-4-delivery-checklist.md), incluindo links ou identificadores dos dashboards, monitores, traces e consultas de logs usadas na validação.
+
 **Artefato sugerido:**
 
 ```text
 docs/observability.md
+docs/infra-runtime-naming.md
+docs/phase-4-delivery-checklist.md
 ```
 
-**Critério de pronto:** todos os serviços devem expor o mesmo conjunto mínimo de sinais e propagar `correlationId` em HTTP, eventos e logs.
+**Critério de pronto:** todos os serviços devem expor o mesmo conjunto mínimo de sinais, propagar `correlationId` em HTTP, eventos, logs e traces, enviar dados reais ao Datadog no ambiente `lab`, possuir dashboards e monitores mínimos ativos e ter evidências registradas no checklist final.
 
 ### 11. Padrão de erros e idempotência
 
@@ -383,6 +398,7 @@ docs/kubernetes-manifest-strategy.md
 5. Criar checklist de revisão de contratos.
 6. Criar checklist dos entregáveis finais da Fase 4, incluindo evidências de cobertura, Swagger/OpenAPI, vídeo, PDF e diagrama de arquitetura.
 7. Criar ambiente local integrado no `oficina-infra` para dependências, bootstrap e teste manual dos três microsserviços.
+8. Operacionalizar Datadog no ambiente `lab` com agente ou collector, dashboards, monitores e evidências de correlação distribuída.
 
 **Resultado esperado:** a plataforma fica pronta para operação, demonstração e evolução controlada.
 
@@ -466,6 +482,9 @@ docs/kubernetes-manifest-strategy.md
 - [x] Criar propagação de `correlationId`.
 - [x] Criar manifests Kubernetes base.
 - [x] Criar pipeline padrão de CI/CD.
+- [ ] Operacionalizar Datadog no `oficina-infra` com agente ou collector, secrets, endpoint OTLP e coleta de logs, métricas e traces no cluster `eks-lab`.
+- [ ] Criar dashboards e monitores mínimos no Datadog para os três microsserviços e para a Saga do `oficina-os-service`.
+- [ ] Registrar evidências de observabilidade distribuída no checklist final da Fase 4, incluindo correlação por `correlationId` em logs, traces, métricas e eventos.
 - [ ] Normalizar valores legados de conta, região e ambiente AWS nos repositórios antigos conforme [Conta, região e ambientes AWS](docs/aws-environments.md). Item adiado: por enquanto, `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` serão usados apenas como fonte de cópia; ajustes necessários no `oficina-auth-lambda` podem ser feitos diretamente nele.
 - [x] Planejar a migração de `oficina-infra-db` e `oficina-infra-k8s` para o novo repositório unificado de infraestrutura.
 - [x] Criar baseline executável do RDS PostgreSQL compartilhado no `oficina-infra`, com Terraform e bootstrap de databases, usuários e secrets independentes para OS e Billing.
@@ -516,15 +535,16 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é fechar as evidências e controles operacionais que ainda impedem a entrega completa da Fase 4: proteção de branch, materialização dos manifests Kubernetes no `oficina-infra` e infraestrutura final de DynamoDB/mensageria.
+O próximo passo mais importante é fechar as evidências e controles operacionais que ainda impedem a entrega completa da Fase 4: proteção de branch, materialização dos manifests Kubernetes no `oficina-infra`, infraestrutura final de DynamoDB/mensageria e Datadog operacional no ambiente `lab`.
 
 A ordem recomendada é:
 
 1. aplicar no GitHub a [Proteção da branch main dos microsserviços](docs/github-branch-protection.md), usando `service-ci-validate` como checagem obrigatória;
 2. materializar no `oficina-infra` os manifests executáveis definidos pela [Estratégia de entrega dos manifestos Kubernetes](docs/kubernetes-manifest-strategy.md);
 3. adicionar DynamoDB do `oficina-execution-service` e mensageria conforme os contratos da plataforma no `oficina-infra`;
-4. aplicar o baseline do RDS PostgreSQL compartilhado em AWS quando `vpc_id`, subnets e security groups reais do ambiente `lab` estiverem disponíveis;
-5. definir e implementar o cenário BDD do fluxo completo da Saga com pelo menos uma falha compensada;
-6. definir rotas reais do API Gateway quando os endpoints dos microsserviços estiverem publicados;
-7. revisar checklists de deploy independente, runbooks mínimos e entregáveis finais da Fase 4;
-8. preparar diagrama final, roteiro e evidências do vídeo de demonstração.
+4. operacionalizar Datadog no `oficina-infra` com agente ou collector, secrets, endpoint OTLP, dashboards, monitores e evidências de correlação distribuída;
+5. aplicar o baseline do RDS PostgreSQL compartilhado em AWS quando `vpc_id`, subnets e security groups reais do ambiente `lab` estiverem disponíveis;
+6. definir e implementar o cenário BDD do fluxo completo da Saga com pelo menos uma falha compensada;
+7. definir rotas reais do API Gateway quando os endpoints dos microsserviços estiverem publicados;
+8. revisar checklists de deploy independente, runbooks mínimos e entregáveis finais da Fase 4;
+9. preparar diagrama final, roteiro e evidências do vídeo de demonstração.

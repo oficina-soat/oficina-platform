@@ -57,7 +57,7 @@ Cada repositório de microsserviço deve possuir:
 | Comunicação REST | Rotas aderentes ao [Contrato de APIs REST](../contracts/Contrato%20de%20APIs%20REST.md) e OpenAPI dos três serviços. | A preencher |
 | Mensageria assíncrona | Eventos e tópicos aderentes ao [Contrato de Eventos de Domínio](../contracts/Contrato%20de%20Eventos%20de%20Domínio.md) e ao [Contrato de Tópicos de Mensageria](../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md). | A preencher |
 | Saga Pattern | Orquestração pelo `oficina-os-service`, com caminho feliz e falha compensada. | A preencher |
-| Mercado Pago | Integração financeira documentada no `oficina-billing-service`. | A preencher |
+| Mercado Pago | Integração financeira documentada no `oficina-billing-service`, conforme a [Referência API Mercado Pago](https://www.mercadopago.com.br/developers/pt/reference). | A preencher |
 | Observabilidade | Logs estruturados, métricas, traces e dashboards mínimos conforme [Padrão de Observabilidade Distribuída](observability.md). | A preencher |
 
 ## Cenários de Demonstração

@@ -215,7 +215,7 @@ Amazon DynamoDB
 2. [x] Criar no `oficina-infra` os Helm values e scripts necessários para instalar o Datadog Agent no cluster `eks-lab`, incluindo Secret Kubernetes esperado, endpoint OTLP/gRPC interno, coleta de logs dos pods, métricas Prometheus e traces.
 3. [x] Definir secrets e variáveis operacionais do Datadog no ambiente `lab`, incluindo chave de API, `DATADOG_SITE`, endpoint OTLP interno e integração com os nomes de runtime descritos em [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
 4. Concluído localmente: `[D-OBS-IMPL-001]` propagar `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_PROTOCOL`, `OTEL_RESOURCE_ATTRIBUTES`, `DEPLOYMENT_ENVIRONMENT` e `OTEL_SERVICE_NAME` nos manifests dos três microsserviços.
-5. Pendente local: `[D-OBS-IMPL-002]` validar nos três microsserviços, por inspeção local e testes locais aplicáveis, a emissão de logs JSON, exposição de `/q/metrics`, health checks Quarkus e configuração de traces OpenTelemetry conforme [Padrão de Observabilidade Distribuída](docs/observability.md).
+5. Concluído localmente: `[D-OBS-IMPL-002]` validar nos três microsserviços, por inspeção local e testes locais aplicáveis, a emissão de logs JSON, exposição de `/q/metrics`, health checks Quarkus e configuração de traces OpenTelemetry conforme [Validação local de observabilidade](docs/observability-local-validation.md).
 
 As instalações reais, dashboards, monitores, testes de ponta a ponta no `eks-lab` e evidências externas ficam apartados em [Validações remotas e evidências externas](#validações-remotas-e-evidências-externas).
 
@@ -517,7 +517,7 @@ Convenção de identificadores para itens abertos:
 - [x] Criar pipeline padrão de CI/CD.
 - [x] Criar baseline executável do Datadog no `oficina-infra` com Datadog Agent via Helm, Secret Kubernetes esperado, endpoint OTLP/gRPC interno e coleta de logs, métricas e traces.
 - [x] `[D-OBS-IMPL-001]` Propagar `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_PROTOCOL`, `OTEL_RESOURCE_ATTRIBUTES`, `DEPLOYMENT_ENVIRONMENT` e `OTEL_SERVICE_NAME` nos manifests dos três microsserviços.
-- [ ] `[D-OBS-IMPL-002]` Validar nos três microsserviços, por inspeção local e testes locais aplicáveis, a emissão de logs JSON, exposição de `/q/metrics`, health checks Quarkus e configuração de traces OpenTelemetry.
+- [x] `[D-OBS-IMPL-002]` Validar nos três microsserviços, por inspeção local e testes locais aplicáveis, a emissão de logs JSON, exposição de `/q/metrics`, health checks Quarkus e configuração de traces OpenTelemetry conforme [Validação local de observabilidade](docs/observability-local-validation.md).
 - [ ] `[D-AWS-IMPL-001]` Normalizar valores legados de conta, região e ambiente AWS nos repositórios antigos conforme [Conta, região e ambientes AWS](docs/aws-environments.md). Item adiado: por enquanto, `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` serão usados apenas como fonte de cópia; ajustes necessários no `oficina-auth-lambda` podem ser feitos diretamente nele.
 - [x] Planejar a migração de `oficina-infra-db` e `oficina-infra-k8s` para o novo repositório unificado de infraestrutura.
 - [x] Criar baseline executável do RDS PostgreSQL compartilhado no `oficina-infra`, com Terraform e bootstrap de databases, usuários e secrets independentes para OS e Billing.
@@ -596,11 +596,10 @@ O próximo passo para agentes deve priorizar itens `IMPL` abertos no [Backlog or
 
 A ordem local recomendada é:
 
-1. `[D-OBS-IMPL-002]` Validar localmente configuração de logs JSON, `/q/metrics`, health checks e traces OpenTelemetry nos três microsserviços.
-2. `[D-INFRA-IMPL-001]` Adicionar DynamoDB do `oficina-execution-service` e mensageria conforme os contratos da plataforma no `oficina-infra`.
-3. `[D-REL-IMPL-001]` Criar checklist de deploy independente.
-4. `[D-OPS-IMPL-001]` Criar runbooks mínimos.
-5. `[D-DIAG-IMPL-001]` Criar diagrama geral da arquitetura final.
-6. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
+1. `[D-INFRA-IMPL-001]` Adicionar DynamoDB do `oficina-execution-service` e mensageria conforme os contratos da plataforma no `oficina-infra`.
+2. `[D-REL-IMPL-001]` Criar checklist de deploy independente.
+3. `[D-OPS-IMPL-001]` Criar runbooks mínimos.
+4. `[D-DIAG-IMPL-001]` Criar diagrama geral da arquitetura final.
+5. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
 
 As validações remotas prioritárias, quando o ambiente externo estiver disponível, são `[B2-CI-REM-001]`, `[B2-CI-REM-002]`, `[B2-GH-REM-001]`, `[D-DD-REM-*]`, `[D-AWS-REM-001]`, `[D-API-REM-001]` e os itens `EVID` finais.

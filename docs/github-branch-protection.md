@@ -31,6 +31,14 @@ O check obrigatório `service-ci-validate` é produzido pelo workflow `.github/w
 
 A aplicação remota exige uma credencial GitHub com permissão administrativa nos três repositórios e autorização para administrar branch protection.
 
+## Escopo administrativo
+
+A aplicação efetiva da proteção de branch no GitHub é uma tarefa administrativa fora do escopo dos agentes.
+
+Agentes podem manter esta política, revisar coerência com os workflows, gerar comandos e registrar evidências fornecidas pelo responsável pela administração do GitHub. Agentes não devem solicitar, armazenar ou operar credenciais administrativas do GitHub para aplicar branch protection remotamente.
+
+O item permanece aberto no [ROADMAP](../ROADMAP.md) até existir evidência administrativa da proteção configurada nos três repositórios.
+
 Variáveis esperadas no terminal:
 
 ```bash

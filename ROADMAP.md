@@ -33,8 +33,11 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
   - conta AWS parametrizada por `AWS_ACCOUNT_ID`, sem número fixo canônico;
   - região `us-east-1`;
   - ambiente `lab`;
-  - infraestrutura compartilhada `eks-lab`.
+  - infraestrutura compartilhada `eks-lab`;
+  - IDs físicos efêmeros de VPC, subnets, security groups e integrações devem ser resolvidos por variáveis, outputs ou descoberta em tempo de deploy, pois a infraestrutura do laboratório pode ser criada e destruída a cada ciclo de teste.
 - Decisão de separar o código de infraestrutura no repositório unificado `oficina-infra`, consolidando as responsabilidades hoje distribuídas entre `oficina-infra-db` e `oficina-infra-k8s`, conforme [Escopo do Repositório Unificado de Infraestrutura](docs/infrastructure-repository-scope.md).
+- Rotas públicas do API Gateway definidas em [Rotas públicas do API Gateway](docs/api-gateway-public-routes.md): todas as APIs REST de negócio dos três microsserviços devem ser expostas pelo `eks-lab-http-api`, sem publicar endpoints operacionais como `/q/metrics`, `/q/health` e `/api/v1/status`.
+- Forma oficial de coleta Datadog definida como Datadog Agent instalado por Helm no cluster EKS `eks-lab`, com OTLP/gRPC, coleta de logs dos pods e coleta das métricas dos microsserviços.
 - Enunciado da Fase 4 incluído como referência normativa em [Enunciado Fase 4](docs/Enunciado%20Fase%204.md).
 - Contratos fundamentais criados para:
   - APIs REST;
@@ -203,13 +206,13 @@ Amazon DynamoDB
 
 **Situação atual:** o padrão operacional foi criado em [Padrão de Observabilidade Distribuída](docs/observability.md), consolidando logs estruturados, métricas, traces, health checks, dashboards e alertas no Datadog, além da propagação de `correlationId`.
 
-**Definição faltante:** manter o padrão coerente com os manifests Kubernetes, pipelines, instalação do Datadog Agent ou collector no repositório de infraestrutura e implementações dos microsserviços conforme esses artefatos forem evoluídos.
+**Definição faltante:** manter o padrão coerente com os manifests Kubernetes, pipelines, instalação do Datadog Agent no repositório de infraestrutura e implementações dos microsserviços conforme esses artefatos forem evoluídos.
 
 **Etapas para Datadog totalmente operacional:**
 
-1. Definir no `oficina-infra` a forma de coleta oficial para o ambiente `lab`: Datadog Agent no cluster EKS ou collector compatível com OTLP, preservando Datadog como backend canônico.
-2. Criar no `oficina-infra` os manifests, Helm values ou módulos necessários para instalar o agente ou collector no cluster `eks-lab`, incluindo coleta de logs dos pods, métricas Prometheus e traces OTLP.
-3. Definir secrets e variáveis operacionais do Datadog no ambiente `lab`, incluindo chave de API, endpoint OTLP interno e integração com os nomes de runtime descritos em [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
+1. [x] Definir no `oficina-infra` a forma de coleta oficial para o ambiente `lab`: Datadog Agent instalado por Helm no cluster EKS, preservando Datadog como backend canônico.
+2. Criar no `oficina-infra` os Helm values, manifests ou módulos necessários para instalar o Datadog Agent no cluster `eks-lab`, incluindo coleta de logs dos pods, métricas Prometheus e traces OTLP/gRPC.
+3. Definir secrets e variáveis operacionais do Datadog no ambiente `lab`, incluindo chave de API, `DATADOG_SITE`, endpoint OTLP interno e integração com os nomes de runtime descritos em [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
 4. Propagar `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_PROTOCOL`, `OTEL_RESOURCE_ATTRIBUTES`, `DEPLOYMENT_ENVIRONMENT` e `OTEL_SERVICE_NAME` nos manifests dos três microsserviços.
 5. Validar nos três microsserviços a emissão de logs JSON, exposição de `/q/metrics`, health checks Quarkus e traces OpenTelemetry conforme [Padrão de Observabilidade Distribuída](docs/observability.md).
 6. Criar dashboards mínimos no Datadog para `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, filtrando por `service.name`, `service.namespace=oficina` e `deployment.environment=lab`.
@@ -226,7 +229,7 @@ docs/infra-runtime-naming.md
 docs/phase-4-delivery-checklist.md
 ```
 
-**Critério de pronto:** todos os serviços devem expor o mesmo conjunto mínimo de sinais, propagar `correlationId` em HTTP, eventos, logs e traces, enviar dados reais ao Datadog no ambiente `lab`, possuir dashboards e monitores mínimos ativos e ter evidências registradas no checklist final.
+**Critério de pronto:** todos os serviços devem expor o mesmo conjunto mínimo de sinais, propagar `correlationId` em HTTP, eventos, logs e traces, enviar dados reais ao Datadog no ambiente `lab` por meio do Datadog Agent, possuir dashboards e monitores mínimos ativos e ter evidências registradas no checklist final.
 
 ### 11. Padrão de erros e idempotência
 
@@ -245,9 +248,9 @@ contracts/idempotency.md
 
 ### 12. BDD, cobertura e qualidade de código
 
-**Situação atual:** o padrão BDD, cobertura e qualidade foi definido em [Padrão BDD, Cobertura e Qualidade](docs/bdd-testing.md), com Cucumber JVM, JUnit Platform, JaCoCo com mínimo de 80% e Quality Gate SonarCloud obrigatório no CI.
+**Situação atual:** o padrão BDD, cobertura e qualidade foi definido em [Padrão BDD, Cobertura e Qualidade](docs/bdd-testing.md), com Cucumber JVM, JUnit Platform, JaCoCo com mínimo de 80% e Quality Gate SonarCloud obrigatório no CI. O cenário BDD da Saga está implementado no `oficina-os-service` e foi verificado localmente em 2026-07-04 com `./mvnw -B -Dtest=RunCucumberTest test`, cobrindo caminho feliz e falha compensada.
 
-**Definição faltante:** implementar o padrão nos três repositórios de microsserviços, criando os cenários BDD, evidências de cobertura e configuração real do SonarCloud conforme cada serviço evoluir.
+**Definição faltante:** registrar evidências remotas de CI, cobertura e Quality Gate no [Checklist Final de Entrega da Fase 4](docs/phase-4-delivery-checklist.md) quando os pipelines finais forem homologados.
 
 **Artefatos sugeridos:**
 
@@ -317,6 +320,26 @@ docs/kubernetes-manifest-strategy.md
 ```
 
 **Critério de pronto:** um agente deve conseguir subir as dependências locais com Docker Compose, preparar bancos, tabelas DynamoDB, tópicos, filas e DLQs, rodar os três microsserviços em portas diferentes e chamar `/api/v1/status` em cada serviço. A validação distribuída completa da Saga continua dependente da implementação de Outbox, producers e consumers nos microsserviços.
+
+### 16. Rotas públicas do API Gateway
+
+**Situação atual:** as OpenAPI dos três microsserviços definem a superfície REST de negócio da Fase 4, todas sob `/api/v1`, e o `oficina-infra` já possui módulo de API Gateway parametrizado para receber rotas HTTP.
+
+**Decisão:** todas as APIs REST de negócio dos três microsserviços serão públicas via API Gateway HTTP `eks-lab-http-api`, conforme [Rotas públicas do API Gateway](docs/api-gateway-public-routes.md). "Públicas" significa roteáveis pela entrada pública da plataforma; a decisão não remove os contratos de autenticação, erro padronizado, idempotência e `correlationId`.
+
+Os endpoints operacionais `/api/v1/status`, `/q/health`, `/q/metrics`, `/q/openapi` e `/q/swagger-ui` não fazem parte da superfície pública permanente de negócio. Se forem usados em demonstração ou evidência, devem ser tratados como exceção operacional temporária no `oficina-infra`.
+
+**Definição faltante:** materializar no `oficina-infra` as rotas do API Gateway quando os backends reais dos microsserviços estiverem publicados e os `integration_uri` estiverem disponíveis no ambiente `lab`.
+
+**Artefatos sugeridos:**
+
+```text
+docs/api-gateway-public-routes.md
+../oficina-infra/terraform/environments/lab/
+../oficina-infra/terraform/modules/api_gateway/
+```
+
+**Critério de pronto:** o API Gateway deve rotear cada método e path público para o microsserviço correto, sem usar uma rota catch-all única para todos os serviços e sem expor endpoints operacionais como API de negócio.
 
 ---
 
@@ -398,7 +421,7 @@ docs/kubernetes-manifest-strategy.md
 5. Criar checklist de revisão de contratos.
 6. Criar checklist dos entregáveis finais da Fase 4, incluindo evidências de cobertura, Swagger/OpenAPI, vídeo, PDF e diagrama de arquitetura.
 7. Criar ambiente local integrado no `oficina-infra` para dependências, bootstrap e teste manual dos três microsserviços.
-8. Operacionalizar Datadog no ambiente `lab` com agente ou collector, dashboards, monitores e evidências de correlação distribuída.
+8. Operacionalizar Datadog no ambiente `lab` com Datadog Agent via Helm, dashboards, monitores e evidências de correlação distribuída.
 
 **Resultado esperado:** a plataforma fica pronta para operação, demonstração e evolução controlada.
 
@@ -453,11 +476,12 @@ docs/kubernetes-manifest-strategy.md
 - [x] Implementar integração de pagamentos com Mercado Pago no `oficina-billing-service`, incluindo configuração, adapter, tratamento de falhas, testes e documentação operacional, conforme a [Referência API Mercado Pago](https://www.mercadopago.com.br/developers/pt/reference).
 - [x] Implementar fila de execução da OS no `oficina-execution-service`, incluindo priorização mínima, consulta de fila, início/finalização de diagnóstico e reparo, e eventos correspondentes.
 - [x] Criar testes unitários e de integração mínimos nos três microsserviços para controllers, use cases, persistência, idempotência, eventos e cenários principais da Saga.
-- [x] Criar cenário BDD automatizado para pelo menos um fluxo completo da OS atravessando `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, incluindo evidência de execução no CI.
+- [x] Criar cenário BDD automatizado para pelo menos um fluxo completo da OS atravessando `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`; validação local executada em 2026-07-04 com `./mvnw -B -Dtest=RunCucumberTest test` no `oficina-os-service`.
+- [ ] Registrar evidência remota da execução BDD no CI quando os pipelines finais estiverem homologados.
 - [x] Configurar cobertura mínima de 80% por serviço, com relatório JaCoCo publicado no CI e link ou evidência registrada no README de cada microsserviço.
 - [x] Validar os três microsserviços contra contratos OpenAPI, schemas JSON de eventos, [Contrato de Erros REST](contracts/error-model.md), [Contrato de Idempotência](contracts/idempotency.md) e [Contrato de Saga do oficina-os-service](contracts/saga/oficina-os-saga-v1.md).
 - [x] Copiar e adaptar workflows de CI/CD para os três repositórios de microsserviços, garantindo build, testes, Quality Gate SonarCloud ou equivalente, publicação de imagem e deploy automatizado em Kubernetes. A publicação de imagem e o deploy foram mantidos condicionais por variáveis/execução manual até a estratégia de manifestos Kubernetes e infraestrutura final estarem fechadas.
-- [ ] Configurar proteção da branch `main` nos três repositórios de microsserviços, com PR obrigatório e checagens automáticas exigidas antes de merge. A política canônica foi documentada em [Proteção da branch main dos microsserviços](docs/github-branch-protection.md); a aplicação remota depende de credencial GitHub com permissão administrativa.
+- [ ] Configurar proteção da branch `main` nos três repositórios de microsserviços, com PR obrigatório e checagens automáticas exigidas antes de merge. A política canônica foi documentada em [Proteção da branch main dos microsserviços](docs/github-branch-protection.md); a aplicação remota depende de credencial GitHub com permissão administrativa e fica fora do escopo dos agentes.
 - [x] Registrar Swagger/OpenAPI ou collection Postman atualizada no README de cada microsserviço, com link para o contrato canônico correspondente.
 - [x] Registrar nos READMEs dos três microsserviços a escolha da Saga orquestrada pelo `oficina-os-service`, com justificativa e links para ADR, contrato e fluxos.
 - [x] Resolver e documentar a estratégia de entrega dos manifestos Kubernetes por microsserviço, conciliando a exigência do enunciado com o repositório canônico `oficina-infra`.
@@ -482,14 +506,16 @@ docs/kubernetes-manifest-strategy.md
 - [x] Criar propagação de `correlationId`.
 - [x] Criar manifests Kubernetes base.
 - [x] Criar pipeline padrão de CI/CD.
-- [ ] Operacionalizar Datadog no `oficina-infra` com agente ou collector, secrets, endpoint OTLP e coleta de logs, métricas e traces no cluster `eks-lab`.
+- [ ] Operacionalizar Datadog no `oficina-infra` com Datadog Agent via Helm, secrets, endpoint OTLP/gRPC e coleta de logs, métricas e traces no cluster `eks-lab`.
 - [ ] Criar dashboards e monitores mínimos no Datadog para os três microsserviços e para a Saga do `oficina-os-service`.
 - [ ] Registrar evidências de observabilidade distribuída no checklist final da Fase 4, incluindo correlação por `correlationId` em logs, traces, métricas e eventos.
 - [ ] Normalizar valores legados de conta, região e ambiente AWS nos repositórios antigos conforme [Conta, região e ambientes AWS](docs/aws-environments.md). Item adiado: por enquanto, `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` serão usados apenas como fonte de cópia; ajustes necessários no `oficina-auth-lambda` podem ser feitos diretamente nele.
 - [x] Planejar a migração de `oficina-infra-db` e `oficina-infra-k8s` para o novo repositório unificado de infraestrutura.
 - [x] Criar baseline executável do RDS PostgreSQL compartilhado no `oficina-infra`, com Terraform e bootstrap de databases, usuários e secrets independentes para OS e Billing.
-- [ ] Aplicar o RDS PostgreSQL compartilhado em AWS usando VPC, subnets e security groups reais do ambiente `lab`.
+- [ ] Aplicar o RDS PostgreSQL compartilhado em AWS usando valores variáveis do ambiente `lab`, como `vpc_id`, subnets e security groups resolvidos por Terraform outputs, variáveis de pipeline ou descoberta em tempo de deploy.
 - [x] Migrar e adaptar EKS, ECR, API Gateway e Kubernetes compartilhado de `oficina-infra-k8s` para `oficina-infra`, removendo dependências operacionais do `oficina-app`.
+- [x] Definir as rotas públicas de negócio do API Gateway para os três microsserviços, conforme [Rotas públicas do API Gateway](docs/api-gateway-public-routes.md).
+- [ ] Materializar no `oficina-infra` as rotas públicas do API Gateway quando os backends reais e `integration_uri` dos microsserviços estiverem disponíveis no ambiente `lab`.
 - [ ] Adicionar DynamoDB do `oficina-execution-service` e mensageria da Fase 4 ao `oficina-infra`.
 - [x] Criar ambiente local integrado no `oficina-infra` com PostgreSQL, DynamoDB Local, LocalStack SNS/SQS, bootstrap de dependências e profile opcional para os três microsserviços.
 - [x] Migrar workflows e scripts operacionais úteis de `oficina-infra-db` e `oficina-infra-k8s` para `oficina-infra`, normalizando state, secrets, conta, região e ambiente.
@@ -535,16 +561,15 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo passo mais importante é fechar as evidências e controles operacionais que ainda impedem a entrega completa da Fase 4: proteção de branch, materialização dos manifests Kubernetes no `oficina-infra`, infraestrutura final de DynamoDB/mensageria e Datadog operacional no ambiente `lab`.
+O próximo passo mais importante é fechar as evidências e controles operacionais que ainda impedem a entrega completa da Fase 4: proteção de branch, materialização dos manifests Kubernetes no `oficina-infra`, rotas públicas do API Gateway, infraestrutura final de DynamoDB/mensageria e Datadog operacional no ambiente `lab`.
 
 A ordem recomendada é:
 
-1. aplicar no GitHub a [Proteção da branch main dos microsserviços](docs/github-branch-protection.md), usando `service-ci-validate` como checagem obrigatória;
+1. aplicar no GitHub a [Proteção da branch main dos microsserviços](docs/github-branch-protection.md), usando `service-ci-validate` como checagem obrigatória; esta é uma tarefa administrativa fora do escopo dos agentes e permanece aberta até existir evidência no GitHub;
 2. materializar no `oficina-infra` os manifests executáveis definidos pela [Estratégia de entrega dos manifestos Kubernetes](docs/kubernetes-manifest-strategy.md);
 3. adicionar DynamoDB do `oficina-execution-service` e mensageria conforme os contratos da plataforma no `oficina-infra`;
-4. operacionalizar Datadog no `oficina-infra` com agente ou collector, secrets, endpoint OTLP, dashboards, monitores e evidências de correlação distribuída;
-5. aplicar o baseline do RDS PostgreSQL compartilhado em AWS quando `vpc_id`, subnets e security groups reais do ambiente `lab` estiverem disponíveis;
-6. definir e implementar o cenário BDD do fluxo completo da Saga com pelo menos uma falha compensada;
-7. definir rotas reais do API Gateway quando os endpoints dos microsserviços estiverem publicados;
-8. revisar checklists de deploy independente, runbooks mínimos e entregáveis finais da Fase 4;
-9. preparar diagrama final, roteiro e evidências do vídeo de demonstração.
+4. materializar no `oficina-infra` as rotas públicas definidas em [Rotas públicas do API Gateway](docs/api-gateway-public-routes.md) quando os backends e `integration_uri` estiverem disponíveis;
+5. operacionalizar Datadog no `oficina-infra` com Datadog Agent via Helm, secret de API key, `DATADOG_SITE`, endpoint OTLP/gRPC, dashboards, monitores e evidências de correlação distribuída;
+6. aplicar o baseline do RDS PostgreSQL compartilhado em AWS com valores variáveis do ambiente `lab`, resolvidos por Terraform outputs, variáveis de pipeline ou descoberta em tempo de deploy;
+7. revisar checklists de deploy independente, runbooks mínimos e entregáveis finais da Fase 4;
+8. preparar diagrama final, roteiro e evidências do vídeo de demonstração após homologação na AWS.

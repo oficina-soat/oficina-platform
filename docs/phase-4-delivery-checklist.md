@@ -4,7 +4,7 @@
 
 Consolidar os entregáveis finais da Fase 4, com os links e evidências que devem ser conferidos antes da entrega no portal.
 
-Este checklist complementa o [Enunciado Fase 4](Enunciado%20Fase%204.md), o [ROADMAP](../ROADMAP.md), a [Matriz de Ownership por Microsserviço](service-ownership.md), o [Padrão BDD, Cobertura e Qualidade](bdd-testing.md), a [ADR-009 - Estratégia de Saga Pattern](../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), a [ADR-010 - Estratégia de Divisão dos Microsserviços](../adr/ADR-010%20-%20Estratégia%20de%20Divisão%20dos%20Microsserviços.md), a [ADR-011 - Estratégia de Persistência Poliglota por Microsserviço](../adr/ADR-011%20-%20Estratégia%20de%20Persistência%20Poliglota%20por%20Microsserviço.md), a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md) e o [Padrão de Observabilidade Distribuída](observability.md).
+Este checklist complementa o [Enunciado Fase 4](Enunciado%20Fase%204.md), o [ROADMAP](../ROADMAP.md), a [Matriz de Ownership por Microsserviço](service-ownership.md), o [Padrão BDD, Cobertura e Qualidade](bdd-testing.md), a [ADR-009 - Estratégia de Saga Pattern](../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), a [ADR-010 - Estratégia de Divisão dos Microsserviços](../adr/ADR-010%20-%20Estratégia%20de%20Divisão%20dos%20Microsserviços.md), a [ADR-011 - Estratégia de Persistência Poliglota por Microsserviço](../adr/ADR-011%20-%20Estratégia%20de%20Persistência%20Poliglota%20por%20Microsserviço.md), a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md), o [Padrão de Observabilidade Distribuída](observability.md) e as [Rotas públicas do API Gateway](api-gateway-public-routes.md).
 
 ## Datas e Responsáveis
 
@@ -54,7 +54,7 @@ Cada repositório de microsserviço deve possuir:
 | Banco próprio por microsserviço | `oficina_os`, `oficina_billing` e tabelas DynamoDB do `oficina-execution-service`. | A preencher |
 | Banco SQL | PostgreSQL em RDS compartilhado com databases isolados, conforme [Padrão de isolamento PostgreSQL no RDS compartilhado](rds-postgresql-isolation.md). | A preencher |
 | Banco NoSQL | DynamoDB do `oficina-execution-service`, conforme [Padrão DynamoDB do oficina-execution-service](dynamodb-execution-service.md). | A preencher |
-| Comunicação REST | Rotas aderentes ao [Contrato de APIs REST](../contracts/Contrato%20de%20APIs%20REST.md) e OpenAPI dos três serviços. | A preencher |
+| Comunicação REST | Rotas aderentes ao [Contrato de APIs REST](../contracts/Contrato%20de%20APIs%20REST.md), às OpenAPI dos três serviços e às [Rotas públicas do API Gateway](api-gateway-public-routes.md). | A preencher |
 | Mensageria assíncrona | Eventos e tópicos aderentes ao [Contrato de Eventos de Domínio](../contracts/Contrato%20de%20Eventos%20de%20Domínio.md) e ao [Contrato de Tópicos de Mensageria](../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md). | A preencher |
 | Saga Pattern | Orquestração pelo `oficina-os-service`, com caminho feliz e falha compensada. | A preencher |
 | Mercado Pago | Integração financeira documentada no `oficina-billing-service`, conforme a [Referência API Mercado Pago](https://www.mercadopago.com.br/developers/pt/reference). | A preencher |
@@ -99,8 +99,8 @@ O diagrama final deve mostrar:
 - mensageria assíncrona com tópicos e filas por domínio;
 - Kubernetes em Amazon EKS;
 - Amazon ECR;
-- API Gateway ou entrada pública adotada;
-- Datadog Agent ou collector;
+- API Gateway ou entrada pública adotada, conforme [Rotas públicas do API Gateway](api-gateway-public-routes.md);
+- Datadog Agent instalado por Helm no cluster;
 - integração Mercado Pago;
 - propagação de `correlationId`.
 

@@ -30,12 +30,21 @@ Os microsserviços devem usar observabilidade distribuída baseada em:
 - métricas Prometheus expostas pelo Micrometer;
 - traces OpenTelemetry;
 - Datadog como backend canônico para dashboards, alertas, logs, métricas e traces no ambiente compartilhado;
+- Datadog Agent instalado no cluster EKS por Helm como coletor oficial do ambiente `lab`;
 - propagação obrigatória de `correlationId` em HTTP, metadados operacionais de eventos, logs e traces;
 - atributos padronizados de serviço, namespace e ambiente.
 
 O ambiente canônico da Fase 4 é `lab`, conforme [Conta, região e ambientes AWS](aws-environments.md).
 
-AWS continua sendo a plataforma de nuvem da solução. A coleta, correlação e visualização dos sinais operacionais deve ser feita no Datadog, preferencialmente por Datadog Agent ou collector compatível com OTLP configurado no repositório de infraestrutura.
+AWS continua sendo a plataforma de nuvem da solução. A coleta dos sinais operacionais deve ser feita pelo Datadog Agent instalado no cluster EKS `eks-lab` por Helm, com OTLP/gRPC habilitado para traces, coleta de logs dos pods e coleta das métricas expostas em `/q/metrics`.
+
+O Agent roda dentro do cluster, mas o backend, os dashboards, os monitores e a interface de consulta continuam pertencendo ao Datadog. Portanto, a operacionalização exige uma conta Datadog, o `DATADOG_SITE` aplicável e uma API key configurada como secret no ambiente `lab`.
+
+Referências operacionais oficiais:
+
+- [Install the Datadog Agent on Kubernetes](https://docs.datadoghq.com/containers/kubernetes/installation/);
+- [OTLP Ingestion by the Datadog Agent](https://docs.datadoghq.com/opentelemetry/setup/otlp_ingest_in_the_agent/);
+- [Kubernetes log collection](https://docs.datadoghq.com/containers/kubernetes/log/).
 
 ## Configuração de Runtime
 
@@ -46,8 +55,8 @@ Variáveis obrigatórias por microsserviço:
 | `OTEL_SERVICE_NAME` | Nome canônico do serviço, como `oficina-os-service`. |
 | `DEPLOYMENT_ENVIRONMENT` | `lab`. |
 | `OTEL_RESOURCE_ATTRIBUTES` | `service.namespace=oficina,deployment.environment=lab`. |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | Endpoint OTLP do Datadog Agent ou collector do ambiente. |
-| `OTEL_EXPORTER_OTLP_PROTOCOL` | `grpc`, salvo necessidade explícita do collector. |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | Endpoint OTLP interno do Datadog Agent publicado pelo `oficina-infra` no ambiente `lab`. |
+| `OTEL_EXPORTER_OTLP_PROTOCOL` | `grpc`. |
 | `QUARKUS_OTEL_TRACES_EXPORTER` | `cdi` no ambiente compartilhado, usando o exportador OTLP gerenciado pelo Quarkus. |
 | `OTEL_METRICS_EXPORTER` | `none`; métricas de aplicação são expostas em `/q/metrics` para coleta compatível com Prometheus. |
 | `OTEL_LOGS_EXPORTER` | `none`; logs são emitidos em JSON no stdout para coleta pelo agente. |
@@ -58,7 +67,7 @@ Variáveis obrigatórias por microsserviço:
 
 O [template Quarkus](../templates/quarkus-service/README.md) já define essas chaves em `application.properties` e deve ser a referência inicial para novos repositórios.
 
-O endpoint OTLP, a instalação do Datadog Agent, a chave de API e qualquer secret necessário pertencem ao repositório de infraestrutura. Este repositório define apenas o contrato de runtime esperado pelos microsserviços e pelos manifests base.
+O endpoint OTLP, a instalação do Datadog Agent via Helm, a chave de API e qualquer secret necessário pertencem ao repositório de infraestrutura. Este repositório define apenas o contrato de runtime esperado pelos microsserviços e pelos manifests base.
 
 ## Identificadores Transversais
 
@@ -260,14 +269,16 @@ Critérios mínimos:
 
 Os painéis de observabilidade da plataforma devem ser criados no Datadog.
 
+Para o ambiente `lab`, a forma oficial de coleta é Datadog Agent no cluster EKS instalado por Helm. Um collector compatível com OTLP só deve ser introduzido depois de nova decisão explícita, quando houver necessidade real de processamento intermediário que o Agent não atenda.
+
 Regras obrigatórias:
 
 - todos os dashboards devem filtrar por `service.name`, `service.namespace` e `deployment.environment`;
 - `service.namespace` deve ser `oficina`;
 - `deployment.environment` deve ser `lab` no ambiente da Fase 4;
-- traces devem chegar ao Datadog por OTLP ou integração equivalente do Datadog Agent, usando o exportador gerenciado pelo Quarkus;
+- traces devem chegar ao Datadog por OTLP/gRPC recebido pelo Datadog Agent, usando o exportador gerenciado pelo Quarkus;
 - logs JSON devem ser coletados do stdout dos pods e correlacionados com `service.name`, `correlationId`, `traceId` e `spanId` quando disponíveis;
-- métricas expostas em `/q/metrics` devem ser coletadas pelo agente ou integração compatível com Prometheus;
+- métricas expostas em `/q/metrics` devem ser coletadas pelo Datadog Agent com configuração compatível com Prometheus;
 - alertas devem referenciar dashboards e monitores do Datadog, sem depender de painéis operacionais no Amazon CloudWatch como visão principal.
 
 O Amazon CloudWatch pode continuar recebendo logs ou métricas nativas da AWS quando isso for consequência da plataforma, mas não é o backend canônico para os painéis de observabilidade dos microsserviços.

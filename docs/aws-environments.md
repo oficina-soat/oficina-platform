@@ -36,6 +36,26 @@ Valores numéricos de conta encontrados em repositórios antigos devem ser trata
 
 ---
 
+## Infraestrutura efêmera do laboratório
+
+O ambiente `lab` pode ser criado e destruído repetidamente para economizar orçamento do laboratório. Por isso, identificadores físicos gerados pela AWS não devem ser tratados como valores canônicos fixos.
+
+Devem permanecer parametrizados, resolvidos por `terraform output`, variáveis de pipeline ou descoberta em tempo de deploy:
+
+```text
+vpc_id
+subnet_ids
+security_group_ids
+api_gateway_integration_uri
+api_gateway_vpc_link_subnet_ids
+api_gateway_vpc_link_security_group_ids
+db_security_group_id
+```
+
+Os nomes lógicos definidos neste documento continuam canônicos, como `lab`, `eks-lab`, `oficina-postgres-lab` e `eks-lab-http-api`. Os IDs físicos derivados desses recursos podem mudar a cada ciclo de criação e destruição da infraestrutura.
+
+---
+
 ## Região AWS canônica
 
 A região AWS canônica da suíte é:

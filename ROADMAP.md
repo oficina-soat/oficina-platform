@@ -38,6 +38,7 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
 - Decisão de separar o código de infraestrutura no repositório unificado `oficina-infra`, consolidando as responsabilidades hoje distribuídas entre `oficina-infra-db` e `oficina-infra-k8s`, conforme [Escopo do Repositório Unificado de Infraestrutura](docs/infrastructure-repository-scope.md).
 - Rotas públicas do API Gateway definidas em [Rotas públicas do API Gateway](docs/api-gateway-public-routes.md): todas as APIs REST de negócio dos três microsserviços devem ser expostas pelo `eks-lab-http-api`, sem publicar endpoints operacionais como `/q/metrics`, `/q/health` e `/api/v1/status`.
 - Forma oficial de coleta Datadog definida como Datadog Agent instalado por Helm no cluster EKS `eks-lab`, com OTLP/gRPC, coleta de logs dos pods e coleta das métricas dos microsserviços.
+- Baseline executável do Datadog Agent criado no `oficina-infra`, com Helm values do ambiente `lab`, script de instalação, Secret Kubernetes esperado, endpoint OTLP/gRPC interno e integração opcional ao deploy.
 - Enunciado da Fase 4 incluído como referência normativa em [Enunciado Fase 4](docs/Enunciado%20Fase%204.md).
 - Contratos fundamentais criados para:
   - APIs REST;
@@ -211,15 +212,16 @@ Amazon DynamoDB
 **Etapas para Datadog totalmente operacional:**
 
 1. [x] Definir no `oficina-infra` a forma de coleta oficial para o ambiente `lab`: Datadog Agent instalado por Helm no cluster EKS, preservando Datadog como backend canônico.
-2. Criar no `oficina-infra` os Helm values, manifests ou módulos necessários para instalar o Datadog Agent no cluster `eks-lab`, incluindo coleta de logs dos pods, métricas Prometheus e traces OTLP/gRPC.
-3. Definir secrets e variáveis operacionais do Datadog no ambiente `lab`, incluindo chave de API, `DATADOG_SITE`, endpoint OTLP interno e integração com os nomes de runtime descritos em [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
-4. Propagar `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_PROTOCOL`, `OTEL_RESOURCE_ATTRIBUTES`, `DEPLOYMENT_ENVIRONMENT` e `OTEL_SERVICE_NAME` nos manifests dos três microsserviços.
-5. Validar nos três microsserviços a emissão de logs JSON, exposição de `/q/metrics`, health checks Quarkus e traces OpenTelemetry conforme [Padrão de Observabilidade Distribuída](docs/observability.md).
-6. Criar dashboards mínimos no Datadog para `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, filtrando por `service.name`, `service.namespace=oficina` e `deployment.environment=lab`.
-7. Criar visão adicional da Saga no Datadog para o `oficina-os-service`, cobrindo Sagas iniciadas, finalizadas, compensadas, em falha manual e duração por etapa.
-8. Criar monitores mínimos no Datadog para indisponibilidade, erro HTTP elevado, latência elevada, Outbox parada, Outbox com falha, DLQ, Saga em falha manual, pagamento indisponível e banco indisponível.
-9. Executar teste de ponta a ponta no ambiente `lab` gerando uma Ordem de Serviço com caminho feliz e uma falha compensada, confirmando correlação por `correlationId` entre logs, traces, métricas e eventos.
-10. Registrar evidências no checklist final da Fase 4 em [Checklist Final de Entrega da Fase 4](docs/phase-4-delivery-checklist.md), incluindo links ou identificadores dos dashboards, monitores, traces e consultas de logs usadas na validação.
+2. [x] Criar no `oficina-infra` os Helm values e scripts necessários para instalar o Datadog Agent no cluster `eks-lab`, incluindo Secret Kubernetes esperado, endpoint OTLP/gRPC interno, coleta de logs dos pods, métricas Prometheus e traces.
+3. [ ] Instalar e validar o Datadog Agent no cluster `eks-lab` quando `DATADOG_API_KEY`, `DATADOG_SITE` e contexto AWS/EKS estiverem disponíveis.
+4. [ ] Definir secrets e variáveis operacionais do Datadog no ambiente `lab`, incluindo chave de API, `DATADOG_SITE`, endpoint OTLP interno e integração com os nomes de runtime descritos em [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
+5. [ ] Propagar `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_PROTOCOL`, `OTEL_RESOURCE_ATTRIBUTES`, `DEPLOYMENT_ENVIRONMENT` e `OTEL_SERVICE_NAME` nos manifests dos três microsserviços.
+6. [ ] Validar nos três microsserviços a emissão de logs JSON, exposição de `/q/metrics`, health checks Quarkus e traces OpenTelemetry conforme [Padrão de Observabilidade Distribuída](docs/observability.md).
+7. [ ] Criar dashboards mínimos no Datadog para `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, filtrando por `service.name`, `service.namespace=oficina` e `deployment.environment=lab`.
+8. [ ] Criar visão adicional da Saga no Datadog para o `oficina-os-service`, cobrindo Sagas iniciadas, finalizadas, compensadas, em falha manual e duração por etapa.
+9. [ ] Criar monitores mínimos no Datadog para indisponibilidade, erro HTTP elevado, latência elevada, Outbox parada, Outbox com falha, DLQ, Saga em falha manual, pagamento indisponível e banco indisponível.
+10. [ ] Executar teste de ponta a ponta no ambiente `lab` gerando uma Ordem de Serviço com caminho feliz e uma falha compensada, confirmando correlação por `correlationId` entre logs, traces, métricas e eventos.
+11. [ ] Registrar evidências no checklist final da Fase 4 em [Checklist Final de Entrega da Fase 4](docs/phase-4-delivery-checklist.md), incluindo links ou identificadores dos dashboards, monitores, traces e consultas de logs usadas na validação.
 
 **Artefato sugerido:**
 
@@ -506,7 +508,8 @@ docs/api-gateway-public-routes.md
 - [x] Criar propagação de `correlationId`.
 - [x] Criar manifests Kubernetes base.
 - [x] Criar pipeline padrão de CI/CD.
-- [ ] Operacionalizar Datadog no `oficina-infra` com Datadog Agent via Helm, secrets, endpoint OTLP/gRPC e coleta de logs, métricas e traces no cluster `eks-lab`.
+- [x] Criar baseline executável do Datadog no `oficina-infra` com Datadog Agent via Helm, Secret Kubernetes esperado, endpoint OTLP/gRPC interno e coleta de logs, métricas e traces.
+- [ ] Instalar e validar o Datadog Agent no cluster `eks-lab` quando `DATADOG_API_KEY`, `DATADOG_SITE` e contexto AWS/EKS estiverem disponíveis.
 - [ ] Criar dashboards e monitores mínimos no Datadog para os três microsserviços e para a Saga do `oficina-os-service`.
 - [ ] Registrar evidências de observabilidade distribuída no checklist final da Fase 4, incluindo correlação por `correlationId` em logs, traces, métricas e eventos.
 - [ ] Normalizar valores legados de conta, região e ambiente AWS nos repositórios antigos conforme [Conta, região e ambientes AWS](docs/aws-environments.md). Item adiado: por enquanto, `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` serão usados apenas como fonte de cópia; ajustes necessários no `oficina-auth-lambda` podem ser feitos diretamente nele.
@@ -569,7 +572,7 @@ A ordem recomendada é:
 2. materializar no `oficina-infra` os manifests executáveis definidos pela [Estratégia de entrega dos manifestos Kubernetes](docs/kubernetes-manifest-strategy.md);
 3. adicionar DynamoDB do `oficina-execution-service` e mensageria conforme os contratos da plataforma no `oficina-infra`;
 4. materializar no `oficina-infra` as rotas públicas definidas em [Rotas públicas do API Gateway](docs/api-gateway-public-routes.md) quando os backends e `integration_uri` estiverem disponíveis;
-5. operacionalizar Datadog no `oficina-infra` com Datadog Agent via Helm, secret de API key, `DATADOG_SITE`, endpoint OTLP/gRPC, dashboards, monitores e evidências de correlação distribuída;
+5. instalar e validar o Datadog Agent no `eks-lab` usando o baseline criado no `oficina-infra`, com secret de API key, `DATADOG_SITE`, endpoint OTLP/gRPC, dashboards, monitores e evidências de correlação distribuída;
 6. aplicar o baseline do RDS PostgreSQL compartilhado em AWS com valores variáveis do ambiente `lab`, resolvidos por Terraform outputs, variáveis de pipeline ou descoberta em tempo de deploy;
 7. revisar checklists de deploy independente, runbooks mínimos e entregáveis finais da Fase 4;
 8. preparar diagrama final, roteiro e evidências do vídeo de demonstração após homologação na AWS.

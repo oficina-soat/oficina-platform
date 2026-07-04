@@ -46,7 +46,7 @@ EKS_CLUSTER_NAME=eks-lab
 K8S_NAMESPACE=default
 DEPLOYMENT_ENVIRONMENT=lab
 OTEL_RESOURCE_ATTRIBUTES=service.namespace=oficina,deployment.environment=lab
-OTEL_EXPORTER_OTLP_ENDPOINT=<endpoint-otlp-interno-do-datadog-agent>
+OTEL_EXPORTER_OTLP_ENDPOINT=http://datadog-agent.datadog.svc.cluster.local:4317
 OTEL_EXPORTER_OTLP_PROTOCOL=grpc
 QUARKUS_OTEL_TRACES_EXPORTER=cdi
 OTEL_METRICS_EXPORTER=none
@@ -62,16 +62,25 @@ A forma oficial de coleta do ambiente `lab` é Datadog Agent instalado por Helm 
 Valores operacionais esperados no `oficina-infra`:
 
 ```text
+INSTALL_DATADOG_AGENT=false
 DATADOG_NAMESPACE=datadog
 DATADOG_HELM_RELEASE=datadog-agent
+DATADOG_LOCAL_SERVICE_NAME=datadog-agent
+DATADOG_API_KEY=<secret-github-ou-variavel-local-nao-versionada>
 DATADOG_API_KEY_SECRET_NAME=datadog-secret
 DATADOG_API_KEY_SECRET_KEY=api-key
-DATADOG_SITE=<datadog-site>
-OTEL_EXPORTER_OTLP_ENDPOINT=<endpoint-otlp-interno-do-datadog-agent>
+DATADOG_SITE=datadoghq.com
+OTEL_EXPORTER_OTLP_ENDPOINT=http://datadog-agent.datadog.svc.cluster.local:4317
 OTEL_EXPORTER_OTLP_PROTOCOL=grpc
 ```
 
-O valor real de `OTEL_EXPORTER_OTLP_ENDPOINT`, a instalação do Datadog Agent e os secrets de integração com Datadog devem ser definidos no repositório de infraestrutura. Este repositório mantém apenas os nomes de runtime esperados pelos microsserviços.
+`INSTALL_DATADOG_AGENT=false` mantém o deploy compatível com execuções sem conta Datadog. Para habilitar a coleta real no cluster, o ambiente de deploy deve definir `INSTALL_DATADOG_AGENT=true` e fornecer `DATADOG_API_KEY` como secret do GitHub Environment `lab` ou variável local segura.
+
+`DATADOG_SITE` usa `datadoghq.com` como padrão operacional, mas deve ser alterado quando a organização Datadog usar outro site. `DATADOG_API_KEY_SECRET_KEY` deve permanecer `api-key`, que é a chave esperada pelo chart Helm do Datadog no Secret Kubernetes `datadog-secret`.
+
+Com os nomes padrão, os microsserviços devem apontar para `OTEL_EXPORTER_OTLP_ENDPOINT=http://datadog-agent.datadog.svc.cluster.local:4317`. Se `DATADOG_NAMESPACE` ou `DATADOG_LOCAL_SERVICE_NAME` forem alterados no `oficina-infra`, o endpoint OTLP propagado aos manifests dos microsserviços deve mudar de forma consistente.
+
+A configuração executável do Agent fica no repositório de infraestrutura em [Datadog Agent no EKS lab](../../oficina-infra/docs/datadog-agent.md). Este repositório mantém os nomes canônicos e o contrato de runtime esperado pelos microsserviços.
 
 ### Credenciais AWS do GitHub Actions
 

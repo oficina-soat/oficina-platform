@@ -214,7 +214,7 @@ Amazon DynamoDB
 1. [x] Definir no `oficina-infra` a forma de coleta oficial para o ambiente `lab`: Datadog Agent instalado por Helm no cluster EKS, preservando Datadog como backend canônico.
 2. [x] Criar no `oficina-infra` os Helm values e scripts necessários para instalar o Datadog Agent no cluster `eks-lab`, incluindo Secret Kubernetes esperado, endpoint OTLP/gRPC interno, coleta de logs dos pods, métricas Prometheus e traces.
 3. [ ] Instalar e validar o Datadog Agent no cluster `eks-lab` quando `DATADOG_API_KEY`, `DATADOG_SITE` e contexto AWS/EKS estiverem disponíveis.
-4. [ ] Definir secrets e variáveis operacionais do Datadog no ambiente `lab`, incluindo chave de API, `DATADOG_SITE`, endpoint OTLP interno e integração com os nomes de runtime descritos em [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
+4. [x] Definir secrets e variáveis operacionais do Datadog no ambiente `lab`, incluindo chave de API, `DATADOG_SITE`, endpoint OTLP interno e integração com os nomes de runtime descritos em [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
 5. [ ] Propagar `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_PROTOCOL`, `OTEL_RESOURCE_ATTRIBUTES`, `DEPLOYMENT_ENVIRONMENT` e `OTEL_SERVICE_NAME` nos manifests dos três microsserviços.
 6. [ ] Validar nos três microsserviços a emissão de logs JSON, exposição de `/q/metrics`, health checks Quarkus e traces OpenTelemetry conforme [Padrão de Observabilidade Distribuída](docs/observability.md).
 7. [ ] Criar dashboards mínimos no Datadog para `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, filtrando por `service.name`, `service.namespace=oficina` e `deployment.environment=lab`.

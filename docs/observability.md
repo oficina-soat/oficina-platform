@@ -55,7 +55,7 @@ Variáveis obrigatórias por microsserviço:
 | `OTEL_SERVICE_NAME` | Nome canônico do serviço, como `oficina-os-service`. |
 | `DEPLOYMENT_ENVIRONMENT` | `lab`. |
 | `OTEL_RESOURCE_ATTRIBUTES` | `service.namespace=oficina,deployment.environment=lab`. |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | Endpoint OTLP interno do Datadog Agent publicado pelo `oficina-infra` no ambiente `lab`. |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://datadog-agent.datadog.svc.cluster.local:4317`, salvo alteração coordenada de `DATADOG_NAMESPACE` ou `DATADOG_LOCAL_SERVICE_NAME` no `oficina-infra`. |
 | `OTEL_EXPORTER_OTLP_PROTOCOL` | `grpc`. |
 | `QUARKUS_OTEL_TRACES_EXPORTER` | `cdi` no ambiente compartilhado, usando o exportador OTLP gerenciado pelo Quarkus. |
 | `OTEL_METRICS_EXPORTER` | `none`; métricas de aplicação são expostas em `/q/metrics` para coleta compatível com Prometheus. |
@@ -67,7 +67,20 @@ Variáveis obrigatórias por microsserviço:
 
 O [template Quarkus](../templates/quarkus-service/README.md) já define essas chaves em `application.properties` e deve ser a referência inicial para novos repositórios.
 
-O endpoint OTLP, a instalação do Datadog Agent via Helm, a chave de API e qualquer secret necessário pertencem ao repositório de infraestrutura. Este repositório define apenas o contrato de runtime esperado pelos microsserviços e pelos manifests base.
+O endpoint OTLP, a instalação do Datadog Agent via Helm, a chave de API e qualquer secret necessário pertencem ao repositório de infraestrutura. A configuração executável fica em [Datadog Agent no EKS lab](../../oficina-infra/docs/datadog-agent.md). Este repositório define apenas o contrato de runtime esperado pelos microsserviços e pelos manifests base.
+
+Variáveis operacionais do Agent no ambiente `lab`:
+
+| Variável | Valor esperado |
+|---|---|
+| `INSTALL_DATADOG_AGENT` | `false` por padrão; `true` quando o deploy deve instalar ou atualizar o Agent no cluster. |
+| `DATADOG_API_KEY` | Secret externo ao repositório, informado no GitHub Environment `lab` ou localmente. |
+| `DATADOG_SITE` | `datadoghq.com` por padrão, ou o site real da organização Datadog. |
+| `DATADOG_NAMESPACE` | `datadog`. |
+| `DATADOG_HELM_RELEASE` | `datadog-agent`. |
+| `DATADOG_LOCAL_SERVICE_NAME` | `datadog-agent`. |
+| `DATADOG_API_KEY_SECRET_NAME` | `datadog-secret`. |
+| `DATADOG_API_KEY_SECRET_KEY` | `api-key`; deve permanecer assim para compatibilidade com o chart Helm. |
 
 ## Identificadores Transversais
 

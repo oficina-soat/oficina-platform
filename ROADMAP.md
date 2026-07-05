@@ -168,7 +168,7 @@ templates/kubernetes/base/
 
 ### 8. Repositório unificado de infraestrutura
 
-**Situação atual:** os repositórios `oficina-infra-db` e `oficina-infra-k8s` existem como referências separadas para banco de dados e Kubernetes, e o repositório unificado `oficina-infra` já existe como destino canônico da Fase 4.
+**Situação atual:** os repositórios `oficina-infra-db` e `oficina-infra-k8s` existem como referências separadas para banco de dados e Kubernetes, e o repositório unificado `oficina-infra` já existe como destino canônico da Fase 4. O `oficina-infra` já possui módulos Terraform para RDS PostgreSQL compartilhado, EKS, ECR, API Gateway, DynamoDB do `oficina-execution-service` e mensageria SNS/SQS da Fase 4.
 
 **Definição fechada:** o escopo e as responsabilidades do `oficina-infra` foram definidos em [Escopo do Repositório Unificado de Infraestrutura](docs/infrastructure-repository-scope.md).
 
@@ -523,7 +523,7 @@ Convenção de identificadores para itens abertos:
 - [x] Criar baseline executável do RDS PostgreSQL compartilhado no `oficina-infra`, com Terraform e bootstrap de databases, usuários e secrets independentes para OS e Billing.
 - [x] Migrar e adaptar EKS, ECR, API Gateway e Kubernetes compartilhado de `oficina-infra-k8s` para `oficina-infra`, removendo dependências operacionais do `oficina-app`.
 - [x] Definir as rotas públicas de negócio do API Gateway para os três microsserviços, conforme [Rotas públicas do API Gateway](docs/api-gateway-public-routes.md).
-- [ ] `[D-INFRA-IMPL-001]` Adicionar DynamoDB do `oficina-execution-service` e mensageria da Fase 4 ao `oficina-infra`.
+- [x] `[D-INFRA-IMPL-001]` Adicionar DynamoDB do `oficina-execution-service` e mensageria da Fase 4 ao `oficina-infra`.
 - [x] Criar ambiente local integrado no `oficina-infra` com PostgreSQL, DynamoDB Local, LocalStack SNS/SQS, bootstrap de dependências e profile opcional para os três microsserviços.
 - [x] Migrar workflows e scripts operacionais úteis de `oficina-infra-db` e `oficina-infra-k8s` para `oficina-infra`, normalizando state, secrets, conta, região e ambiente.
 - [ ] `[D-REL-IMPL-001]` Criar checklist de deploy independente.
@@ -596,10 +596,9 @@ O próximo passo para agentes deve priorizar itens `IMPL` abertos no [Backlog or
 
 A ordem local recomendada é:
 
-1. `[D-INFRA-IMPL-001]` Adicionar DynamoDB do `oficina-execution-service` e mensageria conforme os contratos da plataforma no `oficina-infra`.
-2. `[D-REL-IMPL-001]` Criar checklist de deploy independente.
-3. `[D-OPS-IMPL-001]` Criar runbooks mínimos.
-4. `[D-DIAG-IMPL-001]` Criar diagrama geral da arquitetura final.
-5. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
+1. `[D-REL-IMPL-001]` Criar checklist de deploy independente.
+2. `[D-OPS-IMPL-001]` Criar runbooks mínimos.
+3. `[D-DIAG-IMPL-001]` Criar diagrama geral da arquitetura final.
+4. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
 
 As validações remotas prioritárias, quando o ambiente externo estiver disponível, são `[B2-CI-REM-001]`, `[B2-CI-REM-002]`, `[B2-GH-REM-001]`, `[D-DD-REM-*]`, `[D-AWS-REM-001]`, `[D-API-REM-001]` e os itens `EVID` finais.

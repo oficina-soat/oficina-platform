@@ -262,9 +262,9 @@ templates/github-actions/service-ci.yml
 
 ### 13. Evidências e entregáveis finais da Fase 4
 
-**Situação atual:** o checklist consolidado dos entregáveis finais foi criado em [Checklist Final de Entrega da Fase 4](docs/phase-4-delivery-checklist.md), cobrindo evidências por repositório, cobertura, Swagger/OpenAPI, vídeo, PDF, diagrama, Saga, deploy e observabilidade.
+**Situação atual:** o checklist consolidado dos entregáveis finais foi criado em [Checklist Final de Entrega da Fase 4](docs/phase-4-delivery-checklist.md), cobrindo evidências por repositório, cobertura, Swagger/OpenAPI, vídeo, PDF, diagrama, Saga, deploy e observabilidade. O [Diagrama Geral da Arquitetura Final](docs/architecture-diagram.md) registra a visão consolidada de microsserviços, bancos, mensageria, Kubernetes, observabilidade e Mercado Pago.
 
-**Definição faltante:** preencher os links reais de cobertura, Swagger/OpenAPI, pipelines, vídeo, PDF e diagrama final conforme os repositórios de microsserviço e infraestrutura forem concluídos.
+**Definição faltante:** preencher os links reais de cobertura, Swagger/OpenAPI, pipelines, vídeo e PDF final conforme os repositórios de microsserviço e infraestrutura forem concluídos.
 
 **Artefatos sugeridos:**
 
@@ -529,7 +529,7 @@ Convenção de identificadores para itens abertos:
 - [x] `[D-REL-IMPL-001]` Criar checklist de deploy independente.
 - [x] `[D-OPS-IMPL-001]` Criar runbooks mínimos.
 - [x] Criar checklist final de entrega da Fase 4, cobrindo repositórios, cobertura, Swagger/OpenAPI, vídeo, PDF, diagrama geral, estratégia de Saga, justificativa de microsserviços e tecnologias.
-- [ ] `[D-DIAG-IMPL-001]` Criar diagrama geral da arquitetura final com microsserviços, bancos, mensageria, Kubernetes, observabilidade e integração Mercado Pago.
+- [x] `[D-DIAG-IMPL-001]` Criar diagrama geral da arquitetura final com microsserviços, bancos, mensageria, Kubernetes, observabilidade e integração Mercado Pago.
 - [ ] `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração de até 15 minutos, incluindo fluxo completo da OS, Saga com falha/compensação, deploy automatizado e rastreamento distribuído.
 
 ---
@@ -596,7 +596,6 @@ O próximo passo para agentes deve priorizar itens `IMPL` abertos no [Backlog or
 
 A ordem local recomendada é:
 
-1. `[D-DIAG-IMPL-001]` Criar diagrama geral da arquitetura final.
-2. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
+1. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
 
 As validações remotas prioritárias, quando o ambiente externo estiver disponível, são `[B2-CI-REM-001]`, `[B2-CI-REM-002]`, `[B2-GH-REM-001]`, `[D-DD-REM-*]`, `[D-AWS-REM-001]`, `[D-API-REM-001]` e os itens `EVID` finais.

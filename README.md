@@ -28,6 +28,7 @@ O planejamento incremental da plataforma, incluindo lacunas restantes e backlog 
 - [Conta, região e ambientes AWS](docs/aws-environments.md)
 - [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md)
 - [Rotas públicas do API Gateway](docs/api-gateway-public-routes.md)
+- [Diagrama geral da arquitetura final](docs/architecture-diagram.md)
 - [Escopo do repositório unificado de infraestrutura](docs/infrastructure-repository-scope.md)
 - [Plano de migração para o repositório unificado de infraestrutura](docs/infrastructure-migration-plan.md)
 - [Padrão de isolamento PostgreSQL no RDS compartilhado](docs/rds-postgresql-isolation.md)

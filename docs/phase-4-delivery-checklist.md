@@ -4,7 +4,7 @@
 
 Consolidar os entregáveis finais da Fase 4, com os links e evidências que devem ser conferidos antes da entrega no portal.
 
-Este checklist complementa o [Enunciado Fase 4](Enunciado%20Fase%204.md), o [ROADMAP](../ROADMAP.md), a [Matriz de Ownership por Microsserviço](service-ownership.md), o [Padrão BDD, Cobertura e Qualidade](bdd-testing.md), a [ADR-009 - Estratégia de Saga Pattern](../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), a [ADR-010 - Estratégia de Divisão dos Microsserviços](../adr/ADR-010%20-%20Estratégia%20de%20Divisão%20dos%20Microsserviços.md), a [ADR-011 - Estratégia de Persistência Poliglota por Microsserviço](../adr/ADR-011%20-%20Estratégia%20de%20Persistência%20Poliglota%20por%20Microsserviço.md), a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md), o [Checklist de Deploy Independente](independent-deploy-checklist.md), o [Padrão de Observabilidade Distribuída](observability.md), os [Runbooks Operacionais Mínimos](operational-runbooks.md) e as [Rotas públicas do API Gateway](api-gateway-public-routes.md).
+Este checklist complementa o [Enunciado Fase 4](Enunciado%20Fase%204.md), o [ROADMAP](../ROADMAP.md), o [Diagrama Geral da Arquitetura Final](architecture-diagram.md), a [Matriz de Ownership por Microsserviço](service-ownership.md), o [Padrão BDD, Cobertura e Qualidade](bdd-testing.md), a [ADR-009 - Estratégia de Saga Pattern](../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), a [ADR-010 - Estratégia de Divisão dos Microsserviços](../adr/ADR-010%20-%20Estratégia%20de%20Divisão%20dos%20Microsserviços.md), a [ADR-011 - Estratégia de Persistência Poliglota por Microsserviço](../adr/ADR-011%20-%20Estratégia%20de%20Persistência%20Poliglota%20por%20Microsserviço.md), a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md), o [Checklist de Deploy Independente](independent-deploy-checklist.md), o [Padrão de Observabilidade Distribuída](observability.md), os [Runbooks Operacionais Mínimos](operational-runbooks.md) e as [Rotas públicas do API Gateway](api-gateway-public-routes.md).
 
 ## Datas e Responsáveis
 
@@ -61,6 +61,7 @@ Cada repositório de microsserviço deve possuir:
 | Saga Pattern | Orquestração pelo `oficina-os-service`, com caminho feliz e falha compensada. | A preencher |
 | Mercado Pago | Integração financeira documentada no `oficina-billing-service`, conforme a [Referência API Mercado Pago](https://www.mercadopago.com.br/developers/pt/reference). | A preencher |
 | Observabilidade | Logs estruturados, métricas, traces e dashboards mínimos conforme [Padrão de Observabilidade Distribuída](observability.md). | A preencher |
+| Diagrama geral | Arquitetura final alinhada ao [Diagrama Geral da Arquitetura Final](architecture-diagram.md). | [Diagrama Geral da Arquitetura Final](architecture-diagram.md) |
 
 ## Cenários de Demonstração
 
@@ -82,7 +83,7 @@ O PDF entregue no portal deve conter:
 - [ ] nome e identificação dos participantes;
 - [ ] links dos repositórios;
 - [ ] link do vídeo;
-- [ ] diagrama geral da arquitetura final;
+- [ ] diagrama geral da arquitetura final, conforme o [Diagrama Geral da Arquitetura Final](architecture-diagram.md);
 - [ ] descrição da estratégia de Saga orquestrada pelo `oficina-os-service`;
 - [ ] justificativa da divisão em `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`;
 - [ ] justificativa das tecnologias usadas: Quarkus, AWS, PostgreSQL, DynamoDB, mensageria, Kubernetes, Datadog, SonarCloud e Mercado Pago;
@@ -90,6 +91,8 @@ O PDF entregue no portal deve conter:
 - [ ] observações sobre limitações conhecidas ou pendências aceitas para a apresentação.
 
 ## Diagrama Geral
+
+Fonte canônica: [Diagrama Geral da Arquitetura Final](architecture-diagram.md).
 
 O diagrama final deve mostrar:
 

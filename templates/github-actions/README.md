@@ -39,7 +39,7 @@ Secret obrigatório para Quality Gate no SonarCloud:
 SONAR_TOKEN
 ```
 
-O workflow falha quando `SONAR_TOKEN`, `SONAR_ORGANIZATION` ou `SONAR_PROJECT_KEY` não estiverem configurados. Essa validação é obrigatória para atender ao enunciado da Fase 4 e à [ADR-012 - Estratégia de CI/CD e Deploy Independente](../../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md).
+O workflow `service-ci.yml` falha quando `SONAR_TOKEN`, `SONAR_ORGANIZATION` ou `SONAR_PROJECT_KEY` não estiverem configurados. Essa validação é obrigatória para atender ao enunciado da Fase 4 e à [ADR-012 - Estratégia de CI/CD e Deploy Independente](../../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md).
 
 Variáveis recomendadas no GitHub Environment `lab`:
 
@@ -82,6 +82,8 @@ Pull Requests executam:
 - análise SonarCloud com Quality Gate obrigatório.
 
 O job obrigatório para proteção da branch `main` chama-se `service-ci-validate`, conforme a política em [Proteção da branch main dos microsserviços](../../docs/github-branch-protection.md).
+
+Pushes na branch `develop` executam o workflow auxiliar `open-pr-to-main.yml`, que valida build Maven, testes e contratos antes de criar ou atualizar o PR para `main`. Esse workflow não executa SonarCloud para evitar análise de branch na automação de preparação do PR; o Quality Gate obrigatório é executado pelo `service-ci.yml` no Pull Request para `main`.
 
 O comportamento esperado para BDD, cobertura e evidências de qualidade está definido em [Padrão BDD, Cobertura e Qualidade](../../docs/bdd-testing.md).
 

@@ -14,6 +14,7 @@ Este documento complementa:
 - [Contrato de Saga do oficina-os-service](../contracts/saga/oficina-os-saga-v1.md);
 - [Conta, região e ambientes AWS](aws-environments.md);
 - [Nomes de runtime, secrets e infraestrutura](infra-runtime-naming.md);
+- [Runbooks Operacionais Mínimos](operational-runbooks.md);
 - [Template Quarkus de Microsserviço](../templates/quarkus-service/README.md).
 
 O padrão é obrigatório para:
@@ -337,6 +338,8 @@ Alertas obrigatórios:
 | Banco indisponível | Falha contínua de conexão com PostgreSQL ou DynamoDB. |
 
 Limiares numéricos podem variar por ambiente, mas a existência dos alertas é obrigatória.
+
+A triagem e a contenção inicial desses alertas devem seguir os [Runbooks Operacionais Mínimos](operational-runbooks.md).
 
 ## Critérios de Implementação
 

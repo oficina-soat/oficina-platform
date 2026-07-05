@@ -32,6 +32,7 @@ O planejamento incremental da plataforma, incluindo lacunas restantes e backlog 
 - [Plano de migração para o repositório unificado de infraestrutura](docs/infrastructure-migration-plan.md)
 - [Padrão de isolamento PostgreSQL no RDS compartilhado](docs/rds-postgresql-isolation.md)
 - [Padrão de observabilidade distribuída](docs/observability.md)
+- [Runbooks operacionais mínimos](docs/operational-runbooks.md)
 - [Padrão Outbox por serviço](docs/outbox-pattern.md)
 - [Padrão BDD, cobertura e qualidade](docs/bdd-testing.md)
 - [Fluxos da Saga da Ordem de Serviço](docs/saga-flows.md)

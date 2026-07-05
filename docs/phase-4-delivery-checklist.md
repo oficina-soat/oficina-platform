@@ -4,7 +4,7 @@
 
 Consolidar os entregáveis finais da Fase 4, com os links e evidências que devem ser conferidos antes da entrega no portal.
 
-Este checklist complementa o [Enunciado Fase 4](Enunciado%20Fase%204.md), o [ROADMAP](../ROADMAP.md), a [Matriz de Ownership por Microsserviço](service-ownership.md), o [Padrão BDD, Cobertura e Qualidade](bdd-testing.md), a [ADR-009 - Estratégia de Saga Pattern](../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), a [ADR-010 - Estratégia de Divisão dos Microsserviços](../adr/ADR-010%20-%20Estratégia%20de%20Divisão%20dos%20Microsserviços.md), a [ADR-011 - Estratégia de Persistência Poliglota por Microsserviço](../adr/ADR-011%20-%20Estratégia%20de%20Persistência%20Poliglota%20por%20Microsserviço.md), a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md), o [Checklist de Deploy Independente](independent-deploy-checklist.md), o [Padrão de Observabilidade Distribuída](observability.md) e as [Rotas públicas do API Gateway](api-gateway-public-routes.md).
+Este checklist complementa o [Enunciado Fase 4](Enunciado%20Fase%204.md), o [ROADMAP](../ROADMAP.md), a [Matriz de Ownership por Microsserviço](service-ownership.md), o [Padrão BDD, Cobertura e Qualidade](bdd-testing.md), a [ADR-009 - Estratégia de Saga Pattern](../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), a [ADR-010 - Estratégia de Divisão dos Microsserviços](../adr/ADR-010%20-%20Estratégia%20de%20Divisão%20dos%20Microsserviços.md), a [ADR-011 - Estratégia de Persistência Poliglota por Microsserviço](../adr/ADR-011%20-%20Estratégia%20de%20Persistência%20Poliglota%20por%20Microsserviço.md), a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md), o [Checklist de Deploy Independente](independent-deploy-checklist.md), o [Padrão de Observabilidade Distribuída](observability.md), os [Runbooks Operacionais Mínimos](operational-runbooks.md) e as [Rotas públicas do API Gateway](api-gateway-public-routes.md).
 
 ## Datas e Responsáveis
 
@@ -46,6 +46,7 @@ Cada repositório de microsserviço deve possuir:
 - [ ] propagação de `correlationId` em HTTP, eventos, logs e traces;
 - [ ] documentação da Saga orquestrada pelo `oficina-os-service`, com links para [ADR-009](../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), [Fluxos da Saga da Ordem de Serviço](saga-flows.md) e [Contrato de Saga do oficina-os-service](../contracts/saga/oficina-os-saga-v1.md);
 - [ ] evidência de manifests Kubernetes aplicáveis, conforme a [Estratégia de entrega dos manifestos Kubernetes](kubernetes-manifest-strategy.md).
+- [ ] runbooks aplicáveis revisados conforme os [Runbooks Operacionais Mínimos](operational-runbooks.md).
 
 ## Checklist de Domínio e Contratos
 

@@ -143,6 +143,9 @@ tf-shared-eks-lab-<aws-account-id>-us-east-1
 Chaves de state usadas por escopo:
 
 ```text
+Infraestrutura compartilhada unificada:
+oficina/lab/infra/terraform.tfstate
+
 Infraestrutura Kubernetes:
 oficina/lab/terraform.tfstate
 

@@ -109,6 +109,7 @@ tf-shared-eks-lab-<aws-account-id>-us-east-1
 Chaves de state já usadas:
 
 ```text
+oficina/lab/infra/terraform.tfstate
 oficina/lab/terraform.tfstate
 oficina/lab/database/terraform.tfstate
 ```
@@ -122,7 +123,7 @@ TF_STATE_REGION=us-east-1
 TF_STATE_DYNAMODB_TABLE=<opcional>
 ```
 
-Quando `TF_STATE_BUCKET` não for informado, os scripts legados derivam o bucket a partir de `eks-lab`, conta AWS e região.
+Quando `TF_STATE_BUCKET` não for informado, os scripts de infraestrutura derivam o bucket a partir de `eks-lab`, conta AWS e região.
 
 ### Kubernetes
 

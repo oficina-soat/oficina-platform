@@ -540,12 +540,14 @@ Esta seção concentra tarefas que dependem de ambiente externo, credenciais adm
 
 ### Épico B2 — CI, qualidade e governança remota
 
+- [ ] `[B2-CI-REM-000]` Configurar SonarCloud nos três repositórios de microsserviços antes da homologação dos PRs: criar ou vincular os projetos no SonarCloud, configurar o secret `SONAR_TOKEN`, configurar as variáveis `SONAR_ORGANIZATION` e `SONAR_PROJECT_KEY` em cada repositório e reexecutar o check `service-ci-validate`. Sem esses valores, o workflow falha de forma esperada no passo de Quality Gate, conforme [Padrão BDD, Cobertura e Qualidade](docs/bdd-testing.md) e [Template GitHub Actions](templates/github-actions/README.md).
 - [ ] `[B2-CI-REM-001]` Registrar evidência remota da execução BDD no CI quando os pipelines finais estiverem homologados.
 - [ ] `[B2-CI-REM-002]` Registrar evidência remota do Quality Gate SonarCloud aprovado e da cobertura mínima de 80% nos três microsserviços.
 - [ ] `[B2-GH-REM-001]` Confirmar proteção da branch `main` nos três repositórios de microsserviços, com PR obrigatório e checagens automáticas exigidas antes de merge. A política canônica foi documentada em [Proteção da branch main dos microsserviços](docs/github-branch-protection.md); a aplicação remota depende de credencial GitHub com permissão administrativa e fica fora do escopo dos agentes.
 
 ### Épico D — AWS, Datadog e entrega final
 
+- [ ] `[D-DD-REM-000]` Preparar o acesso Datadog antes da validação de observabilidade: confirmar a conta Datadog e o `DATADOG_SITE`, gerar `DATADOG_API_KEY`, configurar o secret `DATADOG_API_KEY` no GitHub Environment `lab` ou no mecanismo seguro usado pelo `oficina-infra`, habilitar `INSTALL_DATADOG_AGENT=true` para a execução remota e confirmar acesso ao contexto AWS/EKS do cluster `eks-lab`, conforme [Padrão de Observabilidade Distribuída](docs/observability.md) e [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
 - [ ] `[D-DD-REM-001]` Instalar e validar o Datadog Agent no cluster `eks-lab` quando `DATADOG_API_KEY`, `DATADOG_SITE` e contexto AWS/EKS estiverem disponíveis.
 - [ ] `[D-DD-REM-002]` Criar dashboards mínimos no Datadog para `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, filtrando por `service.name`, `service.namespace=oficina` e `deployment.environment=lab`.
 - [ ] `[D-DD-REM-003]` Criar visão adicional da Saga no Datadog para o `oficina-os-service`, cobrindo Sagas iniciadas, finalizadas, compensadas, em falha manual e duração por etapa.

@@ -96,6 +96,8 @@ Merges na `main` podem executar também, quando as variáveis de habilitação e
 
 O fluxo preserva o padrão do `oficina-app`: a imagem publicada usa a tag de `project.version`; versões `SNAPSHOT` não podem ser publicadas na `main`; e uma mudança publicável em `main` deve incrementar `project.version` quando exigir nova imagem ou release.
 
+Antes de habilitar publicação de imagem ou deploy Kubernetes como evidência da Fase 4, use o [Checklist de Deploy Independente](../../docs/independent-deploy-checklist.md) para validar pré-condições, rollout, smoke test, rollback e registro de evidências.
+
 ## Limites
 
 - O workflow não cria ECR, cluster EKS, secrets, service accounts, roles IAM ou manifests Kubernetes.

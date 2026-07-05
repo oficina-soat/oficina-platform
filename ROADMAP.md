@@ -526,7 +526,7 @@ Convenção de identificadores para itens abertos:
 - [x] `[D-INFRA-IMPL-001]` Adicionar DynamoDB do `oficina-execution-service` e mensageria da Fase 4 ao `oficina-infra`.
 - [x] Criar ambiente local integrado no `oficina-infra` com PostgreSQL, DynamoDB Local, LocalStack SNS/SQS, bootstrap de dependências e profile opcional para os três microsserviços.
 - [x] Migrar workflows e scripts operacionais úteis de `oficina-infra-db` e `oficina-infra-k8s` para `oficina-infra`, normalizando state, secrets, conta, região e ambiente.
-- [ ] `[D-REL-IMPL-001]` Criar checklist de deploy independente.
+- [x] `[D-REL-IMPL-001]` Criar checklist de deploy independente.
 - [ ] `[D-OPS-IMPL-001]` Criar runbooks mínimos.
 - [x] Criar checklist final de entrega da Fase 4, cobrindo repositórios, cobertura, Swagger/OpenAPI, vídeo, PDF, diagrama geral, estratégia de Saga, justificativa de microsserviços e tecnologias.
 - [ ] `[D-DIAG-IMPL-001]` Criar diagrama geral da arquitetura final com microsserviços, bancos, mensageria, Kubernetes, observabilidade e integração Mercado Pago.
@@ -596,9 +596,8 @@ O próximo passo para agentes deve priorizar itens `IMPL` abertos no [Backlog or
 
 A ordem local recomendada é:
 
-1. `[D-REL-IMPL-001]` Criar checklist de deploy independente.
-2. `[D-OPS-IMPL-001]` Criar runbooks mínimos.
-3. `[D-DIAG-IMPL-001]` Criar diagrama geral da arquitetura final.
-4. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
+1. `[D-OPS-IMPL-001]` Criar runbooks mínimos.
+2. `[D-DIAG-IMPL-001]` Criar diagrama geral da arquitetura final.
+3. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
 
 As validações remotas prioritárias, quando o ambiente externo estiver disponível, são `[B2-CI-REM-001]`, `[B2-CI-REM-002]`, `[B2-GH-REM-001]`, `[D-DD-REM-*]`, `[D-AWS-REM-001]`, `[D-API-REM-001]` e os itens `EVID` finais.

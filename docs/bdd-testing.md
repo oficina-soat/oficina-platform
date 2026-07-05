@@ -13,7 +13,7 @@ Os microsserviços devem usar:
 - JUnit 5 e Quarkus Test para testes unitários, de integração e de contrato;
 - Cucumber JVM com JUnit Platform para BDD;
 - JaCoCo para cobertura mínima obrigatória de 80%;
-- SonarCloud como Quality Gate obrigatório no CI.
+- SonarCloud como Quality Gate quando `SONAR_TOKEN`, `SONAR_ORGANIZATION` e `SONAR_PROJECT_KEY` estiverem configurados.
 
 O Cucumber deve usar a mesma versão em todas as dependências `io.cucumber`. O [template Maven](../templates/quarkus-service/pom.xml) define essa versão por `cucumber.version`.
 
@@ -97,8 +97,7 @@ O pipeline deve falhar quando:
 
 - testes unitários, de integração, contrato ou BDD falharem;
 - cobertura JaCoCo ficar abaixo de 80%;
-- `SONAR_TOKEN`, `SONAR_ORGANIZATION` ou `SONAR_PROJECT_KEY` não estiverem configurados;
-- o Quality Gate do SonarCloud não for aprovado.
+- o Quality Gate do SonarCloud não for aprovado, quando a configuração SonarCloud estiver disponível.
 
 ## Critérios de pronto
 
@@ -108,5 +107,5 @@ Um microsserviço atende a este padrão quando:
 - participa do cenário BDD completo da OS ou possui os steps necessários para o cenário distribuído;
 - mantém cobertura JaCoCo mínima de 80%;
 - publica evidência de cobertura no README ou no artefato de CI;
-- executa Quality Gate SonarCloud obrigatório;
+- executa Quality Gate SonarCloud quando a configuração estiver disponível;
 - valida contratos OpenAPI, schemas JSON de eventos, erro padronizado, idempotência e Saga quando aplicável.

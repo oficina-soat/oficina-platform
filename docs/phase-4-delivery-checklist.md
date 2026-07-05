@@ -71,7 +71,7 @@ O vídeo de até 15 minutos deve demonstrar:
 - [ ] Saga finalizada com sucesso, incluindo eventos `ordemDeServicoCriada`, `diagnosticoFinalizado`, `orcamentoGerado`, `orcamentoAprovado`, `execucaoFinalizada`, `pagamentoConfirmado`, `ordemDeServicoEntregue` e `sagaFinalizadaComSucesso`;
 - [ ] falha tratável com compensação, resultando em `sagaCompensada`;
 - [ ] execução de testes e evidência de cobertura mínima de 80%;
-- [ ] Quality Gate aprovado;
+- [ ] Quality Gate aprovado quando SonarCloud estiver configurado, ou pendência/evidência alternativa registrada;
 - [ ] deploy automatizado de pelo menos um microsserviço em Kubernetes;
 - [ ] rastreamento distribuído com `correlationId` em logs e traces;
 - [ ] consulta de Swagger/OpenAPI ou collection Postman atualizada.

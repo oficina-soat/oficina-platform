@@ -24,11 +24,11 @@ Antes de habilitar `ENABLE_IMAGE_PUBLISH=true` ou `ENABLE_K8S_DEPLOY=true` em um
 
 - [ ] a branch `main` está protegida conforme [Proteção da branch main dos microsserviços](github-branch-protection.md);
 - [ ] o workflow `.github/workflows/service-ci.yml` deriva do [Template GitHub Actions para Microsserviços](../templates/github-actions/README.md);
-- [ ] `SERVICE_NAME` coincide com o nome canônico do repositório;
-- [ ] `MAVEN_PROFILE` está definido como `postgresql` para `oficina-os-service` e `oficina-billing-service`, ou `dynamodb` para `oficina-execution-service`;
+- [ ] `SERVICE_NAME` coincide com o nome canônico do repositório ou pode ser derivado do nome do repositório;
+- [ ] `MAVEN_PROFILE` está definido ou pode ser derivado como `postgresql` para `oficina-os-service` e `oficina-billing-service`, ou `dynamodb` para `oficina-execution-service`;
 - [ ] `AWS_REGION=us-east-1`, `EKS_CLUSTER_NAME=eks-lab` e `K8S_NAMESPACE=default` estão configurados no GitHub Environment `lab`;
 - [ ] `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` e `AWS_SESSION_TOKEN` estão disponíveis no GitHub Environment `lab`;
-- [ ] `SONAR_TOKEN`, `SONAR_ORGANIZATION` e `SONAR_PROJECT_KEY` estão configurados para Quality Gate;
+- [ ] `SONAR_TOKEN`, `SONAR_ORGANIZATION` e `SONAR_PROJECT_KEY` estão configurados quando o Quality Gate SonarCloud for usado como evidência da entrega;
 - [ ] o repositório ECR do serviço existe no `oficina-infra`;
 - [ ] o `Deployment` e o container Kubernetes usam exatamente o nome canônico do serviço;
 - [ ] os manifests executáveis estão materializados no `../oficina-infra/k8s/base/microservices/<servico>/` e referenciados pelo overlay `../oficina-infra/k8s/overlays/lab/`;
@@ -53,7 +53,7 @@ Para cada alteração candidata a deploy:
 
 1. Abrir PR no repositório do microsserviço.
 2. Confirmar aprovação e execução bem-sucedida do check `service-ci-validate`.
-3. Confirmar Quality Gate aprovado.
+3. Confirmar Quality Gate aprovado quando SonarCloud estiver configurado.
 4. Atualizar `project.version` no `pom.xml` quando a mudança exigir nova imagem, release ou rollout.
 5. Fazer merge na `main`.
 6. No push da `main`, confirmar que o workflow:

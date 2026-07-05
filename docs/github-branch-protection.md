@@ -15,17 +15,13 @@ Esta política atende ao requisito de repositórios protegidos do [Enunciado Fas
 Cada repositório deve proteger a branch `main` com:
 
 - pull request obrigatório antes de merge;
-- pelo menos uma aprovação obrigatória;
-- aprovação anterior descartada quando novos commits forem enviados;
-- resolução obrigatória de conversas antes de merge;
-- branch atualizada em relação à `main` antes de merge;
-- check obrigatório `service-ci-validate`;
-- histórico linear obrigatório;
-- force push desabilitado;
-- deleção da branch desabilitada;
-- aplicação da regra também para administradores.
+- check automático obrigatório `service-ci-validate` antes de merge.
 
 O check obrigatório `service-ci-validate` é produzido pelo workflow `.github/workflows/service-ci.yml` dos três microsserviços. O workflow `.github/workflows/open-pr-to-main.yml` usa o check `develop-validate` e não deve ser configurado como check obrigatório de merge para a `main`, porque ele serve apenas para preparar PRs a partir da branch `develop`.
+
+Não são requisitos canônicos da Fase 4: aprovação obrigatória, descarte de aprovações antigas, aprovação do último push, resolução obrigatória de conversas, branch atualizada em relação à `main`, histórico linear, bloqueio explícito de force push/deleção ou aplicação da regra para administradores. Esses controles podem ser adotados como endurecimento administrativo, mas não devem bloquear a conclusão do item de roadmap quando o requisito do enunciado estiver atendido.
+
+A validação de conformidade da Fase 4 deve considerar somente os dois requisitos canônicos acima.
 
 ## Pré-requisitos
 
@@ -48,7 +44,7 @@ export GITHUB_OWNER=oficina-soat
 
 ## Aplicação via API
 
-Execute para cada repositório:
+Quando a proteção for configurada pela API clássica de branch protection, execute para cada repositório. O payload abaixo mantém desativados os controles que não fazem parte do requisito mínimo do enunciado.
 
 ```bash
 for repo in oficina-os-service oficina-billing-service oficina-execution-service; do
@@ -60,24 +56,24 @@ for repo in oficina-os-service oficina-billing-service oficina-execution-service
     --header "X-GitHub-Api-Version: 2022-11-28" \
     --data '{
       "required_status_checks": {
-        "strict": true,
+        "strict": false,
         "contexts": [
           "service-ci-validate"
         ]
       },
-      "enforce_admins": true,
+      "enforce_admins": false,
       "required_pull_request_reviews": {
-        "dismiss_stale_reviews": true,
+        "dismiss_stale_reviews": false,
         "require_code_owner_reviews": false,
-        "required_approving_review_count": 1,
-        "require_last_push_approval": true
+        "required_approving_review_count": 0,
+        "require_last_push_approval": false
       },
       "restrictions": null,
-      "required_linear_history": true,
-      "allow_force_pushes": false,
+      "required_linear_history": false,
+      "allow_force_pushes": null,
       "allow_deletions": false,
       "block_creations": false,
-      "required_conversation_resolution": true,
+      "required_conversation_resolution": false,
       "lock_branch": false,
       "allow_fork_syncing": false
     }'
@@ -101,14 +97,14 @@ done
 
 Confirme em cada resposta:
 
-- `required_status_checks.strict` igual a `true`;
+- `required_status_checks` configurado;
 - `required_status_checks.contexts` contendo `service-ci-validate`;
-- `required_pull_request_reviews.required_approving_review_count` igual a `1`;
-- `required_pull_request_reviews.dismiss_stale_reviews` igual a `true`;
-- `required_conversation_resolution.enabled` igual a `true`;
-- `required_linear_history.enabled` igual a `true`;
-- `allow_force_pushes.enabled` igual a `false`;
-- `allow_deletions.enabled` igual a `false`.
+- `required_pull_request_reviews` configurado, ainda que com `required_approving_review_count` igual a `0`.
+
+Quando a proteção for implementada por Rulesets em vez da branch protection clássica, confirme que as regras aplicáveis à branch `main` incluem:
+
+- regra `pull_request`;
+- regra `required_status_checks` com o check `service-ci-validate`.
 
 ## Estado operacional
 

@@ -85,6 +85,8 @@ O job obrigatório para proteção da branch `main` chama-se `service-ci-validat
 
 Pushes na branch `develop` executam o workflow auxiliar `open-pr-to-main.yml`, que valida build Maven, testes e contratos antes de criar ou atualizar o PR para `main`. Esse workflow não executa SonarCloud para evitar análise de branch na automação de preparação do PR; o Quality Gate obrigatório é executado pelo `service-ci.yml` no Pull Request para `main`.
 
+O workflow auxiliar pode preparar PR com `project.version` em `SNAPSHOT`, porque ele não publica imagem, release ou deploy. Versões `SNAPSHOT` continuam bloqueadas no fluxo de publicação/deploy da `main`, quando `ENABLE_IMAGE_PUBLISH`, `ENABLE_K8S_DEPLOY` ou os inputs manuais correspondentes estiverem habilitados.
+
 O comportamento esperado para BDD, cobertura e evidências de qualidade está definido em [Padrão BDD, Cobertura e Qualidade](../../docs/bdd-testing.md).
 
 Merges na `main` podem executar também, quando as variáveis de habilitação estiverem configuradas:
@@ -96,7 +98,7 @@ Merges na `main` podem executar também, quando as variáveis de habilitação e
 - atualização da imagem no `Deployment` Kubernetes do serviço;
 - validação do rollout no Amazon EKS.
 
-O fluxo preserva o padrão do `oficina-app`: a imagem publicada usa a tag de `project.version`; versões `SNAPSHOT` não podem ser publicadas na `main`; e uma mudança publicável em `main` deve incrementar `project.version` quando exigir nova imagem ou release.
+O fluxo preserva o padrão do `oficina-app`: a imagem publicada usa a tag de `project.version`; versões `SNAPSHOT` não podem ser publicadas nem implantadas pela `main`; e uma mudança publicável em `main` deve incrementar `project.version` quando exigir nova imagem ou release.
 
 Antes de habilitar publicação de imagem ou deploy Kubernetes como evidência da Fase 4, use o [Checklist de Deploy Independente](../../docs/independent-deploy-checklist.md) para validar pré-condições, rollout, smoke test, rollback e registro de evidências.
 

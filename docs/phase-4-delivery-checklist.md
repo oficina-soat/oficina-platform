@@ -86,7 +86,7 @@ O PDF entregue no portal deve conter:
 - [ ] diagrama geral da arquitetura final, conforme o [Diagrama Geral da Arquitetura Final](architecture-diagram.md);
 - [ ] descrição da estratégia de Saga orquestrada pelo `oficina-os-service`;
 - [ ] justificativa da divisão em `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`;
-- [ ] justificativa das tecnologias usadas: Quarkus, AWS, PostgreSQL, DynamoDB, mensageria, Kubernetes, Datadog, SonarCloud e Mercado Pago;
+- [ ] justificativa das tecnologias usadas: Quarkus, AWS, PostgreSQL, DynamoDB, mensageria, Kubernetes, New Relic, SonarCloud e Mercado Pago;
 - [ ] links para evidências de cobertura, Swagger/OpenAPI, pipelines e deploy;
 - [ ] observações sobre limitações conhecidas ou pendências aceitas para a apresentação.
 
@@ -105,7 +105,7 @@ O diagrama final deve mostrar:
 - Kubernetes em Amazon EKS;
 - Amazon ECR;
 - API Gateway ou entrada pública adotada, conforme [Rotas públicas do API Gateway](api-gateway-public-routes.md);
-- Datadog Agent instalado por Helm no cluster;
+- New Relic OpenTelemetry Collector instalado por Helm no cluster;
 - integração Mercado Pago;
 - propagação de `correlationId`.
 

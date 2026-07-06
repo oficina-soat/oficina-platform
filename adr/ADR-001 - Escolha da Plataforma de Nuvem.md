@@ -146,7 +146,7 @@ A decisão impacta diretamente a arquitetura, que passa a ser composta por:
 - **Amazon EKS** → execução da aplicação Quarkus
 - **Amazon RDS (PostgreSQL)** → banco de dados gerenciado
 - **Terraform** → provisionamento da infraestrutura
-- **Datadog (ou similar)** → observabilidade
+- **New Relic** → observabilidade
 
 ---
 

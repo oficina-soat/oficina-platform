@@ -75,7 +75,7 @@ Após rollout bem-sucedido de um serviço:
 - [ ] chamar uma rota de negócio simples do serviço pelo caminho esperado no ambiente;
 - [ ] não expor `/q/health`, `/q/metrics`, `/q/openapi`, `/q/swagger-ui` ou `/api/v1/status` como API pública permanente, conforme [Rotas públicas do API Gateway](api-gateway-public-routes.md);
 - [ ] verificar logs estruturados com `service.name`, `deployment.environment` e `correlationId` quando houver chamada HTTP;
-- [ ] verificar que métricas em `/q/metrics` continuam coletáveis pelo Datadog Agent quando a coleta estiver habilitada;
+- [ ] verificar que métricas em `/q/metrics` continuam coletáveis pelo New Relic OpenTelemetry Collector quando a coleta estiver habilitada;
 - [ ] para mudanças com evento, publicar ou simular fluxo que confirme Outbox, tópico, fila consumidora e idempotência sem quebrar os demais serviços;
 - [ ] para mudanças de persistência, confirmar que o serviço acessa apenas seu próprio database ou tabelas DynamoDB.
 

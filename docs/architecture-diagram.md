@@ -14,7 +14,7 @@ flowchart LR
   actions["GitHub Actions<br/>pipelines independentes"]
   sonar["SonarCloud<br/>Quality Gate"]
   mercadoPago["Mercado Pago<br/>provedor financeiro"]
-  datadogSaas["Datadog<br/>logs, métricas, traces e monitores"]
+  newRelicSaas["New Relic<br/>logs, métricas, traces e alertas"]
 
   subgraph aws["AWS us-east-1 / ambiente lab"]
     apigw["API Gateway HTTP<br/>eks-lab-http-api"]
@@ -27,7 +27,7 @@ flowchart LR
       os["oficina-os-service<br/>OS, clientes, veículos<br/>orquestra Saga"]
       billing["oficina-billing-service<br/>orçamentos, pagamentos<br/>integra Mercado Pago"]
       execution["oficina-execution-service<br/>catálogo, estoque<br/>diagnóstico e execução"]
-      agent["Datadog Agent<br/>Helm release datadog-agent<br/>OTLP/gRPC :4317"]
+      collector["New Relic OpenTelemetry Collector<br/>Helm release nr-k8s-otel-collector<br/>OTLP/gRPC :4317"]
     end
 
     subgraph rds["Amazon RDS for PostgreSQL<br/>oficina-postgres-lab"]
@@ -81,10 +81,10 @@ flowchart LR
   secrets --> auth
   secrets --> notificacao
 
-  os -->|logs JSON, /q/metrics, traces OTLP| agent
-  billing -->|logs JSON, /q/metrics, traces OTLP| agent
-  execution -->|logs JSON, /q/metrics, traces OTLP| agent
-  agent --> datadogSaas
+  os -->|logs JSON, /q/metrics, traces OTLP| collector
+  billing -->|logs JSON, /q/metrics, traces OTLP| collector
+  execution -->|logs JSON, /q/metrics, traces OTLP| collector
+  collector --> newRelicSaas
 ```
 
 ## Leitura do Diagrama
@@ -98,7 +98,7 @@ flowchart LR
 | Persistência NoSQL | `oficina-execution-service` usa exclusivamente as tabelas DynamoDB com prefixo `oficina-execution-lab`, conforme o [Padrão DynamoDB do oficina-execution-service](dynamodb-execution-service.md). |
 | Mensageria | Eventos são publicados via Outbox em tópicos SNS canônicos e consumidos por filas SQS por consumidor, com DLQs no padrão do [Contrato de Tópicos de Mensageria](../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md). |
 | Saga | A Saga da Ordem de Serviço é orquestrada pelo `oficina-os-service`, com participantes financeiros e operacionais nos outros serviços, conforme [Fluxos da Saga da Ordem de Serviço](saga-flows.md) e o [Contrato de Saga do oficina-os-service](../contracts/saga/oficina-os-saga-v1.md). |
-| Observabilidade | Os três microsserviços propagam `correlationId`, emitem logs JSON, expõem `/q/metrics` e enviam traces OTLP/gRPC para o Datadog Agent `datadog-agent.datadog.svc.cluster.local:4317`, conforme o [Padrão de Observabilidade Distribuída](observability.md). |
+| Observabilidade | Os três microsserviços propagam `correlationId`, emitem logs JSON, expõem `/q/metrics` e enviam traces OTLP/gRPC para o New Relic OpenTelemetry Collector `nr-k8s-otel-collector-gateway.newrelic.svc.cluster.local:4317`, conforme o [Padrão de Observabilidade Distribuída](observability.md). |
 | Deploy independente | Cada microsserviço possui pipeline independente, publica imagem no Amazon ECR e pode acionar deploy Kubernetes quando as condições do [Checklist de Deploy Independente](independent-deploy-checklist.md) estiverem atendidas. |
 | Integração externa | A integração com Mercado Pago pertence ao `oficina-billing-service`; os demais serviços não chamam diretamente o provedor financeiro. |
 
@@ -108,7 +108,7 @@ flowchart LR
 - Comunicação entre microsserviços ocorre por REST ou eventos de domínio.
 - Eventos devem ser publicados somente após persistência local, usando Outbox.
 - `oficina-platform` não contém código runtime dos microsserviços nem infraestrutura executável.
-- `oficina-infra` é o destino canônico para Terraform, Kubernetes, API Gateway, RDS, DynamoDB, SNS/SQS, ECR, Datadog Agent e scripts operacionais.
+- `oficina-infra` é o destino canônico para Terraform, Kubernetes, API Gateway, RDS, DynamoDB, SNS/SQS, ECR, New Relic OpenTelemetry Collector e scripts operacionais.
 - `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` não aparecem como runtime final da Fase 4; quando consultados, servem apenas como fonte histórica ou origem de cópia controlada.
 
 ## Referências

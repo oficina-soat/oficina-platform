@@ -2,7 +2,7 @@
 
 Este registro fecha a validação local do item `D-OBS-IMPL-002` no [Roadmap](../ROADMAP.md) e complementa o [Padrão de Observabilidade Distribuída](observability.md).
 
-A validação foi executada em 2026-07-04 por inspeção dos três microsserviços e por testes locais aplicáveis. Ela não substitui a validação remota do Datadog, do EKS `lab`, dos dashboards, monitores ou traces reais, que permanecem apartados em [Validações remotas e evidências externas](../ROADMAP.md#validações-remotas-e-evidências-externas).
+A validação foi executada em 2026-07-04 por inspeção dos três microsserviços e por testes locais aplicáveis. Ela não substitui a validação remota do New Relic, do EKS `lab`, dos dashboards, alertas ou traces reais, que permanecem apartados em [Validações remotas e evidências externas](../ROADMAP.md#validações-remotas-e-evidências-externas).
 
 ## Resultado
 
@@ -21,4 +21,4 @@ A validação foi executada em 2026-07-04 por inspeção dos três microsserviç
 
 ## Limites da validação
 
-Não foram executados testes contra AWS, EKS `lab` ou backend Datadog. A instalação do Agent, dashboards, monitores, traces reais e correlação ponta a ponta por `correlationId` continuam nos itens remotos `D-DD-REM-*` e `D-DD-EVID-001` do [Roadmap](../ROADMAP.md).
+Não foram executados testes contra AWS, EKS `lab` ou backend New Relic. A instalação do collector, dashboards, alertas, traces reais e correlação ponta a ponta por `correlationId` continuam nos itens remotos `D-NR-REM-*` e `D-NR-EVID-001` do [Roadmap](../ROADMAP.md).

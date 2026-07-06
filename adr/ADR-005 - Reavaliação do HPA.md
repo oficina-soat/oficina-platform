@@ -75,7 +75,7 @@ Por isso, para EKS, a recomendação é complementar o HPA com autoscaling de n�
 - atende diretamente ao requisito de Kubernetes com escalabilidade
 - mantém a arquitetura simples o suficiente para implementação e apresentação
 - permite evolução gradual para métricas mais ricas
-- combina bem com observabilidade via Datadog ou outra ferramenta equivalente
+- combina bem com observabilidade via New Relic
 
 ### Negativas
 

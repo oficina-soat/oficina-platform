@@ -21,7 +21,7 @@ Runbooks cobertos:
 | Banco indisponível | readiness falhando por PostgreSQL ou DynamoDB | Serviço dono do banco |
 | Rollback de deploy | rollout falho ou regressão pós-deploy | Serviço alterado |
 
-Estes runbooks não substituem a criação remota de dashboards e monitores no Datadog. Quando Datadog, AWS, EKS ou GitHub exigirem credenciais administrativas, a execução remota deve ser registrada como evidência externa no [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md).
+Estes runbooks não substituem a criação remota de dashboards e alertas no New Relic. Quando New Relic, AWS, EKS ou GitHub exigirem credenciais administrativas, a execução remota deve ser registrada como evidência externa no [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md).
 
 ## Coleta inicial
 
@@ -79,7 +79,7 @@ Use quando respostas `5xx`, erros funcionais inesperados ou p95 de latência aum
 - [ ] filtrar logs por `service.name`, `deployment.environment=lab`, rota e `correlationId`;
 - [ ] separar erro de cliente esperado de erro interno conforme o [Contrato de Erros REST](../contracts/error-model.md);
 - [ ] verificar se a latência está em HTTP, banco, mensageria, integração Mercado Pago ou dependência AWS;
-- [ ] conferir traces por rota quando Datadog estiver disponível;
+- [ ] conferir traces por rota quando New Relic estiver disponível;
 - [ ] comparar a versão atual com a versão anterior estável do serviço.
 
 ### Contenção

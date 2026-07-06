@@ -30,22 +30,22 @@ Os microsserviços devem usar observabilidade distribuída baseada em:
 - logs estruturados em JSON;
 - métricas Prometheus expostas pelo Micrometer;
 - traces OpenTelemetry;
-- Datadog como backend canônico para dashboards, alertas, logs, métricas e traces no ambiente compartilhado;
-- Datadog Agent instalado no cluster EKS por Helm como coletor oficial do ambiente `lab`;
+- New Relic como backend canônico para dashboards, alertas, logs, métricas e traces no ambiente compartilhado;
+- New Relic OpenTelemetry Collector instalado no cluster EKS por Helm como coletor oficial do ambiente `lab`;
 - propagação obrigatória de `correlationId` em HTTP, metadados operacionais de eventos, logs e traces;
 - atributos padronizados de serviço, namespace e ambiente.
 
 O ambiente canônico da Fase 4 é `lab`, conforme [Conta, região e ambientes AWS](aws-environments.md).
 
-AWS continua sendo a plataforma de nuvem da solução. A coleta dos sinais operacionais deve ser feita pelo Datadog Agent instalado no cluster EKS `eks-lab` por Helm, com OTLP/gRPC habilitado para traces, coleta de logs dos pods e coleta das métricas expostas em `/q/metrics`.
+AWS continua sendo a plataforma de nuvem da solução. A coleta dos sinais operacionais deve ser feita pelo New Relic OpenTelemetry Collector instalado no cluster EKS `eks-lab` por Helm, com OTLP/gRPC habilitado para traces, coleta de logs dos pods e coleta das métricas expostas em `/q/metrics`.
 
-O Agent roda dentro do cluster, mas o backend, os dashboards, os monitores e a interface de consulta continuam pertencendo ao Datadog. Portanto, a operacionalização exige uma conta Datadog, o `DATADOG_SITE` aplicável e uma API key configurada como secret no ambiente `lab`.
+O collector roda dentro do cluster, mas o backend, os dashboards, os alertas e a interface de consulta pertencem ao New Relic. Portanto, a operacionalização exige uma conta New Relic, uma license key configurada como secret no ambiente `lab` e o endpoint OTLP do New Relic aplicável à região da conta.
 
 Referências operacionais oficiais:
 
-- [Install the Datadog Agent on Kubernetes](https://docs.datadoghq.com/containers/kubernetes/installation/);
-- [OTLP Ingestion by the Datadog Agent](https://docs.datadoghq.com/opentelemetry/setup/otlp_ingest_in_the_agent/);
-- [Kubernetes log collection](https://docs.datadoghq.com/containers/kubernetes/log/).
+- [Install OpenTelemetry Collector on Kubernetes](https://docs.newrelic.com/docs/kubernetes-pixie/k8s-otel/install/);
+- [New Relic OTLP endpoint](https://docs.newrelic.com/docs/opentelemetry/best-practices/opentelemetry-otlp/);
+- [OpenTelemetry data in New Relic](https://docs.newrelic.com/docs/opentelemetry/best-practices/opentelemetry-data-overview/).
 
 ## Configuração de Runtime
 
@@ -56,7 +56,7 @@ Variáveis obrigatórias por microsserviço:
 | `OTEL_SERVICE_NAME` | Nome canônico do serviço, como `oficina-os-service`. |
 | `DEPLOYMENT_ENVIRONMENT` | `lab`. |
 | `OTEL_RESOURCE_ATTRIBUTES` | `service.namespace=oficina,deployment.environment=lab`. |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://datadog-agent.datadog.svc.cluster.local:4317`, salvo alteração coordenada de `DATADOG_NAMESPACE` ou `DATADOG_LOCAL_SERVICE_NAME` no `oficina-infra`. |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://nr-k8s-otel-collector-gateway.newrelic.svc.cluster.local:4317`, salvo alteração coordenada de `NEW_RELIC_NAMESPACE` ou `NEW_RELIC_OTEL_COLLECTOR_LOCAL_SERVICE_NAME` no `oficina-infra`. |
 | `OTEL_EXPORTER_OTLP_PROTOCOL` | `grpc`. |
 | `QUARKUS_OTEL_TRACES_EXPORTER` | `cdi` no ambiente compartilhado, usando o exportador OTLP gerenciado pelo Quarkus. |
 | `OTEL_METRICS_EXPORTER` | `none`; métricas de aplicação são expostas em `/q/metrics` para coleta compatível com Prometheus. |
@@ -68,20 +68,21 @@ Variáveis obrigatórias por microsserviço:
 
 O [template Quarkus](../templates/quarkus-service/README.md) já define essas chaves em `application.properties` e deve ser a referência inicial para novos repositórios.
 
-O endpoint OTLP, a instalação do Datadog Agent via Helm, a chave de API e qualquer secret necessário pertencem ao repositório de infraestrutura. A configuração executável fica em [Datadog Agent no EKS lab](../../oficina-infra/docs/datadog-agent.md). Este repositório define apenas o contrato de runtime esperado pelos microsserviços e pelos manifests base.
+O endpoint OTLP interno, a instalação do New Relic OpenTelemetry Collector via Helm, a license key e qualquer secret necessário pertencem ao repositório de infraestrutura. Este repositório define apenas o contrato de runtime esperado pelos microsserviços e pelos manifests base.
 
-Variáveis operacionais do Agent no ambiente `lab`:
+Variáveis operacionais do collector no ambiente `lab`:
 
 | Variável | Valor esperado |
 |---|---|
-| `INSTALL_DATADOG_AGENT` | `false` por padrão; `true` quando o deploy deve instalar ou atualizar o Agent no cluster. |
-| `DATADOG_API_KEY` | Secret externo ao repositório, informado no GitHub Environment `lab` ou localmente. |
-| `DATADOG_SITE` | `datadoghq.com` por padrão, ou o site real da organização Datadog. |
-| `DATADOG_NAMESPACE` | `datadog`. |
-| `DATADOG_HELM_RELEASE` | `datadog-agent`. |
-| `DATADOG_LOCAL_SERVICE_NAME` | `datadog-agent`. |
-| `DATADOG_API_KEY_SECRET_NAME` | `datadog-secret`. |
-| `DATADOG_API_KEY_SECRET_KEY` | `api-key`; deve permanecer assim para compatibilidade com o chart Helm. |
+| `INSTALL_NEW_RELIC_OTEL_COLLECTOR` | `false` por padrão; `true` quando o deploy deve instalar ou atualizar o collector no cluster. |
+| `NEW_RELIC_LICENSE_KEY` | Secret externo ao repositório, informado no GitHub Environment `lab` ou localmente. |
+| `NEW_RELIC_NAMESPACE` | `newrelic`. |
+| `NEW_RELIC_OTEL_COLLECTOR_HELM_RELEASE` | `nr-k8s-otel-collector`. |
+| `NEW_RELIC_OTEL_COLLECTOR_LOCAL_SERVICE_NAME` | `nr-k8s-otel-collector-gateway`. |
+| `NEW_RELIC_LICENSE_KEY_SECRET_NAME` | `new-relic-license-key`. |
+| `NEW_RELIC_LICENSE_KEY_SECRET_KEY` | `licenseKey`. |
+| `NEW_RELIC_CLUSTER_NAME` | `eks-lab`. |
+| `NEW_RELIC_OTLP_ENDPOINT` | `https://otlp.nr-data.net`, salvo conta New Relic em outra região. |
 
 ## Identificadores Transversais
 
@@ -279,27 +280,27 @@ Critérios mínimos:
 | `oficina-billing-service` | PostgreSQL `oficina_billing`, broker de mensageria, dependência financeira quando obrigatória para a operação. |
 | `oficina-execution-service` | DynamoDB, broker de mensageria quando configurado. |
 
-## Datadog
+## New Relic
 
-Os painéis de observabilidade da plataforma devem ser criados no Datadog.
+Os painéis de observabilidade da plataforma devem ser criados no New Relic.
 
-Para o ambiente `lab`, a forma oficial de coleta é Datadog Agent no cluster EKS instalado por Helm. Um collector compatível com OTLP só deve ser introduzido depois de nova decisão explícita, quando houver necessidade real de processamento intermediário que o Agent não atenda.
+Para o ambiente `lab`, a forma oficial de coleta é New Relic OpenTelemetry Collector no cluster EKS instalado por Helm. Os microsserviços enviam traces para o endpoint OTLP interno do collector; logs e métricas são coletados dentro do cluster e encaminhados ao New Relic pelo collector configurado no `oficina-infra`.
 
 Regras obrigatórias:
 
 - todos os dashboards devem filtrar por `service.name`, `service.namespace` e `deployment.environment`;
 - `service.namespace` deve ser `oficina`;
 - `deployment.environment` deve ser `lab` no ambiente da Fase 4;
-- traces devem chegar ao Datadog por OTLP/gRPC recebido pelo Datadog Agent, usando o exportador gerenciado pelo Quarkus;
+- traces devem chegar ao New Relic por OTLP recebido pelo New Relic OpenTelemetry Collector, usando o exportador gerenciado pelo Quarkus;
 - logs JSON devem ser coletados do stdout dos pods e correlacionados com `service.name`, `correlationId`, `traceId` e `spanId` quando disponíveis;
-- métricas expostas em `/q/metrics` devem ser coletadas pelo Datadog Agent com configuração compatível com Prometheus;
-- alertas devem referenciar dashboards e monitores do Datadog, sem depender de painéis operacionais no Amazon CloudWatch como visão principal.
+- métricas expostas em `/q/metrics` devem ser coletadas pelo New Relic OpenTelemetry Collector com configuração compatível com Prometheus;
+- alertas devem referenciar dashboards e políticas de alerta do New Relic, sem depender de painéis operacionais no Amazon CloudWatch como visão principal.
 
 O Amazon CloudWatch pode continuar recebendo logs ou métricas nativas da AWS quando isso for consequência da plataforma, mas não é o backend canônico para os painéis de observabilidade dos microsserviços.
 
 ## Dashboards Mínimos
 
-Cada serviço deve possuir visão operacional no Datadog com:
+Cada serviço deve possuir visão operacional no New Relic com:
 
 - taxa de requisições por rota;
 - latência p50, p95 e p99 por rota;

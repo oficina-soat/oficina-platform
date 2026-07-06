@@ -37,8 +37,8 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
   - IDs físicos efêmeros de VPC, subnets, security groups e integrações devem ser resolvidos por variáveis, outputs ou descoberta em tempo de deploy, pois a infraestrutura do laboratório pode ser criada e destruída a cada ciclo de teste.
 - Decisão de separar o código de infraestrutura no repositório unificado `oficina-infra`, consolidando as responsabilidades hoje distribuídas entre `oficina-infra-db` e `oficina-infra-k8s`, conforme [Escopo do Repositório Unificado de Infraestrutura](docs/infrastructure-repository-scope.md).
 - Rotas públicas do API Gateway definidas em [Rotas públicas do API Gateway](docs/api-gateway-public-routes.md): todas as APIs REST de negócio dos três microsserviços devem ser expostas pelo `eks-lab-http-api`, sem publicar endpoints operacionais como `/q/metrics`, `/q/health` e `/api/v1/status`.
-- Forma oficial de coleta Datadog definida como Datadog Agent instalado por Helm no cluster EKS `eks-lab`, com OTLP/gRPC, coleta de logs dos pods e coleta das métricas dos microsserviços.
-- Baseline executável do Datadog Agent criado no `oficina-infra`, com Helm values do ambiente `lab`, script de instalação, Secret Kubernetes esperado, endpoint OTLP/gRPC interno e integração opcional ao deploy.
+- Forma oficial de coleta New Relic definida como New Relic OpenTelemetry Collector instalado por Helm no cluster EKS `eks-lab`, com OTLP/gRPC, coleta de logs dos pods e coleta das métricas dos microsserviços.
+- Destino do baseline executável do New Relic OpenTelemetry Collector definido como `oficina-infra`, incluindo Helm values do ambiente `lab`, script de instalação, Secret Kubernetes esperado, endpoint OTLP/gRPC interno e integração opcional ao deploy.
 - Enunciado da Fase 4 incluído como referência normativa em [Enunciado Fase 4](docs/Enunciado%20Fase%204.md).
 - Contratos fundamentais criados para:
   - APIs REST;
@@ -205,19 +205,19 @@ Amazon DynamoDB
 
 ### 10. Padrão de observabilidade distribuída
 
-**Situação atual:** o padrão operacional foi criado em [Padrão de Observabilidade Distribuída](docs/observability.md), consolidando logs estruturados, métricas, traces, health checks, dashboards e alertas no Datadog, além da propagação de `correlationId`.
+**Situação atual:** o padrão operacional foi criado em [Padrão de Observabilidade Distribuída](docs/observability.md), consolidando logs estruturados, métricas, traces, health checks, dashboards e alertas no New Relic, além da propagação de `correlationId`.
 
-**Definição faltante:** manter o padrão coerente com os manifests Kubernetes, pipelines, instalação do Datadog Agent no repositório de infraestrutura e implementações dos microsserviços conforme esses artefatos forem evoluídos.
+**Definição faltante:** manter o padrão coerente com os manifests Kubernetes, pipelines, instalação do New Relic OpenTelemetry Collector no repositório de infraestrutura e implementações dos microsserviços conforme esses artefatos forem evoluídos.
 
-**Etapas locais e pendências remotas para Datadog:**
+**Etapas locais e pendências remotas para New Relic:**
 
-1. [x] Definir no `oficina-infra` a forma de coleta oficial para o ambiente `lab`: Datadog Agent instalado por Helm no cluster EKS, preservando Datadog como backend canônico.
-2. [x] Criar no `oficina-infra` os Helm values e scripts necessários para instalar o Datadog Agent no cluster `eks-lab`, incluindo Secret Kubernetes esperado, endpoint OTLP/gRPC interno, coleta de logs dos pods, métricas Prometheus e traces.
-3. [x] Definir secrets e variáveis operacionais do Datadog no ambiente `lab`, incluindo chave de API, `DATADOG_SITE`, endpoint OTLP interno e integração com os nomes de runtime descritos em [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
+1. [x] Definir a forma de coleta oficial para o ambiente `lab`: New Relic OpenTelemetry Collector instalado por Helm no cluster EKS, preservando New Relic como backend canônico.
+2. [ ] Criar no `oficina-infra` os Helm values e scripts necessários para instalar o New Relic OpenTelemetry Collector no cluster `eks-lab`, incluindo Secret Kubernetes esperado, endpoint OTLP/gRPC interno, coleta de logs dos pods, métricas Prometheus e traces.
+3. [ ] Definir secrets e variáveis operacionais do New Relic no ambiente `lab`, incluindo `NEW_RELIC_LICENSE_KEY`, endpoint OTLP interno e integração com os nomes de runtime descritos em [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
 4. Concluído localmente: `[D-OBS-IMPL-001]` propagar `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_PROTOCOL`, `OTEL_RESOURCE_ATTRIBUTES`, `DEPLOYMENT_ENVIRONMENT` e `OTEL_SERVICE_NAME` nos manifests dos três microsserviços.
 5. Concluído localmente: `[D-OBS-IMPL-002]` validar nos três microsserviços, por inspeção local e testes locais aplicáveis, a emissão de logs JSON, exposição de `/q/metrics`, health checks Quarkus e configuração de traces OpenTelemetry conforme [Validação local de observabilidade](docs/observability-local-validation.md).
 
-As instalações reais, dashboards, monitores, testes de ponta a ponta no `eks-lab` e evidências externas ficam apartados em [Validações remotas e evidências externas](#validações-remotas-e-evidências-externas).
+As instalações reais, dashboards, alertas, testes de ponta a ponta no `eks-lab` e evidências externas ficam apartados em [Validações remotas e evidências externas](#validações-remotas-e-evidências-externas).
 
 **Artefato sugerido:**
 
@@ -227,7 +227,7 @@ docs/infra-runtime-naming.md
 docs/phase-4-delivery-checklist.md
 ```
 
-**Critério de pronto:** todos os serviços devem expor o mesmo conjunto mínimo de sinais, propagar `correlationId` em HTTP, eventos, logs e traces, enviar dados reais ao Datadog no ambiente `lab` por meio do Datadog Agent, possuir dashboards e monitores mínimos ativos e ter evidências registradas no checklist final.
+**Critério de pronto:** todos os serviços devem expor o mesmo conjunto mínimo de sinais, propagar `correlationId` em HTTP, eventos, logs e traces, enviar dados reais ao New Relic no ambiente `lab` por meio do New Relic OpenTelemetry Collector, possuir dashboards e alertas mínimos ativos e ter evidências registradas no checklist final.
 
 ### 11. Padrão de erros e idempotência
 
@@ -419,7 +419,7 @@ docs/api-gateway-public-routes.md
 5. Criar checklist de revisão de contratos.
 6. Criar checklist dos entregáveis finais da Fase 4, incluindo evidências de cobertura, Swagger/OpenAPI, vídeo, PDF e diagrama de arquitetura.
 7. Criar ambiente local integrado no `oficina-infra` para dependências, bootstrap e teste manual dos três microsserviços.
-8. Operacionalizar Datadog no ambiente `lab` com Datadog Agent via Helm, dashboards, monitores e evidências de correlação distribuída.
+8. Operacionalizar New Relic no ambiente `lab` com New Relic OpenTelemetry Collector via Helm, dashboards, alertas e evidências de correlação distribuída.
 
 **Resultado esperado:** a plataforma fica pronta para operação, demonstração e evolução controlada.
 
@@ -427,7 +427,7 @@ docs/api-gateway-public-routes.md
 
 ## Backlog orientado a agentes
 
-Esta seção contém tarefas implementáveis por agentes com validação local ou revisão de arquivos no workspace. Itens que dependem de AWS aplicada, GitHub remoto, SonarCloud, Datadog, gravação de vídeo ou evidência externa ficam apartados em [Validações remotas e evidências externas](#validações-remotas-e-evidências-externas).
+Esta seção contém tarefas implementáveis por agentes com validação local ou revisão de arquivos no workspace. Itens que dependem de AWS aplicada, GitHub remoto, SonarCloud, New Relic, gravação de vídeo ou evidência externa ficam apartados em [Validações remotas e evidências externas](#validações-remotas-e-evidências-externas).
 
 Convenção de identificadores para itens abertos:
 
@@ -515,7 +515,7 @@ Convenção de identificadores para itens abertos:
 - [x] Criar propagação de `correlationId`.
 - [x] Criar manifests Kubernetes base.
 - [x] Criar pipeline padrão de CI/CD.
-- [x] Criar baseline executável do Datadog no `oficina-infra` com Datadog Agent via Helm, Secret Kubernetes esperado, endpoint OTLP/gRPC interno e coleta de logs, métricas e traces.
+- [ ] `[D-NR-IMPL-001]` Criar baseline executável do New Relic no `oficina-infra` com New Relic OpenTelemetry Collector via Helm, Secret Kubernetes esperado, endpoint OTLP/gRPC interno e coleta de logs, métricas e traces.
 - [x] `[D-OBS-IMPL-001]` Propagar `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_PROTOCOL`, `OTEL_RESOURCE_ATTRIBUTES`, `DEPLOYMENT_ENVIRONMENT` e `OTEL_SERVICE_NAME` nos manifests dos três microsserviços.
 - [x] `[D-OBS-IMPL-002]` Validar nos três microsserviços, por inspeção local e testes locais aplicáveis, a emissão de logs JSON, exposição de `/q/metrics`, health checks Quarkus e configuração de traces OpenTelemetry conforme [Validação local de observabilidade](docs/observability-local-validation.md).
 - [ ] `[D-AWS-IMPL-001]` Normalizar valores legados de conta, região e ambiente AWS nos repositórios antigos conforme [Conta, região e ambientes AWS](docs/aws-environments.md). Item adiado: por enquanto, `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` serão usados apenas como fonte de cópia; ajustes necessários no `oficina-auth-lambda` podem ser feitos diretamente nele.
@@ -536,7 +536,7 @@ Convenção de identificadores para itens abertos:
 
 ## Validações remotas e evidências externas
 
-Esta seção concentra tarefas que dependem de ambiente externo, credenciais administrativas, execução real em AWS, SonarCloud, GitHub, Datadog, gravação de vídeo ou publicação de evidências. Elas não devem ser tratadas como próxima tarefa de implementação por agentes, salvo pedido explícito do usuário.
+Esta seção concentra tarefas que dependem de ambiente externo, credenciais administrativas, execução real em AWS, SonarCloud, GitHub, New Relic, gravação de vídeo ou publicação de evidências. Elas não devem ser tratadas como próxima tarefa de implementação por agentes, salvo pedido explícito do usuário.
 
 ### Épico B2 — CI, qualidade e governança remota
 
@@ -545,15 +545,15 @@ Esta seção concentra tarefas que dependem de ambiente externo, credenciais adm
 - [ ] `[B2-CI-REM-002]` Registrar evidência remota do Quality Gate SonarCloud aprovado e da cobertura mínima de 80% nos três microsserviços.
 - [ ] `[B2-GH-REM-001]` Confirmar proteção da branch `main` nos três repositórios de microsserviços, com PR obrigatório e checagens automáticas exigidas antes de merge. A política canônica foi documentada em [Proteção da branch main dos microsserviços](docs/github-branch-protection.md); a aplicação remota depende de credencial GitHub com permissão administrativa e fica fora do escopo dos agentes.
 
-### Épico D — AWS, Datadog e entrega final
+### Épico D — AWS, New Relic e entrega final
 
-- [ ] `[D-DD-REM-000]` Preparar o acesso Datadog antes da validação de observabilidade: confirmar a conta Datadog e o `DATADOG_SITE`, gerar `DATADOG_API_KEY`, configurar o secret `DATADOG_API_KEY` no GitHub Environment `lab` ou no mecanismo seguro usado pelo `oficina-infra`, habilitar `INSTALL_DATADOG_AGENT=true` para a execução remota e confirmar acesso ao contexto AWS/EKS do cluster `eks-lab`, conforme [Padrão de Observabilidade Distribuída](docs/observability.md) e [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
-- [ ] `[D-DD-REM-001]` Instalar e validar o Datadog Agent no cluster `eks-lab` quando `DATADOG_API_KEY`, `DATADOG_SITE` e contexto AWS/EKS estiverem disponíveis.
-- [ ] `[D-DD-REM-002]` Criar dashboards mínimos no Datadog para `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, filtrando por `service.name`, `service.namespace=oficina` e `deployment.environment=lab`.
-- [ ] `[D-DD-REM-003]` Criar visão adicional da Saga no Datadog para o `oficina-os-service`, cobrindo Sagas iniciadas, finalizadas, compensadas, em falha manual e duração por etapa.
-- [ ] `[D-DD-REM-004]` Criar monitores mínimos no Datadog para indisponibilidade, erro HTTP elevado, latência elevada, Outbox parada, Outbox com falha, DLQ, Saga em falha manual, pagamento indisponível e banco indisponível.
-- [ ] `[D-DD-REM-005]` Executar teste de ponta a ponta no ambiente `lab` gerando uma Ordem de Serviço com caminho feliz e uma falha compensada, confirmando correlação por `correlationId` entre logs, traces, métricas e eventos.
-- [ ] `[D-DD-EVID-001]` Registrar evidências de observabilidade distribuída no checklist final da Fase 4, incluindo links ou identificadores dos dashboards, monitores, traces e consultas de logs usadas na validação.
+- [ ] `[D-NR-REM-000]` Preparar o acesso New Relic antes da validação de observabilidade: confirmar a conta New Relic, gerar `NEW_RELIC_LICENSE_KEY`, configurar o secret no GitHub Environment `lab` ou no mecanismo seguro usado pelo `oficina-infra`, habilitar `INSTALL_NEW_RELIC_OTEL_COLLECTOR=true` para a execução remota e confirmar acesso ao contexto AWS/EKS do cluster `eks-lab`, conforme [Padrão de Observabilidade Distribuída](docs/observability.md) e [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
+- [ ] `[D-NR-REM-001]` Instalar e validar o New Relic OpenTelemetry Collector no cluster `eks-lab` quando `NEW_RELIC_LICENSE_KEY` e contexto AWS/EKS estiverem disponíveis.
+- [ ] `[D-NR-REM-002]` Criar dashboards mínimos no New Relic para `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, filtrando por `service.name`, `service.namespace=oficina` e `deployment.environment=lab`.
+- [ ] `[D-NR-REM-003]` Criar visão adicional da Saga no New Relic para o `oficina-os-service`, cobrindo Sagas iniciadas, finalizadas, compensadas, em falha manual e duração por etapa.
+- [ ] `[D-NR-REM-004]` Criar alertas mínimos no New Relic para indisponibilidade, erro HTTP elevado, latência elevada, Outbox parada, Outbox com falha, DLQ, Saga em falha manual, pagamento indisponível e banco indisponível.
+- [ ] `[D-NR-REM-005]` Executar teste de ponta a ponta no ambiente `lab` gerando uma Ordem de Serviço com caminho feliz e uma falha compensada, confirmando correlação por `correlationId` entre logs, traces, métricas e eventos.
+- [ ] `[D-NR-EVID-001]` Registrar evidências de observabilidade distribuída no checklist final da Fase 4, incluindo links ou identificadores dos dashboards, alertas, traces e consultas de logs usadas na validação.
 - [ ] `[D-AWS-REM-001]` Aplicar o RDS PostgreSQL compartilhado em AWS usando valores variáveis do ambiente `lab`, como `vpc_id`, subnets e security groups resolvidos por Terraform outputs, variáveis de pipeline ou descoberta em tempo de deploy.
 - [ ] `[D-API-REM-001]` Materializar e validar no `oficina-infra` as rotas públicas do API Gateway quando os backends reais e `integration_uri` dos microsserviços estiverem disponíveis no ambiente `lab`.
 - [ ] `[D-DELIVERY-EVID-001]` Registrar data de entrega da Fase 4, participantes, links dos repositórios e link do vídeo no checklist final ou no documento de entrega.
@@ -598,6 +598,7 @@ O próximo passo para agentes deve priorizar itens `IMPL` abertos no [Backlog or
 
 A ordem local recomendada é:
 
-1. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
+1. `[D-NR-IMPL-001]` Criar baseline executável do New Relic no `oficina-infra`.
+2. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
 
-As validações remotas prioritárias, quando o ambiente externo estiver disponível, são `[B2-CI-REM-001]`, `[B2-CI-REM-002]`, `[B2-GH-REM-001]`, `[D-DD-REM-*]`, `[D-AWS-REM-001]`, `[D-API-REM-001]` e os itens `EVID` finais.
+As validações remotas prioritárias, quando o ambiente externo estiver disponível, são `[B2-CI-REM-001]`, `[B2-CI-REM-002]`, `[B2-GH-REM-001]`, `[D-NR-REM-*]`, `[D-AWS-REM-001]`, `[D-API-REM-001]` e os itens `EVID` finais.

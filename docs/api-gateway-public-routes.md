@@ -92,9 +92,9 @@ Os endpoints abaixo não fazem parte da superfície pública de negócio do API 
 
 - `/api/v1/status` dos microsserviços, por existir com o mesmo path nos três serviços e servir apenas a smoke test local ou operacional;
 - `/q/health`, `/q/health/live` e `/q/health/ready`, que pertencem a probes Kubernetes e readiness interna;
-- `/q/metrics`, que deve ser coletado pelo Datadog Agent dentro do cluster;
+- `/q/metrics`, que deve ser coletado pelo New Relic OpenTelemetry Collector dentro do cluster;
 - `/q/openapi`, `/q/swagger-ui` e `/q/swagger-ui/*`, que podem ser usados como evidência técnica, mas não devem substituir os links canônicos das OpenAPI em [contracts/openapi/](../contracts/openapi/);
-- endpoints diretos de pods, Services Kubernetes, bancos, filas, tópicos, Datadog Agent, collectors ou consoles administrativos.
+- endpoints diretos de pods, Services Kubernetes, bancos, filas, tópicos, collectors ou consoles administrativos.
 
 Se a demonstração precisar expor Swagger ou status publicamente, isso deve ser registrado como exceção temporária no `oficina-infra` e não como contrato permanente da API de negócio.
 

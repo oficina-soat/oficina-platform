@@ -46,41 +46,42 @@ EKS_CLUSTER_NAME=eks-lab
 K8S_NAMESPACE=default
 DEPLOYMENT_ENVIRONMENT=lab
 OTEL_RESOURCE_ATTRIBUTES=service.namespace=oficina,deployment.environment=lab
-OTEL_EXPORTER_OTLP_ENDPOINT=http://datadog-agent.datadog.svc.cluster.local:4317
+OTEL_EXPORTER_OTLP_ENDPOINT=http://nr-k8s-otel-collector-gateway.newrelic.svc.cluster.local:4317
 OTEL_EXPORTER_OTLP_PROTOCOL=grpc
 QUARKUS_OTEL_TRACES_EXPORTER=cdi
 OTEL_METRICS_EXPORTER=none
 OTEL_LOGS_EXPORTER=none
 ```
 
-### Observabilidade Datadog
+### Observabilidade New Relic
 
-O backend canônico para dashboards, alertas, logs, métricas e traces dos microsserviços é Datadog, conforme o [Padrão de Observabilidade Distribuída](observability.md).
+O backend canônico para dashboards, alertas, logs, métricas e traces dos microsserviços é New Relic, conforme o [Padrão de Observabilidade Distribuída](observability.md).
 
-A forma oficial de coleta do ambiente `lab` é Datadog Agent instalado por Helm no cluster EKS `eks-lab`, com OTLP/gRPC habilitado, coleta de logs dos pods e coleta das métricas expostas em `/q/metrics`.
+A forma oficial de coleta do ambiente `lab` é New Relic OpenTelemetry Collector instalado por Helm no cluster EKS `eks-lab`, com OTLP/gRPC habilitado para traces dos microsserviços, coleta de logs dos pods e coleta das métricas expostas em `/q/metrics`.
 
 Valores operacionais esperados no `oficina-infra`:
 
 ```text
-INSTALL_DATADOG_AGENT=false
-DATADOG_NAMESPACE=datadog
-DATADOG_HELM_RELEASE=datadog-agent
-DATADOG_LOCAL_SERVICE_NAME=datadog-agent
-DATADOG_API_KEY=<secret-github-ou-variavel-local-nao-versionada>
-DATADOG_API_KEY_SECRET_NAME=datadog-secret
-DATADOG_API_KEY_SECRET_KEY=api-key
-DATADOG_SITE=datadoghq.com
-OTEL_EXPORTER_OTLP_ENDPOINT=http://datadog-agent.datadog.svc.cluster.local:4317
+INSTALL_NEW_RELIC_OTEL_COLLECTOR=false
+NEW_RELIC_NAMESPACE=newrelic
+NEW_RELIC_OTEL_COLLECTOR_HELM_RELEASE=nr-k8s-otel-collector
+NEW_RELIC_OTEL_COLLECTOR_LOCAL_SERVICE_NAME=nr-k8s-otel-collector-gateway
+NEW_RELIC_LICENSE_KEY=<secret-github-ou-variavel-local-nao-versionada>
+NEW_RELIC_LICENSE_KEY_SECRET_NAME=new-relic-license-key
+NEW_RELIC_LICENSE_KEY_SECRET_KEY=licenseKey
+NEW_RELIC_CLUSTER_NAME=eks-lab
+NEW_RELIC_OTLP_ENDPOINT=https://otlp.nr-data.net
+OTEL_EXPORTER_OTLP_ENDPOINT=http://nr-k8s-otel-collector-gateway.newrelic.svc.cluster.local:4317
 OTEL_EXPORTER_OTLP_PROTOCOL=grpc
 ```
 
-`INSTALL_DATADOG_AGENT=false` mantém o deploy compatível com execuções sem conta Datadog. Para habilitar a coleta real no cluster, o ambiente de deploy deve definir `INSTALL_DATADOG_AGENT=true` e fornecer `DATADOG_API_KEY` como secret do GitHub Environment `lab` ou variável local segura.
+`INSTALL_NEW_RELIC_OTEL_COLLECTOR=false` mantém o deploy compatível com execuções sem conta New Relic. Para habilitar a coleta real no cluster, o ambiente de deploy deve definir `INSTALL_NEW_RELIC_OTEL_COLLECTOR=true` e fornecer `NEW_RELIC_LICENSE_KEY` como secret do GitHub Environment `lab` ou variável local segura.
 
-`DATADOG_SITE` usa `datadoghq.com` como padrão operacional, mas deve ser alterado quando a organização Datadog usar outro site. `DATADOG_API_KEY_SECRET_KEY` deve permanecer `api-key`, que é a chave esperada pelo chart Helm do Datadog no Secret Kubernetes `datadog-secret`.
+`NEW_RELIC_OTLP_ENDPOINT` usa `https://otlp.nr-data.net` como padrão operacional para contas New Relic nos Estados Unidos. Se a conta usar outra região, o endpoint deve ser alterado em conjunto com a configuração do collector no `oficina-infra`.
 
-Com os nomes padrão, os microsserviços devem apontar para `OTEL_EXPORTER_OTLP_ENDPOINT=http://datadog-agent.datadog.svc.cluster.local:4317`. Se `DATADOG_NAMESPACE` ou `DATADOG_LOCAL_SERVICE_NAME` forem alterados no `oficina-infra`, o endpoint OTLP propagado aos manifests dos microsserviços deve mudar de forma consistente.
+Com os nomes padrão, os microsserviços devem apontar para `OTEL_EXPORTER_OTLP_ENDPOINT=http://nr-k8s-otel-collector-gateway.newrelic.svc.cluster.local:4317`. Se `NEW_RELIC_NAMESPACE` ou `NEW_RELIC_OTEL_COLLECTOR_LOCAL_SERVICE_NAME` forem alterados no `oficina-infra`, o endpoint OTLP propagado aos manifests dos microsserviços deve mudar de forma consistente.
 
-A configuração executável do Agent fica no repositório de infraestrutura em [Datadog Agent no EKS lab](../../oficina-infra/docs/datadog-agent.md). Este repositório mantém os nomes canônicos e o contrato de runtime esperado pelos microsserviços.
+A configuração executável do collector fica no repositório de infraestrutura. Este repositório mantém os nomes canônicos e o contrato de runtime esperado pelos microsserviços.
 
 ### Credenciais AWS do GitHub Actions
 

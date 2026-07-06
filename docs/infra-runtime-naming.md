@@ -81,7 +81,7 @@ OTEL_EXPORTER_OTLP_PROTOCOL=grpc
 
 Com os nomes padrão, os microsserviços devem apontar para `OTEL_EXPORTER_OTLP_ENDPOINT=http://nr-k8s-otel-collector-gateway.newrelic.svc.cluster.local:4317`. Se `NEW_RELIC_NAMESPACE` ou `NEW_RELIC_OTEL_COLLECTOR_LOCAL_SERVICE_NAME` forem alterados no `oficina-infra`, o endpoint OTLP propagado aos manifests dos microsserviços deve mudar de forma consistente.
 
-A configuração executável do collector fica no repositório de infraestrutura. Este repositório mantém os nomes canônicos e o contrato de runtime esperado pelos microsserviços.
+A configuração executável do collector fica no repositório de infraestrutura em [New Relic OpenTelemetry Collector no EKS lab](../../oficina-infra/docs/new-relic-otel-collector.md). Este repositório mantém os nomes canônicos e o contrato de runtime esperado pelos microsserviços.
 
 ### Credenciais AWS do GitHub Actions
 

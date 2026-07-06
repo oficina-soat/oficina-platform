@@ -38,7 +38,7 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
 - Decisão de separar o código de infraestrutura no repositório unificado `oficina-infra`, consolidando as responsabilidades hoje distribuídas entre `oficina-infra-db` e `oficina-infra-k8s`, conforme [Escopo do Repositório Unificado de Infraestrutura](docs/infrastructure-repository-scope.md).
 - Rotas públicas do API Gateway definidas em [Rotas públicas do API Gateway](docs/api-gateway-public-routes.md): todas as APIs REST de negócio dos três microsserviços devem ser expostas pelo `eks-lab-http-api`, sem publicar endpoints operacionais como `/q/metrics`, `/q/health` e `/api/v1/status`.
 - Forma oficial de coleta New Relic definida como New Relic OpenTelemetry Collector instalado por Helm no cluster EKS `eks-lab`, com OTLP/gRPC, coleta de logs dos pods e coleta das métricas dos microsserviços.
-- Destino do baseline executável do New Relic OpenTelemetry Collector definido como `oficina-infra`, incluindo Helm values do ambiente `lab`, script de instalação, Secret Kubernetes esperado, endpoint OTLP/gRPC interno e integração opcional ao deploy.
+- Baseline executável do New Relic OpenTelemetry Collector criado no `oficina-infra`, com Helm values do ambiente `lab`, script de instalação, Secret Kubernetes esperado, endpoint OTLP/gRPC interno e integração opcional ao deploy.
 - Enunciado da Fase 4 incluído como referência normativa em [Enunciado Fase 4](docs/Enunciado%20Fase%204.md).
 - Contratos fundamentais criados para:
   - APIs REST;
@@ -212,8 +212,8 @@ Amazon DynamoDB
 **Etapas locais e pendências remotas para New Relic:**
 
 1. [x] Definir a forma de coleta oficial para o ambiente `lab`: New Relic OpenTelemetry Collector instalado por Helm no cluster EKS, preservando New Relic como backend canônico.
-2. [ ] Criar no `oficina-infra` os Helm values e scripts necessários para instalar o New Relic OpenTelemetry Collector no cluster `eks-lab`, incluindo Secret Kubernetes esperado, endpoint OTLP/gRPC interno, coleta de logs dos pods, métricas Prometheus e traces.
-3. [ ] Definir secrets e variáveis operacionais do New Relic no ambiente `lab`, incluindo `NEW_RELIC_LICENSE_KEY`, endpoint OTLP interno e integração com os nomes de runtime descritos em [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
+2. [x] Criar no `oficina-infra` os Helm values e scripts necessários para instalar o New Relic OpenTelemetry Collector no cluster `eks-lab`, incluindo Secret Kubernetes esperado, endpoint OTLP/gRPC interno, coleta de logs dos pods, métricas Prometheus e traces.
+3. [x] Definir secrets e variáveis operacionais do New Relic no ambiente `lab`, incluindo `NEW_RELIC_LICENSE_KEY`, endpoint OTLP interno e integração com os nomes de runtime descritos em [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
 4. Concluído localmente: `[D-OBS-IMPL-001]` propagar `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_PROTOCOL`, `OTEL_RESOURCE_ATTRIBUTES`, `DEPLOYMENT_ENVIRONMENT` e `OTEL_SERVICE_NAME` nos manifests dos três microsserviços.
 5. Concluído localmente: `[D-OBS-IMPL-002]` validar nos três microsserviços, por inspeção local e testes locais aplicáveis, a emissão de logs JSON, exposição de `/q/metrics`, health checks Quarkus e configuração de traces OpenTelemetry conforme [Validação local de observabilidade](docs/observability-local-validation.md).
 
@@ -515,7 +515,7 @@ Convenção de identificadores para itens abertos:
 - [x] Criar propagação de `correlationId`.
 - [x] Criar manifests Kubernetes base.
 - [x] Criar pipeline padrão de CI/CD.
-- [ ] `[D-NR-IMPL-001]` Criar baseline executável do New Relic no `oficina-infra` com New Relic OpenTelemetry Collector via Helm, Secret Kubernetes esperado, endpoint OTLP/gRPC interno e coleta de logs, métricas e traces.
+- [x] `[D-NR-IMPL-001]` Criar baseline executável do New Relic no `oficina-infra` com New Relic OpenTelemetry Collector via Helm, Secret Kubernetes esperado, endpoint OTLP/gRPC interno e coleta de logs, métricas e traces.
 - [x] `[D-OBS-IMPL-001]` Propagar `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_PROTOCOL`, `OTEL_RESOURCE_ATTRIBUTES`, `DEPLOYMENT_ENVIRONMENT` e `OTEL_SERVICE_NAME` nos manifests dos três microsserviços.
 - [x] `[D-OBS-IMPL-002]` Validar nos três microsserviços, por inspeção local e testes locais aplicáveis, a emissão de logs JSON, exposição de `/q/metrics`, health checks Quarkus e configuração de traces OpenTelemetry conforme [Validação local de observabilidade](docs/observability-local-validation.md).
 - [ ] `[D-AWS-IMPL-001]` Normalizar valores legados de conta, região e ambiente AWS nos repositórios antigos conforme [Conta, região e ambientes AWS](docs/aws-environments.md). Item adiado: por enquanto, `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` serão usados apenas como fonte de cópia; ajustes necessários no `oficina-auth-lambda` podem ser feitos diretamente nele.
@@ -598,7 +598,6 @@ O próximo passo para agentes deve priorizar itens `IMPL` abertos no [Backlog or
 
 A ordem local recomendada é:
 
-1. `[D-NR-IMPL-001]` Criar baseline executável do New Relic no `oficina-infra`.
-2. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
+1. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
 
 As validações remotas prioritárias, quando o ambiente externo estiver disponível, são `[B2-CI-REM-001]`, `[B2-CI-REM-002]`, `[B2-GH-REM-001]`, `[D-NR-REM-*]`, `[D-AWS-REM-001]`, `[D-API-REM-001]` e os itens `EVID` finais.

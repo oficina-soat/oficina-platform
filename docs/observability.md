@@ -68,7 +68,7 @@ Variáveis obrigatórias por microsserviço:
 
 O [template Quarkus](../templates/quarkus-service/README.md) já define essas chaves em `application.properties` e deve ser a referência inicial para novos repositórios.
 
-O endpoint OTLP interno, a instalação do New Relic OpenTelemetry Collector via Helm, a license key e qualquer secret necessário pertencem ao repositório de infraestrutura. Este repositório define apenas o contrato de runtime esperado pelos microsserviços e pelos manifests base.
+O endpoint OTLP interno, a instalação do New Relic OpenTelemetry Collector via Helm, a license key e qualquer secret necessário pertencem ao repositório de infraestrutura. A configuração executável fica em [New Relic OpenTelemetry Collector no EKS lab](../../oficina-infra/docs/new-relic-otel-collector.md). Este repositório define apenas o contrato de runtime esperado pelos microsserviços e pelos manifests base.
 
 Variáveis operacionais do collector no ambiente `lab`:
 

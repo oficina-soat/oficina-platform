@@ -547,7 +547,7 @@ Esta seção concentra tarefas que dependem de ambiente externo, credenciais adm
 
 ### Épico D — AWS, New Relic e entrega final
 
-- [ ] `[D-NR-REM-000]` Preparar o acesso New Relic antes da validação de observabilidade: confirmar a conta New Relic, gerar `NEW_RELIC_LICENSE_KEY`, configurar o secret no GitHub Environment `lab` ou no mecanismo seguro usado pelo `oficina-infra`, habilitar `INSTALL_NEW_RELIC_OTEL_COLLECTOR=true` para a execução remota e confirmar acesso ao contexto AWS/EKS do cluster `eks-lab`, conforme [Padrão de Observabilidade Distribuída](docs/observability.md) e [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
+- [ ] `[D-NR-REM-000]` Preparar o acesso New Relic antes da validação de observabilidade: confirmar a conta New Relic, gerar `NEW_RELIC_LICENSE_KEY`, configurar o secret no repositório ou na organização GitHub, habilitar `INSTALL_NEW_RELIC_OTEL_COLLECTOR=true` para a execução remota e confirmar acesso ao contexto AWS/EKS do cluster `eks-lab`, conforme [Padrão de Observabilidade Distribuída](docs/observability.md) e [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
 - [ ] `[D-NR-REM-001]` Instalar e validar o New Relic OpenTelemetry Collector no cluster `eks-lab` quando `NEW_RELIC_LICENSE_KEY` e contexto AWS/EKS estiverem disponíveis.
 - [ ] `[D-NR-REM-002]` Criar dashboards mínimos no New Relic para `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, filtrando por `service.name`, `service.namespace=oficina` e `deployment.environment=lab`.
 - [ ] `[D-NR-REM-003]` Criar visão adicional da Saga no New Relic para o `oficina-os-service`, cobrindo Sagas iniciadas, finalizadas, compensadas, em falha manual e duração por etapa.

@@ -60,7 +60,7 @@ Valores obrigatórios:
 | Região AWS | `us-east-1` |
 | Ambiente | `lab` |
 | Cluster EKS | `eks-lab` |
-| GitHub Environment | `lab` |
+| Escopo de configuração GitHub Actions | Secrets e variáveis de repositório ou organização |
 | Projeto | `oficina` |
 | Prefixo de secrets | `oficina/lab` |
 | State Terraform | `oficina/lab/infra/terraform.tfstate` |

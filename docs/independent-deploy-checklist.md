@@ -26,8 +26,8 @@ Antes de habilitar `ENABLE_IMAGE_PUBLISH=true` ou `ENABLE_K8S_DEPLOY=true` em um
 - [ ] o workflow `.github/workflows/service-ci.yml` deriva do [Template GitHub Actions para Microsserviços](../templates/github-actions/README.md);
 - [ ] `SERVICE_NAME` coincide com o nome canônico do repositório ou pode ser derivado do nome do repositório;
 - [ ] `MAVEN_PROFILE` está definido ou pode ser derivado como `postgresql` para `oficina-os-service` e `oficina-billing-service`, ou `dynamodb` para `oficina-execution-service`;
-- [ ] `AWS_REGION=us-east-1`, `EKS_CLUSTER_NAME=eks-lab` e `K8S_NAMESPACE=default` estão configurados no GitHub Environment `lab`;
-- [ ] `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` e `AWS_SESSION_TOKEN` estão disponíveis no GitHub Environment `lab`;
+- [ ] `AWS_REGION=us-east-1`, `EKS_CLUSTER_NAME=eks-lab` e `K8S_NAMESPACE=default` estão configurados como variáveis do repositório ou da organização;
+- [ ] `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` e `AWS_SESSION_TOKEN` estão disponíveis como secrets do repositório ou da organização;
 - [ ] `SONAR_TOKEN`, `SONAR_ORGANIZATION` e `SONAR_PROJECT_KEY` estão configurados quando o Quality Gate SonarCloud for usado como evidência da entrega;
 - [ ] o repositório ECR do serviço existe no `oficina-infra`;
 - [ ] o `Deployment` e o container Kubernetes usam exatamente o nome canônico do serviço;

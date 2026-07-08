@@ -121,8 +121,8 @@ Copiar workflows e scripts úteis dos repositórios antigos, adaptando nomes e v
 
 Critério de pronto:
 
-- Workflows usam o GitHub Environment `lab`.
-- Credenciais AWS vêm de secrets do environment, sem valores fixos.
+- Workflows não declaram GitHub Environment para evitar aprovações manuais.
+- Credenciais AWS vêm de secrets do repositório ou da organização, sem valores fixos.
 - Scripts possuem validação de shell.
 - Comandos de deploy, destroy, plan e validação estão documentados no `README.md` do `oficina-infra`.
 

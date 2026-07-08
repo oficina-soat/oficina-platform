@@ -75,7 +75,7 @@ Variáveis operacionais do collector no ambiente `lab`:
 | Variável | Valor esperado |
 |---|---|
 | `INSTALL_NEW_RELIC_OTEL_COLLECTOR` | `false` por padrão; `true` quando o deploy deve instalar ou atualizar o collector no cluster. |
-| `NEW_RELIC_LICENSE_KEY` | Secret externo ao repositório, informado no GitHub Environment `lab` ou localmente. |
+| `NEW_RELIC_LICENSE_KEY` | Secret externo ao repositório, informado como secret do repositório/organização ou localmente. |
 | `NEW_RELIC_NAMESPACE` | `newrelic`. |
 | `NEW_RELIC_OTEL_COLLECTOR_HELM_RELEASE` | `nr-k8s-otel-collector`. |
 | `NEW_RELIC_OTEL_COLLECTOR_LOCAL_SERVICE_NAME` | `nr-k8s-otel-collector-gateway`. |

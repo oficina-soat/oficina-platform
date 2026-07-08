@@ -25,7 +25,7 @@ O repositório destino deve possuir Maven Wrapper (`mvnw` e `.mvn/wrapper/`), se
 
 ## Variáveis e secrets
 
-Secrets obrigatórios no GitHub Environment `lab`:
+Secrets obrigatórios no repositório ou na organização GitHub:
 
 ```text
 AWS_ACCESS_KEY_ID
@@ -41,7 +41,7 @@ SONAR_TOKEN
 
 Quando `SONAR_TOKEN`, `SONAR_ORGANIZATION` e `SONAR_PROJECT_KEY` estiverem configurados, o workflow `service-ci.yml` executa a análise SonarCloud e falha se o Quality Gate não for aprovado. Quando algum desses valores estiver ausente, o workflow registra a ausência e continua com build, testes, contratos e cobertura JaCoCo. Essa tolerância evita exigir secrets novos para o pipeline básico, mas a ausência do Quality Gate deve ser registrada como pendência ou substituída por evidência equivalente na entrega final.
 
-Variáveis recomendadas no GitHub Environment `lab`:
+Variáveis recomendadas no repositório ou na organização GitHub:
 
 ```text
 AWS_REGION=us-east-1
@@ -69,6 +69,8 @@ As variáveis `ENABLE_IMAGE_PUBLISH` e `ENABLE_K8S_DEPLOY` controlam a separaç�
 - com `ENABLE_IMAGE_PUBLISH=true`, o push na `main` também consulta ECR, publica a imagem Docker quando necessário e cria release com metadados da imagem;
 - com `ENABLE_K8S_DEPLOY=true`, o push na `main` também consulta o Deployment no EKS e atualiza a imagem quando houver diferença;
 - em `workflow_dispatch`, os inputs `publish_image` e `deploy` permitem acionar manualmente publicação ou deploy mesmo com as variáveis desabilitadas.
+
+O workflow não declara GitHub Environment para evitar aprovações manuais nos jobs. Em trabalhos acadêmicos, o ponto de controle manual é o merge do PR para `main`: pushes em `develop` abrem ou atualizam automaticamente o PR, e a entrega em AWS só roda depois que esse PR é aceito.
 
 Enquanto a estratégia definitiva de manifestos Kubernetes por microsserviço estiver aberta, mantenha `ENABLE_K8S_DEPLOY=false`. O job de deploy deve ser habilitado somente quando os Deployments, containers, namespace, credenciais AWS e fonte canônica dos manifestos estiverem definidos no `oficina-infra` ou documentados no repositório do serviço.
 

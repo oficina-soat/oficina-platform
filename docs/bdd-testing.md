@@ -97,7 +97,7 @@ O pipeline deve falhar quando:
 
 - testes unitários, de integração, contrato ou BDD falharem;
 - cobertura JaCoCo ficar abaixo de 80%;
-- o Quality Gate do SonarCloud não for aprovado, quando a configuração SonarCloud estiver disponível.
+- o Quality Gate do SonarCloud não for aprovado em pull request, quando a configuração SonarCloud estiver disponível.
 
 ## Critérios de pronto
 
@@ -107,5 +107,5 @@ Um microsserviço atende a este padrão quando:
 - participa do cenário BDD completo da OS ou possui os steps necessários para o cenário distribuído;
 - mantém cobertura JaCoCo mínima de 80%;
 - publica evidência de cobertura no README ou no artefato de CI;
-- executa Quality Gate SonarCloud quando a configuração estiver disponível;
+- executa Quality Gate SonarCloud em pull requests quando a configuração estiver disponível;
 - valida contratos OpenAPI, schemas JSON de eventos, erro padronizado, idempotência e Saga quando aplicável.

@@ -39,7 +39,7 @@ Secret opcional para Quality Gate no SonarCloud:
 SONAR_TOKEN
 ```
 
-Quando `SONAR_TOKEN`, `SONAR_ORGANIZATION` e `SONAR_PROJECT_KEY` estiverem configurados, o workflow `service-ci.yml` executa a análise SonarCloud e falha se o Quality Gate não for aprovado. Quando algum desses valores estiver ausente, o workflow registra a ausência e continua com build, testes, contratos e cobertura JaCoCo. Essa tolerância evita exigir secrets novos para o pipeline básico, mas a ausência do Quality Gate deve ser registrada como pendência ou substituída por evidência equivalente na entrega final.
+Em pull requests, quando `SONAR_TOKEN`, `SONAR_ORGANIZATION` e `SONAR_PROJECT_KEY` estiverem configurados, o workflow `service-ci.yml` executa a análise SonarCloud e falha se o Quality Gate não for aprovado. Quando algum desses valores estiver ausente, o workflow registra a ausência e continua com build, testes, contratos e cobertura JaCoCo. Essa tolerância evita exigir secrets novos para o pipeline básico, mas a ausência do Quality Gate deve ser registrada como pendência ou substituída por evidência equivalente na entrega final.
 
 Variáveis recomendadas no repositório ou na organização GitHub:
 
@@ -65,7 +65,7 @@ Quando `SERVICE_NAME` não for informado, o workflow deriva o nome do repositór
 
 As variáveis `ENABLE_IMAGE_PUBLISH` e `ENABLE_K8S_DEPLOY` controlam a separação entre CI obrigatório e entrega em AWS:
 
-- com ambas desabilitadas, pull requests e pushes na `main` executam build Maven, testes, JaCoCo, validação de cobertura mínima e, quando configurado, Quality Gate, sem acessar ECR ou EKS;
+- com ambas desabilitadas, pull requests e pushes na `main` executam build Maven, testes, JaCoCo e validação de cobertura mínima sem acessar ECR ou EKS; pull requests também executam Quality Gate quando SonarCloud estiver configurado;
 - com `ENABLE_IMAGE_PUBLISH=true`, o push na `main` também consulta ECR, publica a imagem Docker quando necessário e cria release com metadados da imagem;
 - com `ENABLE_K8S_DEPLOY=true`, o push na `main` também consulta o Deployment no EKS e atualiza a imagem quando houver diferença;
 - em `workflow_dispatch`, os inputs `publish_image` e `deploy` permitem acionar manualmente publicação ou deploy mesmo com as variáveis desabilitadas.

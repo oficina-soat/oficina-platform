@@ -28,11 +28,13 @@ Se uma avaliação exigir arquivos Kubernetes dentro de cada repositório de mic
 | `oficina-billing-service` | [templates/kubernetes/base/oficina-billing-service/](../templates/kubernetes/base/oficina-billing-service/) | `../oficina-infra/k8s/base/microservices/oficina-billing-service/` |
 | `oficina-execution-service` | [templates/kubernetes/base/oficina-execution-service/](../templates/kubernetes/base/oficina-execution-service/) | `../oficina-infra/k8s/base/microservices/oficina-execution-service/` |
 
-O overlay do ambiente `lab` deve referenciar os manifests dos três serviços em:
+No `oficina-infra`, os manifests executáveis ficam materializados por serviço em:
 
 ```text
-../oficina-infra/k8s/overlays/lab/kustomization.yaml
+../oficina-infra/k8s/base/microservices/<nome-do-servico>/
 ```
+
+O overlay `lab` permanece responsável por componentes compartilhados do cluster. A aplicação dos microsserviços é feita por `../oficina-infra/scripts/manual/apply-microservices.sh`, que gera um `kustomization.yaml` temporário com os serviços selecionados, substitui a imagem ECR e os valores de autenticação e aplica apenas os serviços com imagem disponível.
 
 ## Regras de ownership
 
@@ -41,7 +43,7 @@ O overlay do ambiente `lab` deve referenciar os manifests dos três serviços em
 | Convenções de recursos Kubernetes | `oficina-platform` | Definidas no [Template Kubernetes Base](../templates/kubernetes/base/README.md). |
 | Manifests executáveis de deploy | `oficina-infra` | Adaptam os templates para o ambiente `lab`, imagens ECR, overlays, secrets e integração com EKS. |
 | Dockerfile | Repositório do microsserviço | Cada serviço mantém seu próprio build de imagem. |
-| Workflow de deploy | Repositório do microsserviço | Publica imagem e atualiza Deployment somente quando `ENABLE_K8S_DEPLOY=true`. |
+| Workflow de deploy | Repositório do microsserviço | Publica imagem, cria release e materializa ou atualiza o Deployment do próprio serviço somente quando `ENABLE_K8S_DEPLOY=true`. |
 | Valores sensíveis | `oficina-infra` e AWS | Não devem ser copiados para `oficina-platform` nem para os repositórios dos serviços. |
 | Evidência para entrega | README do microsserviço | Deve apontar para o template e para o destino canônico no `oficina-infra`. |
 
@@ -49,15 +51,14 @@ O overlay do ambiente `lab` deve referenciar os manifests dos três serviços em
 
 O job de deploy dos microsserviços só deve ser habilitado quando as seguintes condições estiverem atendidas:
 
-- o Deployment do serviço existir no cluster `eks-lab`;
 - o nome do Deployment e do container for igual ao nome canônico do serviço;
 - o manifest executável estiver materializado no `oficina-infra`;
-- o overlay `lab` renderizar sem erro;
-- os secrets e ConfigMaps esperados pelo serviço estiverem disponíveis;
+- o script `scripts/manual/apply-microservices.sh` do `oficina-infra` conseguir criar ou atualizar os secrets e ConfigMaps esperados pelo serviço;
 - a imagem ECR do serviço puder ser publicada pelo workflow;
+- o workflow do serviço conseguir fazer checkout do `oficina-infra`;
 - `ENABLE_K8S_DEPLOY=true` estiver configurado no repositório do microsserviço.
 
-Enquanto essas condições não estiverem atendidas, o workflow deve continuar executando CI e publicação opcional de imagem sem acionar deploy Kubernetes. Quando `ENABLE_K8S_DEPLOY=true`, mas o `Deployment` ainda não existir no cluster, o workflow deve reportar a pré-condição ausente e pular o rollout sem executar `kubectl set image`.
+Enquanto essas condições não estiverem atendidas, o workflow deve continuar executando CI e publicação opcional de imagem sem acionar deploy Kubernetes. Quando `ENABLE_K8S_DEPLOY=true`, mas o `Deployment` ainda não existir no cluster, o workflow deve criar o recurso a partir do manifest canônico do `oficina-infra`, aguardar o rollout e conferir se a imagem final do container é a imagem publicada pelo próprio workflow.
 
 ## Validação esperada
 
@@ -67,9 +68,10 @@ No `oficina-platform`, validar os templates:
 kubectl kustomize templates/kubernetes/base
 ```
 
-No `oficina-infra`, validar o overlay executável:
+No `oficina-infra`, validar a base de microsserviços e o overlay compartilhado:
 
 ```bash
+kubectl kustomize k8s/base/microservices
 kubectl kustomize k8s/overlays/lab
 ```
 

@@ -168,6 +168,7 @@ Este projeto depende de versionamento explícito dos contratos e decisões para 
 - Preserve compatibilidade com contratos já publicados, salvo alteração deliberada e documentada.
 - Mudanças incompatíveis em eventos devem incrementar `eventVersion` ou documentar a estratégia de migração.
 - Mudanças incompatíveis em APIs devem preservar versionamento por URI, atualmente `/api/v1`, ou documentar nova versão.
+- Ao fazer alterações relevantes em repositórios de microsserviço, verifique o `project.version` no `pom.xml` antes do commit. Não deixe versões `*-SNAPSHOT` em mudanças prontas para merge, publicação de imagem, release ou deploy; feche a versão no mesmo escopo da alteração ou incremente para uma nova versão fechada quando a mudança exigir novo artefato publicável.
 - Ao identificar necessidade de alterar decisões arquiteturais, sugira a mudança e aguarde avaliação do usuário antes de criar ou alterar ADRs.
 - Ao alterar padrões que impactem microsserviços ou infraestrutura, confirme se templates, contratos e documentação precisam ser atualizados.
 - Não introduza mudanças que exijam intervenção manual implícita sem registrar isso no repositório.

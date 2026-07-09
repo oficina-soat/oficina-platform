@@ -124,6 +124,12 @@ Para mudanças em OpenAPI YAML:
 find contracts/openapi -name '*.yaml' -print
 ```
 
+Para mudanças em YAML, use `yq` como ferramenta padrão de parse e validação sintática:
+
+```bash
+find . -path ./.git -prune -o \( -name '*.yaml' -o -name '*.yml' \) -print0 | xargs -0 yq e '.' >/dev/null
+```
+
 Para mudanças em JSON Schema:
 
 ```bash

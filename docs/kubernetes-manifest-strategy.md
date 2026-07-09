@@ -43,22 +43,22 @@ O overlay `lab` permanece responsável por componentes compartilhados do cluster
 | Convenções de recursos Kubernetes | `oficina-platform` | Definidas no [Template Kubernetes Base](../templates/kubernetes/base/README.md). |
 | Manifests executáveis de deploy | `oficina-infra` | Adaptam os templates para o ambiente `lab`, imagens ECR, overlays, secrets e integração com EKS. |
 | Dockerfile | Repositório do microsserviço | Cada serviço mantém seu próprio build de imagem. |
-| Workflow de deploy | Repositório do microsserviço | Publica imagem, cria release e materializa ou atualiza o Deployment do próprio serviço somente quando `ENABLE_K8S_DEPLOY=true`. |
+| Workflow de deploy | Repositório do microsserviço | Publica imagem, cria release e materializa ou atualiza o Deployment do próprio serviço por padrão, salvo quando `ENABLE_K8S_DEPLOY=false`. |
 | Valores sensíveis | `oficina-infra` e AWS | Não devem ser copiados para `oficina-platform` nem para os repositórios dos serviços. |
 | Evidência para entrega | README do microsserviço | Deve apontar para o template e para o destino canônico no `oficina-infra`. |
 
-## Habilitação do deploy automatizado
+## Deploy automatizado
 
-O job de deploy dos microsserviços só deve ser habilitado quando as seguintes condições estiverem atendidas:
+O job de deploy dos microsserviços fica ativo por padrão no push para `main` e deve ser mantido assim quando as seguintes condições estiverem atendidas:
 
 - o nome do Deployment e do container for igual ao nome canônico do serviço;
 - o manifest executável estiver materializado no `oficina-infra`;
 - o script `scripts/manual/apply-microservices.sh` do `oficina-infra` conseguir criar ou atualizar os secrets e ConfigMaps esperados pelo serviço;
 - a imagem ECR do serviço puder ser publicada pelo workflow;
 - o workflow do serviço conseguir fazer checkout do `oficina-infra`;
-- `ENABLE_K8S_DEPLOY=true` estiver configurado no repositório do microsserviço.
+- `ENABLE_K8S_DEPLOY` não estiver configurado como `false` no repositório do microsserviço.
 
-Enquanto essas condições não estiverem atendidas, o workflow deve continuar executando CI e publicação opcional de imagem sem acionar deploy Kubernetes. Quando `ENABLE_K8S_DEPLOY=true`, mas o `Deployment` ainda não existir no cluster, o workflow deve criar o recurso a partir do manifest canônico do `oficina-infra`, aguardar o rollout e conferir se a imagem final do container é a imagem publicada pelo próprio workflow.
+Enquanto essas condições não estiverem atendidas, configure `ENABLE_K8S_DEPLOY=false` para manter o workflow executando CI e publicação opcional de imagem sem acionar deploy Kubernetes. Quando `ENABLE_K8S_DEPLOY` não é `false`, mas o `Deployment` ainda não existir no cluster, o workflow deve criar o recurso a partir do manifest canônico do `oficina-infra`, aguardar o rollout e conferir se a imagem final do container é a imagem publicada pelo próprio workflow.
 
 ## Validação esperada
 

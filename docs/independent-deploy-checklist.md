@@ -20,7 +20,7 @@ O deploy independente significa que cada serviço pode publicar nova imagem, atu
 
 ## Pré-condições
 
-Antes de habilitar `ENABLE_IMAGE_PUBLISH=true` ou `ENABLE_K8S_DEPLOY=true` em um repositório de microsserviço, confirmar:
+Antes de manter `ENABLE_IMAGE_PUBLISH` e `ENABLE_K8S_DEPLOY` ativos por padrão em um repositório de microsserviço, confirmar:
 
 - [ ] a branch `main` está protegida conforme [Proteção da branch main dos microsserviços](github-branch-protection.md);
 - [ ] o workflow `.github/workflows/service-ci.yml` deriva do [Template GitHub Actions para Microsserviços](../templates/github-actions/README.md);
@@ -59,9 +59,9 @@ Para cada alteração candidata a deploy:
 6. No push da `main`, confirmar que o workflow:
    - [ ] rejeitou versão `SNAPSHOT`;
    - [ ] resolveu a tag `v<project.version>`;
-   - [ ] publicou imagem no ECR quando `ENABLE_IMAGE_PUBLISH=true`;
+   - [ ] publicou imagem no ECR quando `ENABLE_IMAGE_PUBLISH` não é `false`;
    - [ ] criou GitHub Release quando a release ainda não existia;
-   - [ ] atualizou somente o `Deployment` do serviço quando `ENABLE_K8S_DEPLOY=true`;
+   - [ ] atualizou somente o `Deployment` do serviço quando `ENABLE_K8S_DEPLOY` não é `false`;
    - [ ] validou rollout do `Deployment`.
 7. Registrar a URL do workflow, tag, digest da imagem e release no [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md), quando a validação for usada como evidência final.
 

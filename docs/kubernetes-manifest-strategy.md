@@ -57,7 +57,7 @@ O job de deploy dos microsserviços só deve ser habilitado quando as seguintes 
 - a imagem ECR do serviço puder ser publicada pelo workflow;
 - `ENABLE_K8S_DEPLOY=true` estiver configurado no repositório do microsserviço.
 
-Enquanto essas condições não estiverem atendidas, o workflow deve continuar executando CI, Quality Gate quando configurado e publicação opcional de imagem sem acionar deploy Kubernetes.
+Enquanto essas condições não estiverem atendidas, o workflow deve continuar executando CI e publicação opcional de imagem sem acionar deploy Kubernetes. Quando `ENABLE_K8S_DEPLOY=true`, mas o `Deployment` ainda não existir no cluster, o workflow deve reportar a pré-condição ausente e pular o rollout sem executar `kubectl set image`.
 
 ## Validação esperada
 

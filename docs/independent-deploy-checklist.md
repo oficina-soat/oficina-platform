@@ -28,7 +28,7 @@ Antes de habilitar `ENABLE_IMAGE_PUBLISH=true` ou `ENABLE_K8S_DEPLOY=true` em um
 - [ ] `MAVEN_PROFILE` está definido ou pode ser derivado como `postgresql` para `oficina-os-service` e `oficina-billing-service`, ou `dynamodb` para `oficina-execution-service`;
 - [ ] `AWS_REGION=us-east-1`, `EKS_CLUSTER_NAME=eks-lab` e `K8S_NAMESPACE=default` estão configurados como variáveis do repositório ou da organização;
 - [ ] `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` e `AWS_SESSION_TOKEN` estão disponíveis como secrets do repositório ou da organização;
-- [ ] `SONAR_TOKEN`, `SONAR_ORGANIZATION` e `SONAR_PROJECT_KEY` estão configurados quando o Quality Gate SonarCloud for usado como evidência da entrega;
+- [ ] SonarCloud Automatic Analysis ou check externo equivalente está configurado quando o Quality Gate SonarCloud for usado como evidência da entrega;
 - [ ] o repositório ECR do serviço existe no `oficina-infra`;
 - [ ] o `Deployment` e o container Kubernetes usam exatamente o nome canônico do serviço;
 - [ ] os manifests executáveis estão materializados no `../oficina-infra/k8s/base/microservices/<servico>/` e referenciados pelo overlay `../oficina-infra/k8s/overlays/lab/`;
@@ -53,7 +53,7 @@ Para cada alteração candidata a deploy:
 
 1. Abrir PR no repositório do microsserviço.
 2. Confirmar aprovação e execução bem-sucedida do check `service-ci-validate`.
-3. Confirmar Quality Gate aprovado quando SonarCloud estiver configurado.
+3. Confirmar Quality Gate externo aprovado quando SonarCloud estiver configurado.
 4. Atualizar `project.version` no `pom.xml` quando a mudança exigir nova imagem, release ou rollout.
 5. Fazer merge na `main`.
 6. No push da `main`, confirmar que o workflow:
@@ -112,7 +112,7 @@ Para cada deploy usado como evidência final, registrar:
 |---|---|
 | PR aprovado | README do serviço ou [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md) |
 | Check `service-ci-validate` aprovado | README do serviço ou checklist final |
-| Quality Gate e cobertura | README do serviço ou checklist final |
+| Quality Gate externo e cobertura | README do serviço ou checklist final |
 | Tag GitHub Release | README do serviço ou checklist final |
 | URI ou digest da imagem ECR | README do serviço ou checklist final |
 | Rollout Kubernetes | README do serviço ou checklist final |
@@ -124,7 +124,7 @@ Para cada deploy usado como evidência final, registrar:
 O deploy independente de um serviço está pronto quando:
 
 - a mudança passou por PR protegido;
-- CI, testes, cobertura e Quality Gate foram aprovados;
+- CI, testes, cobertura e Quality Gate externo foram aprovados quando aplicável;
 - imagem versionada foi publicada no ECR;
 - apenas o `Deployment` do serviço foi atualizado;
 - rollout e smoke test passaram;

@@ -38,7 +38,7 @@ Cada repositório de microsserviço deve possuir:
 - [ ] proteção da branch `main` com PR obrigatório e checagens automáticas;
 - [ ] testes unitários e de integração;
 - [ ] evidência de cobertura mínima de 80%, conforme [Padrão BDD, Cobertura e Qualidade](bdd-testing.md);
-- [ ] Quality Gate SonarCloud ou equivalente aprovado;
+- [ ] Quality Gate SonarCloud externo ou equivalente aprovado;
 - [ ] link para Swagger, OpenAPI ou collection Postman atualizada;
 - [ ] autenticação JWT configurada conforme contratos da suíte;
 - [ ] tratamento de erros conforme [Contrato de Erros REST](../contracts/error-model.md);
@@ -71,7 +71,7 @@ O vídeo de até 15 minutos deve demonstrar:
 - [ ] Saga finalizada com sucesso, incluindo eventos `ordemDeServicoCriada`, `diagnosticoFinalizado`, `orcamentoGerado`, `orcamentoAprovado`, `execucaoFinalizada`, `pagamentoConfirmado`, `ordemDeServicoEntregue` e `sagaFinalizadaComSucesso`;
 - [ ] falha tratável com compensação, resultando em `sagaCompensada`;
 - [ ] execução de testes e evidência de cobertura mínima de 80%;
-- [ ] Quality Gate aprovado quando SonarCloud estiver configurado, ou pendência/evidência alternativa registrada;
+- [ ] Quality Gate externo aprovado quando SonarCloud estiver configurado, ou pendência/evidência alternativa registrada;
 - [ ] deploy automatizado de pelo menos um microsserviço em Kubernetes;
 - [ ] rastreamento distribuído com `correlationId` em logs e traces;
 - [ ] consulta de Swagger/OpenAPI ou collection Postman atualizada.

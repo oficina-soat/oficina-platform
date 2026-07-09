@@ -8,7 +8,7 @@ Template padrão de CI/CD para os repositórios:
 - `oficina-billing-service`
 - `oficina-execution-service`
 
-Este template implementa a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md), usando GitHub Actions, SonarCloud, Amazon ECR, Amazon EKS e o ambiente canônico `lab` definido em [Conta, região e ambientes AWS](../../docs/aws-environments.md) e [Nomes de runtime, secrets e infraestrutura](../../docs/infra-runtime-naming.md).
+Este template implementa a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md), usando GitHub Actions, SonarCloud Automatic Analysis, Amazon ECR, Amazon EKS e o ambiente canônico `lab` definido em [Conta, região e ambientes AWS](../../docs/aws-environments.md) e [Nomes de runtime, secrets e infraestrutura](../../docs/infra-runtime-naming.md).
 
 ## Como usar
 
@@ -33,13 +33,7 @@ AWS_SECRET_ACCESS_KEY
 AWS_SESSION_TOKEN
 ```
 
-Secret opcional para Quality Gate no SonarCloud:
-
-```text
-SONAR_TOKEN
-```
-
-Em pull requests, quando `SONAR_TOKEN`, `SONAR_ORGANIZATION` e `SONAR_PROJECT_KEY` estiverem configurados, o workflow `service-ci.yml` executa a análise SonarCloud e falha se o Quality Gate não for aprovado. Quando algum desses valores estiver ausente, o workflow registra a ausência e continua com build, testes, contratos e cobertura JaCoCo. Essa tolerância evita exigir secrets novos para o pipeline básico, mas a ausência do Quality Gate deve ser registrada como pendência ou substituída por evidência equivalente na entrega final.
+O workflow não executa `sonar:sonar` nem exige secrets `SONAR_*`. A análise SonarCloud deve ser configurada fora do GitHub Actions, usando Automatic Analysis no projeto SonarCloud ou integração equivalente definida no próprio Sonar. Quando o Quality Gate for usado como evidência, trate o status emitido pelo SonarCloud como check externo ou registre a evidência no checklist da entrega.
 
 Variáveis recomendadas no repositório ou na organização GitHub:
 
@@ -55,8 +49,6 @@ Variáveis opcionais por repositório:
 SERVICE_NAME=<nome-canonico-do-microsservico>
 MAVEN_PROFILE=postgresql|dynamodb
 ECR_REPOSITORY_NAME=<nome-do-repositorio-ecr>
-SONAR_ORGANIZATION=<organizacao-sonarcloud>
-SONAR_PROJECT_KEY=<project-key-sonarcloud>
 ENABLE_IMAGE_PUBLISH=false|true
 ENABLE_K8S_DEPLOY=false|true
 ```
@@ -65,7 +57,7 @@ Quando `SERVICE_NAME` não for informado, o workflow deriva o nome do repositór
 
 As variáveis `ENABLE_IMAGE_PUBLISH` e `ENABLE_K8S_DEPLOY` controlam a separação entre CI obrigatório e entrega em AWS:
 
-- com ambas desabilitadas, pull requests e pushes na `main` executam build Maven, testes, JaCoCo e validação de cobertura mínima sem acessar ECR ou EKS; pull requests também executam Quality Gate quando SonarCloud estiver configurado;
+- com ambas desabilitadas, pull requests e pushes na `main` executam build Maven, testes, JaCoCo e validação de cobertura mínima sem acessar ECR ou EKS;
 - com `ENABLE_IMAGE_PUBLISH=true`, o push na `main` também consulta ECR, publica a imagem Docker quando necessário e cria release com metadados da imagem;
 - com `ENABLE_K8S_DEPLOY=true`, o push na `main` também consulta o Deployment no EKS e atualiza a imagem quando houver diferença;
 - em `workflow_dispatch`, os inputs `publish_image` e `deploy` permitem acionar manualmente publicação ou deploy mesmo com as variáveis desabilitadas.
@@ -80,12 +72,11 @@ Pull Requests executam:
 
 - build Maven;
 - testes unitários, integração, contrato e BDD;
-- relatório JaCoCo com cobertura mínima de 80%;
-- análise SonarCloud com Quality Gate quando `SONAR_TOKEN`, `SONAR_ORGANIZATION` e `SONAR_PROJECT_KEY` estiverem configurados.
+- relatório JaCoCo com cobertura mínima de 80%.
 
 O job obrigatório para proteção da branch `main` chama-se `service-ci-validate`, conforme a política em [Proteção da branch main dos microsserviços](../../docs/github-branch-protection.md).
 
-Pushes na branch `develop` executam o workflow auxiliar `open-pr-to-main.yml`, que valida build Maven, testes e contratos antes de criar ou atualizar o PR para `main`. Esse workflow não executa SonarCloud para evitar análise de branch na automação de preparação do PR; o Quality Gate é executado pelo `service-ci.yml` no Pull Request para `main` quando a configuração SonarCloud estiver disponível.
+Pushes na branch `develop` executam o workflow auxiliar `open-pr-to-main.yml`, que valida build Maven, testes e contratos antes de criar ou atualizar o PR para `main`. Nenhum workflow deste template aciona análise SonarCloud; o projeto SonarCloud deve usar Automatic Analysis ou integração externa própria.
 
 O workflow auxiliar pode preparar PR com `project.version` em `SNAPSHOT`, porque ele não publica imagem, release ou deploy. Versões `SNAPSHOT` continuam bloqueadas no fluxo de publicação/deploy da `main`, quando `ENABLE_IMAGE_PUBLISH`, `ENABLE_K8S_DEPLOY` ou os inputs manuais correspondentes estiverem habilitados.
 
@@ -99,6 +90,8 @@ Merges na `main` podem executar também, quando as variáveis de habilitação e
 - criação de GitHub Release com metadados da imagem;
 - atualização da imagem no `Deployment` Kubernetes do serviço;
 - validação do rollout no Amazon EKS.
+
+Quando `ENABLE_K8S_DEPLOY=true`, mas o `Deployment` do serviço ainda não existir no cluster, o workflow informa a ausência do manifest executável e pula o rollout. A publicação de imagem e release continua podendo ocorrer; o deploy Kubernetes só atualiza imagem quando o recurso já foi materializado pelo `oficina-infra`.
 
 O fluxo preserva o padrão do `oficina-app`: a imagem publicada usa a tag de `project.version`; versões `SNAPSHOT` não podem ser publicadas nem implantadas pela `main`; e uma mudança publicável em `main` deve incrementar `project.version` quando exigir nova imagem ou release.
 

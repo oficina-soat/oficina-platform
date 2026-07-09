@@ -64,7 +64,7 @@ As variáveis `ENABLE_IMAGE_PUBLISH` e `ENABLE_K8S_DEPLOY` controlam a separaç�
 
 O workflow não declara GitHub Environment para evitar aprovações manuais nos jobs. Em trabalhos acadêmicos, o ponto de controle manual é o merge do PR para `main`: pushes em `develop` abrem ou atualizam automaticamente o PR, e a entrega em AWS só roda depois que esse PR é aceito.
 
-Enquanto a estratégia definitiva de manifestos Kubernetes por microsserviço estiver aberta, mantenha `ENABLE_K8S_DEPLOY=false`. O job de deploy deve ser habilitado somente quando os Deployments, containers, namespace, credenciais AWS e fonte canônica dos manifestos estiverem definidos no `oficina-infra` ou documentados no repositório do serviço.
+Antes de habilitar `ENABLE_K8S_DEPLOY=true`, confirme que os Deployments, containers, namespace, credenciais AWS e fonte canônica dos manifests estão definidos no `oficina-infra`. O primeiro Deployment de cada microsserviço deve ser materializado pelo deploy da infraestrutura depois que a imagem do serviço existir no ECR; o workflow do serviço atualiza imagens de Deployments já existentes.
 
 ## Fluxo
 
@@ -91,7 +91,7 @@ Merges na `main` podem executar também, quando as variáveis de habilitação e
 - atualização da imagem no `Deployment` Kubernetes do serviço;
 - validação do rollout no Amazon EKS.
 
-Quando `ENABLE_K8S_DEPLOY=true`, mas o `Deployment` do serviço ainda não existir no cluster, o workflow informa a ausência do manifest executável e pula o rollout. A publicação de imagem e release continua podendo ocorrer; o deploy Kubernetes só atualiza imagem quando o recurso já foi materializado pelo `oficina-infra`.
+Quando `ENABLE_K8S_DEPLOY=true`, mas o `Deployment` do serviço ainda não existir no cluster, o workflow reporta a pré-condição ausente e falha depois da etapa de publicação de imagem/release quando aplicável. Garanta que a imagem exista no ECR e execute o `Deploy Lab` do `oficina-infra` para materializar o manifest inicial; depois disso, o deploy do serviço atualiza a imagem e valida o rollout.
 
 O fluxo preserva o padrão do `oficina-app`: a imagem publicada usa a tag de `project.version`; versões `SNAPSHOT` não podem ser publicadas nem implantadas pela `main`; e uma mudança publicável em `main` deve incrementar `project.version` quando exigir nova imagem ou release.
 

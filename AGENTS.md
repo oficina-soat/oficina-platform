@@ -138,6 +138,17 @@ find contracts/events -name '*.schema.json' -print
 
 Use validações adicionais quando houver ferramentas disponíveis no repositório ou quando a mudança afetar contratos executáveis, exemplos JSON, OpenAPI, schemas de eventos, templates, CI/CD ou Kubernetes.
 
+Ferramentas complementares recomendadas estão documentadas em [Ferramentas de validação local](docs/validation-tooling.md). Quando estiverem disponíveis, execute as validações proporcionais ao escopo:
+
+- alterações em GitHub Actions: `actionlint`;
+- alterações em scripts shell: `bash -n`, `shellcheck` e `shfmt -d`;
+- alterações em Terraform: `terraform fmt -check -recursive`, `terraform validate` ou o script equivalente do repositório, e `tflint`;
+- alterações em Dockerfile: `hadolint Dockerfile`;
+- alterações em Kubernetes ou Kustomize: `kubectl kustomize`, validação YAML com `yq` e `kubeconform -strict -summary`;
+- investigação de CI/CD remoto: prefira `gh` autenticado para consultar runs, jobs e logs antes de inferir a causa.
+
+Se uma ferramenta complementar esperada não estiver instalada, registre isso na resposta final e execute a melhor validação equivalente disponível.
+
 Antes de criar commit, execute uma revisão anti-divergência proporcional ao escopo da alteração. O objetivo é garantir que a mudança não introduziu divergência nova em relação ao estado anterior sem também resolvê-la no mesmo commit.
 
 Regras para a revisão anti-divergência:

@@ -36,6 +36,7 @@ O planejamento incremental da plataforma, incluindo lacunas restantes e backlog 
 - [Runbooks operacionais mínimos](docs/operational-runbooks.md)
 - [Padrão Outbox por serviço](docs/outbox-pattern.md)
 - [Padrão BDD, cobertura e qualidade](docs/bdd-testing.md)
+- [Ferramentas de validação local](docs/validation-tooling.md)
 - [Fluxos da Saga da Ordem de Serviço](docs/saga-flows.md)
 - [Padrão DynamoDB do oficina-execution-service](docs/dynamodb-execution-service.md)
 - [Checklist de deploy independente](docs/independent-deploy-checklist.md)

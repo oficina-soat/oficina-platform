@@ -82,6 +82,7 @@ Variáveis operacionais do collector no ambiente `lab`:
 | `NEW_RELIC_LICENSE_KEY_SECRET_NAME` | `new-relic-license-key`. |
 | `NEW_RELIC_LICENSE_KEY_SECRET_KEY` | `licenseKey`. |
 | `NEW_RELIC_CLUSTER_NAME` | `eks-lab`. |
+| `NEW_RELIC_REGION` | `US`, salvo conta New Relic em outra região. |
 | `NEW_RELIC_OTLP_ENDPOINT` | `https://otlp.nr-data.net`, salvo conta New Relic em outra região. |
 
 ## Identificadores Transversais

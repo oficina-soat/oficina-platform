@@ -70,6 +70,7 @@ NEW_RELIC_LICENSE_KEY=<secret-github-ou-variavel-local-nao-versionada>
 NEW_RELIC_LICENSE_KEY_SECRET_NAME=new-relic-license-key
 NEW_RELIC_LICENSE_KEY_SECRET_KEY=licenseKey
 NEW_RELIC_CLUSTER_NAME=eks-lab
+NEW_RELIC_REGION=US
 NEW_RELIC_OTLP_ENDPOINT=https://otlp.nr-data.net
 OTEL_EXPORTER_OTLP_ENDPOINT=http://nr-k8s-otel-collector-gateway.newrelic.svc.cluster.local:4317
 OTEL_EXPORTER_OTLP_PROTOCOL=grpc
@@ -77,7 +78,7 @@ OTEL_EXPORTER_OTLP_PROTOCOL=grpc
 
 `INSTALL_NEW_RELIC_OTEL_COLLECTOR=auto` mantém o deploy compatível com execuções sem conta New Relic e instala o collector automaticamente quando `NEW_RELIC_LICENSE_KEY` existe como secret do repositório/organização ou variável local segura. Use `INSTALL_NEW_RELIC_OTEL_COLLECTOR=false` para desabilitar explicitamente a etapa, ou `true` para exigir a instalação e falhar cedo quando a license key necessária não estiver disponível.
 
-`NEW_RELIC_OTLP_ENDPOINT` usa `https://otlp.nr-data.net` como padrão operacional para contas New Relic nos Estados Unidos. Se a conta usar outra região, o endpoint deve ser alterado em conjunto com a configuração do collector no `oficina-infra`.
+`NEW_RELIC_REGION=US` e `NEW_RELIC_OTLP_ENDPOINT=https://otlp.nr-data.net` são os padrões operacionais para contas New Relic nos Estados Unidos. Se a conta usar outra região, `NEW_RELIC_REGION` e o endpoint externo devem ser alterados em conjunto na configuração do collector no `oficina-infra`.
 
 Com os nomes padrão, os microsserviços devem apontar para `OTEL_EXPORTER_OTLP_ENDPOINT=http://nr-k8s-otel-collector-gateway.newrelic.svc.cluster.local:4317`. Se `NEW_RELIC_NAMESPACE` ou `NEW_RELIC_OTEL_COLLECTOR_LOCAL_SERVICE_NAME` forem alterados no `oficina-infra`, o endpoint OTLP propagado aos manifests dos microsserviços deve mudar de forma consistente.
 

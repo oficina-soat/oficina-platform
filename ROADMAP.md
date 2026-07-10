@@ -247,9 +247,9 @@ contracts/idempotency.md
 
 ### 12. BDD, cobertura e qualidade de código
 
-**Situação atual:** o padrão BDD, cobertura e qualidade foi definido em [Padrão BDD, Cobertura e Qualidade](docs/bdd-testing.md), com Cucumber JVM, JUnit Platform, JaCoCo com mínimo de 80% e Quality Gate SonarCloud obrigatório no CI. O cenário BDD da Saga está implementado no `oficina-os-service` e foi verificado localmente em 2026-07-04 com `./mvnw -B -Dtest=RunCucumberTest test`, cobrindo caminho feliz e falha compensada. A evidência remota do BDD no CI foi confirmada em 2026-07-10 pelo workflow `Service CI/CD` em `main` do `oficina-os-service` no [run 29116182460](https://github.com/oficina-soat/oficina-os-service/actions/runs/29116182460).
+**Situação atual:** o padrão BDD, cobertura e qualidade foi definido em [Padrão BDD, Cobertura e Qualidade](docs/bdd-testing.md), com Cucumber JVM, JUnit Platform, JaCoCo com mínimo de 80% e Quality Gate SonarCloud obrigatório no CI. O cenário BDD da Saga está implementado no `oficina-os-service` e foi verificado localmente em 2026-07-04 com `./mvnw -B -Dtest=RunCucumberTest test`, cobrindo caminho feliz e falha compensada. A evidência remota do BDD no CI foi confirmada em 2026-07-10 pelo workflow `Service CI/CD` em `main` do `oficina-os-service` no [run 29116182460](https://github.com/oficina-soat/oficina-os-service/actions/runs/29116182460). Os checks externos `SonarCloud Code Analysis` dos três microsserviços também foram confirmados em 2026-07-10 com conclusão `success`, e os jobs `service-ci-validate` dos três repositórios validaram o ciclo Maven com JaCoCo.
 
-**Definição faltante:** registrar evidências remotas restantes de cobertura e Quality Gate no [Checklist Final de Entrega da Fase 4](docs/phase-4-delivery-checklist.md) quando os pipelines finais forem homologados.
+**Definição fechada:** as evidências remotas de BDD, cobertura mínima e Quality Gate foram registradas no roadmap. O [Checklist Final de Entrega da Fase 4](docs/phase-4-delivery-checklist.md) ainda deve receber os links finais consolidados quando o documento de entrega for preenchido.
 
 **Artefatos sugeridos:**
 
@@ -541,9 +541,9 @@ Esta seção concentra tarefas que dependem de ambiente externo, credenciais adm
 
 ### Épico B2 — CI, qualidade e governança remota
 
-- [ ] `[B2-CI-REM-000]` Configurar SonarCloud nos três repositórios de microsserviços antes da homologação dos PRs: criar ou vincular os projetos no SonarCloud, configurar o secret `SONAR_TOKEN`, configurar as variáveis `SONAR_ORGANIZATION` e `SONAR_PROJECT_KEY` em cada repositório e reexecutar o check `service-ci-validate`. Sem esses valores, o workflow falha de forma esperada no passo de Quality Gate, conforme [Padrão BDD, Cobertura e Qualidade](docs/bdd-testing.md) e [Template GitHub Actions](templates/github-actions/README.md).
+- [x] `[B2-CI-REM-000]` Configurar SonarCloud nos três repositórios de microsserviços antes da homologação dos PRs: criar ou vincular os projetos no SonarCloud e habilitar análise por GitHub Actions com `SONAR_TOKEN` ou por check externo/Automatic Analysis equivalente. Evidência conferida em 2026-07-10: os checks externos `SonarCloud Code Analysis` em `main` concluíram com `success` para `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, apontando respectivamente para os dashboards SonarCloud `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`.
 - [x] `[B2-CI-REM-001]` Registrar evidência remota da execução BDD no CI quando os pipelines finais estiverem homologados. Evidência: `Service CI/CD` em `main` do `oficina-os-service` concluído com sucesso em 2026-07-10 no [run 29116182460](https://github.com/oficina-soat/oficina-os-service/actions/runs/29116182460), incluindo o job `service-ci-validate`; o README do serviço registra que o Cucumber BDD roda no ciclo Maven `verify`.
-- [ ] `[B2-CI-REM-002]` Registrar evidência remota do Quality Gate SonarCloud aprovado e da cobertura mínima de 80% nos três microsserviços.
+- [x] `[B2-CI-REM-002]` Registrar evidência remota do Quality Gate SonarCloud aprovado e da cobertura mínima de 80% nos três microsserviços. Evidências conferidas em 2026-07-10: os checks `SonarCloud Code Analysis` concluíram com `success` em `oficina-os-service` ([run 86440220477](https://github.com/oficina-soat/oficina-os-service/runs/86440220477)), `oficina-billing-service` ([run 86440149314](https://github.com/oficina-soat/oficina-billing-service/runs/86440149314)) e `oficina-execution-service` ([run 86440024697](https://github.com/oficina-soat/oficina-execution-service/runs/86440024697)); os workflows `Service CI/CD` em `main` dos três microsserviços concluíram `service-ci-validate` com sucesso e validaram o Maven `verify` com JaCoCo mínimo de 80%.
 - [ ] `[B2-GH-REM-001]` Confirmar proteção da branch `main` nos três repositórios de microsserviços, com PR obrigatório e checagens automáticas exigidas antes de merge. A política canônica foi documentada em [Proteção da branch main dos microsserviços](docs/github-branch-protection.md); a aplicação remota depende de credencial GitHub com permissão administrativa e fica fora do escopo dos agentes.
 
 ### Épico D — AWS, New Relic e entrega final
@@ -601,4 +601,4 @@ A ordem local recomendada é:
 
 1. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
 
-As validações remotas prioritárias, quando o ambiente externo estiver disponível, são `[B2-CI-REM-002]`, `[B2-GH-REM-001]`, `[D-NR-REM-001]` a `[D-NR-REM-005]` e os itens `EVID` finais.
+As validações remotas prioritárias, quando o ambiente externo estiver disponível, são `[B2-GH-REM-001]`, `[D-NR-REM-001]` a `[D-NR-REM-005]` e os itens `EVID` finais.

@@ -143,7 +143,7 @@ Inclui:
 - métricas Prometheus em `/q/metrics`
 - traces OpenTelemetry exportáveis por OTLP para New Relic
 - health checks SmallRye
-- JWT com issuer/audience atuais
+- JWT com issuer e audience canônica do serviço
 
 No ambiente compartilhado, o backend canônico de observabilidade é New Relic, conforme o [Padrão de Observabilidade Distribuída](../../docs/observability.md). O serviço deve manter `QUARKUS_OTEL_TRACES_EXPORTER=cdi` para usar o exportador OTLP gerenciado pelo Quarkus e `OTEL_EXPORTER_OTLP_ENDPOINT` apontando para o New Relic OpenTelemetry Collector definido pelo repositório de infraestrutura. Para execução local, o exportador pode permanecer `none`.
 

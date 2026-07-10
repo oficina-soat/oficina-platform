@@ -247,9 +247,9 @@ contracts/idempotency.md
 
 ### 12. BDD, cobertura e qualidade de código
 
-**Situação atual:** o padrão BDD, cobertura e qualidade foi definido em [Padrão BDD, Cobertura e Qualidade](docs/bdd-testing.md), com Cucumber JVM, JUnit Platform, JaCoCo com mínimo de 80% e Quality Gate SonarCloud obrigatório no CI. O cenário BDD da Saga está implementado no `oficina-os-service` e foi verificado localmente em 2026-07-04 com `./mvnw -B -Dtest=RunCucumberTest test`, cobrindo caminho feliz e falha compensada.
+**Situação atual:** o padrão BDD, cobertura e qualidade foi definido em [Padrão BDD, Cobertura e Qualidade](docs/bdd-testing.md), com Cucumber JVM, JUnit Platform, JaCoCo com mínimo de 80% e Quality Gate SonarCloud obrigatório no CI. O cenário BDD da Saga está implementado no `oficina-os-service` e foi verificado localmente em 2026-07-04 com `./mvnw -B -Dtest=RunCucumberTest test`, cobrindo caminho feliz e falha compensada. A evidência remota do BDD no CI foi confirmada em 2026-07-10 pelo workflow `Service CI/CD` em `main` do `oficina-os-service` no [run 29116182460](https://github.com/oficina-soat/oficina-os-service/actions/runs/29116182460).
 
-**Definição faltante:** registrar evidências remotas de CI, cobertura e Quality Gate no [Checklist Final de Entrega da Fase 4](docs/phase-4-delivery-checklist.md) quando os pipelines finais forem homologados.
+**Definição faltante:** registrar evidências remotas restantes de cobertura e Quality Gate no [Checklist Final de Entrega da Fase 4](docs/phase-4-delivery-checklist.md) quando os pipelines finais forem homologados.
 
 **Artefatos sugeridos:**
 
@@ -328,7 +328,7 @@ docs/kubernetes-manifest-strategy.md
 
 Os endpoints operacionais `/api/v1/status`, `/q/health`, `/q/metrics`, `/q/openapi` e `/q/swagger-ui` não fazem parte da superfície pública permanente de negócio. Se forem usados em demonstração ou evidência, devem ser tratados como exceção operacional temporária no `oficina-infra`.
 
-**Definição faltante:** materializar no `oficina-infra` as rotas do API Gateway quando os backends reais dos microsserviços estiverem publicados e os `integration_uri` estiverem disponíveis no ambiente `lab`.
+**Definição fechada:** as rotas públicas foram materializadas no `oficina-infra` e validadas no ambiente `lab` em 2026-07-10. O HTTP API `eks-lab-http-api` publicou rotas específicas por método e path para os três microsserviços, sem rota catch-all única e sem expor `/q/health`, `/q/metrics` ou `/api/v1/status` como API pública de negócio.
 
 **Artefatos sugeridos:**
 
@@ -338,7 +338,7 @@ docs/api-gateway-public-routes.md
 ../oficina-infra/terraform/modules/api_gateway/
 ```
 
-**Critério de pronto:** o API Gateway deve rotear cada método e path público para o microsserviço correto, sem usar uma rota catch-all única para todos os serviços e sem expor endpoints operacionais como API de negócio.
+**Critério de pronto:** o API Gateway deve rotear cada método e path público para o microsserviço correto, sem usar uma rota catch-all única para todos os serviços e sem expor endpoints operacionais como API de negócio. Confirmado em 2026-07-10 pela lista remota de rotas do API Gateway e por chamadas representativas para OS, Billing e Execution no endpoint público do ambiente `lab`.
 
 ---
 
@@ -542,21 +542,21 @@ Esta seção concentra tarefas que dependem de ambiente externo, credenciais adm
 ### Épico B2 — CI, qualidade e governança remota
 
 - [ ] `[B2-CI-REM-000]` Configurar SonarCloud nos três repositórios de microsserviços antes da homologação dos PRs: criar ou vincular os projetos no SonarCloud, configurar o secret `SONAR_TOKEN`, configurar as variáveis `SONAR_ORGANIZATION` e `SONAR_PROJECT_KEY` em cada repositório e reexecutar o check `service-ci-validate`. Sem esses valores, o workflow falha de forma esperada no passo de Quality Gate, conforme [Padrão BDD, Cobertura e Qualidade](docs/bdd-testing.md) e [Template GitHub Actions](templates/github-actions/README.md).
-- [ ] `[B2-CI-REM-001]` Registrar evidência remota da execução BDD no CI quando os pipelines finais estiverem homologados.
+- [x] `[B2-CI-REM-001]` Registrar evidência remota da execução BDD no CI quando os pipelines finais estiverem homologados. Evidência: `Service CI/CD` em `main` do `oficina-os-service` concluído com sucesso em 2026-07-10 no [run 29116182460](https://github.com/oficina-soat/oficina-os-service/actions/runs/29116182460), incluindo o job `service-ci-validate`; o README do serviço registra que o Cucumber BDD roda no ciclo Maven `verify`.
 - [ ] `[B2-CI-REM-002]` Registrar evidência remota do Quality Gate SonarCloud aprovado e da cobertura mínima de 80% nos três microsserviços.
 - [ ] `[B2-GH-REM-001]` Confirmar proteção da branch `main` nos três repositórios de microsserviços, com PR obrigatório e checagens automáticas exigidas antes de merge. A política canônica foi documentada em [Proteção da branch main dos microsserviços](docs/github-branch-protection.md); a aplicação remota depende de credencial GitHub com permissão administrativa e fica fora do escopo dos agentes.
 
 ### Épico D — AWS, New Relic e entrega final
 
-- [ ] `[D-NR-REM-000]` Preparar o acesso New Relic antes da validação de observabilidade: confirmar a conta New Relic, gerar `NEW_RELIC_LICENSE_KEY`, configurar o secret no repositório ou na organização GitHub, manter `INSTALL_NEW_RELIC_OTEL_COLLECTOR=auto` ou usar `true` para exigir a execução remota, e confirmar acesso ao contexto AWS/EKS do cluster `eks-lab`, conforme [Padrão de Observabilidade Distribuída](docs/observability.md) e [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
-- [ ] `[D-NR-REM-001]` Instalar e validar o New Relic OpenTelemetry Collector no cluster `eks-lab` quando `NEW_RELIC_LICENSE_KEY` e contexto AWS/EKS estiverem disponíveis.
+- [x] `[D-NR-REM-000]` Preparar o acesso New Relic antes da validação de observabilidade: confirmar a conta New Relic, gerar `NEW_RELIC_LICENSE_KEY`, configurar o secret no repositório ou na organização GitHub, manter `INSTALL_NEW_RELIC_OTEL_COLLECTOR=auto` ou usar `true` para exigir a execução remota, e confirmar acesso ao contexto AWS/EKS do cluster `eks-lab`, conforme [Padrão de Observabilidade Distribuída](docs/observability.md) e [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md). Evidência conferida em 2026-07-10: o workflow `Deploy Lab` do `oficina-infra` concluiu com sucesso no [run 29125719440](https://github.com/oficina-soat/oficina-infra/actions/runs/29125719440), o contexto EKS `eks-lab` estava acessível e o Secret Kubernetes `new-relic-license-key` existia no namespace `newrelic`.
+- [ ] `[D-NR-REM-001]` Instalar e validar o New Relic OpenTelemetry Collector no cluster `eks-lab` quando `NEW_RELIC_LICENSE_KEY` e contexto AWS/EKS estiverem disponíveis. Permanece aberto: em 2026-07-10 o release criou deployment, gateway e Secret no namespace `newrelic`, mas o DaemonSet do collector estava em `CrashLoopBackOff` por falha no processor `resourcedetection/cloudproviders`; falta corrigir e validar envio real de sinais ao New Relic.
 - [ ] `[D-NR-REM-002]` Criar dashboards mínimos no New Relic para `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, filtrando por `service.name`, `service.namespace=oficina` e `deployment.environment=lab`.
 - [ ] `[D-NR-REM-003]` Criar visão adicional da Saga no New Relic para o `oficina-os-service`, cobrindo Sagas iniciadas, finalizadas, compensadas, em falha manual e duração por etapa.
 - [ ] `[D-NR-REM-004]` Criar alertas mínimos no New Relic para indisponibilidade, erro HTTP elevado, latência elevada, Outbox parada, Outbox com falha, DLQ, Saga em falha manual, pagamento indisponível e banco indisponível.
 - [ ] `[D-NR-REM-005]` Executar teste de ponta a ponta no ambiente `lab` gerando uma Ordem de Serviço com caminho feliz e uma falha compensada, confirmando correlação por `correlationId` entre logs, traces, métricas e eventos.
 - [ ] `[D-NR-EVID-001]` Registrar evidências de observabilidade distribuída no checklist final da Fase 4, incluindo links ou identificadores dos dashboards, alertas, traces e consultas de logs usadas na validação.
-- [ ] `[D-AWS-REM-001]` Aplicar o RDS PostgreSQL compartilhado em AWS usando valores variáveis do ambiente `lab`, como `vpc_id`, subnets e security groups resolvidos por Terraform outputs, variáveis de pipeline ou descoberta em tempo de deploy.
-- [ ] `[D-API-REM-001]` Materializar e validar no `oficina-infra` as rotas públicas do API Gateway quando os backends reais e `integration_uri` dos microsserviços estiverem disponíveis no ambiente `lab`.
+- [x] `[D-AWS-REM-001]` Aplicar o RDS PostgreSQL compartilhado em AWS usando valores variáveis do ambiente `lab`, como `vpc_id`, subnets e security groups resolvidos por Terraform outputs, variáveis de pipeline ou descoberta em tempo de deploy. Evidência conferida em 2026-07-10: a instância `oficina-postgres-lab` estava `available`, com endpoint RDS, security group e subnet group resolvidos no ambiente AWS `lab`.
+- [x] `[D-API-REM-001]` Materializar e validar no `oficina-infra` as rotas públicas do API Gateway quando os backends reais e `integration_uri` dos microsserviços estiverem disponíveis no ambiente `lab`. Evidência conferida em 2026-07-10: o HTTP API `eks-lab-http-api` expôs rotas específicas para os três microsserviços; chamadas públicas representativas retornaram respostas dos serviços corretos e endpoints operacionais como `/q/health` e `/api/v1/status` permaneceram sem rota pública.
 - [ ] `[D-DELIVERY-EVID-001]` Registrar data de entrega da Fase 4, participantes, links dos repositórios e link do vídeo no checklist final ou no documento de entrega.
 - [ ] `[D-VIDEO-EVID-001]` Registrar evidências finais do vídeo de demonstração de até 15 minutos após gravação e homologação do ambiente.
 
@@ -601,4 +601,4 @@ A ordem local recomendada é:
 
 1. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
 
-As validações remotas prioritárias, quando o ambiente externo estiver disponível, são `[B2-CI-REM-001]`, `[B2-CI-REM-002]`, `[B2-GH-REM-001]`, `[D-NR-REM-*]`, `[D-AWS-REM-001]`, `[D-API-REM-001]` e os itens `EVID` finais.
+As validações remotas prioritárias, quando o ambiente externo estiver disponível, são `[B2-CI-REM-002]`, `[B2-GH-REM-001]`, `[D-NR-REM-001]` a `[D-NR-REM-005]` e os itens `EVID` finais.

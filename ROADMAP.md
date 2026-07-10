@@ -38,7 +38,7 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
 - Decisão de separar o código de infraestrutura no repositório unificado `oficina-infra`, consolidando as responsabilidades hoje distribuídas entre `oficina-infra-db` e `oficina-infra-k8s`, conforme [Escopo do Repositório Unificado de Infraestrutura](docs/infrastructure-repository-scope.md).
 - Rotas públicas do API Gateway definidas em [Rotas públicas do API Gateway](docs/api-gateway-public-routes.md): todas as APIs REST de negócio dos três microsserviços devem ser expostas pelo `eks-lab-http-api`, sem publicar endpoints operacionais como `/q/metrics`, `/q/health` e `/api/v1/status`.
 - Forma oficial de coleta New Relic definida como New Relic OpenTelemetry Collector instalado por Helm no cluster EKS `eks-lab`, com OTLP/gRPC, coleta de logs dos pods e coleta das métricas dos microsserviços.
-- Baseline executável do New Relic OpenTelemetry Collector criado no `oficina-infra`, com Helm values do ambiente `lab`, script de instalação, Secret Kubernetes esperado, endpoint OTLP/gRPC interno e integração opcional ao deploy.
+- Baseline executável do New Relic OpenTelemetry Collector criado no `oficina-infra`, com Helm values do ambiente `lab`, script de instalação, Secret Kubernetes esperado, endpoint OTLP/gRPC interno e integração automática ao deploy quando `NEW_RELIC_LICENSE_KEY` está configurada.
 - Enunciado da Fase 4 incluído como referência normativa em [Enunciado Fase 4](docs/Enunciado%20Fase%204.md).
 - Contratos fundamentais criados para:
   - APIs REST;
@@ -216,6 +216,7 @@ Amazon DynamoDB
 3. [x] Definir secrets e variáveis operacionais do New Relic no ambiente `lab`, incluindo `NEW_RELIC_LICENSE_KEY`, endpoint OTLP interno e integração com os nomes de runtime descritos em [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
 4. Concluído localmente: `[D-OBS-IMPL-001]` propagar `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_PROTOCOL`, `OTEL_RESOURCE_ATTRIBUTES`, `DEPLOYMENT_ENVIRONMENT` e `OTEL_SERVICE_NAME` nos manifests dos três microsserviços.
 5. Concluído localmente: `[D-OBS-IMPL-002]` validar nos três microsserviços, por inspeção local e testes locais aplicáveis, a emissão de logs JSON, exposição de `/q/metrics`, health checks Quarkus e configuração de traces OpenTelemetry conforme [Validação local de observabilidade](docs/observability-local-validation.md).
+6. [x] Automatizar no workflow de deploy do `oficina-infra` a instalação ou atualização do New Relic OpenTelemetry Collector quando a secret GitHub `NEW_RELIC_LICENSE_KEY` estiver presente, mantendo `INSTALL_NEW_RELIC_OTEL_COLLECTOR=false` como override explícito para pular a etapa.
 
 As instalações reais, dashboards, alertas, testes de ponta a ponta no `eks-lab` e evidências externas ficam apartados em [Validações remotas e evidências externas](#validações-remotas-e-evidências-externas).
 
@@ -547,7 +548,7 @@ Esta seção concentra tarefas que dependem de ambiente externo, credenciais adm
 
 ### Épico D — AWS, New Relic e entrega final
 
-- [ ] `[D-NR-REM-000]` Preparar o acesso New Relic antes da validação de observabilidade: confirmar a conta New Relic, gerar `NEW_RELIC_LICENSE_KEY`, configurar o secret no repositório ou na organização GitHub, habilitar `INSTALL_NEW_RELIC_OTEL_COLLECTOR=true` para a execução remota e confirmar acesso ao contexto AWS/EKS do cluster `eks-lab`, conforme [Padrão de Observabilidade Distribuída](docs/observability.md) e [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
+- [ ] `[D-NR-REM-000]` Preparar o acesso New Relic antes da validação de observabilidade: confirmar a conta New Relic, gerar `NEW_RELIC_LICENSE_KEY`, configurar o secret no repositório ou na organização GitHub, manter `INSTALL_NEW_RELIC_OTEL_COLLECTOR=auto` ou usar `true` para exigir a execução remota, e confirmar acesso ao contexto AWS/EKS do cluster `eks-lab`, conforme [Padrão de Observabilidade Distribuída](docs/observability.md) e [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
 - [ ] `[D-NR-REM-001]` Instalar e validar o New Relic OpenTelemetry Collector no cluster `eks-lab` quando `NEW_RELIC_LICENSE_KEY` e contexto AWS/EKS estiverem disponíveis.
 - [ ] `[D-NR-REM-002]` Criar dashboards mínimos no New Relic para `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, filtrando por `service.name`, `service.namespace=oficina` e `deployment.environment=lab`.
 - [ ] `[D-NR-REM-003]` Criar visão adicional da Saga no New Relic para o `oficina-os-service`, cobrindo Sagas iniciadas, finalizadas, compensadas, em falha manual e duração por etapa.

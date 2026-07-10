@@ -62,7 +62,7 @@ A forma oficial de coleta do ambiente `lab` é New Relic OpenTelemetry Collector
 Valores operacionais esperados no `oficina-infra`:
 
 ```text
-INSTALL_NEW_RELIC_OTEL_COLLECTOR=false
+INSTALL_NEW_RELIC_OTEL_COLLECTOR=auto
 NEW_RELIC_NAMESPACE=newrelic
 NEW_RELIC_OTEL_COLLECTOR_HELM_RELEASE=nr-k8s-otel-collector
 NEW_RELIC_OTEL_COLLECTOR_LOCAL_SERVICE_NAME=nr-k8s-otel-collector-gateway
@@ -75,7 +75,7 @@ OTEL_EXPORTER_OTLP_ENDPOINT=http://nr-k8s-otel-collector-gateway.newrelic.svc.cl
 OTEL_EXPORTER_OTLP_PROTOCOL=grpc
 ```
 
-`INSTALL_NEW_RELIC_OTEL_COLLECTOR=false` mantém o deploy compatível com execuções sem conta New Relic. Para habilitar a coleta real no cluster, o ambiente de deploy deve definir `INSTALL_NEW_RELIC_OTEL_COLLECTOR=true` e fornecer `NEW_RELIC_LICENSE_KEY` como secret do repositório/organização ou variável local segura.
+`INSTALL_NEW_RELIC_OTEL_COLLECTOR=auto` mantém o deploy compatível com execuções sem conta New Relic e instala o collector automaticamente quando `NEW_RELIC_LICENSE_KEY` existe como secret do repositório/organização ou variável local segura. Use `INSTALL_NEW_RELIC_OTEL_COLLECTOR=false` para desabilitar explicitamente a etapa, ou `true` para exigir a instalação e falhar cedo quando a license key necessária não estiver disponível.
 
 `NEW_RELIC_OTLP_ENDPOINT` usa `https://otlp.nr-data.net` como padrão operacional para contas New Relic nos Estados Unidos. Se a conta usar outra região, o endpoint deve ser alterado em conjunto com a configuração do collector no `oficina-infra`.
 

@@ -74,7 +74,7 @@ Variáveis operacionais do collector no ambiente `lab`:
 
 | Variável | Valor esperado |
 |---|---|
-| `INSTALL_NEW_RELIC_OTEL_COLLECTOR` | `false` por padrão; `true` quando o deploy deve instalar ou atualizar o collector no cluster. |
+| `INSTALL_NEW_RELIC_OTEL_COLLECTOR` | `auto` por padrão; instala ou atualiza o collector quando `NEW_RELIC_LICENSE_KEY` está disponível. Use `false` para desabilitar explicitamente ou `true` para exigir a instalação. |
 | `NEW_RELIC_LICENSE_KEY` | Secret externo ao repositório, informado como secret do repositório/organização ou localmente. |
 | `NEW_RELIC_NAMESPACE` | `newrelic`. |
 | `NEW_RELIC_OTEL_COLLECTOR_HELM_RELEASE` | `nr-k8s-otel-collector`. |

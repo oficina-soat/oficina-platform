@@ -42,7 +42,7 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
 - Enunciado da Fase 4 incluído como referência normativa em [Enunciado Fase 4](docs/delivery/Enunciado%20Fase%204.md).
 - Auditoria de lacunas realizada em 2026-07-11 identificou que alguns itens do roadmap estavam fechados pelo contrato ou pelo schema, mas ainda sem implementação runtime real ou sem evidência remota:
   - `oficina-os-service` recebeu adapters PostgreSQL locais para domínio, histórico, Saga, Inbox e Outbox em 2026-07-11, ficando pendente apenas a evidência remota no `lab`;
-  - `oficina-billing-service` já recebeu adapters PostgreSQL para orçamento e pagamento no commit local `17535c2`, mas a projeção de eventos e a Outbox ainda precisam sair do store em memória;
+  - `oficina-billing-service` recebeu adapters PostgreSQL para orçamento, pagamento, projeção financeira de eventos consumidos e Outbox em 2026-07-11, ficando pendente a evidência remota no `lab` e a conexão com SNS/SQS real;
   - `oficina-execution-service` modela tabelas DynamoDB, mas ainda precisa substituir o store em memória por cliente DynamoDB real;
   - os três microsserviços ainda precisam conectar Outbox, producers e consumers à mensageria SNS/SQS provisionada no `oficina-infra`;
   - a idempotência ainda precisa persistir resultado e estado de processamento por serviço, não apenas exigir o header `X-Idempotency-Key`;
@@ -496,7 +496,7 @@ Convenção de identificadores para itens abertos:
 - [x] Criar seed limpo do `oficina-execution-service` para tabelas DynamoDB, reaproveitando apenas os dados funcionais aplicáveis do `import.sql` do `oficina-app`.
 - [x] Criar do zero no `oficina-billing-service` o domínio de orçamento, aprovação, recusa, pagamento e integração financeira, porque não há módulo equivalente no `oficina-app`.
 - [x] Criar migrations e seed limpo do `oficina-billing-service` para o database `oficina_billing`, preservando isolamento de acesso e ownership.
-- [x] Implementar no `oficina-billing-service` cálculo e snapshot financeiro de itens, fluxo de aprovação/recusa, pagamento, producers e consumers lógicos definidos nos contratos de eventos. Os adapters PostgreSQL de orçamento/pagamento ficam rastreados em `[B2-BILL-DB-IMPL-001]`; a persistência das projeções/Outbox e a conexão com SNS/SQS real ficam rastreadas em `[B2-BILL-EVENTSTORE-IMPL-001]` e `[B2-MSG-IMPL-001]`.
+- [x] Implementar no `oficina-billing-service` cálculo e snapshot financeiro de itens, fluxo de aprovação/recusa, pagamento, producers e consumers lógicos definidos nos contratos de eventos. Os adapters PostgreSQL de orçamento/pagamento foram concluídos em `[B2-BILL-DB-IMPL-001]`; a persistência das projeções/Outbox foi concluída em `[B2-BILL-EVENTSTORE-IMPL-001]`; e a conexão com SNS/SQS real segue rastreada em `[B2-MSG-IMPL-001]`.
 - [x] Implementar integração de pagamentos com Mercado Pago no `oficina-billing-service`, incluindo configuração, adapter, tratamento de falhas, testes e documentação operacional, conforme a [Referência API Mercado Pago](https://www.mercadopago.com.br/developers/pt/reference).
 - [x] Implementar fila de execução da OS no `oficina-execution-service`, incluindo priorização mínima, consulta de fila, início/finalização de diagnóstico e reparo, e eventos correspondentes.
 - [x] Criar testes unitários e de integração mínimos nos três microsserviços para controllers, use cases, persistência, idempotência, eventos e cenários principais da Saga.
@@ -514,7 +514,7 @@ Convenção de identificadores para itens abertos:
 
 - [x] `[B2-BILL-DB-IMPL-001]` Substituir repositórios em memória de orçamento e pagamento do `oficina-billing-service` por adapters PostgreSQL para `orcamento`, `orcamento_item` e `pagamento`, mantendo o modo em memória apenas no profile de testes. Concluído localmente no `oficina-billing-service` em 2026-07-11 no commit `17535c2`, com `project.version=1.0.6` e validação `./mvnw -B verify -Ppostgresql -DskipITs=false -DfailIfNoTests=false`.
 - [x] `[B2-OS-DB-IMPL-001]` Substituir o `AtendimentoSeedStore` do `oficina-os-service` por adapters PostgreSQL reais para Cliente, Veículo, Ordem de Serviço, histórico de estados, Saga e consultas operacionais, usando o database `oficina_os`, as migrations existentes e testes de integração com PostgreSQL. Concluído localmente no `oficina-os-service` em 2026-07-11 no commit `80ff2e8`, com `project.version=1.0.5`, store em memória restrito ao profile de teste e validação `./mvnw -B verify -Ppostgresql -DskipITs=false -DfailIfNoTests=false`.
-- [ ] `[B2-BILL-EVENTSTORE-IMPL-001]` Persistir no PostgreSQL do `oficina-billing-service` as projeções de eventos consumidos, itens financeiros projetados e registros de Outbox hoje mantidos em `BillingEventStore`, garantindo que orçamento, pagamento, eventos pendentes e histórico de publicação sobrevivam a restart de pod.
+- [x] `[B2-BILL-EVENTSTORE-IMPL-001]` Persistir no PostgreSQL do `oficina-billing-service` as projeções de eventos consumidos, itens financeiros projetados e registros de Outbox antes mantidos em `BillingEventStore`, garantindo que orçamento, pagamento, eventos pendentes e histórico de publicação sobrevivam a restart de pod. Concluído localmente no `oficina-billing-service` em 2026-07-11 no commit `0da6799`, com `project.version=1.0.10`, migration `V3__persist_billing_event_store.sql`, store em memória restrito ao profile de teste e validação `./mvnw -B clean verify -Ppostgresql -DskipITs=false -DfailIfNoTests=false`.
 - [ ] `[B2-EXEC-DDB-IMPL-001]` Substituir o store em memória do `oficina-execution-service` por acesso real ao Amazon DynamoDB, cobrindo catálogo, estoque, execuções, fila operacional, Outbox e idempotência nas tabelas canônicas descritas em [Padrão DynamoDB do oficina-execution-service](docs/infrastructure/dynamodb-execution-service.md). A validação local deve usar DynamoDB Local ou Testcontainers e não apenas `LinkedHashMap`.
 - [ ] `[B2-IDEMP-IMPL-001]` Implementar idempotência persistente nos três microsserviços conforme [Contrato de Idempotência](contracts/idempotency.md): registrar escopo, chave, hash da requisição, status de processamento, resposta consolidada e TTL; retornar a mesma resposta em retries equivalentes; rejeitar reutilização da chave com payload divergente; e manter comportamento após restart de pod.
 - [ ] `[B2-MSG-IMPL-001]` Conectar Outbox, producers e consumers dos três microsserviços à mensageria real SNS/SQS provisionada pelo `oficina-infra`, conforme [Contrato de Tópicos de Mensageria](contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md): publisher assíncrono com retry/backoff, marcação `PUBLISHED`/`FAILED`, consumo por filas SQS, ack/delete somente após processamento persistido, tratamento de DLQ e testes locais com LocalStack.
@@ -579,7 +579,7 @@ Esta seção concentra tarefas que dependem de ambiente externo, credenciais adm
 
 ### Épico B2 — Persistência, mensageria e idempotência remotas
 
-- [ ] `[B2-BILL-DB-REM-001]` Publicar e aplicar no `lab` a imagem do `oficina-billing-service` que contém `[B2-BILL-DB-IMPL-001]`, confirmando que orçamento e pagamento gravam no database `oficina_billing`, que o modo em memória não está ativo no pod e que os dados persistem após restart ou rollout.
+- [ ] `[B2-BILL-DB-REM-001]` Publicar e aplicar no `lab` a imagem do `oficina-billing-service` que contém `[B2-BILL-DB-IMPL-001]` e `[B2-BILL-EVENTSTORE-IMPL-001]`, confirmando que orçamento, pagamento, projeções financeiras, eventos consumidos e Outbox gravam no database `oficina_billing`, que o modo em memória não está ativo no pod e que os dados persistem após restart ou rollout.
 - [ ] `[B2-OS-DB-REM-001]` Após `[B2-OS-DB-IMPL-001]`, validar no `lab` que Cliente, Veículo, Ordem de Serviço, histórico e Saga são gravados no database `oficina_os`, com usuário e secret próprios, sem acesso ao database `oficina_billing`, e que os dados sobrevivem a restart de pod.
 - [ ] `[B2-EXEC-DDB-REM-001]` Após `[B2-EXEC-DDB-IMPL-001]`, validar no `lab` que catálogo, estoque, execuções, Outbox e idempotência do `oficina-execution-service` são gravados nas tabelas DynamoDB `oficina-execution-lab-*`, usando IAM/runtime do serviço e sem fallback para store em memória.
 - [ ] `[B2-IDEMP-REM-001]` Validar no `lab` a idempotência persistente dos três microsserviços: repetir uma requisição mutável com a mesma chave e payload deve retornar o mesmo resultado; repetir a chave com payload divergente deve retornar conflito; e o comportamento deve permanecer igual após restart do pod responsável.
@@ -641,15 +641,14 @@ O próximo passo para agentes deve priorizar itens `IMPL` abertos no [Backlog or
 
 A ordem local recomendada é:
 
-1. `[B2-BILL-EVENTSTORE-IMPL-001]` Persistir projeções de eventos e Outbox do `oficina-billing-service`.
-2. `[B2-EXEC-DDB-IMPL-001]` Substituir store em memória do `oficina-execution-service` por DynamoDB real.
-3. `[B2-IDEMP-IMPL-001]` Implementar idempotência persistente nos três microsserviços.
-4. `[B2-MSG-IMPL-001]` Conectar Outbox, producers e consumers à mensageria SNS/SQS real.
-5. `[B2-CONFIG-IMPL-001]` Impedir fallback silencioso para stores em memória nos profiles `prod` e `lab`.
-6. `[B2-OS-USERS-IMPL-001]` Contratar e implementar CRUD REST de usuários operacionais no `oficina-os-service`.
-7. `[B2-AUTH-USERS-IMPL-001]` Resolver sincronização entre usuários operacionais e autenticação serverless.
-8. `[D-OBS-IMPL-003]` Instrumentar métricas de consumo Mercado Pago.
-9. `[D-OBS-IMPL-004]` Instrumentar métricas de persistência, idempotência, Outbox e mensageria.
-10. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
+1. `[B2-EXEC-DDB-IMPL-001]` Substituir store em memória do `oficina-execution-service` por DynamoDB real.
+2. `[B2-IDEMP-IMPL-001]` Implementar idempotência persistente nos três microsserviços.
+3. `[B2-MSG-IMPL-001]` Conectar Outbox, producers e consumers à mensageria SNS/SQS real.
+4. `[B2-CONFIG-IMPL-001]` Impedir fallback silencioso para stores em memória nos profiles `prod` e `lab`.
+5. `[B2-OS-USERS-IMPL-001]` Contratar e implementar CRUD REST de usuários operacionais no `oficina-os-service`.
+6. `[B2-AUTH-USERS-IMPL-001]` Resolver sincronização entre usuários operacionais e autenticação serverless.
+7. `[D-OBS-IMPL-003]` Instrumentar métricas de consumo Mercado Pago.
+8. `[D-OBS-IMPL-004]` Instrumentar métricas de persistência, idempotência, Outbox e mensageria.
+9. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
 
 As validações remotas prioritárias restantes, quando o ambiente externo estiver disponível, são `[B2-BILL-DB-REM-001]`, `[B2-OS-DB-REM-001]`, `[B2-EXEC-DDB-REM-001]`, `[B2-IDEMP-REM-001]`, `[B2-MSG-REM-001]`, `[B2-MP-REM-001]`, `[B2-GH-REM-001]`, `[D-NR-REM-003]`, `[D-NR-REM-004]`, `[D-NR-REM-006]`, `[D-NR-REM-007]` e os itens `EVID` finais.

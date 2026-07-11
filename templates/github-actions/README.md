@@ -8,7 +8,7 @@ Template padrão de CI/CD para os repositórios:
 - `oficina-billing-service`
 - `oficina-execution-service`
 
-Este template implementa a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md), usando GitHub Actions, SonarCloud Automatic Analysis, Amazon ECR, Amazon EKS e o ambiente canônico `lab` definido em [Conta, região e ambientes AWS](../../docs/aws-environments.md) e [Nomes de runtime, secrets e infraestrutura](../../docs/infra-runtime-naming.md).
+Este template implementa a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md), usando GitHub Actions, SonarCloud por análise baseada em CI, Amazon ECR, Amazon EKS e o ambiente canônico `lab` definido em [Conta, região e ambientes AWS](../../docs/aws-environments.md) e [Nomes de runtime, secrets e infraestrutura](../../docs/infra-runtime-naming.md).
 
 ## Como usar
 
@@ -31,9 +31,12 @@ Secrets obrigatórios no repositório ou na organização GitHub:
 AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY
 AWS_SESSION_TOKEN
+SONAR_TOKEN
 ```
 
-O workflow não executa `sonar:sonar` nem exige secrets `SONAR_*`. A análise SonarCloud deve ser configurada fora do GitHub Actions, usando Automatic Analysis no projeto SonarCloud ou integração equivalente definida no próprio Sonar. Quando o Quality Gate for usado como evidência, trate o status emitido pelo SonarCloud como check externo ou registre a evidência no checklist da entrega.
+O `SONAR_TOKEN` deve ser configurado como secret do repositório ou da organização GitHub. O workflow executa o SonarScanner for Maven depois do `verify`, envia `target/jacoco-report/jacoco.xml` para o SonarCloud e aguarda o Quality Gate com `sonar.qualitygate.wait=true`.
+
+Quando esse workflow estiver ativo, a Automatic Analysis do SonarCloud deve ficar desabilitada no projeto para evitar análises duplicadas e para garantir que a cobertura venha do relatório JaCoCo gerado no CI.
 
 Variáveis recomendadas no repositório ou na organização GitHub:
 
@@ -77,11 +80,12 @@ Pull Requests executam:
 - validação de `project.version` para mudanças publicáveis, rejeitando versão `SNAPSHOT` ou menor ou igual à base do PR;
 - build Maven;
 - testes unitários, integração, contrato e BDD;
-- relatório JaCoCo com cobertura mínima de 80%.
+- relatório JaCoCo com cobertura mínima de 80%;
+- análise SonarCloud baseada em CI, importando `target/jacoco-report/jacoco.xml` e aguardando Quality Gate.
 
 O job obrigatório para proteção da branch `main` chama-se `service-ci-validate`, conforme a política em [Proteção da branch main dos microsserviços](../../docs/github-branch-protection.md).
 
-Pushes na branch `develop` executam o workflow auxiliar `open-pr-to-main.yml`, que valida build Maven, testes e contratos antes de criar ou atualizar o PR para `main`. Nenhum workflow deste template aciona análise SonarCloud; o projeto SonarCloud deve usar Automatic Analysis ou integração externa própria.
+Pushes na branch `develop` executam o workflow auxiliar `open-pr-to-main.yml`, que valida build Maven, testes e contratos antes de criar ou atualizar o PR para `main`. A análise SonarCloud com cobertura roda no `service-ci-validate`, em PR para `main` e em push na `main`, porque depende do relatório JaCoCo produzido pelo `verify`.
 
 O workflow auxiliar pode preparar PR com `project.version` em `SNAPSHOT`, porque ele não publica imagem, release ou deploy. O PR para `main` e o fluxo de publicação/deploy da `main` bloqueiam mudanças publicáveis com versão `SNAPSHOT`, menor ou igual à base do PR, ou repetida em relação ao commit anterior da `main`.
 

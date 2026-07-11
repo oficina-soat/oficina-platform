@@ -28,7 +28,9 @@ Antes de manter `ENABLE_IMAGE_PUBLISH` e `ENABLE_K8S_DEPLOY` ativos por padrão 
 - [ ] `MAVEN_PROFILE` está definido ou pode ser derivado como `postgresql` para `oficina-os-service` e `oficina-billing-service`, ou `dynamodb` para `oficina-execution-service`;
 - [ ] `AWS_REGION=us-east-1`, `EKS_CLUSTER_NAME=eks-lab` e `K8S_NAMESPACE=default` estão configurados como variáveis do repositório ou da organização;
 - [ ] `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` e `AWS_SESSION_TOKEN` estão disponíveis como secrets do repositório ou da organização;
-- [ ] SonarCloud Automatic Analysis ou check externo equivalente está configurado quando o Quality Gate SonarCloud for usado como evidência da entrega;
+- [ ] `SONAR_TOKEN` está configurado como secret do repositório ou da organização GitHub;
+- [ ] Automatic Analysis está desabilitada no projeto SonarCloud quando o workflow `service-ci-validate` executar análise baseada em CI;
+- [ ] o SonarScanner for Maven importa `target/jacoco-report/jacoco.xml` e aguarda o Quality Gate quando o SonarCloud for usado como evidência da entrega;
 - [ ] o repositório ECR do serviço existe no `oficina-infra`;
 - [ ] o `Deployment` e o container Kubernetes usam exatamente o nome canônico do serviço;
 - [ ] os manifests executáveis estão materializados no `../oficina-infra/k8s/base/microservices/<servico>/` e referenciados pelo overlay `../oficina-infra/k8s/overlays/lab/`;
@@ -56,12 +58,13 @@ Para cada alteração candidata a deploy:
 
 1. Abrir PR no repositório do microsserviço.
 2. Confirmar aprovação e execução bem-sucedida do check `service-ci-validate`.
-3. Confirmar Quality Gate externo aprovado quando SonarCloud estiver configurado.
+3. Confirmar Quality Gate SonarCloud aprovado e cobertura importada de `target/jacoco-report/jacoco.xml` quando SonarCloud estiver configurado.
 4. Confirmar que `project.version` no `pom.xml` foi incrementado para toda mudança publicável antes do merge; a versão não pode ser `SNAPSHOT`, menor ou igual à base do PR, nem já publicada para outro build.
 5. Fazer merge na `main`.
 6. No push da `main`, confirmar que o workflow:
    - [ ] rejeitou versão `SNAPSHOT`;
    - [ ] rejeitou alteração publicável sem incremento de `project.version`;
+   - [ ] executou SonarCloud com `SONAR_TOKEN`, importou `target/jacoco-report/jacoco.xml` e aprovou o Quality Gate;
    - [ ] resolveu a tag `v<project.version>`;
    - [ ] publicou imagem no ECR quando `ENABLE_IMAGE_PUBLISH` não é `false`;
    - [ ] criou GitHub Release quando a release ainda não existia;

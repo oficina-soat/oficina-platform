@@ -13,7 +13,7 @@ Os microsserviços devem usar:
 - JUnit 5 e Quarkus Test para testes unitários, de integração e de contrato;
 - Cucumber JVM com JUnit Platform para BDD;
 - JaCoCo para cobertura mínima obrigatória de 80%;
-- SonarCloud como Quality Gate externo quando Automatic Analysis ou integração equivalente estiver configurada no projeto SonarCloud.
+- SonarCloud como Quality Gate baseado em CI, importando o relatório JaCoCo XML gerado pelo workflow.
 
 O Cucumber deve usar a mesma versão em todas as dependências `io.cucumber`. O [template Maven](../templates/quarkus-service/pom.xml) define essa versão por `cucumber.version`.
 
@@ -83,7 +83,7 @@ O relatório JaCoCo deve ser gerado em:
 target/jacoco-report/
 ```
 
-O README de cada microsserviço deve registrar uma evidência de cobertura, como link para o artefato do GitHub Actions, badge ou captura anexada à entrega final. O checklist final da Fase 4 deve consolidar esses links quando for criado.
+O arquivo `target/jacoco-report/jacoco.xml` deve ser enviado ao SonarCloud pelo SonarScanner for Maven no workflow `service-ci-validate`. O README de cada microsserviço deve registrar uma evidência de cobertura, como link para o artifact do GitHub Actions, badge, dashboard SonarCloud ou captura anexada à entrega final. O checklist final da Fase 4 deve consolidar esses links quando for criado.
 
 ## CI/CD
 
@@ -97,7 +97,9 @@ O pipeline deve falhar quando:
 
 - testes unitários, de integração, contrato ou BDD falharem;
 - cobertura JaCoCo ficar abaixo de 80%;
-- o Quality Gate externo do SonarCloud não for aprovado em pull request, quando a configuração SonarCloud estiver disponível.
+- o relatório `target/jacoco-report/jacoco.xml` não for gerado;
+- o `SONAR_TOKEN` não estiver configurado quando a análise SonarCloud for obrigatória;
+- o Quality Gate do SonarCloud não for aprovado em pull request ou push na `main`.
 
 ## Critérios de pronto
 
@@ -107,5 +109,5 @@ Um microsserviço atende a este padrão quando:
 - participa do cenário BDD completo da OS ou possui os steps necessários para o cenário distribuído;
 - mantém cobertura JaCoCo mínima de 80%;
 - publica evidência de cobertura no README ou no artefato de CI;
-- não executa análise SonarCloud no GitHub Actions; o Quality Gate deve vir da configuração automática do SonarCloud ou de check externo equivalente;
+- executa análise SonarCloud pelo GitHub Actions, com Automatic Analysis desabilitada no projeto SonarCloud para evitar análise duplicada;
 - valida contratos OpenAPI, schemas JSON de eventos, erro padronizado, idempotência e Saga quando aplicável.

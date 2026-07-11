@@ -232,6 +232,30 @@ Antes de encerrar alterações, execute a validação compatível com o impacto:
 - `{{BUILD_COMMAND}}`
 - `{{FULL_VALIDATION_COMMAND}}` quando a mudança afetar integração, configuração, persistência, segurança ou contrato HTTP
 
+Antes de criar commit com alteração publicável, prefira validação limpa para evitar que cobertura residual mascare falhas:
+
+```bash
+{{FULL_VALIDATION_COMMAND_CLEAN}}
+test -s target/jacoco-report/jacoco.xml
+```
+
+Quando o repositório usar SonarCloud e `SONAR_TOKEN` estiver disponível, execute também o SonarScanner for Maven antes do commit. Informe explicitamente a branch local:
+
+```bash
+SERVICE_NAME="${SERVICE_NAME:-{{APP_NAME}}}"
+MAVEN_PROFILE="${MAVEN_PROFILE:-{{MAVEN_PROFILE}}}"
+SONAR_BRANCH="${SONAR_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}"
+./mvnw -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+  -P"${MAVEN_PROFILE}" \
+  -DskipTests=true \
+  -Dsonar.organization={{SONAR_ORGANIZATION}} \
+  -Dsonar.projectKey="${SERVICE_NAME}" \
+  -Dsonar.branch.name="${SONAR_BRANCH}" \
+  -Dsonar.coverage.jacoco.xmlReportPaths=target/jacoco-report/jacoco.xml \
+```
+
+Use `-Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=300` somente quando o SonarCloud expuser Quality Gate para a branch analisada, como `main`, branch longa habilitada ou PR real com `sonar.pullrequest.*`.
+
 Se alguma validação não puder ser executada, registre isso claramente na resposta final.
 
 ## Commits
@@ -241,6 +265,6 @@ Quando houver alterações no repositório, crie commit ao final do trabalho.
 Use mensagens em português seguindo Conventional Commits:
 
 - `feat: adiciona consulta detalhada de item`
-- `fix: corrige validacao do token`
+- `fix: corrige validação do token`
 - `test: adiciona constraints arquiteturais`
 - `chore: atualiza regras de agentes`

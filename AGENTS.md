@@ -151,6 +151,42 @@ Ferramentas complementares recomendadas estão documentadas em [Ferramentas de v
 
 Se uma ferramenta complementar esperada não estiver instalada, registre isso na resposta final e execute a melhor validação equivalente disponível.
 
+Para alterações publicáveis em repositórios de microsserviço, execute validação compatível com o SonarCloud antes de criar commit. O objetivo é antecipar localmente falhas de cobertura, duplicação e, quando o contexto analisado permitir consulta, reprovação de Quality Gate que bloquearia o `service-ci-validate`.
+
+Validação mínima obrigatória antes do commit em microsserviços:
+
+```bash
+MAVEN_PROFILE="${MAVEN_PROFILE:-postgresql}"
+./mvnw -B clean verify -P"${MAVEN_PROFILE}" -DskipITs=false -DfailIfNoTests=false
+test -s target/jacoco-report/jacoco.xml
+```
+
+Para `oficina-execution-service`, use `MAVEN_PROFILE=dynamodb`.
+
+Quando `SONAR_TOKEN` estiver disponível no ambiente local, execute também a análise SonarCloud antes do commit. Para evitar contaminar a análise da `main`, informe explicitamente a branch local:
+
+```bash
+SERVICE_NAME="${SERVICE_NAME:-$(basename "$(git rev-parse --show-toplevel)")}"
+MAVEN_PROFILE="${MAVEN_PROFILE:-postgresql}"
+SONAR_BRANCH="${SONAR_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}"
+./mvnw -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+  -P"${MAVEN_PROFILE}" \
+  -DskipTests=true \
+  -Dsonar.organization=oficina-soat \
+  -Dsonar.projectKey="${SERVICE_NAME}" \
+  -Dsonar.branch.name="${SONAR_BRANCH}" \
+  -Dsonar.coverage.jacoco.xmlReportPaths=target/jacoco-report/jacoco.xml \
+  -Dsonar.issue.ignore.multicriteria=postgresqlVarchar,postgresqlDuplicatedLiterals \
+  -Dsonar.issue.ignore.multicriteria.postgresqlVarchar.ruleKey=plsql:VarcharUsageCheck \
+  -Dsonar.issue.ignore.multicriteria.postgresqlVarchar.resourceKey=**/src/main/resources/db/migration/*.sql \
+  -Dsonar.issue.ignore.multicriteria.postgresqlDuplicatedLiterals.ruleKey=plsql:S1192 \
+  -Dsonar.issue.ignore.multicriteria.postgresqlDuplicatedLiterals.resourceKey=**/src/main/resources/db/migration/*.sql
+```
+
+Use `-Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=300` somente quando a análise local estiver em um contexto em que o SonarCloud exponha Quality Gate para a branch analisada, como `main`, uma branch longa com Quality Gate habilitado, ou análise de PR real com os parâmetros `sonar.pullrequest.*`. Branches locais curtas, como `develop`, podem aceitar upload da análise e ainda assim retornar 403 ao consultar o Quality Gate. Nesse caso, não trate a análise local como aprovação do Quality Gate; registre a limitação e mantenha o `service-ci-validate` remoto como evidência definitiva.
+
+Se `SONAR_TOKEN` não estiver disponível, não invente aprovação do SonarCloud: registre na resposta final que a validação remota do Quality Gate não pôde ser executada localmente e que o `clean verify` com JaCoCo foi a validação equivalente disponível.
+
 Antes de criar commit, execute uma revisão anti-divergência proporcional ao escopo da alteração. O objetivo é garantir que a mudança não introduziu divergência nova em relação ao estado anterior sem também resolvê-la no mesmo commit.
 
 Regras para a revisão anti-divergência:
@@ -207,6 +243,7 @@ Antes de criar o commit:
 - verifique `git status --short` antes de fazer stage
 - use `git diff -- <arquivo>` para revisar o conteúdo que será commitado quando houver mudanças pré-existentes no repositório
 - execute a revisão anti-divergência descrita em [Validação](#validação) e resolva divergências novas antes do commit
+- em repositórios de microsserviço com mudança publicável, execute a validação SonarCloud pré-commit descrita em [Validação](#validação), ou registre explicitamente a ausência de `SONAR_TOKEN` e a validação local equivalente executada
 - revise o diff staged com `git diff --cached` quando a tarefa alterar mais de um arquivo ou quando houver risco de inconsistência entre contratos
 
 Ao criar o commit, use mensagens em português seguindo Conventional Commits:

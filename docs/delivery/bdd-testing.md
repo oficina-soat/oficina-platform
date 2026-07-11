@@ -85,6 +85,40 @@ target/jacoco-report/
 
 O arquivo `target/jacoco-report/jacoco.xml` deve ser enviado ao SonarCloud pelo SonarScanner for Maven no workflow `service-ci-validate`. O README de cada microsserviço deve registrar uma evidência de cobertura, como link para o artifact do GitHub Actions, badge, dashboard SonarCloud ou captura anexada à entrega final. O checklist final da Fase 4 deve consolidar esses links quando for criado.
 
+## Validação antes do commit
+
+Antes de criar commit com alteração publicável em microsserviço, execute a validação local limpa para evitar que cobertura residual do JaCoCo mascare falhas que apareceriam no runner do GitHub Actions:
+
+```bash
+MAVEN_PROFILE="${MAVEN_PROFILE:-postgresql}"
+./mvnw -B clean verify -P"${MAVEN_PROFILE}" -DskipITs=false -DfailIfNoTests=false
+test -s target/jacoco-report/jacoco.xml
+```
+
+Para o `oficina-execution-service`, use `MAVEN_PROFILE=dynamodb`.
+
+Quando `SONAR_TOKEN` estiver disponível localmente, execute também o SonarScanner for Maven antes do commit. Informe explicitamente a branch local para evitar atualizar a análise da `main` por acidente:
+
+```bash
+SERVICE_NAME="${SERVICE_NAME:-$(basename "$(git rev-parse --show-toplevel)")}"
+MAVEN_PROFILE="${MAVEN_PROFILE:-postgresql}"
+SONAR_BRANCH="${SONAR_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}"
+./mvnw -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+  -P"${MAVEN_PROFILE}" \
+  -DskipTests=true \
+  -Dsonar.organization=oficina-soat \
+  -Dsonar.projectKey="${SERVICE_NAME}" \
+  -Dsonar.branch.name="${SONAR_BRANCH}" \
+  -Dsonar.coverage.jacoco.xmlReportPaths=target/jacoco-report/jacoco.xml \
+  -Dsonar.issue.ignore.multicriteria=postgresqlVarchar,postgresqlDuplicatedLiterals \
+  -Dsonar.issue.ignore.multicriteria.postgresqlVarchar.ruleKey=plsql:VarcharUsageCheck \
+  -Dsonar.issue.ignore.multicriteria.postgresqlVarchar.resourceKey=**/src/main/resources/db/migration/*.sql \
+  -Dsonar.issue.ignore.multicriteria.postgresqlDuplicatedLiterals.ruleKey=plsql:S1192 \
+  -Dsonar.issue.ignore.multicriteria.postgresqlDuplicatedLiterals.resourceKey=**/src/main/resources/db/migration/*.sql
+```
+
+Adicione `-Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=300` somente quando o SonarCloud expuser Quality Gate para o contexto analisado, como `main`, branch longa com Quality Gate habilitado ou PR real com `sonar.pullrequest.*`. Branches locais curtas podem aceitar o upload da análise e retornar 403 na consulta de Quality Gate. Quando isso ocorrer, registre a limitação na resposta final. O `clean verify` com JaCoCo continua obrigatório, mas não substitui a evidência remota final do Quality Gate no `service-ci-validate`.
+
 ## CI/CD
 
 O workflow padrão deve executar:

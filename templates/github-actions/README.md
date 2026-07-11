@@ -36,6 +36,8 @@ SONAR_TOKEN
 
 O `SONAR_TOKEN` deve ser configurado como secret do repositório ou da organização GitHub. O workflow executa o SonarScanner for Maven depois do `verify`, envia `target/jacoco-report/jacoco.xml` para o SonarCloud e aguarda o Quality Gate com `sonar.qualitygate.wait=true`.
 
+Antes de criar commit em microsserviço com alteração publicável, execute localmente `./mvnw -B clean verify -P"${MAVEN_PROFILE}" -DskipITs=false -DfailIfNoTests=false` e confirme a existência de `target/jacoco-report/jacoco.xml`. Quando `SONAR_TOKEN` estiver disponível no ambiente local, execute também o SonarScanner for Maven informando a branch local. Use `sonar.qualitygate.wait=true` apenas quando o SonarCloud expuser Quality Gate para o contexto analisado, como `main`, branch longa habilitada ou PR real.
+
 Quando esse workflow estiver ativo, a Automatic Analysis do SonarCloud deve ficar desabilitada no projeto para evitar análises duplicadas e para garantir que a cobertura venha do relatório JaCoCo gerado no CI.
 
 Variáveis recomendadas no repositório ou na organização GitHub:

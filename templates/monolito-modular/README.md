@@ -23,6 +23,9 @@ Origem: `oficina-app` no commit `da88d26c9edb971e493b680080e1b19cc99be68b`, copi
    - `{{FRAMEWORK}}`
    - `{{BUILD_COMMAND}}`
    - `{{FULL_VALIDATION_COMMAND}}`
+   - `{{FULL_VALIDATION_COMMAND_CLEAN}}`, por exemplo `./mvnw -B clean verify -Ppostgresql -DskipITs=false -DfailIfNoTests=false`
+   - `{{MAVEN_PROFILE}}`, por exemplo `postgresql` ou `dynamodb`
+   - `{{SONAR_ORGANIZATION}}`, por exemplo `oficina-soat`
 3. Copie `ArchitectureConstraintsTest.template.java` para `src/test/java/<base-package>/architecture/ArchitectureConstraintsTest.java`.
 4. Ajuste a linha `package`, `BASE_PACKAGE`, exceções legadas e pacotes compartilhados permitidos.
 5. Rode `{{BUILD_COMMAND}}` e corrija as violações apontadas antes de evoluir features.

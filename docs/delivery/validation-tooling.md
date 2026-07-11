@@ -93,6 +93,7 @@ Se `gh` não estiver disponível no `apt` da distribuição, use as instruções
 | Terraform | `terraform fmt -check -recursive`, `terraform validate` e `tflint` |
 | Dockerfile | `hadolint Dockerfile` |
 | Kubernetes YAML ou Kustomize | `yq`, `kubectl kustomize` e `kubeconform -strict -summary` |
+| Microsserviço Java publicável | `./mvnw -B clean verify ...`, presença de `target/jacoco-report/jacoco.xml` e SonarCloud local quando `SONAR_TOKEN` existir |
 | CI/CD remoto | `gh run view`, `gh run view --log` e `gh pr checks` |
 
 ## Exemplos por repositório
@@ -114,7 +115,9 @@ actionlint
 Nos microsserviços:
 
 ```bash
-./mvnw -B verify -Ppostgresql -DskipITs=false -DfailIfNoTests=false
+MAVEN_PROFILE="${MAVEN_PROFILE:-postgresql}"
+./mvnw -B clean verify -P"${MAVEN_PROFILE}" -DskipITs=false -DfailIfNoTests=false
+test -s target/jacoco-report/jacoco.xml
 actionlint
 hadolint Dockerfile
 ```
@@ -122,8 +125,31 @@ hadolint Dockerfile
 Para o `oficina-execution-service`, use o profile DynamoDB:
 
 ```bash
-./mvnw -B verify -Pdynamodb -DskipITs=false -DfailIfNoTests=false
+MAVEN_PROFILE=dynamodb ./mvnw -B clean verify -Pdynamodb -DskipITs=false -DfailIfNoTests=false
+test -s target/jacoco-report/jacoco.xml
 ```
+
+Quando `SONAR_TOKEN` estiver disponível localmente, execute também o SonarCloud antes de criar commit em microsserviço. Informe a branch explicitamente para não atualizar a análise da `main` por acidente:
+
+```bash
+SERVICE_NAME="${SERVICE_NAME:-$(basename "$(git rev-parse --show-toplevel)")}"
+MAVEN_PROFILE="${MAVEN_PROFILE:-postgresql}"
+SONAR_BRANCH="${SONAR_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}"
+./mvnw -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+  -P"${MAVEN_PROFILE}" \
+  -DskipTests=true \
+  -Dsonar.organization=oficina-soat \
+  -Dsonar.projectKey="${SERVICE_NAME}" \
+  -Dsonar.branch.name="${SONAR_BRANCH}" \
+  -Dsonar.coverage.jacoco.xmlReportPaths=target/jacoco-report/jacoco.xml \
+  -Dsonar.issue.ignore.multicriteria=postgresqlVarchar,postgresqlDuplicatedLiterals \
+  -Dsonar.issue.ignore.multicriteria.postgresqlVarchar.ruleKey=plsql:VarcharUsageCheck \
+  -Dsonar.issue.ignore.multicriteria.postgresqlVarchar.resourceKey=**/src/main/resources/db/migration/*.sql \
+  -Dsonar.issue.ignore.multicriteria.postgresqlDuplicatedLiterals.ruleKey=plsql:S1192 \
+  -Dsonar.issue.ignore.multicriteria.postgresqlDuplicatedLiterals.resourceKey=**/src/main/resources/db/migration/*.sql
+```
+
+Use `-Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=300` apenas em `main`, branch longa com Quality Gate habilitado ou PR real configurado com `sonar.pullrequest.*`. Em branch local curta, o SonarCloud pode aceitar a análise, mas bloquear a consulta do Quality Gate com 403.
 
 ## Referências oficiais
 

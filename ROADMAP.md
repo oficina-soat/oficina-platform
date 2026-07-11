@@ -549,7 +549,7 @@ Esta seção concentra tarefas que dependem de ambiente externo, credenciais adm
 
 ### Épico B2 — Integração financeira remota
 
-- [ ] `[B2-MP-REM-001]` Habilitar a integração Mercado Pago em modo sandbox no ambiente `lab` do `oficina-billing-service`, usando secret fora do Git para `OFICINA_MERCADO_PAGO_ACCESS_TOKEN`, `OFICINA_MERCADO_PAGO_ENABLED=true` e `OFICINA_MERCADO_PAGO_API_URL=https://api.mercadopago.com`. Evidenciar que o Deployment recebeu a configuração sem expor o token.
+- [ ] `[B2-MP-REM-001]` Habilitar a integração Mercado Pago em modo sandbox no ambiente `lab` do `oficina-billing-service`, usando GitHub Secret fora do Git para `OFICINA_MERCADO_PAGO_ACCESS_TOKEN` e GitHub Variable para `OFICINA_MERCADO_PAGO_ENABLED=true`, conforme [Nomes de runtime, secrets e infraestrutura](docs/infrastructure/infra-runtime-naming.md). Configurar `OFICINA_MERCADO_PAGO_API_URL` e `OFICINA_MERCADO_PAGO_PAYER_EMAIL` somente quando for necessário sobrescrever os defaults do serviço. Evidenciar que o Deployment recebeu a configuração sem expor o token.
 - [ ] `[B2-MP-EVID-001]` Executar uma cobrança PIX sandbox pelo fluxo real `POST /api/v1/pagamentos` e registrar evidências no [Checklist Final de Entrega da Fase 4](docs/delivery/phase-4-delivery-checklist.md): request e response locais com `provedor=mercado-pago`; `pagamentoId`; `transacaoExternaId`; referência externa ou `external_reference` associada ao `pagamentoId`; comprovação no painel ou API sandbox do Mercado Pago; logs e traces com `correlationId`; e evento financeiro correspondente (`pagamentoSolicitado`, `pagamentoConfirmado` ou `pagamentoRecusado`) no New Relic.
 
 ### Épico D — AWS, New Relic e entrega final

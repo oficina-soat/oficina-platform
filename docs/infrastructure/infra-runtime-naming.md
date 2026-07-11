@@ -85,6 +85,33 @@ Com os nomes padrão, os microsserviços devem apontar para `OTEL_EXPORTER_OTLP_
 
 A configuração executável do collector fica no repositório de infraestrutura em [New Relic OpenTelemetry Collector no EKS lab](../../../oficina-infra/docs/new-relic-otel-collector.md). Este repositório mantém os nomes canônicos e o contrato de runtime esperado pelos microsserviços.
 
+### Integração Mercado Pago
+
+A integração financeira pertence ao `oficina-billing-service`. Para o ambiente `lab`, a credencial do Mercado Pago deve ser informada no `oficina-infra`, preferencialmente como secret do repositório ou da organização GitHub, porque o workflow `Deploy Lab` recria ConfigMaps e Secrets Kubernetes quando o laboratório é destruído e recriado.
+
+Secret GitHub recomendado:
+
+```text
+OFICINA_MERCADO_PAGO_ACCESS_TOKEN=<access-token-sandbox-do-mercado-pago>
+```
+
+Variável GitHub recomendada quando a integração deve permanecer habilitada por padrão no `lab`:
+
+```text
+OFICINA_MERCADO_PAGO_ENABLED=true
+```
+
+Variáveis opcionais, configure apenas quando houver necessidade de sobrescrever os defaults do serviço:
+
+```text
+OFICINA_MERCADO_PAGO_API_URL=https://api.mercadopago.com
+OFICINA_MERCADO_PAGO_PAYER_EMAIL=<email-comprador-sandbox>
+```
+
+`OFICINA_MERCADO_PAGO_API_URL` não precisa ser cadastrada como variável GitHub enquanto o endpoint oficial for `https://api.mercadopago.com`, pois esse já é o default do `oficina-billing-service`. `OFICINA_MERCADO_PAGO_PAYER_EMAIL` também não precisa ser configurada sempre; use apenas se o Mercado Pago exigir um e-mail de comprador sandbox específico para o teste ou se o default local não for aceito.
+
+Não cadastre Public Key, Client ID, Client Secret, dados de cartão, chave Pix ou webhook secret para a Fase 4 atual, porque o fluxo implementado no `oficina-billing-service` chama o backend do Mercado Pago diretamente com `Access Token` e método `PIX`. Esses valores só devem entrar no padrão quando houver frontend Mercado Pago, OAuth, produção real ou webhook assíncrono.
+
 ### Credenciais AWS do GitHub Actions
 
 Secrets obrigatórios no repositório ou na organização GitHub:

@@ -54,7 +54,7 @@
         },
         {
           "id": "910001003",
-          "title": "Taxa de erro por servico",
+          "title": "Taxa de falhas HTTP por servico",
           "layout": {
             "column": 9,
             "row": 1,
@@ -71,7 +71,7 @@
                 "accountIds": [
                   0
                 ],
-                "query": "FROM Span SELECT percentage(count(*), WHERE error IS true OR otel.status_code = 'ERROR' OR http.response.status_code >= 500 OR http.status_code >= 500) AS 'erro %' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND service.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') AND (span.kind = 'server' OR span.kind = 'SERVER')"
+                "query": "FROM Log SELECT percentage(count(*), WHERE numeric(`http.status`) >= 400) AS 'falhas HTTP %' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND service.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') AND `http.status` IS NOT NULL FACET service.name"
               }
             ],
             "thresholds": [
@@ -214,7 +214,7 @@
         },
         {
           "id": "910001009",
-          "title": "Logs de erro recentes",
+          "title": "Falhas HTTP e logs de erro recentes",
           "layout": {
             "column": 7,
             "row": 10,
@@ -231,14 +231,14 @@
                 "accountIds": [
                   0
                 ],
-                "query": "FROM Log SELECT latest(timestamp) AS 'quando', latest(message) AS 'mensagem', latest(correlationId) AS 'correlationId', latest(traceId) AS 'traceId' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND service.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') AND (level = 'ERROR' OR level = 'FATAL' OR message LIKE '%Exception%') FACET service.name LIMIT 50"
+                "query": "FROM Log SELECT latest(timestamp) AS 'quando', latest(message) AS 'mensagem', latest(correlationId) AS 'correlationId', latest(traceId) AS 'traceId', latest(`http.status`) AS 'status', latest(`http.path`) AS 'rota' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND service.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') AND ((`http.status` IS NOT NULL AND numeric(`http.status`) >= 400) OR level = 'ERROR' OR level = 'FATAL' OR message LIKE '%Exception%') FACET service.name LIMIT 50"
               }
             ]
           }
         },
         {
           "id": "910001010",
-          "title": "CPU por pod",
+          "title": "CPU por deployment",
           "layout": {
             "column": 1,
             "row": 13,
@@ -255,7 +255,7 @@
                 "accountIds": [
                   0
                 ],
-                "query": "FROM Metric SELECT average(k8s.pod.cpu_limit_utilization) AS 'CPU limite' WHERE k8s.cluster.name = 'eks-lab' AND k8s.namespace.name = 'default' AND k8s.pod.name LIKE 'oficina-%' FACET k8s.pod.name TIMESERIES"
+                "query": "FROM Metric SELECT average(`container.cpu.usage`) AS 'CPU cores', average(`k8s.pod.cpu_limit_utilization`) * 100 AS 'CPU limite %' WHERE `k8s.cluster.name` = 'eks-lab' AND `k8s.namespace.name` = 'default' AND `k8s.deployment.name` IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') FACET `k8s.deployment.name` TIMESERIES"
               }
             ],
             "legend": {
@@ -265,7 +265,7 @@
         },
         {
           "id": "910001011",
-          "title": "Memoria por pod",
+          "title": "Memoria por deployment",
           "layout": {
             "column": 5,
             "row": 13,
@@ -282,7 +282,7 @@
                 "accountIds": [
                   0
                 ],
-                "query": "FROM Metric SELECT average(k8s.pod.memory_limit_utilization) AS 'memoria limite' WHERE k8s.cluster.name = 'eks-lab' AND k8s.namespace.name = 'default' AND k8s.pod.name LIKE 'oficina-%' FACET k8s.pod.name TIMESERIES"
+                "query": "FROM Metric SELECT average(`container.memory.usage`) / 1024 / 1024 AS 'memoria MiB', average(`k8s.pod.memory_limit_utilization`) * 100 AS 'memoria limite %' WHERE `k8s.cluster.name` = 'eks-lab' AND `k8s.namespace.name` = 'default' AND `k8s.deployment.name` IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') FACET `k8s.deployment.name` TIMESERIES"
               }
             ],
             "legend": {
@@ -292,7 +292,7 @@
         },
         {
           "id": "910001012",
-          "title": "Restarts por pod",
+          "title": "Restarts por deployment",
           "layout": {
             "column": 9,
             "row": 13,
@@ -309,7 +309,7 @@
                 "accountIds": [
                   0
                 ],
-                "query": "FROM Metric SELECT max(kube_pod_container_status_restarts_total) AS 'restarts' WHERE k8s.cluster.name = 'eks-lab' AND k8s.namespace.name = 'default' AND k8s.container.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') FACET k8s.pod.name TIMESERIES"
+                "query": "FROM Metric SELECT max(`kube_pod_container_status_restarts_total`) AS 'restarts' WHERE `k8s.cluster.name` = 'eks-lab' AND `k8s.namespace.name` = 'default' AND `k8s.deployment.name` IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') FACET `k8s.deployment.name` TIMESERIES"
               }
             ],
             "legend": {
@@ -319,7 +319,7 @@
         },
         {
           "id": "910001013",
-          "title": "Pods e readiness",
+          "title": "Deployments e readiness",
           "layout": {
             "column": 1,
             "row": 16,
@@ -336,7 +336,7 @@
                 "accountIds": [
                   0
                 ],
-                "query": "FROM Metric SELECT latest(kube_pod_status_ready) AS 'ready', max(kube_pod_container_status_restarts_total) AS 'restarts' WHERE k8s.cluster.name = 'eks-lab' AND k8s.namespace.name = 'default' AND k8s.pod.name LIKE 'oficina-%' FACET k8s.pod.name LIMIT 50"
+                "query": "FROM Metric SELECT latest(`kube_deployment_status_replicas_ready`) AS 'ready replicas', latest(`kube_deployment_status_replicas_available`) AS 'available replicas', latest(`kube_deployment_spec_replicas`) AS 'desired replicas' WHERE `k8s.cluster.name` = 'eks-lab' AND `k8s.namespace.name` = 'default' AND `k8s.deployment.name` IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') FACET `k8s.deployment.name` LIMIT 20"
               }
             ]
           }

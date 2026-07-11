@@ -22,7 +22,7 @@
             "id": "viz.markdown"
           },
           "rawConfiguration": {
-            "text": "## Oficina SOAT - Saga e OS\n\nAntes de importar, substitua todas as ocorrencias de `\"accountIds\": [0]` pelo ID numerico da sua conta New Relic.\n\nEste dashboard usa `oficina-os-service` como orquestrador e combina `Span` e `Log`. As consultas de eventos assumem logs estruturados contendo `domainEventType`, `eventType`, `correlationId`, `ordemServicoId` e, quando aplicavel, `sagaId`, `saga.etapa`, `saga.estado` e `saga.duracaoMs`. `eventType` e o campo canonico dos logs dos pods; `domainEventType` e o alias consultavel no New Relic quando `eventType` for reservado na ingestao."
+            "text": "## Oficina SOAT - Saga e OS\n\nAntes de importar, substitua todas as ocorrencias de `\"accountIds\": [0]` pelo ID numerico da sua conta New Relic.\n\nEste dashboard usa `oficina-os-service` como orquestrador e combina `Span` e `Log`. As consultas de eventos usam os atributos estruturados confirmados no New Relic: `domainEventType`, `event.type`, `correlationId`, `aggregateId`, `producer`, `topic`, `messageStatus`, `traceId` e `spanId`. `eventType` continua preservado no stdout dos pods, mas `domainEventType` e `event.type` sao os aliases consultaveis no New Relic."
           }
         },
         {
@@ -236,14 +236,14 @@
                 "accountIds": [
                   0
                 ],
-                "query": "FROM Span SELECT latest(trace.id) AS 'traceId', latest(http.route) AS 'rota', max(duration.ms) AS 'duracao max ms' WHERE service.name = 'oficina-os-service' AND service.namespace = 'oficina' AND deployment.environment = 'lab' AND (http.route LIKE '%ordens%' OR http.target LIKE '%ordens%' OR name LIKE '%ordens%') FACET correlationId LIMIT 50"
+                "query": "FROM Span SELECT latest(`trace.id`) AS 'traceId', latest(`http.route`) AS 'rota', max(`duration.ms`) AS 'duracao max ms' WHERE service.name = 'oficina-os-service' AND service.namespace = 'oficina' AND deployment.environment = 'lab' AND (`http.route` LIKE '%ordens%' OR `url.path` LIKE '%ordens%' OR name LIKE '%ordens%') FACET `trace.id` LIMIT 50"
               }
             ]
           }
         },
         {
           "id": "920001010",
-          "title": "Duracao por etapa da Saga",
+          "title": "Eventos por produtor e tipo",
           "layout": {
             "column": 1,
             "row": 10,
@@ -260,7 +260,7 @@
                 "accountIds": [
                   0
                 ],
-                "query": "FROM Log SELECT average(saga.duracaoMs) AS 'media ms', percentile(saga.duracaoMs, 95) AS 'p95 ms' WHERE service.name = 'oficina-os-service' AND service.namespace = 'oficina' AND deployment.environment = 'lab' AND saga.etapa IS NOT NULL AND saga.duracaoMs IS NOT NULL FACET saga.etapa TIMESERIES"
+                "query": "FROM Log SELECT count(*) WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND message = 'outbox event registered' AND domainEventType IS NOT NULL FACET producer, domainEventType TIMESERIES"
               }
             ],
             "legend": {
@@ -270,7 +270,7 @@
         },
         {
           "id": "920001011",
-          "title": "Correlacao por ordemServicoId",
+          "title": "Correlacao por aggregateId",
           "layout": {
             "column": 1,
             "row": 13,
@@ -287,7 +287,7 @@
                 "accountIds": [
                   0
                 ],
-                "query": "FROM Log SELECT latest(timestamp) AS 'ultimo log', latest(correlationId) AS 'correlationId', latest(traceId) AS 'traceId', uniques(domainEventType) AS 'eventos' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND ordemServicoId IS NOT NULL FACET ordemServicoId LIMIT 50"
+                "query": "FROM Log SELECT latest(timestamp) AS 'ultimo log', latest(correlationId) AS 'correlationId', latest(traceId) AS 'traceId', latest(producer) AS 'producer', uniques(domainEventType) AS 'eventos' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND message = 'outbox event registered' AND aggregateId IS NOT NULL FACET aggregateId LIMIT 50"
               }
             ]
           }
@@ -335,7 +335,7 @@
                 "accountIds": [
                   0
                 ],
-                "query": "FROM Log SELECT count(*) WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND outbox.status IS NOT NULL FACET service.name, outbox.status LIMIT 30"
+                "query": "FROM Log SELECT count(*) WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND message = 'outbox event registered' AND messageStatus IS NOT NULL FACET service.name, messageStatus LIMIT 30"
               }
             ]
           }
@@ -359,7 +359,7 @@
                 "accountIds": [
                   0
                 ],
-                "query": "FROM Log SELECT latest(timestamp) AS 'quando', latest(message) AS 'mensagem', latest(domainEventType) AS 'domainEventType', latest(correlationId) AS 'correlationId' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND (level = 'ERROR' OR level = 'FATAL' OR message LIKE '%Saga%' OR message LIKE '%Outbox%' OR message LIKE '%Evento nao suportado%') FACET service.name LIMIT 50"
+                "query": "FROM Log SELECT latest(timestamp) AS 'quando', latest(message) AS 'mensagem', latest(domainEventType) AS 'domainEventType', latest(correlationId) AS 'correlationId', latest(`http.status`) AS 'status', latest(`http.path`) AS 'rota' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND ((`http.status` IS NOT NULL AND numeric(`http.status`) >= 400) OR level = 'ERROR' OR level = 'FATAL' OR message LIKE '%Saga%' OR message LIKE '%Outbox%' OR message LIKE '%Evento nao suportado%') FACET service.name LIMIT 50"
               }
             ]
           }

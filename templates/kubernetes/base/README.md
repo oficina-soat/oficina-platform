@@ -53,7 +53,7 @@ Para aplicar em um cluster, o repositório de infraestrutura deve substituir:
 - Os `Deployment`, `Service`, `ServiceAccount` e `ConfigMap` preservam o nome completo do microsserviço.
 - Os `Service` são `ClusterIP` por padrão. Exposição via API Gateway, NLB, Ingress ou `NodePort` pertence ao repositório de infraestrutura.
 - As probes usam os endpoints Quarkus definidos no [Padrão de Observabilidade Distribuída](../../../docs/observability.md): `/q/health/live` e `/q/health/ready`.
-- As métricas ficam disponíveis em `/q/metrics`.
+- As métricas ficam disponíveis em `/q/metrics`; os pods recebem anotações `prometheus.io/*` para permitir scrape interno pelo New Relic OpenTelemetry Collector ou por outra coleta compatível com Prometheus.
 - Os traces OpenTelemetry usam `QUARKUS_OTEL_TRACES_EXPORTER=cdi` para acionar o exportador OTLP gerenciado pelo Quarkus e são enviados por padrão para `http://nr-k8s-otel-collector-gateway.newrelic.svc.cluster.local:4317`, conforme [Nomes de runtime, secrets e infraestrutura](../../../docs/infra-runtime-naming.md).
 - O secret `oficina-jwt-keys` é montado em `/jwt`, mantendo compatibilidade com a autenticação da suíte.
 - `oficina-os-service` e `oficina-billing-service` usam secrets Kubernetes separados para materializar `JDBC_DATABASE_URL`, `REACTIVE_DATABASE_URL`, `DB_USERNAME` e `DB_PASSWORD`.

@@ -48,7 +48,7 @@ Depois abra o arquivo gerado em `/tmp` e cole o JSON no `Import dashboard`.
 
 ## Filtros Canônicos
 
-Todos os painéis usam os filtros:
+Painéis de `Span`, `Log` e métricas Prometheus dos microsserviços usam os filtros:
 
 ```nrql
 service.namespace = 'oficina'
@@ -56,11 +56,13 @@ deployment.environment = 'lab'
 service.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service')
 ```
 
+Painéis de métricas Kubernetes usam `k8s.cluster.name = 'eks-lab'` e `k8s.namespace.name = 'default'`, conforme o formato enviado pelo New Relic OpenTelemetry Collector.
+
 Os sinais esperados são:
 
 - `Span` para throughput, latência, erro e traces lentos;
 - `Log` para mensagens estruturadas, `correlationId`, erros, eventos e Saga;
-- `K8sContainerSample` e `K8sPodSample` para CPU, memória, restarts e readiness dos pods.
+- `Metric` para métricas Kubernetes enviadas pelo New Relic OpenTelemetry Collector e para métricas Prometheus raspadas de `/q/metrics` nos microsserviços.
 
 ## Ajustes Esperados
 
@@ -84,7 +86,11 @@ FROM Log SELECT keyset() WHERE service.namespace = 'oficina' SINCE 30 minutes ag
 ```
 
 ```nrql
-FROM K8sContainerSample SELECT keyset() WHERE clusterName = 'eks-lab' SINCE 30 minutes ago
+FROM Metric SELECT keyset() WHERE k8s.cluster.name = 'eks-lab' SINCE 30 minutes ago
+```
+
+```nrql
+FROM Metric SELECT keyset() WHERE service.namespace = 'oficina' SINCE 30 minutes ago
 ```
 
 ## Limite Atual da Saga

@@ -25,7 +25,7 @@ Os testes usaram autenticação via `POST /auth/token`. O JWT e credenciais não
 | Logs com `correlationId` do fluxo | Falha: não foram encontradas entradas dos `correlationId` dos testes nos logs dos pods. |
 | Traces distribuídos | Falha: os três serviços registraram que `quarkus.otel.traces.exporter` ficou fixado em build como `none`, apesar de `QUARKUS_OTEL_TRACES_EXPORTER=cdi` em runtime. |
 | Métricas `/q/metrics` | Sucesso local no cluster: os três serviços expuseram métricas via port-forward. |
-| Dashboards New Relic | Falha parcial: evidência manual informou que os dashboards exibiram logs, mas nenhum gráfico indicou recebimento de métricas. |
+| Dashboards New Relic | Falha corrigida parcialmente: evidência manual informou ausência de métricas; troubleshooting posterior corrigiu o scrape de `/q/metrics`, mas ainda falta confirmação NRQL no New Relic. |
 | Eventos com `correlationId` | Não comprovado: não houve evidência consultável de eventos/outbox com `correlationId` via logs, endpoint público ou New Relic. |
 | Consulta direta ao New Relic | Não executada: não havia `NEW_RELIC_*` ou chave de consulta NRQL disponível no ambiente local. |
 
@@ -158,6 +158,18 @@ Evidência manual informada em 2026-07-11: os dashboards do New Relic exibiram l
 
 Interpretação: a exposição local de `/q/metrics` nos pods está funcional, mas a coleta, transformação, envio ou consulta das métricas no New Relic não ficou comprovada. Esse resultado reforça que `[D-NR-REM-005]` deve permanecer pendente e também impede considerar os dashboards mínimos como evidência completa de observabilidade.
 
+### Troubleshooting das métricas
+
+Execução complementar em 2026-07-11:
+
+- causa identificada: o ConfigMap gerado pelo chart `nr-k8s-otel-collector` tinha jobs Prometheus para `kube-state-metrics`, `apiserver`, `cadvisor` e `kubelet`, mas não tinha job para raspar `/q/metrics` dos pods dos microsserviços;
+- correção aplicada no `oficina-infra`: `values.lab.yaml` passou a configurar o receiver `prometheus/oficina-microservices`, com descoberta dos pods `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service` no namespace `default`;
+- correção aplicada nos manifests dos microsserviços no `oficina-infra`: os três Deployments receberam anotações `prometheus.io/scrape=true`, `prometheus.io/path=/q/metrics` e `prometheus.io/port=8080`;
+- correção aplicada no ambiente `lab`: o release Helm `nr-k8s-otel-collector` foi atualizado para a revision `3`, e os três Deployments foram anotados e tiveram rollout concluído;
+- validação no cluster: o Deployment do collector ficou `1/1 Running`, os três microsserviços ficaram `1/1`, e os logs do collector registraram `Scrape job added` para `jobName=oficina-microservices`, sem erro de scrape/exportação nos logs recentes.
+
+Limite da validação: a ingestão no backend New Relic ainda não foi confirmada por NRQL porque não havia chave de consulta New Relic disponível no ambiente local. A validação manual esperada deve consultar `FROM Metric` com `k8s.cluster.name = 'eks-lab'` e `service.namespace = 'oficina'`.
+
 ### Logs
 
 Consulta executada nos logs dos três Deployments com os `correlationId` dos cenários:
@@ -202,7 +214,7 @@ O fluxo REST gerou efeitos funcionais de orçamento, pagamento, execução, esto
 | Consolidação inicial do relatório | Erro operacional corrigido | Um uso incorreto de `jq` falhou ao agregar o primeiro arquivo de resultados. | Não afetou as chamadas REST; o resumo foi refeito com os arquivos temporários. |
 | Logs de negócio | Falha de evidência | Nenhum `correlationId` dos cenários apareceu em logs dos pods. | Impede concluir a etapa `[D-NR-REM-005]`. |
 | Traces | Falha de configuração/runtime | `quarkus.otel.traces.exporter` está fixado como `none` no build dos três serviços. | Impede comprovar traces no New Relic. |
-| Dashboards sem métricas | Falha de evidência remota | Os dashboards no New Relic exibiram logs, mas nenhum gráfico indicou recebimento de métricas. | Impede usar o New Relic como evidência completa de métricas distribuídas. |
+| Dashboards sem métricas | Falha corrigida parcialmente | A causa local foi identificada e corrigida no collector e nos manifests; falta confirmar a ingestão com NRQL no New Relic. | Ainda impede usar o New Relic como evidência completa até a confirmação remota. |
 | Eventos | Falha de evidência | Eventos/outbox não ficaram consultáveis por logs, endpoint ou New Relic nesta execução. | Impede comprovar correlação entre eventos e demais sinais. |
 | New Relic remoto | Limitação de acesso | Não havia chave de consulta New Relic/NRQL disponível no ambiente local. | Impede confirmar dashboards, logs, spans e métricas diretamente no backend New Relic. |
 
@@ -210,6 +222,6 @@ O fluxo REST gerou efeitos funcionais de orçamento, pagamento, execução, esto
 
 1. Corrigir o build dos três microsserviços para que `quarkus.otel.traces.exporter` não fique fixado em `none` quando o ambiente `lab` exige tracing.
 2. Emitir logs estruturados de entrada HTTP, Outbox, eventos e Saga contendo `correlationId`, `eventType`, `sagaId`, `ordemServicoId` e status operacional.
-3. Investigar a pipeline de métricas do New Relic OpenTelemetry Collector, incluindo descoberta Prometheus, annotations/labels dos pods, filtros de métricas e consultas NRQL usadas pelos widgets.
+3. Confirmar no New Relic, via NRQL, que `Metric` contém dados com `k8s.cluster.name = 'eks-lab'` e `service.namespace = 'oficina'` após a correção do receiver `prometheus/oficina-microservices`.
 4. Expor evidência operacional segura para Saga/Outbox ou criar consultas NRQL versionadas para validar eventos e correlação no New Relic.
 5. Reexecutar `[D-NR-REM-005]` com uma chave de consulta New Relic disponível, confirmando dados em `Log`, `Span` e métricas coletadas.

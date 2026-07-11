@@ -22,7 +22,7 @@
             "id": "viz.markdown"
           },
           "rawConfiguration": {
-            "text": "## Oficina SOAT - Microsservicos Lab\n\nAntes de importar, substitua todas as ocorrencias de `\"accountIds\": [0]` pelo ID numerico da sua conta New Relic.\n\nFiltros canonicos usados nas consultas:\n\n- `service.namespace = 'oficina'`\n- `deployment.environment = 'lab'`\n- `service.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service')`\n\nSe algum grafico ficar sem dados, valide primeiro se o New Relic OpenTelemetry Collector esta recebendo logs, traces e metricas dos pods no cluster `eks-lab`."
+            "text": "## Oficina SOAT - Microsservicos Lab\n\nAntes de importar, substitua todas as ocorrencias de `\"accountIds\": [0]` pelo ID numerico da sua conta New Relic.\n\nFiltros canonicos para spans, logs e metricas dos microsservicos:\n\n- `service.namespace = 'oficina'`\n- `deployment.environment = 'lab'`\n- `service.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service')`\n\nAs metricas coletadas pelo New Relic OpenTelemetry Collector devem aparecer em `Metric`, com `k8s.cluster.name = 'eks-lab'` para sinais Kubernetes e os filtros canonicos acima para `/q/metrics` dos microsservicos."
           }
         },
         {
@@ -255,7 +255,7 @@
                 "accountIds": [
                   0
                 ],
-                "query": "FROM K8sContainerSample SELECT average(cpuCoresUtilization) AS 'CPU %' WHERE clusterName = 'eks-lab' AND namespaceName = 'default' AND containerName IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') FACET podName TIMESERIES"
+                "query": "FROM Metric SELECT average(k8s.pod.cpu_limit_utilization) AS 'CPU limite' WHERE k8s.cluster.name = 'eks-lab' AND k8s.namespace.name = 'default' AND k8s.pod.name LIKE 'oficina-%' FACET k8s.pod.name TIMESERIES"
               }
             ],
             "legend": {
@@ -282,7 +282,7 @@
                 "accountIds": [
                   0
                 ],
-                "query": "FROM K8sContainerSample SELECT average(memoryWorkingSetUtilization) AS 'memoria %' WHERE clusterName = 'eks-lab' AND namespaceName = 'default' AND containerName IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') FACET podName TIMESERIES"
+                "query": "FROM Metric SELECT average(k8s.pod.memory_limit_utilization) AS 'memoria limite' WHERE k8s.cluster.name = 'eks-lab' AND k8s.namespace.name = 'default' AND k8s.pod.name LIKE 'oficina-%' FACET k8s.pod.name TIMESERIES"
               }
             ],
             "legend": {
@@ -309,7 +309,7 @@
                 "accountIds": [
                   0
                 ],
-                "query": "FROM K8sContainerSample SELECT max(restartCount) AS 'restarts' WHERE clusterName = 'eks-lab' AND namespaceName = 'default' AND containerName IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') FACET podName TIMESERIES"
+                "query": "FROM Metric SELECT max(kube_pod_container_status_restarts_total) AS 'restarts' WHERE k8s.cluster.name = 'eks-lab' AND k8s.namespace.name = 'default' AND k8s.container.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') FACET k8s.pod.name TIMESERIES"
               }
             ],
             "legend": {
@@ -336,7 +336,7 @@
                 "accountIds": [
                   0
                 ],
-                "query": "FROM K8sPodSample SELECT latest(status) AS 'status', latest(isReady) AS 'ready', latest(restartCount) AS 'restarts' WHERE clusterName = 'eks-lab' AND namespaceName = 'default' AND podName LIKE 'oficina-%' FACET podName LIMIT 50"
+                "query": "FROM Metric SELECT latest(kube_pod_status_ready) AS 'ready', max(kube_pod_container_status_restarts_total) AS 'restarts' WHERE k8s.cluster.name = 'eks-lab' AND k8s.namespace.name = 'default' AND k8s.pod.name LIKE 'oficina-%' FACET k8s.pod.name LIMIT 50"
               }
             ]
           }
@@ -361,6 +361,30 @@
                   0
                 ],
                 "query": "FROM Log SELECT latest(timestamp) AS 'ultimo log', latest(message) AS 'mensagem', latest(traceId) AS 'traceId', count(*) AS 'linhas' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND service.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') AND correlationId IS NOT NULL FACET correlationId, service.name LIMIT 50"
+              }
+            ]
+          }
+        },
+        {
+          "id": "910001015",
+          "title": "Metricas Prometheus dos servicos",
+          "layout": {
+            "column": 1,
+            "row": 19,
+            "width": 12,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.table"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Metric SELECT latest(process_uptime_seconds) AS 'uptime s', latest(jvm_threads_live_threads) AS 'threads JVM', latest(http_server_active_requests) AS 'requests ativos' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND service.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') FACET service.name LIMIT 50"
               }
             ]
           }

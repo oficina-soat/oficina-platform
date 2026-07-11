@@ -180,6 +180,7 @@ Use quando o `oficina-billing-service` falhar de forma recorrente ao chamar Merc
 
 - [ ] verificar status do `oficina-billing-service`;
 - [ ] filtrar logs por `pagamentoId`, `ordemServicoId`, `correlationId` e provedor;
+- [ ] verificar métricas `payment.provider.requests.count`, `payment.provider.request.duration`, `payment.provider.failures.count` e `payment.provider.unavailable.count` para `provider=mercado-pago`;
 - [ ] distinguir erro de configuração, indisponibilidade externa, timeout, credencial ausente ou recusa de negócio;
 - [ ] confirmar se o serviço está publicando `pagamentoSolicitado`, `pagamentoConfirmado` ou `pagamentoRecusado` conforme o contrato.
 

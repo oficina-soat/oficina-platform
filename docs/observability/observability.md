@@ -228,6 +228,21 @@ Métricas de Saga mínimas para `oficina-os-service`:
 | `saga.instances.failed.count` | Counter | `service`, `sagaType`, `reason` |
 | `saga.step.duration` | Histogram | `service`, `sagaType`, `step` |
 
+Métricas de provedor financeiro mínimas para `oficina-billing-service`:
+
+| Métrica | Tipo | Dimensões |
+|---|---|---|
+| `payment.provider.enabled` | Gauge | `service`, `provider`, `environment` |
+| `payment.provider.requests.count` | Counter | `service`, `provider`, `method`, `outcome`, `providerStatus` |
+| `payment.provider.request.duration` | Histogram | `service`, `provider`, `method`, `outcome` |
+| `payment.provider.amount` | Distribution | `service`, `provider`, `method`, `outcome`, `currency` |
+| `payment.provider.failures.count` | Counter | `service`, `provider`, `method`, `reason` |
+| `payment.provider.unavailable.count` | Counter | `service`, `provider`, `reason` |
+
+Para Mercado Pago, `provider` deve ser `mercado-pago` e `method` deve refletir o método local de pagamento, como `PIX`. `outcome` deve usar valores de baixa cardinalidade, como `confirmed`, `rejected`, `pending`, `failure` ou `not_integrated`. `providerStatus` deve refletir apenas os status de negócio retornados pelo provedor, como `approved`, `rejected`, `cancelled`, `refunded`, `charged_back`, `pending` ou `in_process`.
+
+As métricas de provedor financeiro não devem usar `pagamentoId`, `ordemServicoId`, `transacaoExternaId`, CPF, e-mail, `correlationId` ou qualquer identificador de alta cardinalidade como dimensão. Esses identificadores pertencem a logs e traces.
+
 ## Traces
 
 Traces devem cobrir:
@@ -327,6 +342,15 @@ O `oficina-os-service` deve possuir visão adicional da Saga com:
 - Sagas em falha manual;
 - duração por etapa;
 - eventos inválidos por estado.
+
+O `oficina-billing-service` deve possuir visão adicional de consumo Mercado Pago quando a integração estiver habilitada:
+
+- chamadas ao provedor por método e desfecho;
+- taxa de sucesso, recusa, pendência e falha;
+- latência p95 e p99 da chamada externa;
+- valor financeiro total por desfecho;
+- indisponibilidade por motivo;
+- logs e traces correlacionáveis por `correlationId` para a mesma cobrança sandbox.
 
 ## Alertas Mínimos
 

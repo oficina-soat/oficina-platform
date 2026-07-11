@@ -59,7 +59,7 @@ Cada repositório de microsserviço deve possuir:
 | Comunicação REST | Rotas aderentes ao [Contrato de APIs REST](../../contracts/Contrato%20de%20APIs%20REST.md), às OpenAPI dos três serviços e às [Rotas públicas do API Gateway](../infrastructure/api-gateway-public-routes.md). | A preencher |
 | Mensageria assíncrona | Eventos e tópicos aderentes ao [Contrato de Eventos de Domínio](../../contracts/Contrato%20de%20Eventos%20de%20Domínio.md) e ao [Contrato de Tópicos de Mensageria](../../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md). | A preencher |
 | Saga Pattern | Orquestração pelo `oficina-os-service`, com caminho feliz e falha compensada. | A preencher |
-| Mercado Pago | Integração financeira documentada no `oficina-billing-service`, conforme a [Referência API Mercado Pago](https://www.mercadopago.com.br/developers/pt/reference). | A preencher |
+| Mercado Pago | Integração financeira documentada e evidência de cobrança PIX sandbox executada pelo `oficina-billing-service`, com `pagamentoId`, `transacaoExternaId`, referência externa do Mercado Pago, logs/traces por `correlationId` e evento financeiro correspondente. | A preencher |
 | Observabilidade | Logs estruturados, métricas, traces e dashboards mínimos conforme [Padrão de Observabilidade Distribuída](../observability/observability.md). | A preencher |
 | Diagrama geral | Arquitetura final alinhada ao [Diagrama Geral da Arquitetura Final](../architecture/architecture-diagram.md). | [Diagrama Geral da Arquitetura Final](../architecture/architecture-diagram.md) |
 
@@ -74,6 +74,8 @@ O vídeo de até 15 minutos deve demonstrar:
 - [ ] Quality Gate externo aprovado quando SonarCloud estiver configurado, ou pendência/evidência alternativa registrada;
 - [ ] deploy automatizado de pelo menos um microsserviço em Kubernetes;
 - [ ] rastreamento distribuído com `correlationId` em logs e traces;
+- [ ] cobrança PIX sandbox no Mercado Pago pelo fluxo real `POST /api/v1/pagamentos`, sem simulação manual de confirmação;
+- [ ] painel ou consulta New Relic com métricas de consumo Mercado Pago do `oficina-billing-service`;
 - [ ] consulta de Swagger/OpenAPI ou collection Postman atualizada.
 
 ## PDF Final
@@ -87,7 +89,8 @@ O PDF entregue no portal deve conter:
 - [ ] descrição da estratégia de Saga orquestrada pelo `oficina-os-service`;
 - [ ] justificativa da divisão em `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`;
 - [ ] justificativa das tecnologias usadas: Quarkus, AWS, PostgreSQL, DynamoDB, mensageria, Kubernetes, New Relic, SonarCloud e Mercado Pago;
-- [ ] links para evidências de cobertura, Swagger/OpenAPI, pipelines e deploy;
+- [ ] links para evidências de cobertura, Swagger/OpenAPI, pipelines, deploy e cobrança Mercado Pago sandbox;
+- [ ] evidências de métricas de consumo Mercado Pago, incluindo volume de chamadas, desfecho, latência e valor total por status;
 - [ ] observações sobre limitações conhecidas ou pendências aceitas para a apresentação.
 
 ## Diagrama Geral

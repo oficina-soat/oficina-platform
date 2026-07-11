@@ -6,11 +6,20 @@ AWS_REGION="${AWS_REGION:-us-east-1}"
 API_GATEWAY_NAME="${API_GATEWAY_NAME:-eks-lab-http-api}"
 AUTH_BASE_URL="${AUTH_BASE_URL:-${OFICINA_AUTH_BASE_URL:-}}"
 DEFAULT_ADMIN_CPF="${DEFAULT_ADMIN_CPF:-84191404067}"
-DEFAULT_ADMIN_PASSWORD="${DEFAULT_ADMIN_PASSWORD:-12345}"
+DEFAULT_ADMIN_PASSWORD="${DEFAULT_ADMIN_PASSWORD:-secret}"
 AUTH_CPF="${AUTH_CPF:-${ADMIN_CPF:-${DEFAULT_ADMIN_CPF}}}"
 AUTH_PASSWORD="${AUTH_PASSWORD:-${OFICINA_AUTH_PASSWORD:-}}"
 AUTH_PASSWORD_FILE="${AUTH_PASSWORD_FILE:-}"
 OUTPUT_FORMAT="${OUTPUT_FORMAT:-header}"
+TEMP_FILES=()
+
+cleanup() {
+	if [[ "${#TEMP_FILES[@]}" -gt 0 ]]; then
+		rm -f "${TEMP_FILES[@]}"
+	fi
+}
+
+trap cleanup EXIT
 
 usage() {
 	cat <<EOF
@@ -164,7 +173,7 @@ request_token() {
 	local response_file status token
 
 	response_file="$(mktemp)"
-	trap 'rm -f "${response_file}"' EXIT
+	TEMP_FILES+=("${response_file}")
 
 	status="$(
 		token_payload "${cpf}" "${password}" |

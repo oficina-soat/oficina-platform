@@ -5,7 +5,9 @@ set -euo pipefail
 AWS_REGION="${AWS_REGION:-us-east-1}"
 API_GATEWAY_NAME="${API_GATEWAY_NAME:-eks-lab-http-api}"
 AUTH_BASE_URL="${AUTH_BASE_URL:-${OFICINA_AUTH_BASE_URL:-}}"
-AUTH_CPF="${AUTH_CPF:-${ADMIN_CPF:-84191404067}}"
+DEFAULT_ADMIN_CPF="${DEFAULT_ADMIN_CPF:-84191404067}"
+DEFAULT_ADMIN_PASSWORD="${DEFAULT_ADMIN_PASSWORD:-12345}"
+AUTH_CPF="${AUTH_CPF:-${ADMIN_CPF:-${DEFAULT_ADMIN_CPF}}}"
 AUTH_PASSWORD="${AUTH_PASSWORD:-${OFICINA_AUTH_PASSWORD:-}}"
 AUTH_PASSWORD_FILE="${AUTH_PASSWORD_FILE:-}"
 OUTPUT_FORMAT="${OUTPUT_FORMAT:-header}"
@@ -16,11 +18,13 @@ Uso:
   $(basename "$0") [opcoes]
 
 Gera um Bearer token chamando POST /auth/token da auth-lambda do ambiente lab.
+Por default usa o seed administrativo com papeis administrativo, mecanico e
+recepcionista.
 
 Opcoes:
   --base-url <url>        URL base da auth-lambda/API Gateway.
-  --cpf <cpf>             CPF do usuario. Default: 84191404067
-  --password <senha>      Senha do usuario. Prefira AUTH_PASSWORD ou --password-file.
+  --cpf <cpf>             CPF do usuario. Default: ${DEFAULT_ADMIN_CPF}
+  --password <senha>      Senha do usuario. Default: senha seed administrativa.
   --password-file <path>  Arquivo contendo a senha.
   --raw                   Imprime apenas o access_token.
   --header                Imprime "Authorization: Bearer <token>". Default.
@@ -32,6 +36,8 @@ Variaveis suportadas:
   AUTH_CPF ou ADMIN_CPF
   AUTH_PASSWORD ou OFICINA_AUTH_PASSWORD
   AUTH_PASSWORD_FILE
+  DEFAULT_ADMIN_CPF       Default: 84191404067
+  DEFAULT_ADMIN_PASSWORD  Default: senha seed administrativa do lab
   API_GATEWAY_NAME        Default: eks-lab-http-api
   AWS_REGION              Default: us-east-1
   OUTPUT_FORMAT           header|raw|export. Default: header
@@ -93,7 +99,12 @@ read_password() {
 		return 0
 	fi
 
-	fail "senha nao informada; use AUTH_PASSWORD, OFICINA_AUTH_PASSWORD ou --password-file"
+	if [[ -n "${DEFAULT_ADMIN_PASSWORD}" ]]; then
+		printf '%s' "${DEFAULT_ADMIN_PASSWORD}"
+		return 0
+	fi
+
+	fail "senha nao informada; use AUTH_PASSWORD, OFICINA_AUTH_PASSWORD, --password-file ou DEFAULT_ADMIN_PASSWORD"
 }
 
 parse_args() {

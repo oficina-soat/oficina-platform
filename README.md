@@ -34,18 +34,23 @@ A documentação normativa está organizada por tema em [docs/](docs/README.md):
 
 ## Scripts manuais
 
-- [generate-bearer-token.sh](scripts/manual/generate-bearer-token.sh): gera um header `Authorization: Bearer ...` chamando `POST /auth/token` da `auth-lambda` do ambiente `lab`.
+- [generate-bearer-token.sh](scripts/manual/generate-bearer-token.sh): gera um header `Authorization: Bearer ...` chamando `POST /auth/token` da `auth-lambda` do ambiente `lab`. Por padrão usa o usuário administrativo seedado, com papéis `administrativo`, `mecanico` e `recepcionista`.
 
-Exemplo sem expor a senha no histórico do shell:
+Uso padrão:
 
 ```bash
-AUTH_PASSWORD_FILE=/tmp/oficina-auth-password \
-  scripts/manual/generate-bearer-token.sh
+scripts/manual/generate-bearer-token.sh
 ```
 
 Para obter apenas o token, use:
 
 ```bash
+scripts/manual/generate-bearer-token.sh --raw
+```
+
+Se a senha administrativa do ambiente mudar, use `AUTH_PASSWORD`, `AUTH_PASSWORD_FILE` ou `--password-file` para sobrescrever o valor seedado:
+
+```bash
 AUTH_PASSWORD_FILE=/tmp/oficina-auth-password \
-  scripts/manual/generate-bearer-token.sh --raw
+  scripts/manual/generate-bearer-token.sh
 ```

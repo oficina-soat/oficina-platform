@@ -87,6 +87,8 @@ O job obrigatório para proteção da branch `main` chama-se `service-ci-validat
 
 As actions JavaScript usadas no workflow devem permanecer em versões compatíveis com Node.js 24. O cache do SonarCloud usa `actions/cache@v6`, pois a série `v4` declara runtime Node.js 20 e gera aviso de depreciação no job `service-ci-validate`.
 
+Actions fora do namespace oficial `actions/*` devem ser referenciadas por SHA completo do commit, mantendo um comentário com a tag semântica de origem. Isso evita que tags mutáveis alterem o pipeline sem revisão e atende à regra de segurança `githubactions:S7637` do SonarQube.
+
 Pushes na branch `develop` executam o workflow auxiliar `open-pr-to-main.yml`, que valida build Maven, testes e contratos antes de criar ou atualizar o PR para `main`. A análise SonarCloud com cobertura roda no `service-ci-validate`, em PR para `main` e em push na `main`, porque depende do relatório JaCoCo produzido pelo `verify`.
 
 O workflow auxiliar pode preparar PR com `project.version` em `SNAPSHOT`, porque ele não publica imagem, release ou deploy. O PR para `main` e o fluxo de publicação/deploy da `main` bloqueiam mudanças publicáveis com versão `SNAPSHOT`, menor ou igual à base do PR, ou repetida em relação ao commit anterior da `main`.

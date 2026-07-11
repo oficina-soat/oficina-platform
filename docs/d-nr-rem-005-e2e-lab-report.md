@@ -24,12 +24,12 @@ Os testes usaram autenticação via `POST /auth/token`. O JWT e credenciais não
 | `X-Correlation-Id` em respostas HTTP | Sucesso: 37 de 37 chamadas limpas retornaram o mesmo `correlationId` enviado. |
 | Logs com `correlationId` do fluxo | Falha: não foram encontradas entradas dos `correlationId` dos testes nos logs dos pods. |
 | Traces distribuídos | Falha: os três serviços registraram que `quarkus.otel.traces.exporter` ficou fixado em build como `none`, apesar de `QUARKUS_OTEL_TRACES_EXPORTER=cdi` em runtime. |
-| Métricas `/q/metrics` | Sucesso local no cluster: os três serviços expuseram métricas via port-forward. |
-| Dashboards New Relic | Falha corrigida parcialmente: evidência manual informou ausência de métricas; troubleshooting posterior corrigiu o scrape de `/q/metrics`, mas ainda falta confirmação NRQL no New Relic. |
+| Métricas `/q/metrics` | Sucesso: os três serviços expuseram métricas no cluster e a ingestão em `Metric` foi confirmada no New Relic. |
+| Dashboards New Relic | Corrigido parcialmente: a ausência de métricas foi corrigida na coleta e confirmada via NRQL; ainda falta validar visualmente ou reimportar os dashboards remotos com os widgets atualizados. |
 | Eventos com `correlationId` | Não comprovado: não houve evidência consultável de eventos/outbox com `correlationId` via logs, endpoint público ou New Relic. |
-| Consulta direta ao New Relic | Não executada: não havia `NEW_RELIC_*` ou chave de consulta NRQL disponível no ambiente local. |
+| Consulta direta ao New Relic | Sucesso parcial: a user key permitiu consultar a conta `8254132`; métricas e logs existem, mas `Span`, logs com `correlationId` e logs com `eventType` continuaram zerados. |
 
-Conclusão: o fluxo REST de ponta a ponta foi executado, mas a etapa `[D-NR-REM-005]` não deve ser marcada como concluída porque a correlação exigida entre logs, traces, métricas e eventos não foi comprovada.
+Conclusão: o fluxo REST de ponta a ponta foi executado e as métricas foram comprovadas depois da correção, mas a etapa `[D-NR-REM-005]` não deve ser marcada como concluída porque logs, traces e eventos ainda não têm evidência correlacionável por `correlationId`.
 
 ## Caminho Feliz
 
@@ -156,7 +156,7 @@ As métricas foram validadas por port-forward temporário para `/q/metrics`:
 
 Evidência manual informada em 2026-07-11: os dashboards do New Relic exibiram logs, mas nenhum outro gráfico indicou recebimento de métricas.
 
-Interpretação: a exposição local de `/q/metrics` nos pods está funcional, mas a coleta, transformação, envio ou consulta das métricas no New Relic não ficou comprovada. Esse resultado reforça que `[D-NR-REM-005]` deve permanecer pendente e também impede considerar os dashboards mínimos como evidência completa de observabilidade.
+Interpretação original: a exposição local de `/q/metrics` nos pods estava funcional, mas a coleta, transformação, envio ou consulta das métricas no New Relic não tinha sido comprovada.
 
 ### Troubleshooting das métricas
 
@@ -166,9 +166,22 @@ Execução complementar em 2026-07-11:
 - correção aplicada no `oficina-infra`: `values.lab.yaml` passou a configurar o receiver `prometheus/oficina-microservices`, com descoberta dos pods `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service` no namespace `default`;
 - correção aplicada nos manifests dos microsserviços no `oficina-infra`: os três Deployments receberam anotações `prometheus.io/scrape=true`, `prometheus.io/path=/q/metrics` e `prometheus.io/port=8080`;
 - correção aplicada no ambiente `lab`: o release Helm `nr-k8s-otel-collector` foi atualizado para a revision `3`, e os três Deployments foram anotados e tiveram rollout concluído;
-- validação no cluster: o Deployment do collector ficou `1/1 Running`, os três microsserviços ficaram `1/1`, e os logs do collector registraram `Scrape job added` para `jobName=oficina-microservices`, sem erro de scrape/exportação nos logs recentes.
+- validação no cluster: o Deployment do collector ficou `1/1 Running`, os três microsserviços ficaram `1/1`, e os logs do collector registraram `Scrape job added` para `jobName=oficina-microservices`, sem erro de scrape/exportação nos logs recentes;
+- validação no New Relic: a conta `8254132` retornou métricas em `Metric` para `k8s.cluster.name = 'eks-lab'` e `service.namespace = 'oficina'`; a conta `8254133` não tinha dados do ambiente.
 
-Limite da validação: a ingestão no backend New Relic ainda não foi confirmada por NRQL porque não havia chave de consulta New Relic disponível no ambiente local. A validação manual esperada deve consultar `FROM Metric` com `k8s.cluster.name = 'eks-lab'` e `service.namespace = 'oficina'`.
+Evidência NRQL em 2026-07-11:
+
+| Consulta | Resultado |
+|---|---|
+| `FROM Metric SELECT count(*) WHERE k8s.cluster.name = 'eks-lab' SINCE 60 minutes ago` | `78305` |
+| `FROM Metric SELECT count(*) WHERE service.namespace = 'oficina' SINCE 60 minutes ago` | `21580` |
+| `FROM Metric SELECT count(*) WHERE service.namespace = 'oficina' SINCE 5 minutes ago FACET service.name` | `oficina-os-service=1644`, `oficina-billing-service=1485`, `oficina-execution-service=1333` |
+| Widget de métricas Prometheus dos serviços | retornou `process_uptime_seconds`, `jvm_threads_live_threads` e `http_server_active_requests` para os três serviços. |
+| `FROM Span SELECT count(*) WHERE service.namespace = 'oficina' SINCE 60 minutes ago` | `0` |
+| `FROM Log SELECT count(*) WHERE correlationId IN (...) SINCE 6 hours ago` | `0` |
+| `FROM Log SELECT count(*) WHERE service.namespace = 'oficina' AND eventType IS NOT NULL SINCE 6 hours ago` | `0` |
+
+Conclusão do troubleshooting: a falha de métricas foi corrigida e comprovada no New Relic. A etapa `[D-NR-REM-005]` ainda deve permanecer pendente porque traces distribuídos, logs de negócio com `correlationId` e eventos/outbox com `eventType` continuam sem evidência.
 
 ### Logs
 
@@ -214,14 +227,14 @@ O fluxo REST gerou efeitos funcionais de orçamento, pagamento, execução, esto
 | Consolidação inicial do relatório | Erro operacional corrigido | Um uso incorreto de `jq` falhou ao agregar o primeiro arquivo de resultados. | Não afetou as chamadas REST; o resumo foi refeito com os arquivos temporários. |
 | Logs de negócio | Falha de evidência | Nenhum `correlationId` dos cenários apareceu em logs dos pods. | Impede concluir a etapa `[D-NR-REM-005]`. |
 | Traces | Falha de configuração/runtime | `quarkus.otel.traces.exporter` está fixado como `none` no build dos três serviços. | Impede comprovar traces no New Relic. |
-| Dashboards sem métricas | Falha corrigida parcialmente | A causa local foi identificada e corrigida no collector e nos manifests; falta confirmar a ingestão com NRQL no New Relic. | Ainda impede usar o New Relic como evidência completa até a confirmação remota. |
+| Dashboards sem métricas | Falha corrigida parcialmente | A causa local foi identificada, corrigida no collector e confirmada por NRQL em `Metric`. | Falta validar visualmente ou reimportar os dashboards remotos com o JSON atualizado. |
 | Eventos | Falha de evidência | Eventos/outbox não ficaram consultáveis por logs, endpoint ou New Relic nesta execução. | Impede comprovar correlação entre eventos e demais sinais. |
-| New Relic remoto | Limitação de acesso | Não havia chave de consulta New Relic/NRQL disponível no ambiente local. | Impede confirmar dashboards, logs, spans e métricas diretamente no backend New Relic. |
+| New Relic remoto | Limitação corrigida | A user key foi fornecida depois da execução original e permitiu confirmar métricas e ausência de spans/eventos. | Mantém pendente apenas a validação visual dos dashboards remotos e a correção dos sinais ausentes. |
 
 ## Pendências Recomendadas
 
 1. Corrigir o build dos três microsserviços para que `quarkus.otel.traces.exporter` não fique fixado em `none` quando o ambiente `lab` exige tracing.
 2. Emitir logs estruturados de entrada HTTP, Outbox, eventos e Saga contendo `correlationId`, `eventType`, `sagaId`, `ordemServicoId` e status operacional.
-3. Confirmar no New Relic, via NRQL, que `Metric` contém dados com `k8s.cluster.name = 'eks-lab'` e `service.namespace = 'oficina'` após a correção do receiver `prometheus/oficina-microservices`.
+3. Validar visualmente ou reimportar no New Relic os dashboards remotos usando os widgets atualizados em [Dashboard operacional dos microsserviços](new-relic-dashboard-operational.json).
 4. Expor evidência operacional segura para Saga/Outbox ou criar consultas NRQL versionadas para validar eventos e correlação no New Relic.
-5. Reexecutar `[D-NR-REM-005]` com uma chave de consulta New Relic disponível, confirmando dados em `Log`, `Span` e métricas coletadas.
+5. Reexecutar `[D-NR-REM-005]` após as correções de logs, traces e eventos, confirmando correlação entre `Log`, `Span`, `Metric` e sinais de evento/Saga.

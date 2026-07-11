@@ -152,6 +152,8 @@ Campos mínimos para logs de eventos:
 |---|---|
 | `eventId` | Identificador único do evento. |
 | `eventType` | Nome lógico camelCase. |
+| `domainEventType` | Cópia de `eventType` para consultas NRQL quando o backend reservar ou normalizar o nome `eventType`. |
+| `event.type` | Alias compatível com semântica OpenTelemetry para o tipo lógico do evento. |
 | `eventVersion` | Versão do contrato. |
 | `topic` | Tópico canônico. |
 | `producer` | Serviço produtor. |

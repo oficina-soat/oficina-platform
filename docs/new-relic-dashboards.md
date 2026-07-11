@@ -95,6 +95,6 @@ FROM Metric SELECT keyset() WHERE service.namespace = 'oficina' SINCE 30 minutes
 
 ## Limite Atual da Saga
 
-O dashboard de Saga já contém consultas para `eventType`, `ordemServicoId`, `sagaId`, `saga.etapa`, `saga.estado`, `saga.duracaoMs` e `outbox.status`. Esses campos precisam chegar como atributos estruturados nos logs para que todos os widgets fiquem completos.
+O dashboard de Saga já contém consultas para `domainEventType`, `eventType`, `ordemServicoId`, `sagaId`, `saga.etapa`, `saga.estado`, `saga.duracaoMs` e `outbox.status`. O campo canônico emitido pelos microsserviços continua sendo `eventType`; no New Relic, use `domainEventType` quando `eventType` não aparecer como atributo consultável após a ingestão. Esses campos precisam chegar como atributos estruturados nos logs para que todos os widgets fiquem completos.
 
 Enquanto os serviços ainda não emitirem todos esses atributos como logs estruturados, use os painéis baseados em `Span`, `message`, `correlationId` e `traceId` como visão inicial. Ao evoluir os logs de Outbox e Saga, preserve os nomes acima para manter compatibilidade com os dashboards.

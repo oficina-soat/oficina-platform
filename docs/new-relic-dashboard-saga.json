@@ -1,0 +1,341 @@
+{
+  "name": "Oficina SOAT - Saga e Ordem de Servico Lab",
+  "description": "Dashboard New Relic para acompanhar a Saga da Ordem de Servico no ambiente lab. Substitua accountIds [0] pelo ID da conta New Relic antes de importar.",
+  "permissions": "PUBLIC_READ_WRITE",
+  "pages": [
+    {
+      "name": "Saga OS",
+      "description": "Visao de eventos, traces e logs do fluxo principal da Ordem de Servico.",
+      "widgets": [
+        {
+          "title": "Como usar",
+          "layout": {
+            "column": 1,
+            "row": 1,
+            "width": 4,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.markdown"
+          },
+          "rawConfiguration": {
+            "text": "## Oficina SOAT - Saga e OS\n\nAntes de importar, substitua todas as ocorrencias de `\"accountIds\": [0]` pelo ID numerico da sua conta New Relic.\n\nEste dashboard usa `oficina-os-service` como orquestrador e combina `Span` e `Log`. As consultas de eventos assumem logs estruturados contendo `eventType`, `correlationId`, `ordemServicoId` e, quando aplicavel, `sagaId`, `saga.etapa`, `saga.estado` e `saga.duracaoMs`. Se esses campos ainda nao aparecerem como atributos no New Relic, use os paineis de traces/logs como visao inicial e evolua os logs estruturados dos produtores/consumidores."
+          }
+        },
+        {
+          "title": "Sagas iniciadas",
+          "layout": {
+            "column": 5,
+            "row": 1,
+            "width": 2,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.billboard"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Log SELECT count(*) AS 'iniciadas' WHERE service.name = 'oficina-os-service' AND service.namespace = 'oficina' AND deployment.environment = 'lab' AND (eventType = 'ordemDeServicoCriada' OR message LIKE '%ordemDeServicoCriada%')"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Sagas finalizadas",
+          "layout": {
+            "column": 7,
+            "row": 1,
+            "width": 2,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.billboard"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Log SELECT count(*) AS 'sucesso' WHERE service.name = 'oficina-os-service' AND service.namespace = 'oficina' AND deployment.environment = 'lab' AND (eventType = 'sagaFinalizadaComSucesso' OR message LIKE '%sagaFinalizadaComSucesso%')"
+              }
+            ],
+            "thresholds": [
+              {
+                "alertSeverity": "NOT_ALERTING",
+                "value": 1
+              }
+            ]
+          }
+        },
+        {
+          "title": "Sagas compensadas",
+          "layout": {
+            "column": 9,
+            "row": 1,
+            "width": 2,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.billboard"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Log SELECT count(*) AS 'compensadas' WHERE service.name = 'oficina-os-service' AND service.namespace = 'oficina' AND deployment.environment = 'lab' AND (eventType = 'sagaCompensada' OR message LIKE '%sagaCompensada%')"
+              }
+            ],
+            "thresholds": [
+              {
+                "alertSeverity": "WARNING",
+                "value": 1
+              }
+            ]
+          }
+        },
+        {
+          "title": "Falha manual",
+          "layout": {
+            "column": 11,
+            "row": 1,
+            "width": 2,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.billboard"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Log SELECT count(*) AS 'falha manual' WHERE service.name = 'oficina-os-service' AND service.namespace = 'oficina' AND deployment.environment = 'lab' AND (saga.estado = 'FALHA_MANUAL' OR message LIKE '%FALHA_MANUAL%')"
+              }
+            ],
+            "thresholds": [
+              {
+                "alertSeverity": "CRITICAL",
+                "value": 1
+              }
+            ]
+          }
+        },
+        {
+          "title": "Eventos da Saga por tipo",
+          "layout": {
+            "column": 1,
+            "row": 4,
+            "width": 6,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.bar"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Log SELECT count(*) WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND eventType IN ('ordemDeServicoCriada', 'diagnosticoIniciado', 'diagnosticoFinalizado', 'orcamentoGerado', 'orcamentoAprovado', 'orcamentoRecusado', 'execucaoIniciada', 'execucaoFinalizada', 'pagamentoSolicitado', 'pagamentoConfirmado', 'pagamentoRecusado', 'ordemDeServicoEntregue', 'sagaFinalizadaComSucesso', 'sagaCompensada') FACET eventType LIMIT 30"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Eventos da Saga ao longo do tempo",
+          "layout": {
+            "column": 7,
+            "row": 4,
+            "width": 6,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Log SELECT count(*) WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND eventType IN ('ordemDeServicoCriada', 'sagaFinalizadaComSucesso', 'sagaCompensada') FACET eventType TIMESERIES"
+              }
+            ],
+            "legend": {
+              "enabled": true
+            }
+          }
+        },
+        {
+          "title": "Duracao das rotas de OS p95",
+          "layout": {
+            "column": 1,
+            "row": 7,
+            "width": 6,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Span SELECT percentile(duration.ms, 95) AS 'p95 ms' WHERE service.name = 'oficina-os-service' AND service.namespace = 'oficina' AND deployment.environment = 'lab' AND (span.kind = 'server' OR span.kind = 'SERVER') AND (http.route LIKE '%ordens%' OR http.target LIKE '%ordens%' OR name LIKE '%ordens%') FACET http.route TIMESERIES"
+              }
+            ],
+            "legend": {
+              "enabled": true
+            }
+          }
+        },
+        {
+          "title": "Traces lentos da OS",
+          "layout": {
+            "column": 7,
+            "row": 7,
+            "width": 6,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.table"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Span SELECT latest(trace.id) AS 'traceId', latest(http.route) AS 'rota', max(duration.ms) AS 'duracao max ms' WHERE service.name = 'oficina-os-service' AND service.namespace = 'oficina' AND deployment.environment = 'lab' AND (http.route LIKE '%ordens%' OR http.target LIKE '%ordens%' OR name LIKE '%ordens%') FACET correlationId LIMIT 50"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Duracao por etapa da Saga",
+          "layout": {
+            "column": 1,
+            "row": 10,
+            "width": 12,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Log SELECT average(saga.duracaoMs) AS 'media ms', percentile(saga.duracaoMs, 95) AS 'p95 ms' WHERE service.name = 'oficina-os-service' AND service.namespace = 'oficina' AND deployment.environment = 'lab' AND saga.etapa IS NOT NULL AND saga.duracaoMs IS NOT NULL FACET saga.etapa TIMESERIES"
+              }
+            ],
+            "legend": {
+              "enabled": true
+            }
+          }
+        },
+        {
+          "title": "Correlacao por ordemServicoId",
+          "layout": {
+            "column": 1,
+            "row": 13,
+            "width": 6,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.table"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Log SELECT latest(timestamp) AS 'ultimo log', latest(correlationId) AS 'correlationId', latest(traceId) AS 'traceId', uniques(eventType) AS 'eventos' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND ordemServicoId IS NOT NULL FACET ordemServicoId LIMIT 50"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Correlacao por correlationId",
+          "layout": {
+            "column": 7,
+            "row": 13,
+            "width": 6,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.table"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Log SELECT latest(timestamp) AS 'ultimo log', latest(message) AS 'mensagem', latest(traceId) AS 'traceId', count(*) AS 'linhas' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND correlationId IS NOT NULL FACET correlationId, service.name LIMIT 50"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Outbox por status",
+          "layout": {
+            "column": 1,
+            "row": 16,
+            "width": 6,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.bar"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Log SELECT count(*) WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND outbox.status IS NOT NULL FACET service.name, outbox.status LIMIT 30"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Erros relacionados a eventos e Saga",
+          "layout": {
+            "column": 7,
+            "row": 16,
+            "width": 6,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.table"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Log SELECT latest(timestamp) AS 'quando', latest(message) AS 'mensagem', latest(eventType) AS 'eventType', latest(correlationId) AS 'correlationId' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND (level = 'ERROR' OR level = 'FATAL' OR message LIKE '%Saga%' OR message LIKE '%Outbox%' OR message LIKE '%Evento nao suportado%') FACET service.name LIMIT 50"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

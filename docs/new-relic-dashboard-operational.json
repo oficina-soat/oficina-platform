@@ -1,0 +1,342 @@
+{
+  "name": "Oficina SOAT - Microsservicos Lab",
+  "description": "Dashboard operacional dos microsservicos da plataforma Oficina SOAT no ambiente lab. Substitua accountIds [0] pelo ID da conta New Relic antes de importar.",
+  "permissions": "PUBLIC_READ_WRITE",
+  "pages": [
+    {
+      "name": "Operacional",
+      "description": "Golden signals, logs, traces e sinais Kubernetes dos tres microsservicos.",
+      "widgets": [
+        {
+          "title": "Como usar",
+          "layout": {
+            "column": 1,
+            "row": 1,
+            "width": 4,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.markdown"
+          },
+          "rawConfiguration": {
+            "text": "## Oficina SOAT - Microsservicos Lab\n\nAntes de importar, substitua todas as ocorrencias de `\"accountIds\": [0]` pelo ID numerico da sua conta New Relic.\n\nFiltros canonicos usados nas consultas:\n\n- `service.namespace = 'oficina'`\n- `deployment.environment = 'lab'`\n- `service.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service')`\n\nSe algum grafico ficar sem dados, valide primeiro se o New Relic OpenTelemetry Collector esta recebendo logs, traces e metricas dos pods no cluster `eks-lab`."
+          }
+        },
+        {
+          "title": "Requisicoes por minuto por servico",
+          "layout": {
+            "column": 5,
+            "row": 1,
+            "width": 4,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Span SELECT rate(count(*), 1 minute) AS 'rpm' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND service.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') AND (span.kind = 'server' OR span.kind = 'SERVER') FACET service.name TIMESERIES"
+              }
+            ],
+            "legend": {
+              "enabled": true
+            }
+          }
+        },
+        {
+          "title": "Taxa de erro por servico",
+          "layout": {
+            "column": 9,
+            "row": 1,
+            "width": 4,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.billboard"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Span SELECT percentage(count(*), WHERE error IS true OR otel.status_code = 'ERROR' OR http.response.status_code >= 500 OR http.status_code >= 500) AS 'erro %' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND service.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') AND (span.kind = 'server' OR span.kind = 'SERVER')"
+              }
+            ],
+            "thresholds": [
+              {
+                "alertSeverity": "WARNING",
+                "value": 1
+              },
+              {
+                "alertSeverity": "CRITICAL",
+                "value": 5
+              }
+            ]
+          }
+        },
+        {
+          "title": "Latencia p50, p95 e p99 por servico",
+          "layout": {
+            "column": 1,
+            "row": 4,
+            "width": 6,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Span SELECT percentile(duration.ms, 50, 95, 99) WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND service.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') AND (span.kind = 'server' OR span.kind = 'SERVER') FACET service.name TIMESERIES"
+              }
+            ],
+            "legend": {
+              "enabled": true
+            }
+          }
+        },
+        {
+          "title": "Status HTTP por servico",
+          "layout": {
+            "column": 7,
+            "row": 4,
+            "width": 6,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.bar"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Span SELECT count(*) WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND service.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') AND (span.kind = 'server' OR span.kind = 'SERVER') FACET service.name, http.response.status_code LIMIT 50"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Rotas mais lentas p95",
+          "layout": {
+            "column": 1,
+            "row": 7,
+            "width": 6,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.table"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Span SELECT percentile(duration.ms, 95) AS 'p95 ms', count(*) AS 'amostras' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND service.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') AND (span.kind = 'server' OR span.kind = 'SERVER') FACET service.name, http.route LIMIT 25"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Traces com erro",
+          "layout": {
+            "column": 7,
+            "row": 7,
+            "width": 6,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.table"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Span SELECT latest(trace.id) AS 'traceId', latest(http.route) AS 'rota', latest(http.response.status_code) AS 'status', latest(duration.ms) AS 'duracao ms' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND service.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') AND (error IS true OR otel.status_code = 'ERROR' OR http.response.status_code >= 500 OR http.status_code >= 500) FACET service.name LIMIT 50"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Logs por nivel e servico",
+          "layout": {
+            "column": 1,
+            "row": 10,
+            "width": 6,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.area"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Log SELECT count(*) WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND service.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') FACET service.name, level TIMESERIES"
+              }
+            ],
+            "legend": {
+              "enabled": true
+            }
+          }
+        },
+        {
+          "title": "Logs de erro recentes",
+          "layout": {
+            "column": 7,
+            "row": 10,
+            "width": 6,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.table"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Log SELECT latest(timestamp) AS 'quando', latest(message) AS 'mensagem', latest(correlationId) AS 'correlationId', latest(traceId) AS 'traceId' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND service.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') AND (level = 'ERROR' OR level = 'FATAL' OR message LIKE '%Exception%') FACET service.name LIMIT 50"
+              }
+            ]
+          }
+        },
+        {
+          "title": "CPU por pod",
+          "layout": {
+            "column": 1,
+            "row": 13,
+            "width": 4,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM K8sContainerSample SELECT average(cpuCoresUtilization) AS 'CPU %' WHERE clusterName = 'eks-lab' AND namespaceName = 'default' AND containerName IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') FACET podName TIMESERIES"
+              }
+            ],
+            "legend": {
+              "enabled": true
+            }
+          }
+        },
+        {
+          "title": "Memoria por pod",
+          "layout": {
+            "column": 5,
+            "row": 13,
+            "width": 4,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM K8sContainerSample SELECT average(memoryWorkingSetUtilization) AS 'memoria %' WHERE clusterName = 'eks-lab' AND namespaceName = 'default' AND containerName IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') FACET podName TIMESERIES"
+              }
+            ],
+            "legend": {
+              "enabled": true
+            }
+          }
+        },
+        {
+          "title": "Restarts por pod",
+          "layout": {
+            "column": 9,
+            "row": 13,
+            "width": 4,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM K8sContainerSample SELECT max(restartCount) AS 'restarts' WHERE clusterName = 'eks-lab' AND namespaceName = 'default' AND containerName IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') FACET podName TIMESERIES"
+              }
+            ],
+            "legend": {
+              "enabled": true
+            }
+          }
+        },
+        {
+          "title": "Pods e readiness",
+          "layout": {
+            "column": 1,
+            "row": 16,
+            "width": 6,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.table"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM K8sPodSample SELECT latest(status) AS 'status', latest(isReady) AS 'ready', latest(restartCount) AS 'restarts' WHERE clusterName = 'eks-lab' AND namespaceName = 'default' AND podName LIKE 'oficina-%' FACET podName LIMIT 50"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Busca operacional por correlationId",
+          "layout": {
+            "column": 7,
+            "row": 16,
+            "width": 6,
+            "height": 3
+          },
+          "visualization": {
+            "id": "viz.table"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Log SELECT latest(timestamp) AS 'ultimo log', latest(message) AS 'mensagem', latest(traceId) AS 'traceId', count(*) AS 'linhas' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND service.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') AND correlationId IS NOT NULL FACET correlationId, service.name LIMIT 50"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

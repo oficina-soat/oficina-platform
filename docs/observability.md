@@ -287,6 +287,8 @@ Os painéis de observabilidade da plataforma devem ser criados no New Relic.
 
 Para o ambiente `lab`, a forma oficial de coleta é New Relic OpenTelemetry Collector no cluster EKS instalado por Helm. Os microsserviços enviam traces para o endpoint OTLP interno do collector; logs e métricas são coletados dentro do cluster e encaminhados ao New Relic pelo collector configurado no `oficina-infra`.
 
+Os templates JSON para criação manual dos painéis ficam em [Dashboards New Relic](new-relic-dashboards.md).
+
 Regras obrigatórias:
 
 - todos os dashboards devem filtrar por `service.name`, `service.namespace` e `deployment.environment`;

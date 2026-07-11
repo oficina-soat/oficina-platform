@@ -74,6 +74,7 @@ Antes de manter o deploy automático ativo, confirme que EKS, ECR, namespace, cr
 
 Pull Requests executam:
 
+- validação de `project.version` para mudanças publicáveis, rejeitando versão `SNAPSHOT` ou menor ou igual à base do PR;
 - build Maven;
 - testes unitários, integração, contrato e BDD;
 - relatório JaCoCo com cobertura mínima de 80%.
@@ -82,13 +83,14 @@ O job obrigatório para proteção da branch `main` chama-se `service-ci-validat
 
 Pushes na branch `develop` executam o workflow auxiliar `open-pr-to-main.yml`, que valida build Maven, testes e contratos antes de criar ou atualizar o PR para `main`. Nenhum workflow deste template aciona análise SonarCloud; o projeto SonarCloud deve usar Automatic Analysis ou integração externa própria.
 
-O workflow auxiliar pode preparar PR com `project.version` em `SNAPSHOT`, porque ele não publica imagem, release ou deploy. Versões `SNAPSHOT` continuam bloqueadas no fluxo de publicação/deploy da `main`, salvo quando publicação e deploy estiverem explicitamente desabilitados.
+O workflow auxiliar pode preparar PR com `project.version` em `SNAPSHOT`, porque ele não publica imagem, release ou deploy. O PR para `main` e o fluxo de publicação/deploy da `main` bloqueiam mudanças publicáveis com versão `SNAPSHOT`, menor ou igual à base do PR, ou repetida em relação ao commit anterior da `main`.
 
 O comportamento esperado para BDD, cobertura e evidências de qualidade está definido em [Padrão BDD, Cobertura e Qualidade](../../docs/bdd-testing.md).
 
 Merges na `main` executam também, salvo opt-out explícito por variável:
 
 - consulta do estado atual no ECR, GitHub Releases e Kubernetes;
+- bloqueio de alteração publicável quando `project.version` não foi incrementado no push da `main`;
 - build da imagem Docker apenas quando a tag de `project.version` ainda não existir;
 - push para Amazon ECR;
 - criação de GitHub Release com metadados da imagem;
@@ -97,7 +99,7 @@ Merges na `main` executam também, salvo opt-out explícito por variável:
 
 Quando `ENABLE_K8S_DEPLOY` não é `false` e o `Deployment` do serviço ainda não existir no cluster, o workflow usa o manifest canônico do `oficina-infra` para criar o recurso, aguarda `rollout status` e falha se o pod não ficar disponível ou se a imagem aplicada for diferente da imagem publicada.
 
-O fluxo preserva o padrão do `oficina-app`: a imagem publicada usa a tag de `project.version`; versões `SNAPSHOT` não podem ser publicadas nem implantadas pela `main`; e uma mudança publicável em `main` deve incrementar `project.version` quando exigir nova imagem ou release.
+O fluxo preserva o padrão do `oficina-app`: a imagem publicada usa a tag de `project.version`; versões `SNAPSHOT` não podem ser publicadas nem implantadas pela `main`; e toda mudança publicável deve incrementar `project.version` para uma versão SemVer fechada `MAJOR.MINOR.PATCH`, maior que a base e ainda não usada para outro build, release ou rollout.
 
 Antes de usar publicação de imagem ou deploy Kubernetes como evidência da Fase 4, use o [Checklist de Deploy Independente](../../docs/independent-deploy-checklist.md) para validar pré-condições, rollout, smoke test, rollback e registro de evidências.
 

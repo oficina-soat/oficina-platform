@@ -179,7 +179,10 @@ Este projeto depende de versionamento explícito dos contratos e decisões para 
 - Preserve compatibilidade com contratos já publicados, salvo alteração deliberada e documentada.
 - Mudanças incompatíveis em eventos devem incrementar `eventVersion` ou documentar a estratégia de migração.
 - Mudanças incompatíveis em APIs devem preservar versionamento por URI, atualmente `/api/v1`, ou documentar nova versão.
-- Ao fazer alterações relevantes em repositórios de microsserviço, verifique o `project.version` no `pom.xml` antes do commit. Não deixe versões `*-SNAPSHOT` em mudanças prontas para merge, publicação de imagem, release ou deploy; feche a versão no mesmo escopo da alteração ou incremente para uma nova versão fechada quando a mudança exigir novo artefato publicável.
+- Ao fazer alterações relevantes em repositórios de microsserviço, verifique o `project.version` no `pom.xml` antes do commit e registre a decisão na revisão final.
+- Trate como mudança publicável qualquer alteração em código Java, `pom.xml`, `Dockerfile`, configuração runtime, resources, migrations, testes que alterem o artefato validado, dependências, observabilidade, segurança, mensageria ou scripts usados pelo build da imagem.
+- Toda mudança publicável candidata a merge em `main`, publicação de imagem, release ou deploy deve incrementar `project.version` no mesmo commit ou PR. Use SemVer fechado `MAJOR.MINOR.PATCH`, sem sufixo `SNAPSHOT`; prefira patch para correções compatíveis, minor para funcionalidades compatíveis e major apenas quando houver quebra deliberada acompanhada dos contratos ou ADRs necessários.
+- Antes de considerar uma mudança de microsserviço pronta, compare `project.version` com a base do PR ou com o commit anterior da `main`; se a versão não aumentou para uma versão ainda não publicada como tag `v<project.version>` e imagem `<project.version>`, ajuste o `pom.xml` antes de concluir. Não reutilize versão já publicada para novo build, release ou rollout.
 - Ao identificar necessidade de alterar decisões arquiteturais, sugira a mudança e aguarde avaliação do usuário antes de criar ou alterar ADRs.
 - Ao alterar padrões que impactem microsserviços ou infraestrutura, confirme se templates, contratos e documentação precisam ser atualizados.
 - Não introduza mudanças que exijam intervenção manual implícita sem registrar isso no repositório.

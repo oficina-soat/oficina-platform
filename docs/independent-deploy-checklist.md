@@ -34,12 +34,15 @@ Antes de manter `ENABLE_IMAGE_PUBLISH` e `ENABLE_K8S_DEPLOY` ativos por padrão 
 - [ ] os manifests executáveis estão materializados no `../oficina-infra/k8s/base/microservices/<servico>/` e referenciados pelo overlay `../oficina-infra/k8s/overlays/lab/`;
 - [ ] o overlay `lab` renderiza sem erro com `kubectl kustomize k8s/overlays/lab` no `oficina-infra`;
 - [ ] secrets, ConfigMaps, service accounts e políticas IAM necessárias ao serviço estão disponíveis no ambiente `lab`;
-- [ ] a imagem atualmente publicada e a versão em `pom.xml` estão coerentes com a regra de versionamento do workflow.
+- [ ] a imagem atualmente publicada, a release `v<project.version>` e a versão em `pom.xml` estão coerentes com a regra de versionamento do workflow;
+- [ ] qualquer versão já existente como GitHub Release ou tag de imagem ECR pertence ao build anterior esperado; para novo build, release ou rollout, planejar uma nova versão SemVer fechada.
 
 ## Checklist por mudança
 
 Para cada alteração candidata a deploy:
 
+- [ ] classificar se a mudança altera artefato publicável: código Java, `pom.xml`, `Dockerfile`, configuração runtime, resources, migrations, dependências, observabilidade, segurança, mensageria, testes que alterem o artefato validado ou scripts usados pelo build da imagem;
+- [ ] quando a mudança for publicável, incrementar `project.version` no mesmo PR para uma versão SemVer fechada `MAJOR.MINOR.PATCH`, maior que a versão da base e ainda não publicada como release `v<project.version>` ou imagem `<project.version>`;
 - [ ] identificar se a mudança é compatível com os contratos atuais de REST, eventos, estados, erro e idempotência;
 - [ ] atualizar OpenAPI, schemas JSON, ADR, README ou roadmap quando a mudança alterar contrato compartilhado;
 - [ ] confirmar que não há mudança incompatível sem versionamento por URI ou `eventVersion`;
@@ -54,10 +57,11 @@ Para cada alteração candidata a deploy:
 1. Abrir PR no repositório do microsserviço.
 2. Confirmar aprovação e execução bem-sucedida do check `service-ci-validate`.
 3. Confirmar Quality Gate externo aprovado quando SonarCloud estiver configurado.
-4. Atualizar `project.version` no `pom.xml` quando a mudança exigir nova imagem, release ou rollout.
+4. Confirmar que `project.version` no `pom.xml` foi incrementado para toda mudança publicável antes do merge; a versão não pode ser `SNAPSHOT`, menor ou igual à base do PR, nem já publicada para outro build.
 5. Fazer merge na `main`.
 6. No push da `main`, confirmar que o workflow:
    - [ ] rejeitou versão `SNAPSHOT`;
+   - [ ] rejeitou alteração publicável sem incremento de `project.version`;
    - [ ] resolveu a tag `v<project.version>`;
    - [ ] publicou imagem no ECR quando `ENABLE_IMAGE_PUBLISH` não é `false`;
    - [ ] criou GitHub Release quando a release ainda não existia;

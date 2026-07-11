@@ -48,10 +48,11 @@ DEPLOYMENT_ENVIRONMENT=lab
 OTEL_RESOURCE_ATTRIBUTES=service.namespace=oficina,deployment.environment=lab
 OTEL_EXPORTER_OTLP_ENDPOINT=http://nr-k8s-otel-collector-gateway.newrelic.svc.cluster.local:4317
 OTEL_EXPORTER_OTLP_PROTOCOL=grpc
-QUARKUS_OTEL_TRACES_EXPORTER=cdi
 OTEL_METRICS_EXPORTER=none
 OTEL_LOGS_EXPORTER=none
 ```
+
+O exportador de traces Quarkus é configuração build-time e deve permanecer fixado como `quarkus.otel.traces.exporter=cdi` no `application.properties` dos microsserviços. Não trate `QUARKUS_OTEL_TRACES_EXPORTER` como variável operacional para alternar tracing em runtime; use `OFICINA_OBSERVABILITY_TRACING_ENABLED=false` em execuções locais controladas.
 
 ### Observabilidade New Relic
 

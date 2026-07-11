@@ -22,14 +22,16 @@ Os testes usaram autenticação via `POST /auth/token`. O JWT e credenciais não
 | Caminho feliz da Ordem de Serviço | Sucesso: 19 de 19 chamadas retornaram o status esperado. |
 | Falha compensada | Sucesso funcional: 18 de 18 chamadas retornaram o status esperado, incluindo falha esperada de estoque e compensação operacional. |
 | `X-Correlation-Id` em respostas HTTP | Sucesso: 37 de 37 chamadas limpas retornaram o mesmo `correlationId` enviado. |
-| Logs com `correlationId` do fluxo | Falha: não foram encontradas entradas dos `correlationId` dos testes nos logs dos pods. |
-| Traces distribuídos | Falha: os três serviços registraram que `quarkus.otel.traces.exporter` ficou fixado em build como `none`, apesar de `QUARKUS_OTEL_TRACES_EXPORTER=cdi` em runtime. |
+| Logs com `correlationId` do fluxo | Falha na execução remota: não foram encontradas entradas dos `correlationId` dos testes nos logs dos pods. Correção local preparada em 2026-07-11 nos três microsserviços, emitindo logs HTTP e Outbox/eventos com MDC estruturado. |
+| Traces distribuídos | Falha na execução remota: os três serviços registraram que `quarkus.otel.traces.exporter` ficou fixado em build como `none`, apesar de `QUARKUS_OTEL_TRACES_EXPORTER=cdi` em runtime. Correção local preparada em 2026-07-11 fixando `quarkus.otel.traces.exporter=cdi` no build e habilitando instrumentação HTTP. |
 | Métricas `/q/metrics` | Sucesso: os três serviços expuseram métricas no cluster e a ingestão em `Metric` foi confirmada no New Relic. |
 | Dashboards New Relic | Corrigido parcialmente: a ausência de métricas foi corrigida na coleta e confirmada via NRQL; ainda falta validar visualmente ou reimportar os dashboards remotos com os widgets atualizados. |
-| Eventos com `correlationId` | Não comprovado: não houve evidência consultável de eventos/outbox com `correlationId` via logs, endpoint público ou New Relic. |
+| Eventos com `correlationId` | Não comprovado na execução remota: não houve evidência consultável de eventos/outbox com `correlationId` via logs, endpoint público ou New Relic. Correção local preparada em 2026-07-11 para logs de Outbox e consumers com `eventType`, `eventId`, `aggregateId`, `topic`/`consumer` e `messageStatus`. |
 | Consulta direta ao New Relic | Sucesso parcial: a user key permitiu consultar a conta `8254132`; métricas e logs existem, mas `Span`, logs com `correlationId` e logs com `eventType` continuaram zerados. |
 
 Conclusão: o fluxo REST de ponta a ponta foi executado e as métricas foram comprovadas depois da correção, mas a etapa `[D-NR-REM-005]` não deve ser marcada como concluída porque logs, traces e eventos ainda não têm evidência correlacionável por `correlationId`.
+
+Atualização de remediação em 2026-07-11: os três microsserviços receberam correções locais para traces, logs de negócio e logs de Outbox/eventos, com versões publicáveis incrementadas e suítes locais executadas com sucesso. A etapa continua pendente até essas imagens serem publicadas/deployadas no `lab` e o E2E ser reexecutado com evidência em `Log`, `Span` e `Metric`.
 
 ## Caminho Feliz
 
@@ -225,16 +227,16 @@ O fluxo REST gerou efeitos funcionais de orçamento, pagamento, execução, esto
 |---|---|---|---|
 | Tentativa inicial do cenário compensado | Erro operacional corrigido | Foram usados CPFs inválidos para o `oficina-os-service` (`36655462007` e `17245011010`). A execução limpa usou `12345678909`. | Não afeta o resultado final, mas gerou respostas `400` e dependências vazias nas tentativas descartadas. |
 | Consolidação inicial do relatório | Erro operacional corrigido | Um uso incorreto de `jq` falhou ao agregar o primeiro arquivo de resultados. | Não afetou as chamadas REST; o resumo foi refeito com os arquivos temporários. |
-| Logs de negócio | Falha de evidência | Nenhum `correlationId` dos cenários apareceu em logs dos pods. | Impede concluir a etapa `[D-NR-REM-005]`. |
-| Traces | Falha de configuração/runtime | `quarkus.otel.traces.exporter` está fixado como `none` no build dos três serviços. | Impede comprovar traces no New Relic. |
+| Logs de negócio | Falha de evidência com correção local preparada | Nenhum `correlationId` dos cenários apareceu em logs dos pods. Em 2026-07-11, os três serviços passaram a emitir logs HTTP estruturados com `correlationId`, `requestId`, `http.method`, `http.path`, `http.status` e `durationMs`. | Impede concluir a etapa `[D-NR-REM-005]` até deploy e nova evidência remota. |
+| Traces | Falha de configuração/runtime com correção local preparada | `quarkus.otel.traces.exporter` está fixado como `none` no build das imagens atuais. Em 2026-07-11, os três serviços passaram a fixar `quarkus.otel.traces.exporter=cdi` no build e `quarkus.otel.instrument.vertx-http=true`. | Impede comprovar traces no New Relic até deploy e nova evidência remota. |
 | Dashboards sem métricas | Falha corrigida parcialmente | A causa local foi identificada, corrigida no collector e confirmada por NRQL em `Metric`. | Falta validar visualmente ou reimportar os dashboards remotos com o JSON atualizado. |
-| Eventos | Falha de evidência | Eventos/outbox não ficaram consultáveis por logs, endpoint ou New Relic nesta execução. | Impede comprovar correlação entre eventos e demais sinais. |
+| Eventos | Falha de evidência com correção local preparada | Eventos/outbox não ficaram consultáveis por logs, endpoint ou New Relic nesta execução. Em 2026-07-11, os três serviços passaram a emitir logs estruturados de Outbox e consumers com `eventType` e identificadores operacionais. | Impede comprovar correlação entre eventos e demais sinais até deploy e nova evidência remota. |
 | New Relic remoto | Limitação corrigida | A user key foi fornecida depois da execução original e permitiu confirmar métricas e ausência de spans/eventos. | Mantém pendente apenas a validação visual dos dashboards remotos e a correção dos sinais ausentes. |
 
 ## Pendências Recomendadas
 
-1. Corrigir o build dos três microsserviços para que `quarkus.otel.traces.exporter` não fique fixado em `none` quando o ambiente `lab` exige tracing.
-2. Emitir logs estruturados de entrada HTTP, Outbox, eventos e Saga contendo `correlationId`, `eventType`, `sagaId`, `ordemServicoId` e status operacional.
+1. Publicar e deployar as novas versões dos três microsserviços com `quarkus.otel.traces.exporter=cdi`, instrumentação HTTP e logs estruturados com MDC em campos planos.
+2. Reexecutar as consultas NRQL de `Span`, `Log` por `correlationId` e `Log` por `eventType` após o rollout.
 3. Validar visualmente ou reimportar no New Relic os dashboards remotos usando os widgets atualizados em [Dashboard operacional dos microsserviços](new-relic-dashboard-operational.json).
 4. Expor evidência operacional segura para Saga/Outbox ou criar consultas NRQL versionadas para validar eventos e correlação no New Relic.
 5. Reexecutar `[D-NR-REM-005]` após as correções de logs, traces e eventos, confirmando correlação entre `Log`, `Span`, `Metric` e sinais de evento/Saga.

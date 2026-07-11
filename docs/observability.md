@@ -58,13 +58,14 @@ Variáveis obrigatórias por microsserviço:
 | `OTEL_RESOURCE_ATTRIBUTES` | `service.namespace=oficina,deployment.environment=lab`. |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://nr-k8s-otel-collector-gateway.newrelic.svc.cluster.local:4317`, salvo alteração coordenada de `NEW_RELIC_NAMESPACE` ou `NEW_RELIC_OTEL_COLLECTOR_LOCAL_SERVICE_NAME` no `oficina-infra`. |
 | `OTEL_EXPORTER_OTLP_PROTOCOL` | `grpc`. |
-| `QUARKUS_OTEL_TRACES_EXPORTER` | `cdi` no ambiente compartilhado, usando o exportador OTLP gerenciado pelo Quarkus. |
 | `OTEL_METRICS_EXPORTER` | `none`; métricas de aplicação são expostas em `/q/metrics` para coleta compatível com Prometheus. |
 | `OTEL_LOGS_EXPORTER` | `none`; logs são emitidos em JSON no stdout para coleta pelo agente. |
 | `OFICINA_OBSERVABILITY_ENABLED` | `true`, salvo execução local controlada. |
 | `OFICINA_OBSERVABILITY_JSON_LOGS_ENABLED` | Mesmo valor de `OFICINA_OBSERVABILITY_ENABLED`, salvo exceção local. |
 | `OFICINA_OBSERVABILITY_METRICS_ENABLED` | Mesmo valor de `OFICINA_OBSERVABILITY_ENABLED`. |
 | `OFICINA_OBSERVABILITY_TRACING_ENABLED` | Mesmo valor de `OFICINA_OBSERVABILITY_ENABLED`. |
+
+O exportador de traces do Quarkus deve ficar fixado em `quarkus.otel.traces.exporter=cdi` no build dos microsserviços, usando o exportador OTLP gerenciado pelo Quarkus. Não use `QUARKUS_OTEL_TRACES_EXPORTER=none` para desabilitar tracing em runtime, pois essa chave é build-time; para execução local ou testes, desabilite por `OFICINA_OBSERVABILITY_TRACING_ENABLED=false` ou por perfil `%test.quarkus.otel.traces.enabled=false`.
 
 O [template Quarkus](../templates/quarkus-service/README.md) já define essas chaves em `application.properties` e deve ser a referência inicial para novos repositórios.
 

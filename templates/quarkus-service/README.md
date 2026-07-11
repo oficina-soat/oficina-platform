@@ -139,13 +139,13 @@ Inclui:
 
 - nome da aplicação via `OTEL_SERVICE_NAME`
 - Swagger UI
-- logs JSON
+- logs JSON com MDC em campos planos para `correlationId`, `traceId`, `spanId`, `eventType` e atributos operacionais
 - métricas Prometheus em `/q/metrics`
 - traces OpenTelemetry exportáveis por OTLP para New Relic
 - health checks SmallRye
 - JWT com issuer e audience canônica do serviço
 
-No ambiente compartilhado, o backend canônico de observabilidade é New Relic, conforme o [Padrão de Observabilidade Distribuída](../../docs/observability.md). O serviço deve manter `QUARKUS_OTEL_TRACES_EXPORTER=cdi` para usar o exportador OTLP gerenciado pelo Quarkus e `OTEL_EXPORTER_OTLP_ENDPOINT` apontando para o New Relic OpenTelemetry Collector definido pelo repositório de infraestrutura. Para execução local, o exportador pode permanecer `none`.
+No ambiente compartilhado, o backend canônico de observabilidade é New Relic, conforme o [Padrão de Observabilidade Distribuída](../../docs/observability.md). O serviço deve manter `quarkus.otel.traces.exporter=cdi` fixado em `application.properties`, pois essa configuração é build-time no Quarkus. Use `OTEL_EXPORTER_OTLP_ENDPOINT` apontando para o New Relic OpenTelemetry Collector definido pelo repositório de infraestrutura. Para execução local controlada, desabilite tracing por `OFICINA_OBSERVABILITY_TRACING_ENABLED=false`, sem trocar o exporter para `none`.
 
 Para serviços PostgreSQL, incorporar os valores de `application-postgresql.properties.example`.
 

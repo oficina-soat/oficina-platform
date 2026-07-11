@@ -22,9 +22,29 @@ Os templates seguem o [Padrão de Observabilidade Distribuída](observability.md
 
 A documentação oficial do New Relic descreve a [importação pela UI](https://docs.newrelic.com/docs/query-your-data/explore-query-data/dashboards/dashboards-charts-import-export-data/) em `Dashboards > Import dashboard` e a colagem do JSON exportado/importável. A documentação de [widgets via NerdGraph](https://docs.newrelic.com/docs/apis/nerdgraph/examples/create-widgets-dashboards-api/) também mostra `viz.line`, `viz.area`, `viz.bar`, `viz.billboard`, `viz.table` e `viz.markdown` como visualizações suportadas para dashboards.
 
+O campo `variables` do dashboard não centraliza `accountIds`. Variáveis de dashboard são filtros ou placeholders usados nas consultas NRQL; `accountIds` é um campo estrutural de cada widget. Por isso, a própria documentação do New Relic para dashboards JSON orienta substituir `"accountId": 0` ou `"accountIds": [0]` em cada ocorrência do JSON.
+
 Os arquivos já incluem `pages[].guid`, `widgets[].id`, `linkedEntityGuids` e `variables`, pois a UI de importação valida esses campos em alguns fluxos. Esses identificadores são internos ao template JSON; para criar um novo dashboard, mantenha-os e altere apenas o `accountIds`.
 
 Se estiver usando `Manage JSON` dentro de um dashboard já criado, preserve o `guid` real da página existente no New Relic. Esse fluxo atualiza um dashboard existente, enquanto `Import dashboard` cria um dashboard novo a partir do JSON.
+
+## Renderização Local
+
+Para informar o account ID uma única vez e gerar cópias prontas para colar na UI, execute:
+
+```bash
+NEW_RELIC_ACCOUNT_ID=1234567
+
+for dashboard in docs/new-relic-dashboard-operational.json docs/new-relic-dashboard-saga.json; do
+  output="/tmp/$(basename "${dashboard}")"
+  jq --argjson account_id "${NEW_RELIC_ACCOUNT_ID}" \
+    'walk(if type == "object" and has("accountIds") then .accountIds = [$account_id] else . end)' \
+    "${dashboard}" > "${output}"
+  printf 'Gerado: %s\n' "${output}"
+done
+```
+
+Depois abra o arquivo gerado em `/tmp` e cole o JSON no `Import dashboard`.
 
 ## Filtros Canônicos
 

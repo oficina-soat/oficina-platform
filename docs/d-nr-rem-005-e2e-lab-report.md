@@ -25,13 +25,13 @@ Os testes usaram autenticação via `POST /auth/token`. O JWT e credenciais não
 | Logs com `correlationId` do fluxo | Sucesso na revalidação pós-merge: o New Relic retornou logs dos três serviços para `correlationId=d-nr-rem-005-reval-tracefix-20260711T143832Z`. |
 | Traces distribuídos | Sucesso após correção do collector: o New Relic retornou `Span` para `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`. |
 | Métricas `/q/metrics` | Sucesso: os três serviços expuseram métricas no cluster e a ingestão em `Metric` foi confirmada no New Relic. |
-| Dashboards New Relic | Corrigido parcialmente: a ausência de métricas foi corrigida na coleta e confirmada via NRQL; ainda falta validar visualmente ou reimportar os dashboards remotos com os widgets atualizados. |
-| Eventos com `correlationId` | Parcial: Outbox/eventos aparecem como logs estruturados com `correlationId`, `eventId`, `eventVersion`, `topic`, `producer`, `aggregateId` e `messageStatus`; o campo literal `eventType` existe no stdout do pod, mas não fica como atributo consultável no `Log` do New Relic. |
-| Consulta direta ao New Relic | Sucesso parcial: a user key permitiu consultar a conta `8254132`; `Metric`, `Span` e `Log` com `correlationId` foram comprovados. Falta publicar/deployar aliases de evento para consultar `domainEventType` no New Relic. |
+| Dashboards New Relic | Fora do escopo de conclusão desta etapa: a ingestão de métricas foi corrigida e confirmada por NRQL; a validação visual ou reimportação dos dashboards remotos permanece no item `[D-NR-REM-002]`. |
+| Eventos com `correlationId` | Sucesso após rollout: Outbox/eventos aparecem como logs estruturados com `correlationId`, `eventId`, `eventVersion`, `topic`, `producer`, `aggregateId`, `messageStatus`, `domainEventType` e `event.type`. |
+| Consulta direta ao New Relic | Sucesso: a user key permitiu consultar a conta `8254132`; `Metric`, `Span`, `Log` com `correlationId` e eventos por `domainEventType`/`event.type` foram comprovados. |
 
-Conclusão atual: o fluxo REST de ponta a ponta foi executado, e `Metric`, `Span` e `Log` com `correlationId` foram comprovados depois das correções. A etapa `[D-NR-REM-005]` ainda não deve ser marcada como concluída porque o tipo lógico dos eventos precisa aparecer como atributo consultável no New Relic; o stdout dos pods contém `eventType`, mas a ingestão do New Relic remove esse nome.
+Conclusão final: o fluxo REST de ponta a ponta foi executado novamente após o rollout das imagens corrigidas, e `Metric`, `Span`, `Log` com `correlationId` e eventos de Outbox consultáveis por `domainEventType`/`event.type` foram comprovados no New Relic. A etapa `[D-NR-REM-005]` pode ser marcada como concluída.
 
-Atualização de remediação em 2026-07-11: o `oficina-infra` recebeu a pipeline `traces/oficina-microservices` no New Relic OpenTelemetry Collector e o release Helm foi atualizado no `lab`. Os três microsserviços receberam correção local para manter `eventType` no JSON do pod e emitir aliases consultáveis `domainEventType` e `event.type`, com versões publicáveis incrementadas e suítes locais executadas com sucesso. Falta publicar/deployar essas novas imagens para reexecutar a validação remota dos aliases de evento.
+Atualização de remediação em 2026-07-11: o `oficina-infra` recebeu a pipeline `traces/oficina-microservices` no New Relic OpenTelemetry Collector e o release Helm foi atualizado no `lab`. Os três microsserviços receberam correção para manter `eventType` no JSON do pod e emitir aliases consultáveis `domainEventType` e `event.type`; as imagens corrigidas foram publicadas, implantadas e revalidadas remotamente.
 
 ## Revalidação Pós-Merge
 
@@ -91,6 +91,62 @@ Versões preparadas para o próximo rollout:
 | `oficina-os-service` | `1.0.4` |
 | `oficina-billing-service` | `1.0.5` |
 | `oficina-execution-service` | `1.0.4` |
+
+## Reexecução Final Pós-Rollout
+
+Execução complementar realizada em `2026-07-11 12:13:58 -03` (`2026-07-11T15:13:58Z`) após o rollout das imagens com aliases de evento.
+
+Versões implantadas no `lab`:
+
+| Serviço | Imagem |
+|---|---|
+| `oficina-os-service` | `1.0.4` |
+| `oficina-billing-service` | `1.0.5` |
+| `oficina-execution-service` | `1.0.4` |
+
+Testes locais reexecutados antes do E2E:
+
+| Repositório | Comando | Resultado |
+|---|---|---|
+| `oficina-os-service` | `./mvnw -B test -Ppostgresql` | `89` testes, `0` falhas, `0` erros, `0` ignorados. |
+| `oficina-billing-service` | `./mvnw -B test -Ppostgresql` | `42` testes, `0` falhas, `0` erros, `0` ignorados. |
+| `oficina-execution-service` | `./mvnw -B test -Pdynamodb` | `42` testes, `0` falhas, `0` erros, `0` ignorados. |
+
+Artefatos do E2E final:
+
+| Artefato | Caminho feliz | Falha compensada |
+|---|---|---|
+| `correlationId` | `d-nr-rem-005-rerun-happy-20260711T151358Z` | `d-nr-rem-005-rerun-comp-20260711T151358Z` |
+| Ordem de Serviço | `2261be83-1e6b-46d4-9fdb-c157d18f0df7` | `38f88a87-4e31-4535-8b1d-aaf7a0bb3756` |
+| Execução | `d09a016f-407a-4b8b-9bea-ed6b34acff9c` | `cf3e2a05-4673-4ffb-b04f-ff1145e3c772` |
+| Orçamento | `e715b042-fc97-449a-b9e3-da9201bf8bdd` | `2da1d54a-d553-4a15-9f2c-f7d39d2040ff` |
+| Pagamento | `adf80c9a-4e24-4cfb-bc0c-5c2b6eab2cfc` | não aplicável |
+| Peça sem estoque | não aplicável | `0c3a5afa-b837-4345-9742-63e49bbb1b82` |
+
+Resultado funcional:
+
+| Cenário | Resultado |
+|---|---|
+| Caminho feliz | `19` de `19` chamadas retornaram o status esperado; a OS terminou em `ENTREGUE` e o histórico retornou pelo menos `6` registros. |
+| Falha compensada | `18` chamadas retornaram o status esperado, incluindo `409` esperado em `POST /api/v1/estoques/movimentos/reserva`, execução final em `CANCELADA` e aceite de cancelamento da OS com `202`. |
+
+Evidência NRQL na conta `8254132`:
+
+| Consulta | Resultado |
+|---|---|
+| `FROM Metric SELECT count(*) WHERE service.name IN (...) SINCE 30 minutes ago FACET service.name` | `oficina-os-service=10336`, `oficina-billing-service=10304`, `oficina-execution-service=8673` |
+| `FROM Span SELECT count(*) WHERE service.name IN (...) SINCE 30 minutes ago FACET service.name` | `oficina-os-service=18`, `oficina-execution-service=12`, `oficina-billing-service=6` |
+| `FROM Log SELECT count(*) WHERE correlationId IN (...) SINCE 30 minutes ago FACET service.name, correlationId` | `oficina-os-service=23`, `oficina-execution-service=19`, `oficina-billing-service=12` entre os dois `correlationId` da execução. |
+| `FROM Log SELECT count(*) WHERE correlationId IN (...) AND message = 'outbox event registered' AND domainEventType IS NOT NULL SINCE 30 minutes ago FACET service.name, domainEventType` | retornou eventos dos três serviços, incluindo `ordemDeServicoCriada`, `ordemDeServicoEntregue`, `sagaFinalizadaComSucesso`, `sagaCompensada`, `orcamentoGerado`, `orcamentoAprovado`, `pagamentoSolicitado`, `pagamentoConfirmado`, `diagnosticoIniciado`, `diagnosticoFinalizado`, `execucaoIniciada` e `execucaoFinalizada`. |
+| `FROM Log SELECT count(*) WHERE correlationId IN (...) AND message = 'outbox event registered' AND event.type IS NOT NULL SINCE 30 minutes ago FACET service.name, event.type` | retornou os mesmos tipos lógicos de evento consultáveis por alias `event.type`. |
+| `FROM Log SELECT keyset() WHERE correlationId IN (...) AND message = 'outbox event registered' SINCE 30 minutes ago` | retornou `aggregateId`, `correlationId`, `domainEventType`, `event.type`, `eventId`, `eventVersion`, `producer`, `topic`, `traceId`, `spanId`, `service.name`, `service.namespace` e `deployment.environment`. |
+| `FROM Log SELECT count(*) WHERE correlationId = 'd-nr-rem-005-rerun-comp-20260711T151358Z' AND http.status = '409' SINCE 30 minutes ago FACET service.name, http.path` | `oficina-execution-service`, `//api/v1/estoques/movimentos/reserva` = `1`. |
+
+Validação complementar no Kubernetes:
+
+- os logs recentes dos três Deployments continham as entradas JSON com `correlationId`, `traceId`, `spanId`, `service.name`, `service.namespace=oficina` e `deployment.environment=lab`;
+- os logs de Outbox continham `eventType` preservado no stdout do pod e os aliases `domainEventType` e `event.type`;
+- as entradas de `sagaFinalizadaComSucesso` e `sagaCompensada` foram emitidas pelo `oficina-os-service`.
 
 ## Caminho Feliz
 
@@ -280,7 +336,7 @@ Na execução original, o fluxo REST gerou efeitos funcionais de orçamento, pag
 - não foram encontrados logs com `eventType` e `correlationId` dos cenários;
 - a consulta direta ao New Relic ainda não tinha sido executada por ausência de chave de consulta NRQL no ambiente local.
 
-Na revalidação pós-merge, os logs de Outbox apareceram no New Relic com `correlationId` e identificadores estruturados, mas o atributo literal `eventType` foi removido pela ingestão. A correção preparada nos microsserviços adiciona `domainEventType` e `event.type` para consulta remota, preservando `eventType` no stdout dos pods.
+Na revalidação pós-merge, os logs de Outbox apareceram no New Relic com `correlationId` e identificadores estruturados, mas o atributo literal `eventType` foi removido pela ingestão. A reexecução final pós-rollout comprovou que os aliases `domainEventType` e `event.type` chegam ao New Relic e permanecem consultáveis, preservando `eventType` no stdout dos pods.
 
 ## Erros e Limitações
 
@@ -291,13 +347,12 @@ Na revalidação pós-merge, os logs de Outbox apareceram no New Relic com `corr
 | Logs de negócio | Corrigido e comprovado | A revalidação pós-merge confirmou logs no New Relic com `correlationId` para os três serviços. | Não bloqueia mais `[D-NR-REM-005]`. |
 | Traces | Corrigido e comprovado | A revalidação pós-merge confirmou `Span` no New Relic para os três serviços após adicionar a pipeline `traces/oficina-microservices` no collector. | Não bloqueia mais `[D-NR-REM-005]`. |
 | Dashboards sem métricas | Falha corrigida parcialmente | A causa local foi identificada, corrigida no collector e confirmada por NRQL em `Metric`. | Falta validar visualmente ou reimportar os dashboards remotos com o JSON atualizado. |
-| Eventos | Falha residual com correção local preparada | Eventos/outbox aparecem como logs estruturados no New Relic, mas `eventType` é removido como atributo consultável. Em 2026-07-11, os três serviços passaram a emitir aliases `domainEventType` e `event.type`. | Impede concluir `[D-NR-REM-005]` até publicar/deployar as novas imagens e confirmar `domainEventType` por NRQL. |
-| New Relic remoto | Limitação corrigida | A user key foi fornecida depois da execução original e permitiu confirmar métricas e ausência de spans/eventos. | Mantém pendente apenas a validação visual dos dashboards remotos e a correção dos sinais ausentes. |
+| Eventos | Corrigido e comprovado | Eventos/outbox aparecem como logs estruturados no New Relic com `domainEventType` e `event.type`; `eventType` segue preservado no stdout dos pods. | Não bloqueia mais `[D-NR-REM-005]`. |
+| New Relic remoto | Limitação corrigida | A user key permitiu confirmar métricas, spans, logs correlacionados e eventos por alias consultável na conta `8254132`. | Mantém pendente apenas validações de dashboards, alertas e evidências finais em itens próprios do roadmap. |
 
 ## Pendências Recomendadas
 
-1. Publicar e deployar `oficina-os-service:1.0.4`, `oficina-billing-service:1.0.5` e `oficina-execution-service:1.0.4`, contendo aliases `domainEventType` e `event.type` para logs de eventos.
-2. Reexecutar as consultas NRQL de `Log` por `domainEventType` após o rollout, mantendo `eventType` como campo canônico do stdout dos pods.
-3. Validar visualmente ou reimportar no New Relic os dashboards remotos usando os widgets atualizados em [Dashboard operacional dos microsserviços](new-relic-dashboard-operational.json).
-4. Expor evidência operacional segura para Saga/Outbox ou criar consultas NRQL versionadas para validar eventos e correlação no New Relic.
-5. Reexecutar `[D-NR-REM-005]` após as correções de logs, traces e eventos, confirmando correlação entre `Log`, `Span`, `Metric` e sinais de evento/Saga.
+1. Validar visualmente ou reimportar no New Relic os dashboards remotos usando os widgets atualizados em [Dashboard operacional dos microsserviços](new-relic-dashboard-operational.json), conforme `[D-NR-REM-002]`.
+2. Criar ou validar a visão remota da Saga no New Relic conforme `[D-NR-REM-003]`, usando `domainEventType` para eventos como `sagaFinalizadaComSucesso` e `sagaCompensada`.
+3. Criar alertas mínimos no New Relic conforme `[D-NR-REM-004]`.
+4. Registrar as evidências finais de observabilidade distribuída no checklist final da Fase 4 conforme `[D-NR-EVID-001]`.

@@ -20,6 +20,8 @@ Os microsserviços definidos para a plataforma são:
 
 A direção da plataforma é que cada microsserviço tenha seu próprio repositório independente, seguindo a governança, os contratos e os padrões definidos aqui. Ao criar ou evoluir esses repositórios, use os nomes dos microsserviços acima como referência canônica.
 
+O padrão reutilizável de regras arquiteturais e constraints estruturais copiado do `oficina-app` fica em [Template de regras para monolito modular](templates/monolito-modular/README.md). Use esse template como referência base para orientar `AGENTS.md` e testes estruturais de arquitetura dos microsserviços, substituindo placeholders por valores do serviço consumidor antes de aplicar.
+
 Este repositório faz parte de uma suíte maior. Alguns repositórios irmãos existentes ainda podem servir como referência, mesmo que parte deles deixe de ser usada conforme os novos microsserviços forem criados. Assuma que, quando presentes na mesma raiz deste diretório, os repositórios irmãos relevantes são:
 
 - `../oficina-app`

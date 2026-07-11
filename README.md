@@ -19,6 +19,10 @@ Os repositórios remotos verificados seguem a organização `oficina-soat` no Gi
 
 Este repositório continua sendo a fonte normativa para ADRs, contratos, OpenAPI, eventos, padrões e artefatos compartilhados. Código de aplicação, pipelines específicos e manifestos próprios permanecem nos repositórios dos microsserviços.
 
+## Padrões Reutilizáveis
+
+- [Template de regras para monolito modular](templates/monolito-modular/README.md): referência canônica copiada do `oficina-app` para orientar `AGENTS.md` e testes estruturais de arquitetura nos microsserviços.
+
 ## Roadmap
 
 O planejamento incremental da plataforma, incluindo lacunas restantes e backlog orientado a agentes, está documentado em [ROADMAP.md](ROADMAP.md).

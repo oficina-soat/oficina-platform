@@ -23,21 +23,29 @@ Este repositório continua sendo a fonte normativa para ADRs, contratos, OpenAPI
 
 O planejamento incremental da plataforma, incluindo lacunas restantes e backlog orientado a agentes, está documentado em [ROADMAP.md](ROADMAP.md).
 
-## Governança operacional
+## Documentação
 
-- [Conta, região e ambientes AWS](docs/aws-environments.md)
-- [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md)
-- [Rotas públicas do API Gateway](docs/api-gateway-public-routes.md)
-- [Diagrama geral da arquitetura final](docs/architecture-diagram.md)
-- [Escopo do repositório unificado de infraestrutura](docs/infrastructure-repository-scope.md)
-- [Plano de migração para o repositório unificado de infraestrutura](docs/infrastructure-migration-plan.md)
-- [Padrão de isolamento PostgreSQL no RDS compartilhado](docs/rds-postgresql-isolation.md)
-- [Padrão de observabilidade distribuída](docs/observability.md)
-- [Runbooks operacionais mínimos](docs/operational-runbooks.md)
-- [Padrão Outbox por serviço](docs/outbox-pattern.md)
-- [Padrão BDD, cobertura e qualidade](docs/bdd-testing.md)
-- [Ferramentas de validação local](docs/validation-tooling.md)
-- [Fluxos da Saga da Ordem de Serviço](docs/saga-flows.md)
-- [Padrão DynamoDB do oficina-execution-service](docs/dynamodb-execution-service.md)
-- [Checklist de deploy independente](docs/independent-deploy-checklist.md)
-- [Checklist final de entrega da Fase 4](docs/phase-4-delivery-checklist.md)
+A documentação normativa está organizada por tema em [docs/](docs/README.md):
+
+- [Arquitetura](docs/README.md#arquitetura)
+- [Infraestrutura](docs/README.md#infraestrutura)
+- [Observabilidade](docs/README.md#observabilidade)
+- [Entrega e Validação](docs/README.md#entrega-e-validação)
+
+## Scripts manuais
+
+- [generate-bearer-token.sh](scripts/manual/generate-bearer-token.sh): gera um header `Authorization: Bearer ...` chamando `POST /auth/token` da `auth-lambda` do ambiente `lab`.
+
+Exemplo sem expor a senha no histórico do shell:
+
+```bash
+AUTH_PASSWORD_FILE=/tmp/oficina-auth-password \
+  scripts/manual/generate-bearer-token.sh
+```
+
+Para obter apenas o token, use:
+
+```bash
+AUTH_PASSWORD_FILE=/tmp/oficina-auth-password \
+  scripts/manual/generate-bearer-token.sh --raw
+```

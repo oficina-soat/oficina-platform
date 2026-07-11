@@ -1,8 +1,8 @@
 # Validação local de observabilidade
 
-Este registro fecha a validação local do item `D-OBS-IMPL-002` no [Roadmap](../ROADMAP.md) e complementa o [Padrão de Observabilidade Distribuída](observability.md).
+Este registro fecha a validação local do item `D-OBS-IMPL-002` no [Roadmap](../../ROADMAP.md) e complementa o [Padrão de Observabilidade Distribuída](observability.md).
 
-A validação foi executada inicialmente em 2026-07-04 por inspeção dos três microsserviços e por testes locais aplicáveis. Em 2026-07-11, a validação foi atualizada após o troubleshooting do [Relatório D-NR-REM-005 — E2E no ambiente lab](d-nr-rem-005-e2e-lab-report.md), cobrindo `quarkus.otel.traces.exporter=cdi`, instrumentação HTTP, MDC em campos planos e logs estruturados de HTTP, Outbox e eventos. Ela não substitui a validação remota do New Relic, do EKS `lab`, dos dashboards, alertas ou traces reais, que permanecem apartados em [Validações remotas e evidências externas](../ROADMAP.md#validações-remotas-e-evidências-externas).
+A validação foi executada inicialmente em 2026-07-04 por inspeção dos três microsserviços e por testes locais aplicáveis. Em 2026-07-11, a validação foi atualizada após o troubleshooting do [Relatório D-NR-REM-005 — E2E no ambiente lab](d-nr-rem-005-e2e-lab-report.md), cobrindo `quarkus.otel.traces.exporter=cdi`, instrumentação HTTP, MDC em campos planos e logs estruturados de HTTP, Outbox e eventos. Ela não substitui a validação remota do New Relic, do EKS `lab`, dos dashboards, alertas ou traces reais, que permanecem apartados em [Validações remotas e evidências externas](../../ROADMAP.md#validações-remotas-e-evidências-externas).
 
 ## Resultado
 
@@ -22,4 +22,4 @@ A validação foi executada inicialmente em 2026-07-04 por inspeção dos três 
 
 ## Limites da validação
 
-Não foram executados testes contra AWS, EKS `lab` ou backend New Relic. A instalação do collector, dashboards, alertas, traces reais e correlação ponta a ponta por `correlationId` continuam nos itens remotos `D-NR-REM-*` e `D-NR-EVID-001` do [Roadmap](../ROADMAP.md).
+Não foram executados testes contra AWS, EKS `lab` ou backend New Relic. A instalação do collector, dashboards, alertas, traces reais e correlação ponta a ponta por `correlationId` continuam nos itens remotos `D-NR-REM-*` e `D-NR-EVID-001` do [Roadmap](../../ROADMAP.md).

@@ -126,5 +126,5 @@ O `oficina-infra` estará alinhado com a governança quando:
 - [Padrão de isolamento PostgreSQL no RDS compartilhado](rds-postgresql-isolation.md)
 - [Padrão DynamoDB do oficina-execution-service](dynamodb-execution-service.md)
 - [Proposta de Migrations PostgreSQL Decompostas](postgres-migrations-decomposition.md)
-- [Matriz de Ownership por Microsserviço](service-ownership.md)
-- [Contrato de Tópicos de Mensageria](../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md)
+- [Matriz de Ownership por Microsserviço](../architecture/service-ownership.md)
+- [Contrato de Tópicos de Mensageria](../../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md)

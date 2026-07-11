@@ -93,7 +93,7 @@ Usado por todos os serviços:
 - Cucumber JVM com JUnit Platform
 - JaCoCo com cobertura mínima de 80%
 
-O padrão de testes, BDD, cobertura e Quality Gate está definido em [Padrão BDD, Cobertura e Qualidade](../../docs/bdd-testing.md).
+O padrão de testes, BDD, cobertura e Quality Gate está definido em [Padrão BDD, Cobertura e Qualidade](../../docs/delivery/bdd-testing.md).
 
 ### PostgreSQL
 
@@ -145,7 +145,7 @@ Inclui:
 - health checks SmallRye
 - JWT com issuer e audience canônica do serviço
 
-No ambiente compartilhado, o backend canônico de observabilidade é New Relic, conforme o [Padrão de Observabilidade Distribuída](../../docs/observability.md). O serviço deve manter `quarkus.otel.traces.exporter=cdi` fixado em `application.properties`, pois essa configuração é build-time no Quarkus. Use `OTEL_EXPORTER_OTLP_ENDPOINT` apontando para o New Relic OpenTelemetry Collector definido pelo repositório de infraestrutura. Para execução local controlada, desabilite tracing por `OFICINA_OBSERVABILITY_TRACING_ENABLED=false`, sem trocar o exporter para `none`.
+No ambiente compartilhado, o backend canônico de observabilidade é New Relic, conforme o [Padrão de Observabilidade Distribuída](../../docs/observability/observability.md). O serviço deve manter `quarkus.otel.traces.exporter=cdi` fixado em `application.properties`, pois essa configuração é build-time no Quarkus. Use `OTEL_EXPORTER_OTLP_ENDPOINT` apontando para o New Relic OpenTelemetry Collector definido pelo repositório de infraestrutura. Para execução local controlada, desabilite tracing por `OFICINA_OBSERVABILITY_TRACING_ENABLED=false`, sem trocar o exporter para `none`.
 
 Para serviços PostgreSQL, incorporar os valores de `application-postgresql.properties.example`.
 
@@ -172,7 +172,7 @@ src/main/resources/db/migration/
 
 Baselines propostas:
 
-- [Proposta de Migrations PostgreSQL Decompostas](../../docs/postgres-migrations-decomposition.md)
+- [Proposta de Migrations PostgreSQL Decompostas](../../docs/infrastructure/postgres-migrations-decomposition.md)
 
 O `oficina-execution-service` não usa migrations PostgreSQL.
 

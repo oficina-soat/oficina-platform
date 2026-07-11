@@ -2,7 +2,7 @@
 
 ## Contexto
 
-Este relatório registra a execução remota da etapa `[D-NR-REM-005]` do [ROADMAP](../ROADMAP.md), relacionada ao [Padrão de Observabilidade Distribuída](observability.md), às [Rotas públicas do API Gateway](api-gateway-public-routes.md), ao [Contrato de APIs REST](../contracts/Contrato%20de%20APIs%20REST.md), ao [Contrato de Erros REST](../contracts/error-model.md) e ao [Contrato de Saga do oficina-os-service](../contracts/saga/oficina-os-saga-v1.md).
+Este relatório registra a execução remota da etapa `[D-NR-REM-005]` do [ROADMAP](../../ROADMAP.md), relacionada ao [Padrão de Observabilidade Distribuída](observability.md), às [Rotas públicas do API Gateway](../infrastructure/api-gateway-public-routes.md), ao [Contrato de APIs REST](../../contracts/Contrato%20de%20APIs%20REST.md), ao [Contrato de Erros REST](../../contracts/error-model.md) e ao [Contrato de Saga do oficina-os-service](../../contracts/saga/oficina-os-saga-v1.md).
 
 Execução realizada em `2026-07-11 09:23:40 -03` (`2026-07-11T12:23:40Z`) contra o ambiente `lab`.
 

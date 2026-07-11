@@ -4,7 +4,7 @@
 
 Definir o padrão mínimo de testes BDD, cobertura e qualidade para os repositórios `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`.
 
-Este padrão complementa a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md), o [Template Quarkus de Microsserviço](../templates/quarkus-service/README.md), o [Template GitHub Actions para Microsserviços](../templates/github-actions/README.md), os [Fluxos da Saga da Ordem de Serviço](saga-flows.md), o [Contrato de Saga do oficina-os-service](../contracts/saga/oficina-os-saga-v1.md), o [Contrato de APIs REST](../contracts/Contrato%20de%20APIs%20REST.md), o [Contrato de Eventos de Domínio](../contracts/Contrato%20de%20Eventos%20de%20Domínio.md), o [Contrato de Erros REST](../contracts/error-model.md) e o [Contrato de Idempotência](../contracts/idempotency.md).
+Este padrão complementa a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md), o [Template Quarkus de Microsserviço](../../templates/quarkus-service/README.md), o [Template GitHub Actions para Microsserviços](../../templates/github-actions/README.md), os [Fluxos da Saga da Ordem de Serviço](../architecture/saga-flows.md), o [Contrato de Saga do oficina-os-service](../../contracts/saga/oficina-os-saga-v1.md), o [Contrato de APIs REST](../../contracts/Contrato%20de%20APIs%20REST.md), o [Contrato de Eventos de Domínio](../../contracts/Contrato%20de%20Eventos%20de%20Domínio.md), o [Contrato de Erros REST](../../contracts/error-model.md) e o [Contrato de Idempotência](../../contracts/idempotency.md).
 
 ## Decisão
 
@@ -15,7 +15,7 @@ Os microsserviços devem usar:
 - JaCoCo para cobertura mínima obrigatória de 80%;
 - SonarCloud como Quality Gate baseado em CI, importando o relatório JaCoCo XML gerado pelo workflow.
 
-O Cucumber deve usar a mesma versão em todas as dependências `io.cucumber`. O [template Maven](../templates/quarkus-service/pom.xml) define essa versão por `cucumber.version`.
+O Cucumber deve usar a mesma versão em todas as dependências `io.cucumber`. O [template Maven](../../templates/quarkus-service/pom.xml) define essa versão por `cucumber.version`.
 
 ## Estrutura por repositório
 
@@ -53,7 +53,7 @@ O cenário feliz mínimo deve cobrir:
 | 5 | `oficina-billing-service` | Pagamento solicitado e confirmado. |
 | 6 | `oficina-os-service` | OS entregue e Saga encerrada com `sagaFinalizadaComSucesso`. |
 
-Também deve existir pelo menos um cenário de falha compensada. A opção canônica inicial é falha de estoque ou execução antes de `execucaoFinalizada`, resultando em `sagaCompensada`, conforme [Fluxos da Saga da Ordem de Serviço](saga-flows.md).
+Também deve existir pelo menos um cenário de falha compensada. A opção canônica inicial é falha de estoque ou execução antes de `execucaoFinalizada`, resultando em `sagaCompensada`, conforme [Fluxos da Saga da Ordem de Serviço](../architecture/saga-flows.md).
 
 ## Exemplo de feature
 

@@ -57,7 +57,7 @@ O `../oficina-auth-lambda` é exceção: quando a mudança pertencer aos fluxos 
 - Ao alterar uma decisão compartilhada, atualize todos os artefatos afetados no mesmo escopo da mudança.
 - Quando houver divergência entre documentação conceitual e contratos implementáveis, explicite a decisão e normalize os artefatos relacionados.
 - Quando houver dúvida sobre nomes que precisam ser iguais entre plataforma, aplicação, autenticação, banco e infraestrutura, consulte os repositórios irmãos antes de definir novos valores.
-- Ao consultar `oficina-app`, `oficina-infra-db` ou `oficina-infra-k8s`, use-os apenas como referência ou origem de cópia; registre e aplique adaptações nos destinos canônicos definidos no [Plano de migração para o repositório unificado de infraestrutura](docs/infrastructure-migration-plan.md) e no [Plano de Decomposição do oficina-app](docs/oficina-app-decomposition.md).
+- Ao consultar `oficina-app`, `oficina-infra-db` ou `oficina-infra-k8s`, use-os apenas como referência ou origem de cópia; registre e aplique adaptações nos destinos canônicos definidos no [Plano de migração para o repositório unificado de infraestrutura](docs/infrastructure/infrastructure-migration-plan.md) e no [Plano de Decomposição do oficina-app](docs/architecture/oficina-app-decomposition.md).
 - Quando houver ponto de decisão não tomado, incerto ou ambíguo que possa mudar arquitetura, contrato, ownership, nome canônico, prioridade, compatibilidade, infraestrutura, segurança ou operação, consulte o usuário antes de decidir. A consulta deve apresentar as opções possíveis, a recomendação quando houver, e explicar objetivamente como cada opção influencia a decisão, os artefatos afetados e os riscos de divergência.
 - Em arquivos Markdown, use links relativos sempre que citar artefatos do próprio repositório, como ADRs, contratos, OpenAPI, schemas, templates, documentos em `docs/` e itens do roadmap. Prefira texto descritivo com link, por exemplo `[Contrato de APIs REST](contracts/Contrato%20de%20APIs%20REST.md)`, em vez de apenas citar o caminho em texto solto.
 - Ao criar ou alterar um artefato Markdown, inclua links para os documentos diretamente relacionados sempre que isso ajudar um agente a navegar pela decisão sem procurar manualmente. Preserve caminhos em monospace apenas quando o caminho for valor técnico, comando, exemplo de estrutura ou parte de um contrato.
@@ -138,7 +138,7 @@ find contracts/events -name '*.schema.json' -print
 
 Use validações adicionais quando houver ferramentas disponíveis no repositório ou quando a mudança afetar contratos executáveis, exemplos JSON, OpenAPI, schemas de eventos, templates, CI/CD ou Kubernetes.
 
-Ferramentas complementares recomendadas estão documentadas em [Ferramentas de validação local](docs/validation-tooling.md). Quando estiverem disponíveis, execute as validações proporcionais ao escopo:
+Ferramentas complementares recomendadas estão documentadas em [Ferramentas de validação local](docs/delivery/validation-tooling.md). Quando estiverem disponíveis, execute as validações proporcionais ao escopo:
 
 - alterações em GitHub Actions: `actionlint`;
 - alterações em scripts shell: `bash -n`, `shellcheck` e `shfmt -d`;

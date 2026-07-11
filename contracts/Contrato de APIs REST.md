@@ -59,7 +59,7 @@ Authorization: Bearer <jwt>
 
 ### Exposição pública
 
-As rotas REST de negócio dos três microsserviços devem ser expostas publicamente pelo API Gateway conforme [Rotas públicas do API Gateway](../docs/api-gateway-public-routes.md).
+As rotas REST de negócio dos três microsserviços devem ser expostas publicamente pelo API Gateway conforme [Rotas públicas do API Gateway](../docs/infrastructure/api-gateway-public-routes.md).
 
 Nesse contrato, exposição pública significa rota acessível pela entrada pública da plataforma. A decisão não remove autenticação, autorização, erros padronizados, idempotência ou propagação de `correlationId`.
 

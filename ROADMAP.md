@@ -27,19 +27,19 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
 - Estratégia de PostgreSQL definida para a Fase 4 como uma única instância Amazon RDS compartilhada, com databases independentes por microsserviço relacional:
   - `oficina_os`, acessado apenas pelo `oficina-os-service`;
   - `oficina_billing`, acessado apenas pelo `oficina-billing-service`.
-- Uso de Amazon DynamoDB definido para o `oficina-execution-service`, atendendo ao requisito de banco não relacional, com padrão de tabelas, chaves, índices, seeds e streams registrado em [Padrão DynamoDB do oficina-execution-service](docs/dynamodb-execution-service.md).
+- Uso de Amazon DynamoDB definido para o `oficina-execution-service`, atendendo ao requisito de banco não relacional, com padrão de tabelas, chaves, índices, seeds e streams registrado em [Padrão DynamoDB do oficina-execution-service](docs/infrastructure/dynamodb-execution-service.md).
 - Estratégia de CI/CD independente definida por microsserviço.
-- Conta, região e ambiente AWS definidos em [Conta, região e ambientes AWS](docs/aws-environments.md):
+- Conta, região e ambiente AWS definidos em [Conta, região e ambientes AWS](docs/infrastructure/aws-environments.md):
   - conta AWS parametrizada por `AWS_ACCOUNT_ID`, sem número fixo canônico;
   - região `us-east-1`;
   - ambiente `lab`;
   - infraestrutura compartilhada `eks-lab`;
   - IDs físicos efêmeros de VPC, subnets, security groups e integrações devem ser resolvidos por variáveis, outputs ou descoberta em tempo de deploy, pois a infraestrutura do laboratório pode ser criada e destruída a cada ciclo de teste.
-- Decisão de separar o código de infraestrutura no repositório unificado `oficina-infra`, consolidando as responsabilidades hoje distribuídas entre `oficina-infra-db` e `oficina-infra-k8s`, conforme [Escopo do Repositório Unificado de Infraestrutura](docs/infrastructure-repository-scope.md).
-- Rotas públicas do API Gateway definidas em [Rotas públicas do API Gateway](docs/api-gateway-public-routes.md): todas as APIs REST de negócio dos três microsserviços devem ser expostas pelo `eks-lab-http-api`, sem publicar endpoints operacionais como `/q/metrics`, `/q/health` e `/api/v1/status`.
+- Decisão de separar o código de infraestrutura no repositório unificado `oficina-infra`, consolidando as responsabilidades hoje distribuídas entre `oficina-infra-db` e `oficina-infra-k8s`, conforme [Escopo do Repositório Unificado de Infraestrutura](docs/infrastructure/infrastructure-repository-scope.md).
+- Rotas públicas do API Gateway definidas em [Rotas públicas do API Gateway](docs/infrastructure/api-gateway-public-routes.md): todas as APIs REST de negócio dos três microsserviços devem ser expostas pelo `eks-lab-http-api`, sem publicar endpoints operacionais como `/q/metrics`, `/q/health` e `/api/v1/status`.
 - Forma oficial de coleta New Relic definida como New Relic OpenTelemetry Collector instalado por Helm no cluster EKS `eks-lab`, com OTLP/gRPC, coleta de logs dos pods e coleta das métricas dos microsserviços.
 - Baseline executável do New Relic OpenTelemetry Collector criado no `oficina-infra`, com Helm values do ambiente `lab`, script de instalação, Secret Kubernetes esperado, endpoint OTLP/gRPC interno e integração automática ao deploy quando `NEW_RELIC_LICENSE_KEY` está configurada.
-- Enunciado da Fase 4 incluído como referência normativa em [Enunciado Fase 4](docs/Enunciado%20Fase%204.md).
+- Enunciado da Fase 4 incluído como referência normativa em [Enunciado Fase 4](docs/delivery/Enunciado%20Fase%204.md).
 - Contratos fundamentais criados para:
   - APIs REST;
   - eventos de domínio;
@@ -94,21 +94,21 @@ contracts/events/schemas/<nome-do-evento>.schema.json
 
 ### 4. Catálogo de responsabilidades por microsserviço
 
-**Situação atual:** as responsabilidades principais estão definidas nas ADRs e contratos, e a matriz operacional única para agentes foi criada em [Matriz de Ownership por Microsserviço](docs/service-ownership.md).
+**Situação atual:** as responsabilidades principais estão definidas nas ADRs e contratos, e a matriz operacional única para agentes foi criada em [Matriz de Ownership por Microsserviço](docs/architecture/service-ownership.md).
 
 **Definição faltante:** manter a matriz de ownership atualizada sempre que APIs, eventos, bancos, jobs/outbox, integrações externas ou limites de responsabilidade forem alterados.
 
 **Artefato sugerido:**
 
 ```text
-docs/service-ownership.md
+docs/architecture/service-ownership.md
 ```
 
 **Critério de pronto:** um agente deve conseguir identificar rapidamente onde implementar uma regra sem consultar todas as ADRs.
 
 ### 5. Plano de decomposição do `oficina-app`
 
-**Situação atual:** o plano inicial de decomposição foi criado em [Plano de Decomposição do oficina-app](docs/oficina-app-decomposition.md), usando o `oficina-app` como referência de código, testes e seed funcional para a arquitetura de microsserviços da Fase 4.
+**Situação atual:** o plano inicial de decomposição foi criado em [Plano de Decomposição do oficina-app](docs/architecture/oficina-app-decomposition.md), usando o `oficina-app` como referência de código, testes e seed funcional para a arquitetura de microsserviços da Fase 4.
 
 **Decisão:** o código do `oficina-app` será dividido entre `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, respeitando os limites de responsabilidade, contratos REST, eventos, bancos e regras de ownership definidos neste repositório.
 
@@ -124,25 +124,25 @@ Também foi definido que:
 **Artefato:**
 
 ```text
-docs/oficina-app-decomposition.md
+docs/architecture/oficina-app-decomposition.md
 ```
 
 **Definição faltante:** detalhar, durante a implementação dos microsserviços, os mapeamentos finais de classes, testes e seeds executáveis conforme cada repositório evoluir.
 
-As decisões para as baselines PostgreSQL decompostas de `oficina-os-service` e `oficina-billing-service` foram registradas em [Proposta de Migrations PostgreSQL Decompostas](docs/postgres-migrations-decomposition.md).
+As decisões para as baselines PostgreSQL decompostas de `oficina-os-service` e `oficina-billing-service` foram registradas em [Proposta de Migrations PostgreSQL Decompostas](docs/infrastructure/postgres-migrations-decomposition.md).
 
 **Critério de pronto:** cada componente relevante do `oficina-app` deve possuir destino explícito, estratégia de seed ou descarte, e critério de retenção apenas como referência.
 
 ### 6. Fluxos da Saga em formato executável para implementação
 
-**Situação atual:** a estratégia de Saga está documentada conceitualmente na ADR-009, os fluxos implementáveis foram detalhados em [Fluxos da Saga da Ordem de Serviço](docs/saga-flows.md) e o contrato operacional foi criado em [Contrato de Saga do oficina-os-service](contracts/saga/oficina-os-saga-v1.md).
+**Situação atual:** a estratégia de Saga está documentada conceitualmente na ADR-009, os fluxos implementáveis foram detalhados em [Fluxos da Saga da Ordem de Serviço](docs/architecture/saga-flows.md) e o contrato operacional foi criado em [Contrato de Saga do oficina-os-service](contracts/saga/oficina-os-saga-v1.md).
 
 **Definição faltante:** evoluir os fluxos conforme a implementação dos microsserviços estabilizar payloads, endpoints auxiliares ou novas compensações.
 
 **Artefatos sugeridos:**
 
 ```text
-docs/saga-flows.md
+docs/architecture/saga-flows.md
 contracts/saga/oficina-os-saga-v1.md
 ```
 
@@ -150,7 +150,7 @@ contracts/saga/oficina-os-saga-v1.md
 
 ### 7. Padrões técnicos para repositórios de microsserviços
 
-**Situação atual:** há decisões sobre CI/CD, deploy independente e governança; o template base Quarkus foi criado em [Template Quarkus de Microsserviço](templates/quarkus-service/README.md); o pipeline padrão foi criado em [Template GitHub Actions para Microsserviços](templates/github-actions/README.md); os manifests Kubernetes base foram criados em [Template Kubernetes Base](templates/kubernetes/base/README.md); e o padrão DynamoDB do `oficina-execution-service` foi definido em [Padrão DynamoDB do oficina-execution-service](docs/dynamodb-execution-service.md).
+**Situação atual:** há decisões sobre CI/CD, deploy independente e governança; o template base Quarkus foi criado em [Template Quarkus de Microsserviço](templates/quarkus-service/README.md); o pipeline padrão foi criado em [Template GitHub Actions para Microsserviços](templates/github-actions/README.md); os manifests Kubernetes base foram criados em [Template Kubernetes Base](templates/kubernetes/base/README.md); e o padrão DynamoDB do `oficina-execution-service` foi definido em [Padrão DynamoDB do oficina-execution-service](docs/infrastructure/dynamodb-execution-service.md).
 
 **Definição faltante:** evoluir os templates com documentação local específica quando esses padrões forem fechados nos repositórios dos microsserviços.
 
@@ -170,7 +170,7 @@ templates/kubernetes/base/
 
 **Situação atual:** os repositórios `oficina-infra-db` e `oficina-infra-k8s` existem como referências separadas para banco de dados e Kubernetes, e o repositório unificado `oficina-infra` já existe como destino canônico da Fase 4. O `oficina-infra` já possui módulos Terraform para RDS PostgreSQL compartilhado, EKS, ECR, API Gateway, DynamoDB do `oficina-execution-service` e mensageria SNS/SQS da Fase 4.
 
-**Definição fechada:** o escopo e as responsabilidades do `oficina-infra` foram definidos em [Escopo do Repositório Unificado de Infraestrutura](docs/infrastructure-repository-scope.md).
+**Definição fechada:** o escopo e as responsabilidades do `oficina-infra` foram definidos em [Escopo do Repositório Unificado de Infraestrutura](docs/infrastructure/infrastructure-repository-scope.md).
 
 **Critério de pronto:** o novo repositório deve concentrar os artefatos de infraestrutura compartilhada da suíte, mantendo nomes de ambientes, secrets, variáveis, manifests, migrations e padrões de deploy compatíveis com os contratos e decisões deste repositório.
 
@@ -205,7 +205,7 @@ Amazon DynamoDB
 
 ### 10. Padrão de observabilidade distribuída
 
-**Situação atual:** o padrão operacional foi criado em [Padrão de Observabilidade Distribuída](docs/observability.md), consolidando logs estruturados, métricas, traces, health checks, dashboards e alertas no New Relic, além da propagação de `correlationId`.
+**Situação atual:** o padrão operacional foi criado em [Padrão de Observabilidade Distribuída](docs/observability/observability.md), consolidando logs estruturados, métricas, traces, health checks, dashboards e alertas no New Relic, além da propagação de `correlationId`.
 
 **Definição faltante:** manter o padrão coerente com os manifests Kubernetes, pipelines, instalação do New Relic OpenTelemetry Collector no repositório de infraestrutura e implementações dos microsserviços conforme esses artefatos forem evoluídos.
 
@@ -213,9 +213,9 @@ Amazon DynamoDB
 
 1. [x] Definir a forma de coleta oficial para o ambiente `lab`: New Relic OpenTelemetry Collector instalado por Helm no cluster EKS, preservando New Relic como backend canônico.
 2. [x] Criar no `oficina-infra` os Helm values e scripts necessários para instalar o New Relic OpenTelemetry Collector no cluster `eks-lab`, incluindo Secret Kubernetes esperado, endpoint OTLP/gRPC interno, coleta de logs dos pods, métricas Prometheus e traces.
-3. [x] Definir secrets e variáveis operacionais do New Relic no ambiente `lab`, incluindo `NEW_RELIC_LICENSE_KEY`, endpoint OTLP interno e integração com os nomes de runtime descritos em [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md).
+3. [x] Definir secrets e variáveis operacionais do New Relic no ambiente `lab`, incluindo `NEW_RELIC_LICENSE_KEY`, endpoint OTLP interno e integração com os nomes de runtime descritos em [Nomes de runtime, secrets e infraestrutura](docs/infrastructure/infra-runtime-naming.md).
 4. Concluído localmente: `[D-OBS-IMPL-001]` propagar `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_PROTOCOL`, `OTEL_RESOURCE_ATTRIBUTES`, `DEPLOYMENT_ENVIRONMENT` e `OTEL_SERVICE_NAME` nos manifests dos três microsserviços.
-5. Concluído localmente: `[D-OBS-IMPL-002]` validar nos três microsserviços, por inspeção local e testes locais aplicáveis, a emissão de logs JSON, exposição de `/q/metrics`, health checks Quarkus e configuração de traces OpenTelemetry conforme [Validação local de observabilidade](docs/observability-local-validation.md).
+5. Concluído localmente: `[D-OBS-IMPL-002]` validar nos três microsserviços, por inspeção local e testes locais aplicáveis, a emissão de logs JSON, exposição de `/q/metrics`, health checks Quarkus e configuração de traces OpenTelemetry conforme [Validação local de observabilidade](docs/observability/observability-local-validation.md).
 6. [x] Automatizar no workflow de deploy do `oficina-infra` a instalação ou atualização do New Relic OpenTelemetry Collector quando a secret GitHub `NEW_RELIC_LICENSE_KEY` estiver presente, mantendo `INSTALL_NEW_RELIC_OTEL_COLLECTOR=false` como override explícito para pular a etapa.
 
 As instalações reais, dashboards, alertas, testes de ponta a ponta no `eks-lab` e evidências externas ficam apartados em [Validações remotas e evidências externas](#validações-remotas-e-evidências-externas).
@@ -223,9 +223,9 @@ As instalações reais, dashboards, alertas, testes de ponta a ponta no `eks-lab
 **Artefato sugerido:**
 
 ```text
-docs/observability.md
-docs/infra-runtime-naming.md
-docs/phase-4-delivery-checklist.md
+docs/observability/observability.md
+docs/infrastructure/infra-runtime-naming.md
+docs/delivery/phase-4-delivery-checklist.md
 ```
 
 **Critério de pronto:** todos os serviços devem expor o mesmo conjunto mínimo de sinais, propagar `correlationId` em HTTP, eventos, logs e traces, enviar dados reais ao New Relic no ambiente `lab` por meio do New Relic OpenTelemetry Collector, possuir dashboards e alertas mínimos ativos e ter evidências registradas no checklist final.
@@ -247,14 +247,14 @@ contracts/idempotency.md
 
 ### 12. BDD, cobertura e qualidade de código
 
-**Situação atual:** o padrão BDD, cobertura e qualidade foi definido em [Padrão BDD, Cobertura e Qualidade](docs/bdd-testing.md), com Cucumber JVM, JUnit Platform, JaCoCo com mínimo de 80% e Quality Gate SonarCloud obrigatório no CI. O cenário BDD da Saga está implementado no `oficina-os-service` e foi verificado localmente em 2026-07-04 com `./mvnw -B -Dtest=RunCucumberTest test`, cobrindo caminho feliz e falha compensada. A evidência remota do BDD no CI foi confirmada em 2026-07-10 pelo workflow `Service CI/CD` em `main` do `oficina-os-service` no [run 29116182460](https://github.com/oficina-soat/oficina-os-service/actions/runs/29116182460). Em 2026-07-11 foi identificada ausência de métricas de cobertura nos dashboards SonarCloud porque a Automatic Analysis não importa cobertura; o padrão foi ajustado para análise baseada em CI com `SONAR_TOKEN`, SonarScanner for Maven e importação de `target/jacoco-report/jacoco.xml`. Em 2026-07-11, o cache do SonarCloud no `service-ci-validate` foi atualizado para `actions/cache@v6`, compatível com Node.js 24, removendo a dependência da série `v4` com runtime Node.js 20 depreciado. Também foi reforçada a pinagem por SHA completo para actions de terceiros usadas no pipeline, preservando comentário com a tag semântica de origem.
+**Situação atual:** o padrão BDD, cobertura e qualidade foi definido em [Padrão BDD, Cobertura e Qualidade](docs/delivery/bdd-testing.md), com Cucumber JVM, JUnit Platform, JaCoCo com mínimo de 80% e Quality Gate SonarCloud obrigatório no CI. O cenário BDD da Saga está implementado no `oficina-os-service` e foi verificado localmente em 2026-07-04 com `./mvnw -B -Dtest=RunCucumberTest test`, cobrindo caminho feliz e falha compensada. A evidência remota do BDD no CI foi confirmada em 2026-07-10 pelo workflow `Service CI/CD` em `main` do `oficina-os-service` no [run 29116182460](https://github.com/oficina-soat/oficina-os-service/actions/runs/29116182460). Em 2026-07-11 foi identificada ausência de métricas de cobertura nos dashboards SonarCloud porque a Automatic Analysis não importa cobertura; o padrão foi ajustado para análise baseada em CI com `SONAR_TOKEN`, SonarScanner for Maven e importação de `target/jacoco-report/jacoco.xml`. Em 2026-07-11, o cache do SonarCloud no `service-ci-validate` foi atualizado para `actions/cache@v6`, compatível com Node.js 24, removendo a dependência da série `v4` com runtime Node.js 20 depreciado. Também foi reforçada a pinagem por SHA completo para actions de terceiros usadas no pipeline, preservando comentário com a tag semântica de origem.
 
-**Definição fechada:** as evidências remotas de BDD, cobertura mínima e Quality Gate devem vir do workflow `service-ci-validate`, que executa Maven `verify`, gera JaCoCo e envia o XML ao SonarCloud. O [Checklist Final de Entrega da Fase 4](docs/phase-4-delivery-checklist.md) ainda deve receber os links finais consolidados quando o documento de entrega for preenchido.
+**Definição fechada:** as evidências remotas de BDD, cobertura mínima e Quality Gate devem vir do workflow `service-ci-validate`, que executa Maven `verify`, gera JaCoCo e envia o XML ao SonarCloud. O [Checklist Final de Entrega da Fase 4](docs/delivery/phase-4-delivery-checklist.md) ainda deve receber os links finais consolidados quando o documento de entrega for preenchido.
 
 **Artefatos sugeridos:**
 
 ```text
-docs/bdd-testing.md
+docs/delivery/bdd-testing.md
 templates/quarkus-service/src/test/resources/features/
 templates/github-actions/service-ci.yml
 ```
@@ -263,15 +263,15 @@ templates/github-actions/service-ci.yml
 
 ### 13. Evidências e entregáveis finais da Fase 4
 
-**Situação atual:** o checklist consolidado dos entregáveis finais foi criado em [Checklist Final de Entrega da Fase 4](docs/phase-4-delivery-checklist.md), cobrindo evidências por repositório, cobertura, Swagger/OpenAPI, vídeo, PDF, diagrama, Saga, deploy e observabilidade. O [Diagrama Geral da Arquitetura Final](docs/architecture-diagram.md) registra a visão consolidada de microsserviços, bancos, mensageria, Kubernetes, observabilidade e Mercado Pago.
+**Situação atual:** o checklist consolidado dos entregáveis finais foi criado em [Checklist Final de Entrega da Fase 4](docs/delivery/phase-4-delivery-checklist.md), cobrindo evidências por repositório, cobertura, Swagger/OpenAPI, vídeo, PDF, diagrama, Saga, deploy e observabilidade. O [Diagrama Geral da Arquitetura Final](docs/architecture/architecture-diagram.md) registra a visão consolidada de microsserviços, bancos, mensageria, Kubernetes, observabilidade e Mercado Pago.
 
 **Definição faltante:** preencher os links reais de cobertura, Swagger/OpenAPI, pipelines, vídeo e PDF final conforme os repositórios de microsserviço e infraestrutura forem concluídos.
 
 **Artefatos sugeridos:**
 
 ```text
-docs/phase-4-delivery-checklist.md
-docs/architecture-diagram.md
+docs/delivery/phase-4-delivery-checklist.md
+docs/architecture/architecture-diagram.md
 ```
 
 **Critério de pronto:** cada repositório de microsserviço deve possuir README com link de cobertura e Swagger/OpenAPI; a plataforma deve possuir checklist final da entrega; e o PDF/vídeo devem demonstrar fluxo completo da OS, Saga com falha/compensação, deploy automatizado e observabilidade distribuída.
@@ -280,7 +280,7 @@ docs/architecture-diagram.md
 
 **Situação atual:** a governança da suíte definiu o repositório `oficina-infra` como destino canônico da infraestrutura executável, mas o enunciado da Fase 4 lista manifestos Kubernetes como entregável dos repositórios de microsserviço.
 
-**Decisão:** a estratégia foi fechada em [Estratégia de entrega dos manifestos Kubernetes](docs/kubernetes-manifest-strategy.md). O `oficina-infra` é a fonte canônica dos manifests executáveis; o [Template Kubernetes Base](templates/kubernetes/base/README.md) permanece como referência normativa; e os READMEs dos microsserviços apontam para o template aplicável e para o destino canônico no `oficina-infra`.
+**Decisão:** a estratégia foi fechada em [Estratégia de entrega dos manifestos Kubernetes](docs/infrastructure/kubernetes-manifest-strategy.md). O `oficina-infra` é a fonte canônica dos manifests executáveis; o [Template Kubernetes Base](templates/kubernetes/base/README.md) permanece como referência normativa; e os READMEs dos microsserviços apontam para o template aplicável e para o destino canônico no `oficina-infra`.
 
 Se uma avaliação exigir arquivos Kubernetes dentro de cada repositório de microsserviço, as cópias devem ser registradas como referência não canônica. O deploy real continua pertencendo ao `oficina-infra`.
 
@@ -290,7 +290,7 @@ Se uma avaliação exigir arquivos Kubernetes dentro de cada repositório de mic
 ../oficina-infra/
 templates/kubernetes/base/
 README.md dos microsserviços
-docs/kubernetes-manifest-strategy.md
+docs/infrastructure/kubernetes-manifest-strategy.md
 ```
 
 **Critério de pronto:** a entrega deve demonstrar onde estão os manifestos Kubernetes de cada serviço, qual repositório é a fonte canônica de deploy e como evitar divergência entre cópias ou referências.
@@ -304,8 +304,8 @@ docs/kubernetes-manifest-strategy.md
 **Etapas:**
 
 1. [x] Criar `compose.local.yml` no `../oficina-infra` com PostgreSQL, DynamoDB Local e LocalStack para SNS/SQS.
-2. [x] Criar bootstrap local de PostgreSQL com os databases `oficina_os` e `oficina_billing`, usuários independentes e permissões compatíveis com o [Padrão de isolamento PostgreSQL no RDS compartilhado](docs/rds-postgresql-isolation.md).
-3. [x] Criar bootstrap local de DynamoDB com as tabelas canônicas do `oficina-execution-service`, conforme o [Padrão DynamoDB do oficina-execution-service](docs/dynamodb-execution-service.md).
+2. [x] Criar bootstrap local de PostgreSQL com os databases `oficina_os` e `oficina_billing`, usuários independentes e permissões compatíveis com o [Padrão de isolamento PostgreSQL no RDS compartilhado](docs/infrastructure/rds-postgresql-isolation.md).
+3. [x] Criar bootstrap local de DynamoDB com as tabelas canônicas do `oficina-execution-service`, conforme o [Padrão DynamoDB do oficina-execution-service](docs/infrastructure/dynamodb-execution-service.md).
 4. [x] Criar bootstrap local de SNS/SQS com tópicos, filas e DLQs alinhados ao [Contrato de Tópicos de Mensageria](contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md).
 5. [x] Adicionar profile opcional no Compose para subir os três microsserviços com portas locais distintas, sem tornar esse profile pré-requisito para validar dependências.
 6. [x] Documentar comandos locais para subir dependências, executar bootstrap, consultar status e desligar o ambiente.
@@ -324,7 +324,7 @@ docs/kubernetes-manifest-strategy.md
 
 **Situação atual:** as OpenAPI dos três microsserviços definem a superfície REST de negócio da Fase 4, todas sob `/api/v1`, e o `oficina-infra` já possui módulo de API Gateway parametrizado para receber rotas HTTP.
 
-**Decisão:** todas as APIs REST de negócio dos três microsserviços serão públicas via API Gateway HTTP `eks-lab-http-api`, conforme [Rotas públicas do API Gateway](docs/api-gateway-public-routes.md). "Públicas" significa roteáveis pela entrada pública da plataforma; a decisão não remove os contratos de autenticação, erro padronizado, idempotência e `correlationId`.
+**Decisão:** todas as APIs REST de negócio dos três microsserviços serão públicas via API Gateway HTTP `eks-lab-http-api`, conforme [Rotas públicas do API Gateway](docs/infrastructure/api-gateway-public-routes.md). "Públicas" significa roteáveis pela entrada pública da plataforma; a decisão não remove os contratos de autenticação, erro padronizado, idempotência e `correlationId`.
 
 Os endpoints operacionais `/api/v1/status`, `/q/health`, `/q/metrics`, `/q/openapi` e `/q/swagger-ui` não fazem parte da superfície pública permanente de negócio. Se forem usados em demonstração ou evidência, devem ser tratados como exceção operacional temporária no `oficina-infra`.
 
@@ -333,7 +333,7 @@ Os endpoints operacionais `/api/v1/status`, `/q/health`, `/q/metrics`, `/q/opena
 **Artefatos sugeridos:**
 
 ```text
-docs/api-gateway-public-routes.md
+docs/infrastructure/api-gateway-public-routes.md
 ../oficina-infra/terraform/environments/lab/
 ../oficina-infra/terraform/modules/api_gateway/
 ```
@@ -383,10 +383,10 @@ docs/api-gateway-public-routes.md
 **Entregas:**
 
 1. Criar baseline Quarkus nos repositórios `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, usando [Template Quarkus de Microsserviço](templates/quarkus-service/README.md), [Template GitHub Actions para Microsserviços](templates/github-actions/README.md) e [Template Kubernetes Base](templates/kubernetes/base/README.md).
-2. Copiar e adaptar o domínio de atendimento do `oficina-app` para o `oficina-os-service`, conforme [Plano de Decomposição do oficina-app](docs/oficina-app-decomposition.md).
-3. Copiar e adaptar o domínio de peças, serviços e estoque do `oficina-app` para o `oficina-execution-service`, reimplementando a persistência em DynamoDB conforme [Padrão DynamoDB do oficina-execution-service](docs/dynamodb-execution-service.md).
-4. Criar a implementação nova do `oficina-billing-service`, sem origem equivalente no `oficina-app`, a partir do [Contrato de APIs REST](contracts/Contrato%20de%20APIs%20REST.md), da [OpenAPI do oficina-billing-service](contracts/openapi/oficina-billing-service.yaml), dos eventos e da [Matriz de Ownership por Microsserviço](docs/service-ownership.md).
-5. Separar seeds e migrations executáveis por serviço, preservando seed limpo e isolamento de banco conforme [Proposta de Migrations PostgreSQL Decompostas](docs/postgres-migrations-decomposition.md) e [Padrão de isolamento PostgreSQL no RDS compartilhado](docs/rds-postgresql-isolation.md).
+2. Copiar e adaptar o domínio de atendimento do `oficina-app` para o `oficina-os-service`, conforme [Plano de Decomposição do oficina-app](docs/architecture/oficina-app-decomposition.md).
+3. Copiar e adaptar o domínio de peças, serviços e estoque do `oficina-app` para o `oficina-execution-service`, reimplementando a persistência em DynamoDB conforme [Padrão DynamoDB do oficina-execution-service](docs/infrastructure/dynamodb-execution-service.md).
+4. Criar a implementação nova do `oficina-billing-service`, sem origem equivalente no `oficina-app`, a partir do [Contrato de APIs REST](contracts/Contrato%20de%20APIs%20REST.md), da [OpenAPI do oficina-billing-service](contracts/openapi/oficina-billing-service.yaml), dos eventos e da [Matriz de Ownership por Microsserviço](docs/architecture/service-ownership.md).
+5. Separar seeds e migrations executáveis por serviço, preservando seed limpo e isolamento de banco conforme [Proposta de Migrations PostgreSQL Decompostas](docs/infrastructure/postgres-migrations-decomposition.md) e [Padrão de isolamento PostgreSQL no RDS compartilhado](docs/infrastructure/rds-postgresql-isolation.md).
 6. Implementar producers, consumers, Outbox, idempotência, tratamento de erros, autenticação JWT e propagação de `correlationId` nos três microsserviços.
 7. Criar testes unitários, de contrato, de integração e BDD por serviço, incluindo validação mínima das OpenAPI, eventos, fluxos de Saga e cobertura mínima de 80%.
 8. Aplicar os workflows de CI/CD nos três repositórios de microsserviços, com build, testes, relatório de cobertura, Quality Gate SonarCloud ou equivalente, publicação de imagem e deploy automatizado em Kubernetes.
@@ -474,11 +474,11 @@ Convenção de identificadores para itens abertos:
 - [x] Criar baseline Quarkus executável em `oficina-billing-service`, com estrutura, dependências, health checks, configuração por ambiente, autenticação JWT, erro padronizado, idempotência e observabilidade.
 - [x] Criar baseline Quarkus executável em `oficina-execution-service`, com estrutura, dependências, health checks, configuração por ambiente, autenticação JWT, erro padronizado, idempotência e observabilidade.
 - [x] Criar diretivas locais para agentes, README operacional e backlog local nos três repositórios de microsserviços antes de iniciar a migração de domínio.
-- [x] Copiar e adaptar para `oficina-os-service` o domínio de Pessoa, Usuário, Cliente, Veículo e Ordem de Serviço do `oficina-app`, conforme [Plano de Decomposição do oficina-app](docs/oficina-app-decomposition.md).
+- [x] Copiar e adaptar para `oficina-os-service` o domínio de Pessoa, Usuário, Cliente, Veículo e Ordem de Serviço do `oficina-app`, conforme [Plano de Decomposição do oficina-app](docs/architecture/oficina-app-decomposition.md).
 - [x] Copiar e adaptar para `oficina-os-service` controllers, presenters, DTOs, validações, testes e seed de atendimento do `oficina-app`, alinhando rotas com a [OpenAPI do oficina-os-service](contracts/openapi/oficina-os-service.yaml).
 - [x] Criar migrations e seed limpo do `oficina-os-service` para o database `oficina_os`, preservando isolamento de acesso e ownership.
 - [x] Implementar no `oficina-os-service` a orquestração da Saga, histórico de estados, Outbox, publicação dos eventos de OS e consumo dos eventos de Billing e Execution.
-- [x] Copiar e adaptar para `oficina-execution-service` o domínio de catálogo técnico, peças, serviços e estoque do `oficina-app`, conforme [Plano de Decomposição do oficina-app](docs/oficina-app-decomposition.md).
+- [x] Copiar e adaptar para `oficina-execution-service` o domínio de catálogo técnico, peças, serviços e estoque do `oficina-app`, conforme [Plano de Decomposição do oficina-app](docs/architecture/oficina-app-decomposition.md).
 - [x] Reimplementar no `oficina-execution-service` a persistência de catálogo, estoque, execução, Outbox e idempotência em DynamoDB, sem migrar diretamente adapters PostgreSQL/Panache do `oficina-app`.
 - [x] Implementar no `oficina-execution-service` diagnóstico, execução, reparo, movimentação de estoque, producers e consumers definidos nos contratos de eventos.
 - [x] Criar seed limpo do `oficina-execution-service` para tabelas DynamoDB, reaproveitando apenas os dados funcionais aplicáveis do `import.sql` do `oficina-app`.
@@ -518,12 +518,12 @@ Convenção de identificadores para itens abertos:
 - [x] Criar pipeline padrão de CI/CD.
 - [x] `[D-NR-IMPL-001]` Criar baseline executável do New Relic no `oficina-infra` com New Relic OpenTelemetry Collector via Helm, Secret Kubernetes esperado, endpoint OTLP/gRPC interno e coleta de logs, métricas e traces.
 - [x] `[D-OBS-IMPL-001]` Propagar `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_PROTOCOL`, `OTEL_RESOURCE_ATTRIBUTES`, `DEPLOYMENT_ENVIRONMENT` e `OTEL_SERVICE_NAME` nos manifests dos três microsserviços.
-- [x] `[D-OBS-IMPL-002]` Validar nos três microsserviços, por inspeção local e testes locais aplicáveis, a emissão de logs JSON, exposição de `/q/metrics`, health checks Quarkus e configuração de traces OpenTelemetry conforme [Validação local de observabilidade](docs/observability-local-validation.md).
-- [x] `[D-AWS-IMPL-001]` Encerrar a normalização direta de valores legados de conta, região e ambiente AWS nos repositórios antigos. Decisão: `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` permanecem apenas como fontes históricas ou origem de cópia controlada; as normalizações aplicáveis foram concentradas nos destinos canônicos, especialmente `oficina-infra`, conforme [Conta, região e ambientes AWS](docs/aws-environments.md), [Plano de migração para o repositório unificado de infraestrutura](docs/infrastructure-migration-plan.md) e [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md). Ajustes diretos continuam permitidos apenas em `oficina-auth-lambda` quando a mudança pertencer ao próprio componente serverless.
+- [x] `[D-OBS-IMPL-002]` Validar nos três microsserviços, por inspeção local e testes locais aplicáveis, a emissão de logs JSON, exposição de `/q/metrics`, health checks Quarkus e configuração de traces OpenTelemetry conforme [Validação local de observabilidade](docs/observability/observability-local-validation.md).
+- [x] `[D-AWS-IMPL-001]` Encerrar a normalização direta de valores legados de conta, região e ambiente AWS nos repositórios antigos. Decisão: `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` permanecem apenas como fontes históricas ou origem de cópia controlada; as normalizações aplicáveis foram concentradas nos destinos canônicos, especialmente `oficina-infra`, conforme [Conta, região e ambientes AWS](docs/infrastructure/aws-environments.md), [Plano de migração para o repositório unificado de infraestrutura](docs/infrastructure/infrastructure-migration-plan.md) e [Nomes de runtime, secrets e infraestrutura](docs/infrastructure/infra-runtime-naming.md). Ajustes diretos continuam permitidos apenas em `oficina-auth-lambda` quando a mudança pertencer ao próprio componente serverless.
 - [x] Planejar a migração de `oficina-infra-db` e `oficina-infra-k8s` para o novo repositório unificado de infraestrutura.
 - [x] Criar baseline executável do RDS PostgreSQL compartilhado no `oficina-infra`, com Terraform e bootstrap de databases, usuários e secrets independentes para OS e Billing.
 - [x] Migrar e adaptar EKS, ECR, API Gateway e Kubernetes compartilhado de `oficina-infra-k8s` para `oficina-infra`, removendo dependências operacionais do `oficina-app`.
-- [x] Definir as rotas públicas de negócio do API Gateway para os três microsserviços, conforme [Rotas públicas do API Gateway](docs/api-gateway-public-routes.md).
+- [x] Definir as rotas públicas de negócio do API Gateway para os três microsserviços, conforme [Rotas públicas do API Gateway](docs/infrastructure/api-gateway-public-routes.md).
 - [x] `[D-INFRA-IMPL-001]` Adicionar DynamoDB do `oficina-execution-service` e mensageria da Fase 4 ao `oficina-infra`.
 - [x] Criar ambiente local integrado no `oficina-infra` com PostgreSQL, DynamoDB Local, LocalStack SNS/SQS, bootstrap de dependências e profile opcional para os três microsserviços.
 - [x] Migrar workflows e scripts operacionais úteis de `oficina-infra-db` e `oficina-infra-k8s` para `oficina-infra`, normalizando state, secrets, conta, região e ambiente.
@@ -544,16 +544,16 @@ Esta seção concentra tarefas que dependem de ambiente externo, credenciais adm
 - [x] `[B2-CI-REM-000]` Configurar SonarCloud nos três repositórios de microsserviços antes da homologação dos PRs: criar ou vincular os projetos no SonarCloud, configurar `SONAR_TOKEN` como secret GitHub e usar análise baseada em CI pelo SonarScanner for Maven. Ajustado em 2026-07-11 para substituir a dependência de Automatic Analysis, que não importa cobertura, por envio explícito de `target/jacoco-report/jacoco.xml` no workflow `service-ci-validate`.
 - [x] `[B2-CI-REM-001]` Registrar evidência remota da execução BDD no CI quando os pipelines finais estiverem homologados. Evidência: `Service CI/CD` em `main` do `oficina-os-service` concluído com sucesso em 2026-07-10 no [run 29116182460](https://github.com/oficina-soat/oficina-os-service/actions/runs/29116182460), incluindo o job `service-ci-validate`; o README do serviço registra que o Cucumber BDD roda no ciclo Maven `verify`.
 - [x] `[B2-CI-REM-002]` Registrar evidência remota do Quality Gate SonarCloud aprovado e da cobertura mínima de 80% nos três microsserviços. Ajuste complementar em 2026-07-11: os workflows devem executar SonarCloud após o Maven `verify`, falhar quando `target/jacoco-report/jacoco.xml` não existir e aguardar o Quality Gate, garantindo que a cobertura apareça no dashboard SonarCloud.
-- [ ] `[B2-GH-REM-001]` Confirmar proteção da branch `main` nos três repositórios de microsserviços, com PR obrigatório e checagens automáticas exigidas antes de merge. A política canônica foi documentada em [Proteção da branch main dos microsserviços](docs/github-branch-protection.md); a aplicação remota depende de credencial GitHub com permissão administrativa e fica fora do escopo dos agentes.
+- [ ] `[B2-GH-REM-001]` Confirmar proteção da branch `main` nos três repositórios de microsserviços, com PR obrigatório e checagens automáticas exigidas antes de merge. A política canônica foi documentada em [Proteção da branch main dos microsserviços](docs/delivery/github-branch-protection.md); a aplicação remota depende de credencial GitHub com permissão administrativa e fica fora do escopo dos agentes.
 
 ### Épico D — AWS, New Relic e entrega final
 
-- [x] `[D-NR-REM-000]` Preparar o acesso New Relic antes da validação de observabilidade: confirmar a conta New Relic, gerar `NEW_RELIC_LICENSE_KEY`, configurar o secret no repositório ou na organização GitHub, manter `INSTALL_NEW_RELIC_OTEL_COLLECTOR=auto` ou usar `true` para exigir a execução remota, e confirmar acesso ao contexto AWS/EKS do cluster `eks-lab`, conforme [Padrão de Observabilidade Distribuída](docs/observability.md) e [Nomes de runtime, secrets e infraestrutura](docs/infra-runtime-naming.md). Evidência conferida em 2026-07-10: o workflow `Deploy Lab` do `oficina-infra` concluiu com sucesso no [run 29125719440](https://github.com/oficina-soat/oficina-infra/actions/runs/29125719440), o contexto EKS `eks-lab` estava acessível e o Secret Kubernetes `new-relic-license-key` existia no namespace `newrelic`.
+- [x] `[D-NR-REM-000]` Preparar o acesso New Relic antes da validação de observabilidade: confirmar a conta New Relic, gerar `NEW_RELIC_LICENSE_KEY`, configurar o secret no repositório ou na organização GitHub, manter `INSTALL_NEW_RELIC_OTEL_COLLECTOR=auto` ou usar `true` para exigir a execução remota, e confirmar acesso ao contexto AWS/EKS do cluster `eks-lab`, conforme [Padrão de Observabilidade Distribuída](docs/observability/observability.md) e [Nomes de runtime, secrets e infraestrutura](docs/infrastructure/infra-runtime-naming.md). Evidência conferida em 2026-07-10: o workflow `Deploy Lab` do `oficina-infra` concluiu com sucesso no [run 29125719440](https://github.com/oficina-soat/oficina-infra/actions/runs/29125719440), o contexto EKS `eks-lab` estava acessível e o Secret Kubernetes `new-relic-license-key` existia no namespace `newrelic`.
 - [x] `[D-NR-REM-001]` Instalar e validar o New Relic OpenTelemetry Collector no cluster `eks-lab` quando `NEW_RELIC_LICENSE_KEY` e contexto AWS/EKS estiverem disponíveis. Evidência conferida em 2026-07-10: o release Helm `nr-k8s-otel-collector` ficou `deployed` no namespace `newrelic`, o Deployment, o DaemonSet e o `kube-state-metrics` ficaram `1/1 Running`, o Service interno `nr-k8s-otel-collector-gateway` expôs OTLP/gRPC e OTLP/HTTP, e os logs do DaemonSet registraram `Everything is ready` com o receiver `filelog` lendo os arquivos de `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`. A causa do `CrashLoopBackOff` anterior foi corrigida no node atual ajustando o IMDS `HttpPutResponseHopLimit` para `2`; a persistência foi registrada no módulo EKS do repositório `oficina-infra`.
-- [x] `[D-NR-REM-002]` Criar dashboards mínimos no New Relic para `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, filtrando por `service.name`, `service.namespace=oficina` e `deployment.environment=lab`. Templates locais preparados em [Dashboards New Relic](docs/new-relic-dashboards.md) e [Dashboard operacional dos microsserviços](docs/new-relic-dashboard-operational.json). Evidência conferida em 2026-07-11: o dashboard remoto `Oficina SOAT - Microsservicos Lab` foi atualizado via NerdGraph na conta `8254132`, mantendo a página `Operacional` com 15 widgets. O troubleshooting corrigiu os painéis de falhas para usar logs estruturados com `numeric(http.status) >= 400`, trocou CPU, memória, restarts e readiness para métricas Kubernetes por `k8s.deployment.name`, confirmou dados em `Metric` para os três serviços e validou todos os NRQLs do template.
-- [ ] `[D-NR-REM-003]` Criar visão adicional da Saga no New Relic para o `oficina-os-service`, cobrindo Sagas iniciadas, finalizadas, compensadas, em falha manual e duração por etapa. Template local preparado em [Dashboard da Saga e OS](docs/new-relic-dashboard-saga.json). Evidência parcial conferida em 2026-07-11: o dashboard remoto `Oficina SOAT - Saga e Ordem de Servico Lab` foi atualizado via NerdGraph na conta `8254132`, mantendo a página `Saga OS` com 14 widgets. Os painéis foram ajustados para os atributos estruturados confirmados no New Relic, incluindo `domainEventType`, `event.type`, `aggregateId`, `producer`, `messageStatus`, `correlationId`, `traceId` e `spanId`, e todos os NRQLs do template foram validados. A pendência restante é emitir atributos estruturados de etapa e duração da Saga, como `saga.etapa` e `saga.duracaoMs`, para completar o painel de duração por etapa.
+- [x] `[D-NR-REM-002]` Criar dashboards mínimos no New Relic para `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, filtrando por `service.name`, `service.namespace=oficina` e `deployment.environment=lab`. Templates locais preparados em [Dashboards New Relic](docs/observability/new-relic-dashboards.md) e [Dashboard operacional dos microsserviços](docs/observability/new-relic-dashboard-operational.json). Evidência conferida em 2026-07-11: o dashboard remoto `Oficina SOAT - Microsservicos Lab` foi atualizado via NerdGraph na conta `8254132`, mantendo a página `Operacional` com 15 widgets. O troubleshooting corrigiu os painéis de falhas para usar logs estruturados com `numeric(http.status) >= 400`, trocou CPU, memória, restarts e readiness para métricas Kubernetes por `k8s.deployment.name`, confirmou dados em `Metric` para os três serviços e validou todos os NRQLs do template.
+- [ ] `[D-NR-REM-003]` Criar visão adicional da Saga no New Relic para o `oficina-os-service`, cobrindo Sagas iniciadas, finalizadas, compensadas, em falha manual e duração por etapa. Template local preparado em [Dashboard da Saga e OS](docs/observability/new-relic-dashboard-saga.json). Evidência parcial conferida em 2026-07-11: o dashboard remoto `Oficina SOAT - Saga e Ordem de Servico Lab` foi atualizado via NerdGraph na conta `8254132`, mantendo a página `Saga OS` com 14 widgets. Os painéis foram ajustados para os atributos estruturados confirmados no New Relic, incluindo `domainEventType`, `event.type`, `aggregateId`, `producer`, `messageStatus`, `correlationId`, `traceId` e `spanId`, e todos os NRQLs do template foram validados. A pendência restante é emitir atributos estruturados de etapa e duração da Saga, como `saga.etapa` e `saga.duracaoMs`, para completar o painel de duração por etapa.
 - [ ] `[D-NR-REM-004]` Criar alertas mínimos no New Relic para indisponibilidade, erro HTTP elevado, latência elevada, Outbox parada, Outbox com falha, DLQ, Saga em falha manual, pagamento indisponível e banco indisponível.
-- [x] `[D-NR-REM-005]` Executar teste de ponta a ponta no ambiente `lab` gerando uma Ordem de Serviço com caminho feliz e uma falha compensada, confirmando correlação por `correlationId` entre logs, traces, métricas e eventos. Execução, troubleshooting e reexecução final registrados em 2026-07-11 no [Relatório D-NR-REM-005 — E2E no ambiente lab](docs/d-nr-rem-005-e2e-lab-report.md): o fluxo REST passou, `Metric`, `Span`, `Log` com `correlationId` e eventos de Outbox por `domainEventType`/`event.type` foram comprovados no New Relic para os três serviços após o rollout de `oficina-os-service:1.0.4`, `oficina-billing-service:1.0.5` e `oficina-execution-service:1.0.4`.
+- [x] `[D-NR-REM-005]` Executar teste de ponta a ponta no ambiente `lab` gerando uma Ordem de Serviço com caminho feliz e uma falha compensada, confirmando correlação por `correlationId` entre logs, traces, métricas e eventos. Execução, troubleshooting e reexecução final registrados em 2026-07-11 no [Relatório D-NR-REM-005 — E2E no ambiente lab](docs/observability/d-nr-rem-005-e2e-lab-report.md): o fluxo REST passou, `Metric`, `Span`, `Log` com `correlationId` e eventos de Outbox por `domainEventType`/`event.type` foram comprovados no New Relic para os três serviços após o rollout de `oficina-os-service:1.0.4`, `oficina-billing-service:1.0.5` e `oficina-execution-service:1.0.4`.
 - [ ] `[D-NR-EVID-001]` Registrar evidências de observabilidade distribuída no checklist final da Fase 4, incluindo links ou identificadores dos dashboards, alertas, traces e consultas de logs usadas na validação.
 - [x] `[D-AWS-REM-001]` Aplicar o RDS PostgreSQL compartilhado em AWS usando valores variáveis do ambiente `lab`, como `vpc_id`, subnets e security groups resolvidos por Terraform outputs, variáveis de pipeline ou descoberta em tempo de deploy. Evidência conferida em 2026-07-10: a instância `oficina-postgres-lab` estava `available`, com endpoint RDS, security group e subnet group resolvidos no ambiente AWS `lab`.
 - [x] `[D-API-REM-001]` Materializar e validar no `oficina-infra` as rotas públicas do API Gateway quando os backends reais e `integration_uri` dos microsserviços estiverem disponíveis no ambiente `lab`. Evidência conferida em 2026-07-10: o HTTP API `eks-lab-http-api` expôs rotas específicas para os três microsserviços; chamadas públicas representativas retornaram respostas dos serviços corretos e endpoints operacionais como `/q/health` e `/api/v1/status` permaneceram sem rota pública.

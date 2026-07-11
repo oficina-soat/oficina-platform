@@ -49,7 +49,7 @@ A configuração inicial será enxuta, priorizando baixo custo e simplicidade op
 - alta disponibilidade: Single-AZ
 - backup automático: retenção de 7 dias
 - autenticação: usuário e senha (sem IAM DB Auth)
-- monitoramento: métricas padrão do RDS disponíveis na AWS e painéis operacionais dos microsserviços no New Relic, conforme o [Padrão de Observabilidade Distribuída](../docs/observability.md)
+- monitoramento: métricas padrão do RDS disponíveis na AWS e painéis operacionais dos microsserviços no New Relic, conforme o [Padrão de Observabilidade Distribuída](../docs/observability/observability.md)
 
 Não será utilizado autoscaling de storage neste momento, mantendo controle explícito sobre crescimento de custos.
 

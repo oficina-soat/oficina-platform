@@ -56,7 +56,7 @@ O exportador de traces Quarkus é configuração build-time e deve permanecer fi
 
 ### Observabilidade New Relic
 
-O backend canônico para dashboards, alertas, logs, métricas e traces dos microsserviços é New Relic, conforme o [Padrão de Observabilidade Distribuída](observability.md).
+O backend canônico para dashboards, alertas, logs, métricas e traces dos microsserviços é New Relic, conforme o [Padrão de Observabilidade Distribuída](../observability/observability.md).
 
 A forma oficial de coleta do ambiente `lab` é New Relic OpenTelemetry Collector instalado por Helm no cluster EKS `eks-lab`, com OTLP/gRPC habilitado para traces dos microsserviços, coleta de logs dos pods e coleta das métricas expostas em `/q/metrics`.
 
@@ -83,7 +83,7 @@ OTEL_EXPORTER_OTLP_PROTOCOL=grpc
 
 Com os nomes padrão, os microsserviços devem apontar para `OTEL_EXPORTER_OTLP_ENDPOINT=http://nr-k8s-otel-collector-gateway.newrelic.svc.cluster.local:4317`. Se `NEW_RELIC_NAMESPACE` ou `NEW_RELIC_OTEL_COLLECTOR_LOCAL_SERVICE_NAME` forem alterados no `oficina-infra`, o endpoint OTLP propagado aos manifests dos microsserviços deve mudar de forma consistente.
 
-A configuração executável do collector fica no repositório de infraestrutura em [New Relic OpenTelemetry Collector no EKS lab](../../oficina-infra/docs/new-relic-otel-collector.md). Este repositório mantém os nomes canônicos e o contrato de runtime esperado pelos microsserviços.
+A configuração executável do collector fica no repositório de infraestrutura em [New Relic OpenTelemetry Collector no EKS lab](../../../oficina-infra/docs/new-relic-otel-collector.md). Este repositório mantém os nomes canônicos e o contrato de runtime esperado pelos microsserviços.
 
 ### Credenciais AWS do GitHub Actions
 
@@ -227,7 +227,7 @@ APP_SECRET_NAME=oficina/lab/database/app
 OFICINA_DB_APP_SECRET_ID=oficina/lab/database/app
 ```
 
-Esses valores descrevem o modelo atual/legado. Para a Fase 4, a decisão canônica continua sendo uma instância RDS PostgreSQL compartilhada com databases, usuários, secrets e migrations isolados para `oficina-os-service` e `oficina-billing-service`, conforme [ROADMAP.md](../ROADMAP.md), [Conta, região e ambientes AWS](aws-environments.md) e [Padrão de isolamento PostgreSQL no RDS compartilhado](rds-postgresql-isolation.md).
+Esses valores descrevem o modelo atual/legado. Para a Fase 4, a decisão canônica continua sendo uma instância RDS PostgreSQL compartilhada com databases, usuários, secrets e migrations isolados para `oficina-os-service` e `oficina-billing-service`, conforme [ROADMAP.md](../../ROADMAP.md), [Conta, região e ambientes AWS](aws-environments.md) e [Padrão de isolamento PostgreSQL no RDS compartilhado](rds-postgresql-isolation.md).
 
 Valores canônicos da Fase 4:
 
@@ -345,7 +345,7 @@ Kubernetes ServiceAccount: oficina-execution-service
 ConfigMap: oficina-execution-service-config
 ```
 
-Os manifests base ficam em [Template Kubernetes Base](../templates/kubernetes/base/README.md).
+Os manifests base ficam em [Template Kubernetes Base](../../templates/kubernetes/base/README.md).
 
 O nome completo dos microsserviços deve ser preservado nos recursos Kubernetes. Secrets Kubernetes materializados no cluster usam nomes sem ambiente quando já estão isolados pelo cluster/namespace. O `oficina-execution-service` não usa secret de banco PostgreSQL.
 

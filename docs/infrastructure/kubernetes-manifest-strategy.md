@@ -4,13 +4,13 @@
 
 Definir como a Fase 4 entrega manifestos Kubernetes por microsserviço sem criar cópias divergentes entre `oficina-platform`, `oficina-infra` e os repositórios dos serviços.
 
-Esta decisão concilia o requisito do [Enunciado Fase 4](Enunciado%20Fase%204.md), que lista manifestos Kubernetes como entregável dos repositórios Git dos microsserviços, com a governança definida no [Escopo do Repositório Unificado de Infraestrutura](infrastructure-repository-scope.md).
+Esta decisão concilia o requisito do [Enunciado Fase 4](../delivery/Enunciado%20Fase%204.md), que lista manifestos Kubernetes como entregável dos repositórios Git dos microsserviços, com a governança definida no [Escopo do Repositório Unificado de Infraestrutura](infrastructure-repository-scope.md).
 
 ## Decisão
 
 O repositório `oficina-infra` é a fonte canônica dos manifestos Kubernetes executáveis da Fase 4.
 
-O `oficina-platform` mantém os templates normativos em [Template Kubernetes Base](../templates/kubernetes/base/README.md), e os repositórios `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service` documentam em seus READMEs onde ficam:
+O `oficina-platform` mantém os templates normativos em [Template Kubernetes Base](../../templates/kubernetes/base/README.md), e os repositórios `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service` documentam em seus READMEs onde ficam:
 
 - o template Kubernetes aplicável ao serviço;
 - o destino canônico no `oficina-infra`;
@@ -24,9 +24,9 @@ Se uma avaliação exigir arquivos Kubernetes dentro de cada repositório de mic
 
 | Serviço | Template normativo | Destino canônico no `oficina-infra` |
 |---|---|---|
-| `oficina-os-service` | [templates/kubernetes/base/oficina-os-service/](../templates/kubernetes/base/oficina-os-service/) | `../oficina-infra/k8s/base/microservices/oficina-os-service/` |
-| `oficina-billing-service` | [templates/kubernetes/base/oficina-billing-service/](../templates/kubernetes/base/oficina-billing-service/) | `../oficina-infra/k8s/base/microservices/oficina-billing-service/` |
-| `oficina-execution-service` | [templates/kubernetes/base/oficina-execution-service/](../templates/kubernetes/base/oficina-execution-service/) | `../oficina-infra/k8s/base/microservices/oficina-execution-service/` |
+| `oficina-os-service` | [templates/kubernetes/base/oficina-os-service/](../../templates/kubernetes/base/oficina-os-service/) | `../oficina-infra/k8s/base/microservices/oficina-os-service/` |
+| `oficina-billing-service` | [templates/kubernetes/base/oficina-billing-service/](../../templates/kubernetes/base/oficina-billing-service/) | `../oficina-infra/k8s/base/microservices/oficina-billing-service/` |
+| `oficina-execution-service` | [templates/kubernetes/base/oficina-execution-service/](../../templates/kubernetes/base/oficina-execution-service/) | `../oficina-infra/k8s/base/microservices/oficina-execution-service/` |
 
 No `oficina-infra`, os manifests executáveis ficam materializados por serviço em:
 
@@ -40,7 +40,7 @@ O overlay `lab` permanece responsável por componentes compartilhados do cluster
 
 | Artefato | Fonte canônica | Regra |
 |---|---|---|
-| Convenções de recursos Kubernetes | `oficina-platform` | Definidas no [Template Kubernetes Base](../templates/kubernetes/base/README.md). |
+| Convenções de recursos Kubernetes | `oficina-platform` | Definidas no [Template Kubernetes Base](../../templates/kubernetes/base/README.md). |
 | Manifests executáveis de deploy | `oficina-infra` | Adaptam os templates para o ambiente `lab`, imagens ECR, overlays, secrets e integração com EKS. |
 | Dockerfile | Repositório do microsserviço | Cada serviço mantém seu próprio build de imagem. |
 | Workflow de deploy | Repositório do microsserviço | Publica imagem, cria release e materializa ou atualiza o Deployment do próprio serviço por padrão, salvo quando `ENABLE_K8S_DEPLOY=false`. |
@@ -82,7 +82,7 @@ Nos repositórios dos microsserviços, validar que os READMEs apontam para esta 
 A estratégia está resolvida quando:
 
 - esta decisão está documentada no `oficina-platform`;
-- o [Template Kubernetes Base](../templates/kubernetes/base/README.md) aponta para esta decisão;
+- o [Template Kubernetes Base](../../templates/kubernetes/base/README.md) aponta para esta decisão;
 - o `oficina-infra` declara que é a fonte canônica dos manifests executáveis;
 - os três READMEs dos microsserviços apontam para o template aplicável e para o destino canônico no `oficina-infra`;
-- o [ROADMAP](../ROADMAP.md) registra que a estratégia de entrega dos manifests foi fechada.
+- o [ROADMAP](../../ROADMAP.md) registra que a estratégia de entrega dos manifests foi fechada.

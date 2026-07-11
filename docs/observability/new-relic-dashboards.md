@@ -2,7 +2,7 @@
 
 Este documento reúne templates JSON para criar manualmente os dashboards mínimos da Fase 4 no New Relic.
 
-Os templates seguem o [Padrão de Observabilidade Distribuída](observability.md), usam o ambiente canônico definido em [Conta, região e ambientes AWS](aws-environments.md) e dependem do New Relic OpenTelemetry Collector instalado pelo `oficina-infra`, conforme [Nomes de runtime, secrets e infraestrutura](infra-runtime-naming.md).
+Os templates seguem o [Padrão de Observabilidade Distribuída](observability.md), usam o ambiente canônico definido em [Conta, região e ambientes AWS](../infrastructure/aws-environments.md) e dependem do New Relic OpenTelemetry Collector instalado pelo `oficina-infra`, conforme [Nomes de runtime, secrets e infraestrutura](../infrastructure/infra-runtime-naming.md).
 
 ## Arquivos
 
@@ -35,7 +35,7 @@ Para informar o account ID uma única vez e gerar cópias prontas para colar na 
 ```bash
 NEW_RELIC_ACCOUNT_ID=1234567
 
-for dashboard in docs/new-relic-dashboard-operational.json docs/new-relic-dashboard-saga.json; do
+for dashboard in docs/observability/new-relic-dashboard-operational.json docs/observability/new-relic-dashboard-saga.json; do
   output="/tmp/$(basename "${dashboard}")"
   jq --argjson account_id "${NEW_RELIC_ACCOUNT_ID}" \
     'walk(if type == "object" and has("accountIds") then .accountIds = [$account_id] else . end)' \

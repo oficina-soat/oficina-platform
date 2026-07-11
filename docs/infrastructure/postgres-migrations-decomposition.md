@@ -299,4 +299,4 @@ CREATE INDEX ix_outbox_event_aggregate
 - Itens do orçamento são imutáveis após `GERADO`.
 - `pagamento.orcamento_id` deve ser único na Fase 4.
 - Outbox usa apenas `PENDING`, `PUBLISHED` e `FAILED`.
-- O padrão transversal da Outbox está definido em [Padrão Outbox por Serviço](outbox-pattern.md).
+- O padrão transversal da Outbox está definido em [Padrão Outbox por Serviço](../architecture/outbox-pattern.md).

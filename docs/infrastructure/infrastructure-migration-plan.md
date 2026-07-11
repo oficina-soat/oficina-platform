@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Definir como copiar, selecionar e adaptar artefatos de `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` para o repositório unificado `oficina-infra` e para os repositórios dos microsserviços, preservando a governança definida em [Escopo do Repositório Unificado de Infraestrutura](infrastructure-repository-scope.md) e no [Plano de Decomposição do oficina-app](oficina-app-decomposition.md).
+Definir como copiar, selecionar e adaptar artefatos de `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` para o repositório unificado `oficina-infra` e para os repositórios dos microsserviços, preservando a governança definida em [Escopo do Repositório Unificado de Infraestrutura](infrastructure-repository-scope.md) e no [Plano de Decomposição do oficina-app](../architecture/oficina-app-decomposition.md).
 
 Este plano não altera `oficina-app`, `oficina-infra-db` ou `oficina-infra-k8s`. Esses repositórios devem ser usados apenas como fonte de consulta e cópia controlada; adaptações da Fase 4 devem acontecer nos repositórios de destino.
 
@@ -106,7 +106,7 @@ Critério de pronto:
 Adicionar ao `oficina-infra` os recursos que não existiam nos repositórios legados ou que precisam ser criados para a Fase 4:
 
 - tabelas DynamoDB do `oficina-execution-service`, conforme [Padrão DynamoDB do oficina-execution-service](dynamodb-execution-service.md);
-- tópicos, filas, assinaturas e DLQs conforme o [Contrato de Tópicos de Mensageria](../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md);
+- tópicos, filas, assinaturas e DLQs conforme o [Contrato de Tópicos de Mensageria](../../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md);
 - permissões IAM mínimas para produtores, consumidores e workloads Kubernetes.
 
 Critério de pronto:

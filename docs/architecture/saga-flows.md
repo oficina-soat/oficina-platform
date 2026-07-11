@@ -4,7 +4,7 @@
 
 Detalhar os fluxos da Saga orquestrada pelo `oficina-os-service` para a Ordem de Serviço, incluindo fluxo feliz, recusa de orçamento, pagamento recusado, falhas de execução, compensações, timeouts, retentativas e testes de contrato.
 
-Este documento complementa a [ADR-009 - Estratégia de Saga Pattern](../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), o [Contrato de Saga do oficina-os-service](../contracts/saga/oficina-os-saga-v1.md), o [Contrato de Estados da Ordem de Serviço](../contracts/Contrato%20de%20Estados%20da%20Ordem%20de%20Serviço.md), o [Contrato de Eventos de Domínio](../contracts/Contrato%20de%20Eventos%20de%20Domínio.md), o [Contrato de Tópicos de Mensageria](../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md) e o [Contrato de Idempotência](../contracts/idempotency.md).
+Este documento complementa a [ADR-009 - Estratégia de Saga Pattern](../../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), o [Contrato de Saga do oficina-os-service](../../contracts/saga/oficina-os-saga-v1.md), o [Contrato de Estados da Ordem de Serviço](../../contracts/Contrato%20de%20Estados%20da%20Ordem%20de%20Serviço.md), o [Contrato de Eventos de Domínio](../../contracts/Contrato%20de%20Eventos%20de%20Domínio.md), o [Contrato de Tópicos de Mensageria](../../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md) e o [Contrato de Idempotência](../../contracts/idempotency.md).
 
 ## Premissas
 
@@ -13,7 +13,7 @@ Este documento complementa a [ADR-009 - Estratégia de Saga Pattern](../adr/ADR-
 - `oficina-execution-service` é autoridade sobre diagnóstico, execução e estoque operacional.
 - Comandos da Saga usam APIs REST existentes com `X-Idempotency-Key` determinística.
 - Confirmações de etapas são recebidas por eventos de domínio publicados via Outbox.
-- A Saga não cria eventos novos além dos eventos já definidos em [Contrato de Eventos de Domínio](../contracts/Contrato%20de%20Eventos%20de%20Domínio.md).
+- A Saga não cria eventos novos além dos eventos já definidos em [Contrato de Eventos de Domínio](../../contracts/Contrato%20de%20Eventos%20de%20Domínio.md).
 
 ## Estados da Saga
 
@@ -120,5 +120,5 @@ Os testes de contrato da Saga devem cobrir:
 - falha de execução antes de `execucaoFinalizada`;
 - falha de estoque com estorno idempotente;
 - duplicidade de eventos por `eventId`;
-- reuso de `X-Idempotency-Key` com payload diferente retornando erro do [Contrato de Erros REST](../contracts/error-model.md);
+- reuso de `X-Idempotency-Key` com payload diferente retornando erro do [Contrato de Erros REST](../../contracts/error-model.md);
 - timeouts levando ao estado de Saga esperado.

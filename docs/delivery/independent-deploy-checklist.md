@@ -4,7 +4,7 @@
 
 Definir a verificação operacional mínima para publicar um microsserviço sem exigir deploy simultâneo dos demais.
 
-Este checklist implementa a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md) e complementa o [Template GitHub Actions para Microsserviços](../templates/github-actions/README.md), a [Estratégia de entrega dos manifestos Kubernetes](kubernetes-manifest-strategy.md), o [Escopo do Repositório Unificado de Infraestrutura](infrastructure-repository-scope.md), os [Nomes de runtime, secrets e infraestrutura](infra-runtime-naming.md), as [Rotas públicas do API Gateway](api-gateway-public-routes.md) e o [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md).
+Este checklist implementa a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md) e complementa o [Template GitHub Actions para Microsserviços](../../templates/github-actions/README.md), a [Estratégia de entrega dos manifestos Kubernetes](../infrastructure/kubernetes-manifest-strategy.md), o [Escopo do Repositório Unificado de Infraestrutura](../infrastructure/infrastructure-repository-scope.md), os [Nomes de runtime, secrets e infraestrutura](../infrastructure/infra-runtime-naming.md), as [Rotas públicas do API Gateway](../infrastructure/api-gateway-public-routes.md) e o [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md).
 
 ## Escopo
 
@@ -23,7 +23,7 @@ O deploy independente significa que cada serviço pode publicar nova imagem, atu
 Antes de manter `ENABLE_IMAGE_PUBLISH` e `ENABLE_K8S_DEPLOY` ativos por padrão em um repositório de microsserviço, confirmar:
 
 - [ ] a branch `main` está protegida conforme [Proteção da branch main dos microsserviços](github-branch-protection.md);
-- [ ] o workflow `.github/workflows/service-ci.yml` deriva do [Template GitHub Actions para Microsserviços](../templates/github-actions/README.md);
+- [ ] o workflow `.github/workflows/service-ci.yml` deriva do [Template GitHub Actions para Microsserviços](../../templates/github-actions/README.md);
 - [ ] `SERVICE_NAME` coincide com o nome canônico do repositório ou pode ser derivado do nome do repositório;
 - [ ] `MAVEN_PROFILE` está definido ou pode ser derivado como `postgresql` para `oficina-os-service` e `oficina-billing-service`, ou `dynamodb` para `oficina-execution-service`;
 - [ ] `AWS_REGION=us-east-1`, `EKS_CLUSTER_NAME=eks-lab` e `K8S_NAMESPACE=default` estão configurados como variáveis do repositório ou da organização;
@@ -48,7 +48,7 @@ Para cada alteração candidata a deploy:
 - [ ] identificar se a mudança é compatível com os contratos atuais de REST, eventos, estados, erro e idempotência;
 - [ ] atualizar OpenAPI, schemas JSON, ADR, README ou roadmap quando a mudança alterar contrato compartilhado;
 - [ ] confirmar que não há mudança incompatível sem versionamento por URI ou `eventVersion`;
-- [ ] revisar variáveis de ambiente novas ou alteradas contra [Nomes de runtime, secrets e infraestrutura](infra-runtime-naming.md);
+- [ ] revisar variáveis de ambiente novas ou alteradas contra [Nomes de runtime, secrets e infraestrutura](../infrastructure/infra-runtime-naming.md);
 - [ ] executar testes locais do serviço, incluindo unitários, integração, contratos e BDD quando aplicável;
 - [ ] confirmar cobertura mínima de 80%;
 - [ ] confirmar que a mudança não exige deploy coordenado dos demais serviços;
@@ -80,7 +80,7 @@ Após rollout bem-sucedido de um serviço:
 - [ ] confirmar que a imagem do `Deployment` usa a tag e digest esperados;
 - [ ] confirmar readiness e liveness do pod pelo Kubernetes;
 - [ ] chamar uma rota de negócio simples do serviço pelo caminho esperado no ambiente;
-- [ ] não expor `/q/health`, `/q/metrics`, `/q/openapi`, `/q/swagger-ui` ou `/api/v1/status` como API pública permanente, conforme [Rotas públicas do API Gateway](api-gateway-public-routes.md);
+- [ ] não expor `/q/health`, `/q/metrics`, `/q/openapi`, `/q/swagger-ui` ou `/api/v1/status` como API pública permanente, conforme [Rotas públicas do API Gateway](../infrastructure/api-gateway-public-routes.md);
 - [ ] verificar logs estruturados com `service.name`, `deployment.environment` e `correlationId` quando houver chamada HTTP;
 - [ ] verificar que métricas em `/q/metrics` continuam coletáveis pelo New Relic OpenTelemetry Collector quando a coleta estiver habilitada;
 - [ ] para mudanças com evento, publicar ou simular fluxo que confirme Outbox, tópico, fila consumidora e idempotência sem quebrar os demais serviços;

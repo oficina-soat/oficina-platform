@@ -4,7 +4,7 @@
 
 Consolidar os entregáveis finais da Fase 4, com os links e evidências que devem ser conferidos antes da entrega no portal.
 
-Este checklist complementa o [Enunciado Fase 4](Enunciado%20Fase%204.md), o [ROADMAP](../ROADMAP.md), o [Diagrama Geral da Arquitetura Final](architecture-diagram.md), a [Matriz de Ownership por Microsserviço](service-ownership.md), o [Padrão BDD, Cobertura e Qualidade](bdd-testing.md), a [ADR-009 - Estratégia de Saga Pattern](../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), a [ADR-010 - Estratégia de Divisão dos Microsserviços](../adr/ADR-010%20-%20Estratégia%20de%20Divisão%20dos%20Microsserviços.md), a [ADR-011 - Estratégia de Persistência Poliglota por Microsserviço](../adr/ADR-011%20-%20Estratégia%20de%20Persistência%20Poliglota%20por%20Microsserviço.md), a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md), o [Checklist de Deploy Independente](independent-deploy-checklist.md), o [Padrão de Observabilidade Distribuída](observability.md), os [Runbooks Operacionais Mínimos](operational-runbooks.md) e as [Rotas públicas do API Gateway](api-gateway-public-routes.md).
+Este checklist complementa o [Enunciado Fase 4](Enunciado%20Fase%204.md), o [ROADMAP](../../ROADMAP.md), o [Diagrama Geral da Arquitetura Final](../architecture/architecture-diagram.md), a [Matriz de Ownership por Microsserviço](../architecture/service-ownership.md), o [Padrão BDD, Cobertura e Qualidade](bdd-testing.md), a [ADR-009 - Estratégia de Saga Pattern](../../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), a [ADR-010 - Estratégia de Divisão dos Microsserviços](../../adr/ADR-010%20-%20Estratégia%20de%20Divisão%20dos%20Microsserviços.md), a [ADR-011 - Estratégia de Persistência Poliglota por Microsserviço](../../adr/ADR-011%20-%20Estratégia%20de%20Persistência%20Poliglota%20por%20Microsserviço.md), a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md), o [Checklist de Deploy Independente](independent-deploy-checklist.md), o [Padrão de Observabilidade Distribuída](../observability/observability.md), os [Runbooks Operacionais Mínimos](../observability/operational-runbooks.md) e as [Rotas públicas do API Gateway](../infrastructure/api-gateway-public-routes.md).
 
 ## Datas e Responsáveis
 
@@ -20,9 +20,9 @@ Este checklist complementa o [Enunciado Fase 4](Enunciado%20Fase%204.md), o [ROA
 
 | Repositório | Link remoto | README final | Cobertura | Swagger/OpenAPI | Pipeline | Kubernetes | Status |
 |---|---|---|---|---|---|---|---|
-| `oficina-os-service` | `git@github.com:oficina-soat/oficina-os-service.git` | A preencher | A preencher | [OpenAPI canônica](../contracts/openapi/oficina-os-service.yaml) | A preencher | A preencher | Pendente |
-| `oficina-billing-service` | `git@github.com:oficina-soat/oficina-billing-service.git` | A preencher | A preencher | [OpenAPI canônica](../contracts/openapi/oficina-billing-service.yaml) | A preencher | A preencher | Pendente |
-| `oficina-execution-service` | `git@github.com:oficina-soat/oficina-execution-service.git` | A preencher | A preencher | [OpenAPI canônica](../contracts/openapi/oficina-execution-service.yaml) | A preencher | A preencher | Pendente |
+| `oficina-os-service` | `git@github.com:oficina-soat/oficina-os-service.git` | A preencher | A preencher | [OpenAPI canônica](../../contracts/openapi/oficina-os-service.yaml) | A preencher | A preencher | Pendente |
+| `oficina-billing-service` | `git@github.com:oficina-soat/oficina-billing-service.git` | A preencher | A preencher | [OpenAPI canônica](../../contracts/openapi/oficina-billing-service.yaml) | A preencher | A preencher | Pendente |
+| `oficina-execution-service` | `git@github.com:oficina-soat/oficina-execution-service.git` | A preencher | A preencher | [OpenAPI canônica](../../contracts/openapi/oficina-execution-service.yaml) | A preencher | A preencher | Pendente |
 | `oficina-infra` | A preencher | A preencher | Não aplicável | Não aplicável | A preencher | A preencher | Pendente |
 | `oficina-auth-lambda` | A preencher | A preencher | A preencher | Não aplicável | A preencher | Não aplicável | Pendente |
 
@@ -41,27 +41,27 @@ Cada repositório de microsserviço deve possuir:
 - [ ] Quality Gate SonarCloud externo ou equivalente aprovado;
 - [ ] link para Swagger, OpenAPI ou collection Postman atualizada;
 - [ ] autenticação JWT configurada conforme contratos da suíte;
-- [ ] tratamento de erros conforme [Contrato de Erros REST](../contracts/error-model.md);
-- [ ] idempotência conforme [Contrato de Idempotência](../contracts/idempotency.md);
+- [ ] tratamento de erros conforme [Contrato de Erros REST](../../contracts/error-model.md);
+- [ ] idempotência conforme [Contrato de Idempotência](../../contracts/idempotency.md);
 - [ ] propagação de `correlationId` em HTTP, eventos, logs e traces;
-- [ ] documentação da Saga orquestrada pelo `oficina-os-service`, com links para [ADR-009](../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), [Fluxos da Saga da Ordem de Serviço](saga-flows.md) e [Contrato de Saga do oficina-os-service](../contracts/saga/oficina-os-saga-v1.md);
-- [ ] evidência de manifests Kubernetes aplicáveis, conforme a [Estratégia de entrega dos manifestos Kubernetes](kubernetes-manifest-strategy.md).
-- [ ] runbooks aplicáveis revisados conforme os [Runbooks Operacionais Mínimos](operational-runbooks.md).
+- [ ] documentação da Saga orquestrada pelo `oficina-os-service`, com links para [ADR-009](../../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), [Fluxos da Saga da Ordem de Serviço](../architecture/saga-flows.md) e [Contrato de Saga do oficina-os-service](../../contracts/saga/oficina-os-saga-v1.md);
+- [ ] evidência de manifests Kubernetes aplicáveis, conforme a [Estratégia de entrega dos manifestos Kubernetes](../infrastructure/kubernetes-manifest-strategy.md).
+- [ ] runbooks aplicáveis revisados conforme os [Runbooks Operacionais Mínimos](../observability/operational-runbooks.md).
 
 ## Checklist de Domínio e Contratos
 
 | Requisito | Evidência esperada | Link |
 |---|---|---|
-| Separação em três microsserviços | Repositórios independentes e responsabilidades alinhadas à [Matriz de Ownership por Microsserviço](service-ownership.md). | A preencher |
+| Separação em três microsserviços | Repositórios independentes e responsabilidades alinhadas à [Matriz de Ownership por Microsserviço](../architecture/service-ownership.md). | A preencher |
 | Banco próprio por microsserviço | `oficina_os`, `oficina_billing` e tabelas DynamoDB do `oficina-execution-service`. | A preencher |
-| Banco SQL | PostgreSQL em RDS compartilhado com databases isolados, conforme [Padrão de isolamento PostgreSQL no RDS compartilhado](rds-postgresql-isolation.md). | A preencher |
-| Banco NoSQL | DynamoDB do `oficina-execution-service`, conforme [Padrão DynamoDB do oficina-execution-service](dynamodb-execution-service.md). | A preencher |
-| Comunicação REST | Rotas aderentes ao [Contrato de APIs REST](../contracts/Contrato%20de%20APIs%20REST.md), às OpenAPI dos três serviços e às [Rotas públicas do API Gateway](api-gateway-public-routes.md). | A preencher |
-| Mensageria assíncrona | Eventos e tópicos aderentes ao [Contrato de Eventos de Domínio](../contracts/Contrato%20de%20Eventos%20de%20Domínio.md) e ao [Contrato de Tópicos de Mensageria](../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md). | A preencher |
+| Banco SQL | PostgreSQL em RDS compartilhado com databases isolados, conforme [Padrão de isolamento PostgreSQL no RDS compartilhado](../infrastructure/rds-postgresql-isolation.md). | A preencher |
+| Banco NoSQL | DynamoDB do `oficina-execution-service`, conforme [Padrão DynamoDB do oficina-execution-service](../infrastructure/dynamodb-execution-service.md). | A preencher |
+| Comunicação REST | Rotas aderentes ao [Contrato de APIs REST](../../contracts/Contrato%20de%20APIs%20REST.md), às OpenAPI dos três serviços e às [Rotas públicas do API Gateway](../infrastructure/api-gateway-public-routes.md). | A preencher |
+| Mensageria assíncrona | Eventos e tópicos aderentes ao [Contrato de Eventos de Domínio](../../contracts/Contrato%20de%20Eventos%20de%20Domínio.md) e ao [Contrato de Tópicos de Mensageria](../../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md). | A preencher |
 | Saga Pattern | Orquestração pelo `oficina-os-service`, com caminho feliz e falha compensada. | A preencher |
 | Mercado Pago | Integração financeira documentada no `oficina-billing-service`, conforme a [Referência API Mercado Pago](https://www.mercadopago.com.br/developers/pt/reference). | A preencher |
-| Observabilidade | Logs estruturados, métricas, traces e dashboards mínimos conforme [Padrão de Observabilidade Distribuída](observability.md). | A preencher |
-| Diagrama geral | Arquitetura final alinhada ao [Diagrama Geral da Arquitetura Final](architecture-diagram.md). | [Diagrama Geral da Arquitetura Final](architecture-diagram.md) |
+| Observabilidade | Logs estruturados, métricas, traces e dashboards mínimos conforme [Padrão de Observabilidade Distribuída](../observability/observability.md). | A preencher |
+| Diagrama geral | Arquitetura final alinhada ao [Diagrama Geral da Arquitetura Final](../architecture/architecture-diagram.md). | [Diagrama Geral da Arquitetura Final](../architecture/architecture-diagram.md) |
 
 ## Cenários de Demonstração
 
@@ -83,7 +83,7 @@ O PDF entregue no portal deve conter:
 - [ ] nome e identificação dos participantes;
 - [ ] links dos repositórios;
 - [ ] link do vídeo;
-- [ ] diagrama geral da arquitetura final, conforme o [Diagrama Geral da Arquitetura Final](architecture-diagram.md);
+- [ ] diagrama geral da arquitetura final, conforme o [Diagrama Geral da Arquitetura Final](../architecture/architecture-diagram.md);
 - [ ] descrição da estratégia de Saga orquestrada pelo `oficina-os-service`;
 - [ ] justificativa da divisão em `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`;
 - [ ] justificativa das tecnologias usadas: Quarkus, AWS, PostgreSQL, DynamoDB, mensageria, Kubernetes, New Relic, SonarCloud e Mercado Pago;
@@ -92,7 +92,7 @@ O PDF entregue no portal deve conter:
 
 ## Diagrama Geral
 
-Fonte canônica: [Diagrama Geral da Arquitetura Final](architecture-diagram.md).
+Fonte canônica: [Diagrama Geral da Arquitetura Final](../architecture/architecture-diagram.md).
 
 O diagrama final deve mostrar:
 
@@ -104,7 +104,7 @@ O diagrama final deve mostrar:
 - mensageria assíncrona com tópicos e filas por domínio;
 - Kubernetes em Amazon EKS;
 - Amazon ECR;
-- API Gateway ou entrada pública adotada, conforme [Rotas públicas do API Gateway](api-gateway-public-routes.md);
+- API Gateway ou entrada pública adotada, conforme [Rotas públicas do API Gateway](../infrastructure/api-gateway-public-routes.md);
 - New Relic OpenTelemetry Collector instalado por Helm no cluster;
 - integração Mercado Pago;
 - propagação de `correlationId`.

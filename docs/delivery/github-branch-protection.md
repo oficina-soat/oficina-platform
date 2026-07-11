@@ -8,7 +8,7 @@ Definir a configuração obrigatória de proteção da branch `main` para os rep
 - `oficina-billing-service`;
 - `oficina-execution-service`.
 
-Esta política atende ao requisito de repositórios protegidos do [Enunciado Fase 4](Enunciado%20Fase%204.md) e deve ser aplicada em conjunto com os workflows derivados do [Template GitHub Actions para Microsserviços](../templates/github-actions/README.md).
+Esta política atende ao requisito de repositórios protegidos do [Enunciado Fase 4](Enunciado%20Fase%204.md) e deve ser aplicada em conjunto com os workflows derivados do [Template GitHub Actions para Microsserviços](../../templates/github-actions/README.md).
 
 ## Regra canônica
 
@@ -33,7 +33,7 @@ A aplicação efetiva da proteção de branch no GitHub é uma tarefa administra
 
 Agentes podem manter esta política, revisar coerência com os workflows, gerar comandos e registrar evidências fornecidas pelo responsável pela administração do GitHub. Agentes não devem solicitar, armazenar ou operar credenciais administrativas do GitHub para aplicar branch protection remotamente.
 
-O item permanece aberto no [ROADMAP](../ROADMAP.md) até existir evidência administrativa da proteção configurada nos três repositórios.
+O item permanece aberto no [ROADMAP](../../ROADMAP.md) até existir evidência administrativa da proteção configurada nos três repositórios.
 
 Variáveis esperadas no terminal:
 

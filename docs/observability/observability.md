@@ -6,16 +6,16 @@ Definir o padrão mínimo de logs, métricas, traces, headers de correlação, d
 
 Este documento complementa:
 
-- [Contrato de APIs REST](../contracts/Contrato%20de%20APIs%20REST.md);
-- [Contrato de Erros REST](../contracts/error-model.md);
-- [Contrato de Idempotência](../contracts/idempotency.md);
-- [Contrato de Tópicos de Mensageria](../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md);
-- [Padrão Outbox por Serviço](outbox-pattern.md);
-- [Contrato de Saga do oficina-os-service](../contracts/saga/oficina-os-saga-v1.md);
-- [Conta, região e ambientes AWS](aws-environments.md);
-- [Nomes de runtime, secrets e infraestrutura](infra-runtime-naming.md);
+- [Contrato de APIs REST](../../contracts/Contrato%20de%20APIs%20REST.md);
+- [Contrato de Erros REST](../../contracts/error-model.md);
+- [Contrato de Idempotência](../../contracts/idempotency.md);
+- [Contrato de Tópicos de Mensageria](../../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md);
+- [Padrão Outbox por Serviço](../architecture/outbox-pattern.md);
+- [Contrato de Saga do oficina-os-service](../../contracts/saga/oficina-os-saga-v1.md);
+- [Conta, região e ambientes AWS](../infrastructure/aws-environments.md);
+- [Nomes de runtime, secrets e infraestrutura](../infrastructure/infra-runtime-naming.md);
 - [Runbooks Operacionais Mínimos](operational-runbooks.md);
-- [Template Quarkus de Microsserviço](../templates/quarkus-service/README.md).
+- [Template Quarkus de Microsserviço](../../templates/quarkus-service/README.md).
 
 O padrão é obrigatório para:
 
@@ -35,7 +35,7 @@ Os microsserviços devem usar observabilidade distribuída baseada em:
 - propagação obrigatória de `correlationId` em HTTP, metadados operacionais de eventos, logs e traces;
 - atributos padronizados de serviço, namespace e ambiente.
 
-O ambiente canônico da Fase 4 é `lab`, conforme [Conta, região e ambientes AWS](aws-environments.md).
+O ambiente canônico da Fase 4 é `lab`, conforme [Conta, região e ambientes AWS](../infrastructure/aws-environments.md).
 
 AWS continua sendo a plataforma de nuvem da solução. A coleta dos sinais operacionais deve ser feita pelo New Relic OpenTelemetry Collector instalado no cluster EKS `eks-lab` por Helm, com OTLP/gRPC habilitado para traces, coleta de logs dos pods e coleta das métricas expostas em `/q/metrics`.
 
@@ -67,9 +67,9 @@ Variáveis obrigatórias por microsserviço:
 
 O exportador de traces do Quarkus deve ficar fixado em `quarkus.otel.traces.exporter=cdi` no build dos microsserviços, usando o exportador OTLP gerenciado pelo Quarkus. Não use `QUARKUS_OTEL_TRACES_EXPORTER=none` para desabilitar tracing em runtime, pois essa chave é build-time; para execução local ou testes, desabilite por `OFICINA_OBSERVABILITY_TRACING_ENABLED=false` ou por perfil `%test.quarkus.otel.traces.enabled=false`.
 
-O [template Quarkus](../templates/quarkus-service/README.md) já define essas chaves em `application.properties` e deve ser a referência inicial para novos repositórios.
+O [template Quarkus](../../templates/quarkus-service/README.md) já define essas chaves em `application.properties` e deve ser a referência inicial para novos repositórios.
 
-O endpoint OTLP interno, a instalação do New Relic OpenTelemetry Collector via Helm, a license key e qualquer secret necessário pertencem ao repositório de infraestrutura. A configuração executável fica em [New Relic OpenTelemetry Collector no EKS lab](../../oficina-infra/docs/new-relic-otel-collector.md). Este repositório define apenas o contrato de runtime esperado pelos microsserviços e pelos manifests base.
+O endpoint OTLP interno, a instalação do New Relic OpenTelemetry Collector via Helm, a license key e qualquer secret necessário pertencem ao repositório de infraestrutura. A configuração executável fica em [New Relic OpenTelemetry Collector no EKS lab](../../../oficina-infra/docs/new-relic-otel-collector.md). Este repositório define apenas o contrato de runtime esperado pelos microsserviços e pelos manifests base.
 
 Variáveis operacionais do collector no ambiente `lab`:
 
@@ -96,7 +96,7 @@ Regras obrigatórias:
 
 - aceitar `X-Correlation-Id` em todas as requisições HTTP;
 - gerar um novo `correlationId` quando o header estiver ausente;
-- retornar `X-Correlation-Id` nas respostas de erro, conforme [Contrato de Erros REST](../contracts/error-model.md);
+- retornar `X-Correlation-Id` nas respostas de erro, conforme [Contrato de Erros REST](../../contracts/error-model.md);
 - propagar o mesmo valor em chamadas REST entre microsserviços;
 - persistir o valor em registros de idempotência;
 - persistir o valor em registros de Outbox;
@@ -208,7 +208,7 @@ Métricas de eventos mínimas:
 | `messaging.events.processing.duration` | Histogram | `service`, `eventType`, `topic` |
 | `messaging.dlq.count` | Counter | `service`, `eventType`, `topic` |
 
-Métricas de Outbox devem seguir o [Padrão Outbox por Serviço](outbox-pattern.md):
+Métricas de Outbox devem seguir o [Padrão Outbox por Serviço](../architecture/outbox-pattern.md):
 
 | Métrica | Tipo | Dimensões |
 |---|---|---|

@@ -4,7 +4,7 @@
 
 Definir o contrato implementável da Saga orquestrada pelo `oficina-os-service` para coordenação da Ordem de Serviço.
 
-Este contrato deve ser usado junto com [Fluxos da Saga da Ordem de Serviço](../../docs/saga-flows.md), [Contrato de APIs REST](../Contrato%20de%20APIs%20REST.md), [Contrato de Eventos de Domínio](../Contrato%20de%20Eventos%20de%20Domínio.md), [Contrato de Tópicos de Mensageria](../Contrato%20de%20Tópicos%20de%20Mensageria.md), [Contrato de Estados da Ordem de Serviço](../Contrato%20de%20Estados%20da%20Ordem%20de%20Serviço.md), [Contrato de Erros REST](../error-model.md) e [Contrato de Idempotência](../idempotency.md).
+Este contrato deve ser usado junto com [Fluxos da Saga da Ordem de Serviço](../../docs/architecture/saga-flows.md), [Contrato de APIs REST](../Contrato%20de%20APIs%20REST.md), [Contrato de Eventos de Domínio](../Contrato%20de%20Eventos%20de%20Domínio.md), [Contrato de Tópicos de Mensageria](../Contrato%20de%20Tópicos%20de%20Mensageria.md), [Contrato de Estados da Ordem de Serviço](../Contrato%20de%20Estados%20da%20Ordem%20de%20Serviço.md), [Contrato de Erros REST](../error-model.md) e [Contrato de Idempotência](../idempotency.md).
 
 ## Identidade da Saga
 

@@ -152,7 +152,7 @@ Confirmar pagamento
 Entregar veículo
 ```
 
-O fluxo detalhado, incluindo compensações, timeouts, retentativas e testes de contrato, está definido em [Fluxos da Saga da Ordem de Serviço](../docs/saga-flows.md) e no [Contrato de Saga do oficina-os-service](../contracts/saga/oficina-os-saga-v1.md).
+O fluxo detalhado, incluindo compensações, timeouts, retentativas e testes de contrato, está definido em [Fluxos da Saga da Ordem de Serviço](../docs/architecture/saga-flows.md) e no [Contrato de Saga do oficina-os-service](../contracts/saga/oficina-os-saga-v1.md).
 
 Participantes:
 

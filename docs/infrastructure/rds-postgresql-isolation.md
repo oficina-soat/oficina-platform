@@ -4,7 +4,7 @@
 
 Definir o padrão canônico de isolamento lógico para os databases PostgreSQL usados por `oficina-os-service` e `oficina-billing-service` na instância Amazon RDS compartilhada da Fase 4.
 
-Este documento complementa a [ADR-011 - Estratégia de Persistência Poliglota por Microsserviço](../adr/ADR-011%20-%20Estratégia%20de%20Persistência%20Poliglota%20por%20Microsserviço.md), a [Matriz de Ownership por Microsserviço](service-ownership.md), os [Nomes de runtime, secrets e infraestrutura](infra-runtime-naming.md) e o [Escopo do Repositório Unificado de Infraestrutura](infrastructure-repository-scope.md).
+Este documento complementa a [ADR-011 - Estratégia de Persistência Poliglota por Microsserviço](../../adr/ADR-011%20-%20Estratégia%20de%20Persistência%20Poliglota%20por%20Microsserviço.md), a [Matriz de Ownership por Microsserviço](../architecture/service-ownership.md), os [Nomes de runtime, secrets e infraestrutura](infra-runtime-naming.md) e o [Escopo do Repositório Unificado de Infraestrutura](infrastructure-repository-scope.md).
 
 ## Decisão
 
@@ -93,7 +93,7 @@ Para o Billing, o campo `database` deve ser `oficina_billing` e o campo `usernam
 
 ## Variáveis de runtime
 
-Os microsserviços Quarkus devem materializar os secrets em variáveis compatíveis com o template base em [templates/quarkus-service/](../templates/quarkus-service/).
+Os microsserviços Quarkus devem materializar os secrets em variáveis compatíveis com o template base em [templates/quarkus-service/](../../templates/quarkus-service/).
 
 | Microsserviço | `JDBC_DATABASE_URL` | `DB_USERNAME` | `DB_PASSWORD` |
 |---|---|---|---|

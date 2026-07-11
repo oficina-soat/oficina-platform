@@ -4,7 +4,7 @@
 
 Definir os procedimentos mínimos para diagnosticar, conter e registrar incidentes operacionais da Fase 4.
 
-Este documento complementa o [Padrão de Observabilidade Distribuída](observability.md), o [Padrão Outbox por Serviço](outbox-pattern.md), os [Fluxos da Saga da Ordem de Serviço](saga-flows.md), o [Checklist de Deploy Independente](independent-deploy-checklist.md), o [Escopo do Repositório Unificado de Infraestrutura](infrastructure-repository-scope.md), os [Nomes de runtime, secrets e infraestrutura](infra-runtime-naming.md), o [Contrato de Erros REST](../contracts/error-model.md), o [Contrato de Tópicos de Mensageria](../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md) e o [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md).
+Este documento complementa o [Padrão de Observabilidade Distribuída](observability.md), o [Padrão Outbox por Serviço](../architecture/outbox-pattern.md), os [Fluxos da Saga da Ordem de Serviço](../architecture/saga-flows.md), o [Checklist de Deploy Independente](../delivery/independent-deploy-checklist.md), o [Escopo do Repositório Unificado de Infraestrutura](../infrastructure/infrastructure-repository-scope.md), os [Nomes de runtime, secrets e infraestrutura](../infrastructure/infra-runtime-naming.md), o [Contrato de Erros REST](../../contracts/error-model.md), o [Contrato de Tópicos de Mensageria](../../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md) e o [Checklist Final de Entrega da Fase 4](../delivery/phase-4-delivery-checklist.md).
 
 ## Escopo
 
@@ -21,7 +21,7 @@ Runbooks cobertos:
 | Banco indisponível | readiness falhando por PostgreSQL ou DynamoDB | Serviço dono do banco |
 | Rollback de deploy | rollout falho ou regressão pós-deploy | Serviço alterado |
 
-Estes runbooks não substituem a criação remota de dashboards e alertas no New Relic. Quando New Relic, AWS, EKS ou GitHub exigirem credenciais administrativas, a execução remota deve ser registrada como evidência externa no [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md).
+Estes runbooks não substituem a criação remota de dashboards e alertas no New Relic. Quando New Relic, AWS, EKS ou GitHub exigirem credenciais administrativas, a execução remota deve ser registrada como evidência externa no [Checklist Final de Entrega da Fase 4](../delivery/phase-4-delivery-checklist.md).
 
 ## Coleta inicial
 
@@ -29,7 +29,7 @@ Antes de atuar em qualquer incidente:
 
 - [ ] identificar serviço, ambiente, versão e janela de início;
 - [ ] coletar `correlationId`, `traceId`, `eventId`, `aggregateId`, `ordemServicoId` ou `sagaId` quando disponíveis;
-- [ ] confirmar se houve deploy recente usando o [Checklist de Deploy Independente](independent-deploy-checklist.md);
+- [ ] confirmar se houve deploy recente usando o [Checklist de Deploy Independente](../delivery/independent-deploy-checklist.md);
 - [ ] verificar se a falha afeta um serviço, uma rota, um consumidor, uma fila ou o fluxo completo da Saga;
 - [ ] confirmar se o incidente exige contenção imediata, rollback, reprocessamento ou apenas acompanhamento.
 
@@ -55,7 +55,7 @@ Use quando readiness falhar, pods reiniciarem continuamente, rollout ficar preso
 - [ ] inspecionar pod afetado: `kubectl describe pod <pod> -n <namespace>`;
 - [ ] verificar logs recentes: `kubectl logs deployment/<servico> -n <namespace> --since=30m`;
 - [ ] conferir probes `/q/health/live` e `/q/health/ready`;
-- [ ] verificar se a imagem, variáveis e secrets do `Deployment` batem com os nomes canônicos em [Nomes de runtime, secrets e infraestrutura](infra-runtime-naming.md).
+- [ ] verificar se a imagem, variáveis e secrets do `Deployment` batem com os nomes canônicos em [Nomes de runtime, secrets e infraestrutura](../infrastructure/infra-runtime-naming.md).
 
 ### Contenção
 
@@ -77,7 +77,7 @@ Use quando respostas `5xx`, erros funcionais inesperados ou p95 de latência aum
 ### Diagnóstico
 
 - [ ] filtrar logs por `service.name`, `deployment.environment=lab`, rota e `correlationId`;
-- [ ] separar erro de cliente esperado de erro interno conforme o [Contrato de Erros REST](../contracts/error-model.md);
+- [ ] separar erro de cliente esperado de erro interno conforme o [Contrato de Erros REST](../../contracts/error-model.md);
 - [ ] verificar se a latência está em HTTP, banco, mensageria, integração Mercado Pago ou dependência AWS;
 - [ ] conferir traces por rota quando New Relic estiver disponível;
 - [ ] comparar a versão atual com a versão anterior estável do serviço.
@@ -110,9 +110,9 @@ Use quando eventos ficarem `PENDING` além do SLA, `outbox.pending.count` cresce
 
 ### Contenção
 
-- [ ] se o tópico ou permissão estiver ausente, corrigir no `oficina-infra` conforme [Escopo do Repositório Unificado de Infraestrutura](infrastructure-repository-scope.md);
+- [ ] se o tópico ou permissão estiver ausente, corrigir no `oficina-infra` conforme [Escopo do Repositório Unificado de Infraestrutura](../infrastructure/infrastructure-repository-scope.md);
 - [ ] se o evento estiver inválido, corrigir o produtor e manter o mesmo `eventId` para reprocessamento;
-- [ ] se a falha for temporária, aguardar retentativas com backoff conforme [Padrão Outbox por Serviço](outbox-pattern.md);
+- [ ] se a falha for temporária, aguardar retentativas com backoff conforme [Padrão Outbox por Serviço](../architecture/outbox-pattern.md);
 - [ ] não publicar manualmente evento novo para substituir o mesmo fato de negócio sem preservar idempotência.
 
 ### Encerramento
@@ -131,7 +131,7 @@ Use quando uma fila de erro receber mensagens ou consumidores rejeitarem eventos
 - [ ] inspecionar atributos da mensagem sem expor payload sensível;
 - [ ] coletar `eventId`, `eventVersion`, `aggregateId` e `correlationId`;
 - [ ] verificar logs do consumidor no serviço dono;
-- [ ] confirmar se o schema do evento está compatível com os [schemas JSON de eventos](../contracts/events/schemas/), quando presentes;
+- [ ] confirmar se o schema do evento está compatível com os [schemas JSON de eventos](../../contracts/events/schemas/), quando presentes;
 - [ ] distinguir falha transitória de bug de consumidor ou evento incompatível.
 
 ### Contenção
@@ -156,7 +156,7 @@ Use quando uma Saga não puder avançar nem compensar automaticamente.
 - [ ] localizar `sagaId`, `ordemServicoId`, estado atual e última etapa concluída;
 - [ ] conferir histórico da OS e eventos recebidos pelo `oficina-os-service`;
 - [ ] verificar se há evento faltante, duplicado, inválido ou preso em Outbox/DLQ;
-- [ ] comparar a etapa com os [Fluxos da Saga da Ordem de Serviço](saga-flows.md);
+- [ ] comparar a etapa com os [Fluxos da Saga da Ordem de Serviço](../architecture/saga-flows.md);
 - [ ] verificar se pagamento, execução ou estoque exige runbook específico.
 
 ### Contenção
@@ -245,7 +245,7 @@ Use quando um rollout falhar ou uma regressão for detectada após publicar nova
 
 - [ ] registrar workflow, release, imagem revertida, causa provável e evidência;
 - [ ] abrir correção no repositório dono;
-- [ ] atualizar o [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md) quando o rollback fizer parte de evidência ou limitação da entrega.
+- [ ] atualizar o [Checklist Final de Entrega da Fase 4](../delivery/phase-4-delivery-checklist.md) quando o rollback fizer parte de evidência ou limitação da entrega.
 
 ## Escalação
 
@@ -272,4 +272,4 @@ Para incidentes usados como evidência final ou de homologação, registrar:
 | Ação | Contenção, correção, rollback ou reprocessamento. |
 | Resultado | Métrica ou validação que confirma recuperação. |
 
-O [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md) deve concentrar links ou identificadores das evidências finais.
+O [Checklist Final de Entrega da Fase 4](../delivery/phase-4-delivery-checklist.md) deve concentrar links ou identificadores das evidências finais.

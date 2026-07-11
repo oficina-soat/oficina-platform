@@ -4,10 +4,12 @@
   "permissions": "PUBLIC_READ_WRITE",
   "pages": [
     {
+      "guid": "MHxWSVp8REFTSEJPQVJEfDkwMDAwMTAwMQ",
       "name": "Operacional",
       "description": "Golden signals, logs, traces e sinais Kubernetes dos tres microsservicos.",
       "widgets": [
         {
+          "id": "910001001",
           "title": "Como usar",
           "layout": {
             "column": 1,
@@ -15,6 +17,7 @@
             "width": 4,
             "height": 3
           },
+          "linkedEntityGuids": null,
           "visualization": {
             "id": "viz.markdown"
           },
@@ -23,6 +26,7 @@
           }
         },
         {
+          "id": "910001002",
           "title": "Requisicoes por minuto por servico",
           "layout": {
             "column": 5,
@@ -30,6 +34,7 @@
             "width": 4,
             "height": 3
           },
+          "linkedEntityGuids": null,
           "visualization": {
             "id": "viz.line"
           },
@@ -48,6 +53,7 @@
           }
         },
         {
+          "id": "910001003",
           "title": "Taxa de erro por servico",
           "layout": {
             "column": 9,
@@ -55,6 +61,7 @@
             "width": 4,
             "height": 3
           },
+          "linkedEntityGuids": null,
           "visualization": {
             "id": "viz.billboard"
           },
@@ -80,6 +87,7 @@
           }
         },
         {
+          "id": "910001004",
           "title": "Latencia p50, p95 e p99 por servico",
           "layout": {
             "column": 1,
@@ -87,6 +95,7 @@
             "width": 6,
             "height": 3
           },
+          "linkedEntityGuids": null,
           "visualization": {
             "id": "viz.line"
           },
@@ -105,6 +114,7 @@
           }
         },
         {
+          "id": "910001005",
           "title": "Status HTTP por servico",
           "layout": {
             "column": 7,
@@ -112,6 +122,7 @@
             "width": 6,
             "height": 3
           },
+          "linkedEntityGuids": null,
           "visualization": {
             "id": "viz.bar"
           },
@@ -127,6 +138,7 @@
           }
         },
         {
+          "id": "910001006",
           "title": "Rotas mais lentas p95",
           "layout": {
             "column": 1,
@@ -134,6 +146,7 @@
             "width": 6,
             "height": 3
           },
+          "linkedEntityGuids": null,
           "visualization": {
             "id": "viz.table"
           },
@@ -149,6 +162,7 @@
           }
         },
         {
+          "id": "910001007",
           "title": "Traces com erro",
           "layout": {
             "column": 7,
@@ -156,6 +170,7 @@
             "width": 6,
             "height": 3
           },
+          "linkedEntityGuids": null,
           "visualization": {
             "id": "viz.table"
           },
@@ -171,6 +186,7 @@
           }
         },
         {
+          "id": "910001008",
           "title": "Logs por nivel e servico",
           "layout": {
             "column": 1,
@@ -178,6 +194,7 @@
             "width": 6,
             "height": 3
           },
+          "linkedEntityGuids": null,
           "visualization": {
             "id": "viz.area"
           },
@@ -196,6 +213,7 @@
           }
         },
         {
+          "id": "910001009",
           "title": "Logs de erro recentes",
           "layout": {
             "column": 7,
@@ -203,6 +221,7 @@
             "width": 6,
             "height": 3
           },
+          "linkedEntityGuids": null,
           "visualization": {
             "id": "viz.table"
           },
@@ -218,6 +237,7 @@
           }
         },
         {
+          "id": "910001010",
           "title": "CPU por pod",
           "layout": {
             "column": 1,
@@ -225,6 +245,7 @@
             "width": 4,
             "height": 3
           },
+          "linkedEntityGuids": null,
           "visualization": {
             "id": "viz.line"
           },
@@ -243,6 +264,7 @@
           }
         },
         {
+          "id": "910001011",
           "title": "Memoria por pod",
           "layout": {
             "column": 5,
@@ -250,6 +272,7 @@
             "width": 4,
             "height": 3
           },
+          "linkedEntityGuids": null,
           "visualization": {
             "id": "viz.line"
           },
@@ -268,6 +291,7 @@
           }
         },
         {
+          "id": "910001012",
           "title": "Restarts por pod",
           "layout": {
             "column": 9,
@@ -275,6 +299,7 @@
             "width": 4,
             "height": 3
           },
+          "linkedEntityGuids": null,
           "visualization": {
             "id": "viz.line"
           },
@@ -293,6 +318,7 @@
           }
         },
         {
+          "id": "910001013",
           "title": "Pods e readiness",
           "layout": {
             "column": 1,
@@ -300,6 +326,7 @@
             "width": 6,
             "height": 3
           },
+          "linkedEntityGuids": null,
           "visualization": {
             "id": "viz.table"
           },
@@ -315,6 +342,7 @@
           }
         },
         {
+          "id": "910001014",
           "title": "Busca operacional por correlationId",
           "layout": {
             "column": 7,
@@ -322,6 +350,7 @@
             "width": 6,
             "height": 3
           },
+          "linkedEntityGuids": null,
           "visualization": {
             "id": "viz.table"
           },
@@ -338,5 +367,6 @@
         }
       ]
     }
-  ]
+  ],
+  "variables": []
 }

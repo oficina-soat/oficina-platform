@@ -22,6 +22,10 @@ Os templates seguem o [Padrão de Observabilidade Distribuída](observability.md
 
 A documentação oficial do New Relic descreve a [importação pela UI](https://docs.newrelic.com/docs/query-your-data/explore-query-data/dashboards/dashboards-charts-import-export-data/) em `Dashboards > Import dashboard` e a colagem do JSON exportado/importável. A documentação de [widgets via NerdGraph](https://docs.newrelic.com/docs/apis/nerdgraph/examples/create-widgets-dashboards-api/) também mostra `viz.line`, `viz.area`, `viz.bar`, `viz.billboard`, `viz.table` e `viz.markdown` como visualizações suportadas para dashboards.
 
+Os arquivos já incluem `pages[].guid`, `widgets[].id`, `linkedEntityGuids` e `variables`, pois a UI de importação valida esses campos em alguns fluxos. Esses identificadores são internos ao template JSON; para criar um novo dashboard, mantenha-os e altere apenas o `accountIds`.
+
+Se estiver usando `Manage JSON` dentro de um dashboard já criado, preserve o `guid` real da página existente no New Relic. Esse fluxo atualiza um dashboard existente, enquanto `Import dashboard` cria um dashboard novo a partir do JSON.
+
 ## Filtros Canônicos
 
 Todos os painéis usam os filtros:

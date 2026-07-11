@@ -40,7 +40,7 @@ Esta matriz deve ser usada por agentes e desenvolvedores para decidir onde imple
 |---|---|
 | Entidades próprias | Pessoa, Usuário, Cliente, Veículo, Ordem de Serviço, item de peça da OS, item de serviço da OS, histórico de estados, estado da Saga. |
 | Banco de dados | Amazon RDS for PostgreSQL, database `oficina_os`, usuário `oficina_os_user`. |
-| APIs REST | `/api/v1/clientes`, `/api/v1/clientes/{clienteId}`, `/api/v1/clientes/{clienteId}/veiculos`, `/api/v1/veiculos/{veiculoId}`, `/api/v1/ordens-servico`, `/api/v1/ordens-servico/{ordemServicoId}`, `/api/v1/ordens-servico/{ordemServicoId}/historico`, `/api/v1/ordens-servico/{ordemServicoId}/estado`, `/api/v1/ordens-servico/{ordemServicoId}/cancelamento`. |
+| APIs REST | `/api/v1/clientes`, `/api/v1/clientes/{clienteId}`, `/api/v1/clientes/{clienteId}/veiculos`, `/api/v1/veiculos/{veiculoId}`, `/api/v1/ordens-servico`, `/api/v1/ordens-servico/{ordemServicoId}`, `/api/v1/ordens-servico/{ordemServicoId}/historico`, `/api/v1/ordens-servico/{ordemServicoId}/estado`, `/api/v1/ordens-servico/{ordemServicoId}/cancelamento`. O CRUD administrativo de usuários operacionais ainda não está exposto no [OpenAPI do oficina-os-service](../../contracts/openapi/oficina-os-service.yaml) e permanece como lacuna de implementação. |
 | Eventos produzidos | `ordemDeServicoCriada`, `pecaIncluidaNaOrdemDeServico`, `servicoIncluidoNaOrdemDeServico`, `ordemDeServicoFinalizada`, `ordemDeServicoEntregue`, `sagaCompensada`, `sagaFinalizadaComSucesso`. |
 | Eventos consumidos | `diagnosticoIniciado`, `diagnosticoFinalizado`, `orcamentoGerado`, `orcamentoAprovado`, `orcamentoRecusado`, `execucaoIniciada`, `execucaoFinalizada`, `pagamentoSolicitado`, `pagamentoConfirmado`, `pagamentoRecusado`. |
 | Outbox/jobs | Outbox dos eventos de OS e Saga; jobs de publicação de eventos; controle de timeout, retentativas e compensações da Saga quando detalhados nos fluxos de Saga. |
@@ -63,6 +63,14 @@ O `oficina-os-service` não deve:
 O catálogo técnico pertence ao `oficina-execution-service`.
 
 Quando uma peça ou serviço é incluído em uma Ordem de Serviço, o `oficina-os-service` deve persistir o item da OS com os identificadores e snapshots necessários para auditoria, como nome, quantidade, valor usado no momento e demais campos estabilizados nos contratos.
+
+### Observação Sobre Usuários e Autenticação
+
+O `oficina-os-service` é dono do cadastro operacional de Pessoa e Usuário, incluindo papéis e vínculo com Cliente quando aplicável. Porém, o CRUD REST de usuários ainda não foi contratado nem implementado nesta fase: o serviço possui domínio, migrations e seed relacionados, mas a superfície HTTP atual cobre apenas Cliente, Veículo e Ordem de Serviço.
+
+O `oficina-auth-lambda` continua sendo o componente responsável por autenticar credenciais e emitir JWT, conforme a [ADR-003 - Serverless para Autenticação e Notificações](../../adr/ADR-003%20-%20Serverless%20para%20Autenticação%20e%20Notificações.md). No estado atual, ele consulta um store PostgreSQL próprio de autenticação, com tabelas `pessoa`, `papel`, `usuario` e `usuario_papel`, e não consulta o `oficina-os-service` por REST nem deve acessar diretamente o database `oficina_os`.
+
+Quando o CRUD administrativo de usuários for materializado no `oficina-os-service`, a integração com o store de autenticação deve ser resolvida por contrato explícito de provisionamento ou sincronização com o `oficina-auth-lambda`. A recomendação inicial é não colocar uma chamada síncrona ao `oficina-os-service` no caminho crítico de login, para preservar isolamento, disponibilidade e baixa latência da autenticação serverless. Se a decisão futura for fazer o `oficina-auth-lambda` consultar o serviço de OS durante o login, a [ADR-003 - Serverless para Autenticação e Notificações](../../adr/ADR-003%20-%20Serverless%20para%20Autenticação%20e%20Notificações.md), os contratos REST e os runbooks de disponibilidade devem ser atualizados antes da implementação.
 
 ---
 
@@ -129,7 +137,7 @@ O `oficina-execution-service` não deve:
 | Entidade ou conceito | Serviço dono | Observação |
 |---|---|---|
 | Pessoa | `oficina-os-service` | Cadastro operacional herdado do `oficina-app`, usado por usuários e clientes. |
-| Usuário | `oficina-os-service` | Usuários e papéis operacionais da oficina. |
+| Usuário | `oficina-os-service` | Usuários e papéis operacionais da oficina. Credenciais de login e emissão de JWT permanecem sob responsabilidade do `oficina-auth-lambda`, com sincronização pendente quando o CRUD administrativo for exposto. |
 | Cliente | `oficina-os-service` | Usado na abertura e consulta da OS. |
 | Veículo | `oficina-os-service` | Associado ao cliente e à OS. |
 | Ordem de Serviço | `oficina-os-service` | Agregado central do fluxo. |

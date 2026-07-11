@@ -83,7 +83,7 @@ Código pequeno e estável, como paginação, filtros de `correlationId`, mapper
 | `br.com.oficina.common.framework.db.pessoa` | `oficina-os-service` | Migrar para persistência relacional em `oficina_os`. |
 | `br.com.oficina.common.framework.db.usuario` | `oficina-os-service` | Migrar para persistência relacional em `oficina_os`. |
 | `br.com.oficina.common.framework.web.pessoa` | `oficina-os-service` | Migrar se as APIs forem mantidas internamente no OS Service; caso contrário, manter apenas como referência para dados operacionais. |
-| `br.com.oficina.common.framework.web.usuario` | `oficina-os-service` | Migrar se as APIs forem mantidas internamente no OS Service; caso contrário, manter apenas como referência para autenticação/autorização local. |
+| `br.com.oficina.common.framework.web.usuario` | `oficina-os-service` | O CRUD REST de usuários operacionais ainda não foi materializado no OS Service. Migrar depois que a reorganização arquitetural dos microsserviços estabilizar, alinhando contrato REST, OpenAPI e integração com o `oficina-auth-lambda`. |
 | `br.com.oficina.common.framework.observability` | Todos os serviços | Copiar seletivamente para cada serviço ou reaproveitar no template futuro. Não criar dependência compartilhada. |
 | `br.com.oficina.common.web` | Todos os serviços, se necessário | Copiar apenas constantes ou helpers realmente usados. Evitar pacote comum entre repositórios. |
 | `br.com.oficina.gestao_de_pecas.core.entities.catalogo` | `oficina-execution-service` | Migrar como catálogo técnico de peças e serviços. |
@@ -261,6 +261,8 @@ Regras:
 - manter `RECEBIDA`, `EM_DIAGNOSTICO`, `AGUARDANDO_APROVACAO`, `EM_EXECUCAO` e `FINALIZADA` como massa inicial, pois cobrem diferentes pontos do fluxo;
 - armazenar itens da OS como snapshots, incluindo identificador de catálogo, nome, quantidade, valor unitário e valor total quando esses campos estiverem disponíveis.
 
+O `oficina-auth-lambda` mantém um store PostgreSQL próprio para autenticação, com tabelas `pessoa`, `papel`, `usuario` e `usuario_papel`. Esse store deve ser tratado separadamente do cadastro operacional do `oficina-os-service` até que exista contrato explícito de provisionamento ou sincronização entre o CRUD administrativo de usuários e a Lambda de autenticação.
+
 ### Seed do oficina-execution-service
 
 Origem no seed atual:
@@ -325,6 +327,7 @@ Após a migração dos componentes relevantes:
 - Os três microsserviços preservam independência de build, deploy e banco.
 - Não existe biblioteca `common` compartilhada entre os microsserviços.
 - Pessoa e Usuário estão sob ownership do `oficina-os-service`.
+- O CRUD REST de usuários operacionais e sua sincronização com o `oficina-auth-lambda` permanecem como pendência rastreada no [ROADMAP](../../ROADMAP.md).
 - O seed da Fase 4 usa os dados funcionais do `import.sql` atual como referência.
 - `oficina-billing-service` nasce de contratos, não de código legado inexistente.
 - Rotas, eventos, tópicos e bancos permanecem coerentes com [Matriz de Ownership por Microsserviço](service-ownership.md), [Contrato de APIs REST](../../contracts/Contrato%20de%20APIs%20REST.md), [Contrato de Eventos de Domínio](../../contracts/Contrato%20de%20Eventos%20de%20Domínio.md) e [Contrato de Tópicos de Mensageria](../../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md).

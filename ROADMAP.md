@@ -45,7 +45,9 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
   - `oficina-billing-service` já recebeu adapters PostgreSQL para orçamento e pagamento no commit local `17535c2`, mas a projeção de eventos e a Outbox ainda precisam sair do store em memória;
   - `oficina-execution-service` modela tabelas DynamoDB, mas ainda precisa substituir o store em memória por cliente DynamoDB real;
   - os três microsserviços ainda precisam conectar Outbox, producers e consumers à mensageria SNS/SQS provisionada no `oficina-infra`;
-  - a idempotência ainda precisa persistir resultado e estado de processamento por serviço, não apenas exigir o header `X-Idempotency-Key`.
+  - a idempotência ainda precisa persistir resultado e estado de processamento por serviço, não apenas exigir o header `X-Idempotency-Key`;
+  - o CRUD REST de usuários operacionais ainda não está contratado nem implementado no `oficina-os-service`, apesar de Pessoa e Usuário estarem sob seu ownership;
+  - o `oficina-auth-lambda` consulta um store PostgreSQL próprio de autenticação e ainda precisa de contrato explícito para sincronizar credenciais, status e papéis com o cadastro operacional de usuários.
 - Contratos fundamentais criados para:
   - APIs REST;
   - eventos de domínio;
@@ -136,6 +138,10 @@ docs/architecture/oficina-app-decomposition.md
 **Definição faltante:** detalhar, durante a implementação dos microsserviços, os mapeamentos finais de classes, testes e seeds executáveis conforme cada repositório evoluir.
 
 As decisões para as baselines PostgreSQL decompostas de `oficina-os-service` e `oficina-billing-service` foram registradas em [Proposta de Migrations PostgreSQL Decompostas](docs/infrastructure/postgres-migrations-decomposition.md).
+
+O CRUD administrativo de usuários operacionais permanece pendente. A decisão de ownership continua sendo que Pessoa e Usuário pertencem ao `oficina-os-service`, conforme a [Matriz de Ownership por Microsserviço](docs/architecture/service-ownership.md), mas a superfície REST atual não expõe `/api/v1/usuarios` nem endpoints equivalentes no [OpenAPI do oficina-os-service](contracts/openapi/oficina-os-service.yaml).
+
+O `oficina-auth-lambda` já consulta banco diretamente para autenticar CPF e senha, usando um store PostgreSQL próprio com tabelas `pessoa`, `papel`, `usuario` e `usuario_papel`. Ele não consulta o `oficina-os-service` por REST no caminho de login. A recomendação inicial é manter o caminho crítico de login independente de chamada síncrona ao `oficina-os-service`, resolvendo a consistência por provisionamento ou sincronização explícita entre o CRUD administrativo do OS e o store da Lambda. Se a decisão futura for fazer a Lambda consultar o serviço de OS durante o login, a [ADR-003 - Serverless para Autenticação e Notificações](adr/ADR-003%20-%20Serverless%20para%20Autenticação%20e%20Notificações.md), o contrato REST, o OpenAPI e os runbooks de disponibilidade devem ser atualizados antes da implementação.
 
 **Critério de pronto:** cada componente relevante do `oficina-app` deve possuir destino explícito, estratégia de seed ou descarte, e critério de retenção apenas como referência.
 
@@ -513,6 +519,8 @@ Convenção de identificadores para itens abertos:
 - [ ] `[B2-IDEMP-IMPL-001]` Implementar idempotência persistente nos três microsserviços conforme [Contrato de Idempotência](contracts/idempotency.md): registrar escopo, chave, hash da requisição, status de processamento, resposta consolidada e TTL; retornar a mesma resposta em retries equivalentes; rejeitar reutilização da chave com payload divergente; e manter comportamento após restart de pod.
 - [ ] `[B2-MSG-IMPL-001]` Conectar Outbox, producers e consumers dos três microsserviços à mensageria real SNS/SQS provisionada pelo `oficina-infra`, conforme [Contrato de Tópicos de Mensageria](contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md): publisher assíncrono com retry/backoff, marcação `PUBLISHED`/`FAILED`, consumo por filas SQS, ack/delete somente após processamento persistido, tratamento de DLQ e testes locais com LocalStack.
 - [ ] `[B2-CONFIG-IMPL-001]` Impedir fallback silencioso para stores em memória nos profiles `prod` e `lab` dos três microsserviços. O serviço deve falhar na inicialização quando banco, DynamoDB, SNS/SQS ou secrets obrigatórios estiverem ausentes; o modo em memória deve ficar documentado e restrito a testes ou execução local deliberada.
+- [ ] `[B2-OS-USERS-IMPL-001]` Contratar e implementar o CRUD REST de usuários operacionais no `oficina-os-service` após a reorganização arquitetural dos microsserviços, atualizando [Contrato de APIs REST](contracts/Contrato%20de%20APIs%20REST.md), [OpenAPI do oficina-os-service](contracts/openapi/oficina-os-service.yaml), use cases, controllers, presenters, adapters PostgreSQL, testes e documentação local. O escopo deve cobrir Pessoa, Usuário, papéis, status e regras de autorização, sem mover login ou emissão de JWT para o OS.
+- [ ] `[B2-AUTH-USERS-IMPL-001]` Resolver a integração entre o CRUD administrativo de usuários do `oficina-os-service` e o store de autenticação do `oficina-auth-lambda`. Estado atual verificado: a Lambda consulta seu próprio PostgreSQL de autenticação, não o serviço de OS. A recomendação é evitar chamada síncrona ao `oficina-os-service` durante login e usar provisionamento/sincronização explícita de credenciais, status e papéis; se a alternativa escolhida for consulta síncrona ao serviço, atualizar a [ADR-003 - Serverless para Autenticação e Notificações](adr/ADR-003%20-%20Serverless%20para%20Autenticação%20e%20Notificações.md), os contratos e os runbooks antes de implementar.
 
 ### Épico C — Saga
 
@@ -638,8 +646,10 @@ A ordem local recomendada é:
 3. `[B2-IDEMP-IMPL-001]` Implementar idempotência persistente nos três microsserviços.
 4. `[B2-MSG-IMPL-001]` Conectar Outbox, producers e consumers à mensageria SNS/SQS real.
 5. `[B2-CONFIG-IMPL-001]` Impedir fallback silencioso para stores em memória nos profiles `prod` e `lab`.
-6. `[D-OBS-IMPL-003]` Instrumentar métricas de consumo Mercado Pago.
-7. `[D-OBS-IMPL-004]` Instrumentar métricas de persistência, idempotência, Outbox e mensageria.
-8. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
+6. `[B2-OS-USERS-IMPL-001]` Contratar e implementar CRUD REST de usuários operacionais no `oficina-os-service`.
+7. `[B2-AUTH-USERS-IMPL-001]` Resolver sincronização entre usuários operacionais e autenticação serverless.
+8. `[D-OBS-IMPL-003]` Instrumentar métricas de consumo Mercado Pago.
+9. `[D-OBS-IMPL-004]` Instrumentar métricas de persistência, idempotência, Outbox e mensageria.
+10. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
 
 As validações remotas prioritárias restantes, quando o ambiente externo estiver disponível, são `[B2-BILL-DB-REM-001]`, `[B2-OS-DB-REM-001]`, `[B2-EXEC-DDB-REM-001]`, `[B2-IDEMP-REM-001]`, `[B2-MSG-REM-001]`, `[B2-MP-REM-001]`, `[B2-GH-REM-001]`, `[D-NR-REM-003]`, `[D-NR-REM-004]`, `[D-NR-REM-006]`, `[D-NR-REM-007]` e os itens `EVID` finais.

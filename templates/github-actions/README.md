@@ -85,6 +85,8 @@ Pull Requests executam:
 
 O job obrigatório para proteção da branch `main` chama-se `service-ci-validate`, conforme a política em [Proteção da branch main dos microsserviços](../../docs/github-branch-protection.md).
 
+As actions JavaScript usadas no workflow devem permanecer em versões compatíveis com Node.js 24. O cache do SonarCloud usa `actions/cache@v6`, pois a série `v4` declara runtime Node.js 20 e gera aviso de depreciação no job `service-ci-validate`.
+
 Pushes na branch `develop` executam o workflow auxiliar `open-pr-to-main.yml`, que valida build Maven, testes e contratos antes de criar ou atualizar o PR para `main`. A análise SonarCloud com cobertura roda no `service-ci-validate`, em PR para `main` e em push na `main`, porque depende do relatório JaCoCo produzido pelo `verify`.
 
 O workflow auxiliar pode preparar PR com `project.version` em `SNAPSHOT`, porque ele não publica imagem, release ou deploy. O PR para `main` e o fluxo de publicação/deploy da `main` bloqueiam mudanças publicáveis com versão `SNAPSHOT`, menor ou igual à base do PR, ou repetida em relação ao commit anterior da `main`.

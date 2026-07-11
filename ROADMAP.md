@@ -41,7 +41,7 @@ Este roadmap foi estruturado para facilitar o trabalho incremental com agentes, 
 - Baseline executável do New Relic OpenTelemetry Collector criado no `oficina-infra`, com Helm values do ambiente `lab`, script de instalação, Secret Kubernetes esperado, endpoint OTLP/gRPC interno e integração automática ao deploy quando `NEW_RELIC_LICENSE_KEY` está configurada.
 - Enunciado da Fase 4 incluído como referência normativa em [Enunciado Fase 4](docs/delivery/Enunciado%20Fase%204.md).
 - Auditoria de lacunas realizada em 2026-07-11 identificou que alguns itens do roadmap estavam fechados pelo contrato ou pelo schema, mas ainda sem implementação runtime real ou sem evidência remota:
-  - `oficina-os-service` ainda mantém domínio, Saga e Outbox em store de processo, apesar de possuir migrations PostgreSQL;
+  - `oficina-os-service` recebeu adapters PostgreSQL locais para domínio, histórico, Saga, Inbox e Outbox em 2026-07-11, ficando pendente apenas a evidência remota no `lab`;
   - `oficina-billing-service` já recebeu adapters PostgreSQL para orçamento e pagamento no commit local `17535c2`, mas a projeção de eventos e a Outbox ainda precisam sair do store em memória;
   - `oficina-execution-service` modela tabelas DynamoDB, mas ainda precisa substituir o store em memória por cliente DynamoDB real;
   - os três microsserviços ainda precisam conectar Outbox, producers e consumers à mensageria SNS/SQS provisionada no `oficina-infra`;
@@ -483,7 +483,7 @@ Convenção de identificadores para itens abertos:
 - [x] Copiar e adaptar para `oficina-os-service` o domínio de Pessoa, Usuário, Cliente, Veículo e Ordem de Serviço do `oficina-app`, conforme [Plano de Decomposição do oficina-app](docs/architecture/oficina-app-decomposition.md).
 - [x] Copiar e adaptar para `oficina-os-service` controllers, presenters, DTOs, validações, testes e seed de atendimento do `oficina-app`, alinhando rotas com a [OpenAPI do oficina-os-service](contracts/openapi/oficina-os-service.yaml).
 - [x] Criar migrations e seed limpo do `oficina-os-service` para o database `oficina_os`, preservando isolamento de acesso e ownership.
-- [x] Implementar no `oficina-os-service` a baseline funcional da orquestração da Saga, histórico de estados, Outbox, publicação lógica dos eventos de OS e consumo lógico dos eventos de Billing e Execution. A substituição do store de processo por PostgreSQL e a conexão com SNS/SQS real ficam rastreadas em `[B2-OS-DB-IMPL-001]` e `[B2-MSG-IMPL-001]`.
+- [x] Implementar no `oficina-os-service` a baseline funcional da orquestração da Saga, histórico de estados, Outbox, publicação lógica dos eventos de OS e consumo lógico dos eventos de Billing e Execution. A substituição do store de processo por PostgreSQL foi concluída em `[B2-OS-DB-IMPL-001]`; a conexão com SNS/SQS real segue rastreada em `[B2-MSG-IMPL-001]`.
 - [x] Copiar e adaptar para `oficina-execution-service` o domínio de catálogo técnico, peças, serviços e estoque do `oficina-app`, conforme [Plano de Decomposição do oficina-app](docs/architecture/oficina-app-decomposition.md).
 - [x] Modelar no `oficina-execution-service` a persistência de catálogo, estoque, execução, Outbox e idempotência no formato das tabelas DynamoDB, sem migrar diretamente adapters PostgreSQL/Panache do `oficina-app`. O acesso runtime real ao DynamoDB fica rastreado em `[B2-EXEC-DDB-IMPL-001]`.
 - [x] Implementar no `oficina-execution-service` diagnóstico, execução, reparo, movimentação de estoque, producers e consumers lógicos definidos nos contratos de eventos. A conexão com SNS/SQS real fica rastreada em `[B2-MSG-IMPL-001]`.
@@ -507,7 +507,7 @@ Convenção de identificadores para itens abertos:
 #### Lacunas reabertas por auditoria de persistência, mensageria e idempotência
 
 - [x] `[B2-BILL-DB-IMPL-001]` Substituir repositórios em memória de orçamento e pagamento do `oficina-billing-service` por adapters PostgreSQL para `orcamento`, `orcamento_item` e `pagamento`, mantendo o modo em memória apenas no profile de testes. Concluído localmente no `oficina-billing-service` em 2026-07-11 no commit `17535c2`, com `project.version=1.0.6` e validação `./mvnw -B verify -Ppostgresql -DskipITs=false -DfailIfNoTests=false`.
-- [ ] `[B2-OS-DB-IMPL-001]` Substituir o `AtendimentoSeedStore` do `oficina-os-service` por adapters PostgreSQL reais para Cliente, Veículo, Ordem de Serviço, histórico de estados, Saga e consultas operacionais, usando o database `oficina_os`, as migrations existentes e testes de integração com PostgreSQL. O store em memória pode permanecer apenas como fixture de teste explicitamente isolada por profile.
+- [x] `[B2-OS-DB-IMPL-001]` Substituir o `AtendimentoSeedStore` do `oficina-os-service` por adapters PostgreSQL reais para Cliente, Veículo, Ordem de Serviço, histórico de estados, Saga e consultas operacionais, usando o database `oficina_os`, as migrations existentes e testes de integração com PostgreSQL. Concluído localmente no `oficina-os-service` em 2026-07-11 no commit `80ff2e8`, com `project.version=1.0.5`, store em memória restrito ao profile de teste e validação `./mvnw -B verify -Ppostgresql -DskipITs=false -DfailIfNoTests=false`.
 - [ ] `[B2-BILL-EVENTSTORE-IMPL-001]` Persistir no PostgreSQL do `oficina-billing-service` as projeções de eventos consumidos, itens financeiros projetados e registros de Outbox hoje mantidos em `BillingEventStore`, garantindo que orçamento, pagamento, eventos pendentes e histórico de publicação sobrevivam a restart de pod.
 - [ ] `[B2-EXEC-DDB-IMPL-001]` Substituir o store em memória do `oficina-execution-service` por acesso real ao Amazon DynamoDB, cobrindo catálogo, estoque, execuções, fila operacional, Outbox e idempotência nas tabelas canônicas descritas em [Padrão DynamoDB do oficina-execution-service](docs/infrastructure/dynamodb-execution-service.md). A validação local deve usar DynamoDB Local ou Testcontainers e não apenas `LinkedHashMap`.
 - [ ] `[B2-IDEMP-IMPL-001]` Implementar idempotência persistente nos três microsserviços conforme [Contrato de Idempotência](contracts/idempotency.md): registrar escopo, chave, hash da requisição, status de processamento, resposta consolidada e TTL; retornar a mesma resposta em retries equivalentes; rejeitar reutilização da chave com payload divergente; e manter comportamento após restart de pod.
@@ -633,14 +633,13 @@ O próximo passo para agentes deve priorizar itens `IMPL` abertos no [Backlog or
 
 A ordem local recomendada é:
 
-1. `[B2-OS-DB-IMPL-001]` Substituir stores em memória do `oficina-os-service` por PostgreSQL real.
-2. `[B2-BILL-EVENTSTORE-IMPL-001]` Persistir projeções de eventos e Outbox do `oficina-billing-service`.
-3. `[B2-EXEC-DDB-IMPL-001]` Substituir store em memória do `oficina-execution-service` por DynamoDB real.
-4. `[B2-IDEMP-IMPL-001]` Implementar idempotência persistente nos três microsserviços.
-5. `[B2-MSG-IMPL-001]` Conectar Outbox, producers e consumers à mensageria SNS/SQS real.
-6. `[B2-CONFIG-IMPL-001]` Bloquear fallback silencioso para memória em `prod` e `lab`.
-7. `[D-OBS-IMPL-003]` Instrumentar métricas de consumo Mercado Pago.
-8. `[D-OBS-IMPL-004]` Instrumentar métricas de persistência, idempotência, Outbox e mensageria.
-9. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
+1. `[B2-BILL-EVENTSTORE-IMPL-001]` Persistir projeções de eventos e Outbox do `oficina-billing-service`.
+2. `[B2-EXEC-DDB-IMPL-001]` Substituir store em memória do `oficina-execution-service` por DynamoDB real.
+3. `[B2-IDEMP-IMPL-001]` Implementar idempotência persistente nos três microsserviços.
+4. `[B2-MSG-IMPL-001]` Conectar Outbox, producers e consumers à mensageria SNS/SQS real.
+5. `[B2-CONFIG-IMPL-001]` Impedir fallback silencioso para stores em memória nos profiles `prod` e `lab`.
+6. `[D-OBS-IMPL-003]` Instrumentar métricas de consumo Mercado Pago.
+7. `[D-OBS-IMPL-004]` Instrumentar métricas de persistência, idempotência, Outbox e mensageria.
+8. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
 
 As validações remotas prioritárias restantes, quando o ambiente externo estiver disponível, são `[B2-BILL-DB-REM-001]`, `[B2-OS-DB-REM-001]`, `[B2-EXEC-DDB-REM-001]`, `[B2-IDEMP-REM-001]`, `[B2-MSG-REM-001]`, `[B2-MP-REM-001]`, `[B2-GH-REM-001]`, `[D-NR-REM-003]`, `[D-NR-REM-004]`, `[D-NR-REM-006]`, `[D-NR-REM-007]` e os itens `EVID` finais.

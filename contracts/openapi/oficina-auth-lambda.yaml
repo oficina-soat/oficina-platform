@@ -1,0 +1,277 @@
+openapi: 3.1.0
+info:
+  title: oficina-auth-lambda API
+  version: 1.1.0
+  description: Contrato HTTP para autenticação JWT e ativação segura de credenciais dos usuários operacionais.
+  license:
+    name: Internal
+    identifier: LicenseRef-Internal
+servers:
+  - url: /
+tags:
+  - name: Autenticacao
+    description: Autenticação por CPF e senha e emissão de JWT.
+  - name: Ativacao
+    description: Provisionamento de senha sem transportar credenciais pelo oficina-os-service.
+paths:
+  /auth:
+    post:
+      tags: [Autenticacao]
+      summary: Autenticar usuário
+      operationId: autenticarUsuario
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/CorrelationId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AutenticacaoRequest"
+            examples:
+              administrativo:
+                value:
+                  cpf: "84191404067"
+                  password: senha-nao-exposta-em-logs
+      responses:
+        "200":
+          description: JWT emitido para usuário ativo e com credencial ativada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /auth/token:
+    post:
+      tags: [Autenticacao]
+      summary: Autenticar usuário pelo alias de emissão de token
+      operationId: emitirToken
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/CorrelationId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AutenticacaoRequest"
+      responses:
+        "200":
+          description: JWT emitido para usuário ativo e com credencial ativada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /auth/usuarios/{usuarioId}/ativacao:
+    post:
+      tags: [Ativacao]
+      summary: Gerar token de ativação de credencial
+      description: Gera um segredo de uso único para usuário operacional ativo e ainda sem senha. O token é retornado somente nesta resposta e nunca é publicado em eventos.
+      operationId: solicitarAtivacaoCredencial
+      security:
+        - bearerAuth: []
+      x-required-roles: [administrativo]
+      parameters:
+        - $ref: "#/components/parameters/UsuarioId"
+        - $ref: "#/components/parameters/CorrelationId"
+      responses:
+        "201":
+          description: Token de ativação criado; tokens anteriores não utilizados foram invalidados.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AtivacaoTokenResponse"
+              examples:
+                token:
+                  value:
+                    token: 0mX7Yj6eN8uW5qX4gZ1hC3bL9vT2sR0pK7dF6aQ8wE4
+                    expiresAt: "2026-07-13T18:30:00Z"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /auth/ativacoes:
+    post:
+      tags: [Ativacao]
+      summary: Concluir ativação de credencial
+      description: Valida o token de posse e grava somente o hash BCrypt da senha na mesma transação que consome o token.
+      operationId: ativarCredencial
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/CorrelationId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AtivacaoRequest"
+            examples:
+              ativacao:
+                value:
+                  token: 0mX7Yj6eN8uW5qX4gZ1hC3bL9vT2sR0pK7dF6aQ8wE4
+                  password: uma-senha-forte-e-unica
+      responses:
+        "204":
+          description: Credencial ativada e token marcado como utilizado.
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /.well-known/openid-configuration:
+    get:
+      tags: [Autenticacao]
+      summary: Consultar metadados do emissor JWT
+      operationId: consultarMetadadosOidc
+      security: []
+      responses:
+        "200":
+          description: Metadados públicos do emissor.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /.well-known/jwks.json:
+    get:
+      tags: [Autenticacao]
+      summary: Consultar chaves públicas JWT
+      operationId: consultarJwks
+      security: []
+      responses:
+        "200":
+          description: JWKS público para validação dos tokens.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [keys]
+                properties:
+                  keys:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    UsuarioId:
+      name: usuarioId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: UUID canônico do usuário operacional no oficina-os-service.
+    CorrelationId:
+      name: X-Correlation-Id
+      in: header
+      required: false
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
+      description: Identificador propagado para resposta, logs e traces.
+  schemas:
+    AutenticacaoRequest:
+      type: object
+      required: [cpf, password]
+      properties:
+        cpf:
+          type: string
+          pattern: "^[0-9]{11}$"
+        password:
+          type: string
+          minLength: 1
+          maxLength: 128
+      additionalProperties: false
+    TokenResponse:
+      type: object
+      required: [access_token, token_type, expires_in]
+      properties:
+        access_token:
+          type: string
+        token_type:
+          const: Bearer
+        expires_in:
+          type: integer
+          minimum: 1
+          description: Validade do JWT em segundos.
+      additionalProperties: false
+    AtivacaoTokenResponse:
+      type: object
+      required: [token, expiresAt]
+      properties:
+        token:
+          type: string
+          minLength: 43
+          description: Segredo de uso único com pelo menos 256 bits de entropia, retornado apenas uma vez.
+        expiresAt:
+          type: string
+          format: date-time
+      additionalProperties: false
+    AtivacaoRequest:
+      type: object
+      required: [token, password]
+      properties:
+        token:
+          type: string
+          minLength: 43
+          maxLength: 512
+        password:
+          type: string
+          minLength: 12
+          maxLength: 128
+      additionalProperties: false
+    AuthError:
+      type: object
+      required: [message, motivo]
+      properties:
+        message:
+          type: string
+        motivo:
+          type: string
+      additionalProperties: false
+  responses:
+    BadRequest:
+      description: Requisição, senha ou token de ativação inválido.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AuthError"
+    Unauthorized:
+      description: Credenciais ausentes, inválidas ou usuário não autorizado a autenticar.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AuthError"
+    Forbidden:
+      description: JWT válido sem o papel administrativo.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AuthError"
+    NotFound:
+      description: Usuário operacional ainda não projetado no store de autenticação.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AuthError"
+    Conflict:
+      description: Usuário não está ativo ou sua credencial já foi ativada.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AuthError"

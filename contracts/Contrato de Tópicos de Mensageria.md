@@ -80,6 +80,14 @@ Todos os eventos publicados na plataforma devem seguir a seguinte estrutura:
 
 # Tópicos do OS Service
 
+## Usuários operacionais
+
+```text
+oficina.os.usuario-adicionado
+oficina.os.usuario-atualizado
+oficina.os.usuario-excluido
+```
+
 ## Ciclo de Vida da Ordem de Serviço
 
 ```text
@@ -200,6 +208,9 @@ Esta tabela deve ser mantida coerente com o [Contrato de Eventos de Domínio](Co
 | `pagamentoRecusado` | `oficina.billing.pagamento-recusado` | `oficina-billing-service` | `oficina-os-service` |
 | `estoqueAcrescentado` | `oficina.execution.estoque-acrescentado` | `oficina-execution-service` | `oficina-billing-service` |
 | `estoqueBaixado` | `oficina.execution.estoque-baixado` | `oficina-execution-service` | `oficina-billing-service` |
+| `usuarioAdicionado` | `oficina.os.usuario-adicionado` | `oficina-os-service` | `oficina-auth-sync-lambda` |
+| `usuarioAtualizado` | `oficina.os.usuario-atualizado` | `oficina-os-service` | `oficina-auth-sync-lambda` |
+| `usuarioExcluido` | `oficina.os.usuario-excluido` | `oficina-os-service` | `oficina-auth-sync-lambda` |
 | `sagaCompensada` | `oficina.saga.saga-compensada` | `oficina-os-service` | `oficina-billing-service`, `oficina-execution-service` |
 | `sagaFinalizadaComSucesso` | `oficina.saga.saga-finalizada-com-sucesso` | `oficina-os-service` | `oficina-billing-service`, `oficina-execution-service` |
 
@@ -222,11 +233,13 @@ Consumidores devem ser:
 - tolerantes a eventos duplicados;
 - compatíveis com processamento assíncrono.
 
+O `oficina-auth-sync-lambda` é um consumidor serverless da mesma mensageria. Suas filas devem acionar a função por event source mapping com resposta parcial de lote habilitada. O consumidor confirma eventos duplicados já registrados por `eventId` e retorna como falha somente os itens que não puderam ser aplicados, preservando os demais itens do lote.
+
 ## Ordenação
 
-A plataforma não garante ordenação global.
+A plataforma não garante ordenação global nem entre tópicos diferentes.
 
-Quando necessário, a ordenação deve ser garantida pelo identificador do agregado (`aggregateId`).
+Quando necessário, o consumidor deve controlar a progressão pelo identificador do agregado (`aggregateId`) e pelo instante do fato (`occurredAt`). Como os três eventos de usuário usam filas distintas, o `oficina-auth-sync-lambda` persiste o último `occurredAt` aplicado por usuário. Um evento com instante igual ou anterior é registrado para idempotência, mas não pode sobrescrever a projeção mais recente.
 
 ## Retentativas
 

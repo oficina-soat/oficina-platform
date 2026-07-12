@@ -249,15 +249,17 @@ oficina-execution-service
 
 Cada microsserviço deve configurar `OFICINA_AUTH_AUDIENCE` com o próprio nome canônico. O valor `oficina-app` é legado e deve continuar apenas como referência histórica para o backend monolítico atual.
 
-### Lambda de autenticação e notificações
+### Lambdas de autenticação, sincronização e notificações
 
 Nomes canônicos já usados:
 
 ```text
 OFICINA_AUTH_LAMBDA_NAME=oficina-auth-lambda
+OFICINA_AUTH_SYNC_LAMBDA_NAME=oficina-auth-sync-lambda
 OFICINA_NOTIFICACAO_LAMBDA_NAME=oficina-notificacao-lambda
-OFICINA_AUTH_LAMBDA_FUNCTION_NAME=oficina-auth-lambda-lab
-OFICINA_NOTIFICACAO_LAMBDA_FUNCTION_NAME=oficina-notificacao-lambda-lab
+AUTH_LAMBDA_FUNCTION_NAME=oficina-auth-lambda-lab
+AUTH_SYNC_LAMBDA_FUNCTION_NAME=oficina-auth-sync-lambda-lab
+NOTIFICACAO_LAMBDA_FUNCTION_NAME=oficina-notificacao-lambda-lab
 ```
 
 Secrets e artefatos:
@@ -265,9 +267,20 @@ Secrets e artefatos:
 ```text
 AUTH_DB_SECRET_NAME=oficina/lab/database/auth-lambda
 OFICINA_AUTH_DB_SECRET_ID=oficina/lab/database/auth-lambda
-OFICINA_AUTH_LAMBDA_ARTIFACT_PREFIX=oficina/lab/lambda/oficina-auth-lambda
-OFICINA_NOTIFICACAO_LAMBDA_ARTIFACT_PREFIX=oficina/lab/lambda/oficina-notificacao-lambda
+AUTH_LAMBDA_ARTIFACT_PREFIX=oficina/lab/lambda/oficina-auth-lambda
+AUTH_SYNC_LAMBDA_ARTIFACT_PREFIX=oficina/lab/lambda/oficina-auth-sync-lambda
+NOTIFICACAO_LAMBDA_ARTIFACT_PREFIX=oficina/lab/lambda/oficina-notificacao-lambda
 ```
+
+O `oficina-auth-lambda` e o `oficina-auth-sync-lambda` compartilham exclusivamente o store e o secret de autenticação. O consumidor assíncrono não usa API Gateway e recebe os eventos por três filas SQS canônicas:
+
+```text
+oficina-os-usuario-adicionado-oficina-auth-sync-lambda
+oficina-os-usuario-atualizado-oficina-auth-sync-lambda
+oficina-os-usuario-excluido-oficina-auth-sync-lambda
+```
+
+Cada fila possui a DLQ do tópico correspondente. O event source mapping deve habilitar `ReportBatchItemFailures`. A Lambda HTTP usa `OFICINA_AUTH_ACTIVATION_TTL_HOURS=24` como validade padrão configurável para tokens de ativação; tokens e senhas nunca são variáveis de ambiente nem secrets compartilhados.
 
 ### PostgreSQL legado e transição Fase 4
 

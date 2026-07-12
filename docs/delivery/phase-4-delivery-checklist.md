@@ -24,7 +24,7 @@ Este checklist complementa o [Enunciado Fase 4](Enunciado%20Fase%204.md), o [ROA
 | `oficina-billing-service` | `git@github.com:oficina-soat/oficina-billing-service.git` | A preencher | A preencher | [OpenAPI canônica](../../contracts/openapi/oficina-billing-service.yaml) | A preencher | A preencher | Pendente |
 | `oficina-execution-service` | `git@github.com:oficina-soat/oficina-execution-service.git` | A preencher | A preencher | [OpenAPI canônica](../../contracts/openapi/oficina-execution-service.yaml) | A preencher | A preencher | Pendente |
 | `oficina-infra` | A preencher | A preencher | Não aplicável | Não aplicável | A preencher | A preencher | Pendente |
-| `oficina-auth-lambda` | A preencher | A preencher | A preencher | Não aplicável | A preencher | Não aplicável | Pendente |
+| `oficina-auth-lambda` | A preencher | A preencher | A preencher | [OpenAPI canônica](../../contracts/openapi/oficina-auth-lambda.yaml) | A preencher | Não aplicável | Pendente |
 
 ## Checklist por Microsserviço
 

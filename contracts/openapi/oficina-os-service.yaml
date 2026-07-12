@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: oficina-os-service API
-  version: 1.1.0
+  version: 1.2.0
   description: Contrato REST v1 para usuários operacionais, clientes, veículos, ordens de serviço, estados e histórico da OS.
   license:
     name: Internal
@@ -26,9 +26,10 @@ paths:
     post:
       tags: [Usuarios]
       summary: Criar usuário operacional
-      description: Cria o cadastro operacional de Pessoa e Usuário. Não recebe nem persiste credenciais de autenticação.
+      description: Cria o cadastro operacional de Pessoa e Usuário, persiste usuarioAdicionado na Outbox e não recebe nem persiste credenciais de autenticação.
       operationId: criarUsuario
       x-required-roles: [administrativo]
+      x-publishes-events: [usuarioAdicionado]
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
@@ -111,9 +112,10 @@ paths:
     put:
       tags: [Usuarios]
       summary: Atualizar usuário operacional
-      description: Substitui nome, CPF, status e papéis do cadastro operacional. Credenciais não pertencem a este recurso.
+      description: Substitui nome, CPF, status e papéis do cadastro operacional e persiste usuarioAtualizado na Outbox. Credenciais não pertencem a este recurso.
       operationId: atualizarUsuario
       x-required-roles: [administrativo]
+      x-publishes-events: [usuarioAtualizado]
       parameters:
         - $ref: "#/components/parameters/UsuarioId"
       requestBody:
@@ -149,9 +151,10 @@ paths:
     delete:
       tags: [Usuarios]
       summary: Inativar usuário operacional
-      description: Exclusão lógica e idempotente que altera o status para INATIVO, preservando Pessoa e papéis para auditoria.
+      description: Exclusão lógica e idempotente que altera o status para INATIVO, preserva Pessoa e papéis e publica usuarioExcluido somente na primeira transição.
       operationId: inativarUsuario
       x-required-roles: [administrativo]
+      x-publishes-events: [usuarioExcluido]
       parameters:
         - $ref: "#/components/parameters/UsuarioId"
       responses:

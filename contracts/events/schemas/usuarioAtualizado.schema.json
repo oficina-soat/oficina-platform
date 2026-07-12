@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oficina.example.com/contracts/events/schemas/usuarioAtualizado.schema.json",
+  "title": "usuarioAtualizado",
+  "type": "object",
+  "x-topic": "oficina.os.usuario-atualizado",
+  "allOf": [
+    {
+      "$ref": "./common.schema.json#/$defs/eventEnvelope"
+    }
+  ],
+  "properties": {
+    "eventType": {
+      "const": "usuarioAtualizado"
+    },
+    "eventVersion": {
+      "const": 1
+    },
+    "producer": {
+      "const": "oficina-os-service"
+    },
+    "payload": {
+      "$ref": "./common.schema.json#/$defs/usuarioOperacionalSnapshot"
+    }
+  },
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "eventId": "6ac43de0-d1fb-4b04-94cf-8e109206ef7c",
+      "eventType": "usuarioAtualizado",
+      "eventVersion": 1,
+      "occurredAt": "2026-07-12T19:00:00Z",
+      "producer": "oficina-os-service",
+      "aggregateId": "5c9528f8-8f0f-45f6-a142-e1fc1f587d91",
+      "payload": {
+        "usuarioId": "5c9528f8-8f0f-45f6-a142-e1fc1f587d91",
+        "pessoaId": "29d83ef5-0cbe-4e3d-8f58-ef97a38984da",
+        "nome": "Ana Silva",
+        "documento": "84191404067",
+        "status": "BLOQUEADO",
+        "papeis": [
+          "mecanico",
+          "recepcionista"
+        ],
+        "atualizadoEm": "2026-07-12T19:00:00Z"
+      }
+    }
+  ]
+}

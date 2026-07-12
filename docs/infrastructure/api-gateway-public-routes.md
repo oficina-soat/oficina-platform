@@ -16,7 +16,22 @@ Não foram identificadas, nas OpenAPI canônicas, rotas administrativas, callbac
 
 O CRUD de usuários operacionais é administrativo, mas continua roteável pela entrada pública: todas as operações em `/api/v1/usuarios` exigem JWT com o papel `administrativo` no `oficina-os-service`. Exposição no API Gateway não equivale a acesso anônimo nem substitui a autorização no microsserviço.
 
+O componente serverless `oficina-auth-lambda` mantém suas próprias integrações HTTP no mesmo API Gateway. Além de login, OIDC e JWKS, `POST /auth/usuarios/{usuarioId}/ativacao` exige JWT com papel `administrativo`, enquanto `POST /auth/ativacoes` é anônimo por usar um token aleatório de uso único como segredo de posse. O `oficina-auth-sync-lambda` não possui rota HTTP pública.
+
 ## Rotas públicas por serviço
+
+### `oficina-auth-lambda`
+
+Fonte canônica: [OpenAPI do oficina-auth-lambda](../../contracts/openapi/oficina-auth-lambda.yaml).
+
+| Método | Rota pública |
+|---|---|
+| `POST` | `/auth` |
+| `POST` | `/auth/token` |
+| `POST` | `/auth/usuarios/{usuarioId}/ativacao` |
+| `POST` | `/auth/ativacoes` |
+| `GET` | `/.well-known/openid-configuration` |
+| `GET` | `/.well-known/jwks.json` |
 
 ### `oficina-os-service`
 

@@ -19,6 +19,7 @@ flowchart LR
   subgraph aws["AWS us-east-1 / ambiente lab"]
     apigw["API Gateway HTTP<br/>eks-lab-http-api"]
     auth["AWS Lambda<br/>oficina-auth-lambda-lab"]
+    authSync["AWS Lambda<br/>oficina-auth-sync-lambda-lab"]
     notificacao["AWS Lambda<br/>oficina-notificacao-lambda-lab"]
     ecr["Amazon ECR<br/>imagens Docker dos microsserviços"]
     secrets["AWS Secrets Manager<br/>oficina/lab/..."]
@@ -33,6 +34,7 @@ flowchart LR
     subgraph rds["Amazon RDS for PostgreSQL<br/>oficina-postgres-lab"]
       dbOs["database oficina_os<br/>owner oficina_os_user"]
       dbBilling["database oficina_billing<br/>owner oficina_billing_user"]
+      authDb["store PostgreSQL de autenticação<br/>owner oficina_auth_lambda"]
     end
 
     ddb["Amazon DynamoDB<br/>prefixo oficina-execution-lab<br/>catalogo, estoque, execucoes, outbox, idempotencia"]
@@ -44,6 +46,7 @@ flowchart LR
   end
 
   usuario -->|login e emissão de JWT| auth
+  usuario -->|ativação direta da credencial| auth
   auth -->|JWT / JWKS| apigw
   usuario -->|REST público /api/v1<br/>X-Correlation-Id| apigw
 
@@ -71,7 +74,11 @@ flowchart LR
   sqs -->|consumo idempotente| os
   sqs -->|consumo idempotente| billing
   sqs -->|consumo idempotente| execution
+  sqs -->|eventos de usuário| authSync
   sqs -.-> notificacao
+
+  auth -->|credenciais e JWT| authDb
+  authSync -->|projeção sem credenciais| authDb
 
   billing -->|pagamentos e conciliação| mercadoPago
 
@@ -79,6 +86,7 @@ flowchart LR
   secrets --> billing
   secrets --> execution
   secrets --> auth
+  secrets --> authSync
   secrets --> notificacao
 
   os -->|logs JSON, /q/metrics, traces OTLP| collector
@@ -92,9 +100,9 @@ flowchart LR
 | Bloco | Decisão canônica |
 |---|---|
 | Entrada pública | O API Gateway HTTP `eks-lab-http-api` expõe somente as rotas REST de negócio definidas em [Rotas públicas do API Gateway](../infrastructure/api-gateway-public-routes.md). Endpoints `/q/health`, `/q/metrics`, `/q/openapi` e Swagger UI não são rotas públicas permanentes de negócio. |
-| Autenticação e notificações | `oficina-auth-lambda-lab` e `oficina-notificacao-lambda-lab` permanecem como componentes serverless separados dos três microsserviços, conforme a [ADR-003 - Serverless para Autenticação e Notificações](../../adr/ADR-003%20-%20Serverless%20para%20Autenticação%20e%20Notificações.md). |
+| Autenticação e notificações | `oficina-auth-lambda-lab`, `oficina-auth-sync-lambda-lab` e `oficina-notificacao-lambda-lab` permanecem como componentes serverless separados dos três microsserviços, conforme a [ADR-003 - Serverless para Autenticação e Notificações](../../adr/ADR-003%20-%20Serverless%20para%20Autenticação%20e%20Notificações.md). O consumidor de sincronização recebe somente dados operacionais e compartilha o store da autenticação, nunca o database do OS. |
 | Kubernetes | Os workloads de negócio rodam no cluster `eks-lab`. Os manifests executáveis pertencem ao `oficina-infra`, enquanto este repositório mantém os templates e decisões conforme a [Estratégia de entrega dos manifestos Kubernetes](../infrastructure/kubernetes-manifest-strategy.md). |
-| Persistência relacional | `oficina-os-service` usa somente o database `oficina_os`; `oficina-billing-service` usa somente `oficina_billing`; ambos ficam na instância RDS `oficina-postgres-lab`, conforme o [Padrão de isolamento PostgreSQL no RDS compartilhado](../infrastructure/rds-postgresql-isolation.md). |
+| Persistência relacional | `oficina-os-service` usa somente o database `oficina_os`; `oficina-billing-service` usa somente `oficina_billing`; ambos ficam na instância RDS `oficina-postgres-lab`, conforme o [Padrão de isolamento PostgreSQL no RDS compartilhado](../infrastructure/rds-postgresql-isolation.md). As Lambdas de autenticação e sincronização compartilham um terceiro store PostgreSQL próprio, sem acesso aos databases dos microsserviços. |
 | Persistência NoSQL | `oficina-execution-service` usa exclusivamente as tabelas DynamoDB com prefixo `oficina-execution-lab`, conforme o [Padrão DynamoDB do oficina-execution-service](../infrastructure/dynamodb-execution-service.md). |
 | Mensageria | Eventos são publicados via Outbox em tópicos SNS canônicos e consumidos por filas SQS por consumidor, com DLQs no padrão do [Contrato de Tópicos de Mensageria](../../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md). |
 | Saga | A Saga da Ordem de Serviço é orquestrada pelo `oficina-os-service`, com participantes financeiros e operacionais nos outros serviços, conforme [Fluxos da Saga da Ordem de Serviço](saga-flows.md) e o [Contrato de Saga do oficina-os-service](../../contracts/saga/oficina-os-saga-v1.md). |

@@ -6,7 +6,7 @@ Definir como copiar, selecionar e adaptar artefatos de `oficina-app`, `oficina-i
 
 Este plano não altera `oficina-app`, `oficina-infra-db` ou `oficina-infra-k8s`. Esses repositórios devem ser usados apenas como fonte de consulta e cópia controlada; adaptações da Fase 4 devem acontecer nos repositórios de destino.
 
-O `oficina-auth-lambda` é exceção a essa regra: quando ajustes forem necessários nos fluxos de autenticação ou notificações, eles devem ser feitos diretamente no próprio repositório `oficina-auth-lambda`, pois ele continua sendo componente serverless ativo da suíte.
+O `oficina-auth-lambda` é exceção a essa regra: quando ajustes forem necessários nos fluxos de autenticação, sincronização do cadastro operacional ou notificações, eles devem ser feitos diretamente no próprio repositório `oficina-auth-lambda`, pois ele continua sendo componente serverless ativo da suíte.
 
 ## Fontes de cópia
 
@@ -15,7 +15,7 @@ O `oficina-auth-lambda` é exceção a essa regra: quando ajustes forem necessá
 | `../oficina-app` | Copiar ou consultar código, testes, seeds, contratos práticos e referências funcionais para decomposição nos três microsserviços. | Não alterar durante a decomposição; adaptar apenas nos repositórios de destino. |
 | `../oficina-infra-db` | Copiar padrões de RDS, bootstrap de banco, secrets, scripts de migração operacional e workflows úteis. | Não alterar durante a consolidação; adaptar apenas no `oficina-infra`. |
 | `../oficina-infra-k8s` | Copiar padrões de EKS, ECR, API Gateway, Kubernetes, scripts operacionais, workflows e observabilidade já validada. | Não alterar durante a consolidação; adaptar apenas no `oficina-infra`. |
-| `../oficina-auth-lambda` | Consultar nomes, issuer, JWKS, secrets, artefatos e integrações de autenticação/notificação. | Pode ser alterado diretamente quando a mudança pertencer ao componente serverless. |
+| `../oficina-auth-lambda` | Consultar nomes, issuer, JWKS, secrets, artefatos e integrações de autenticação, sincronização e notificação. | Pode ser alterado diretamente quando a mudança pertencer ao componente serverless. |
 
 O destino canônico dos artefatos de infraestrutura é sempre `../oficina-infra`. O destino canônico de código de domínio copiado do `oficina-app` são os repositórios `../oficina-os-service`, `../oficina-billing-service` e `../oficina-execution-service`, conforme ownership.
 
@@ -23,7 +23,7 @@ O destino canônico dos artefatos de infraestrutura é sempre `../oficina-infra`
 
 - Copiar primeiro, adaptar depois, dentro do `oficina-infra`.
 - Não corrigir `oficina-app`, `oficina-infra-db` ou `oficina-infra-k8s` durante a migração.
-- Ajustar `oficina-auth-lambda` diretamente quando a mudança for necessária para autenticação ou notificações.
+- Ajustar `oficina-auth-lambda` diretamente quando a mudança for necessária para autenticação, sincronização ou notificações.
 - Não promover valores históricos para contrato novo.
 - Parametrizar conta AWS com `AWS_ACCOUNT_ID` ou resolução por `aws sts get-caller-identity`, conforme [Conta, região e ambientes AWS](aws-environments.md).
 - Preservar `us-east-1`, `lab`, `eks-lab` e os nomes definidos em [Nomes de runtime, secrets e infraestrutura](infra-runtime-naming.md).
@@ -40,7 +40,7 @@ Levantar, sem alterar os repositórios de origem:
 | `oficina-app` | código de domínio, controllers, testes, `import.sql`, configurações e integrações que sirvam de referência para decomposição. |
 | `oficina-infra-db` | módulos Terraform de RDS, scripts de bootstrap, criação de secrets, workflows `deploy`/`destroy`, documentação de state e comandos manuais. |
 | `oficina-infra-k8s` | módulos Terraform de EKS/ECR/API Gateway, manifests Kubernetes compartilhados, scripts de deploy e limpeza, workflows, observabilidade e exemplos de publicação. |
-| `oficina-auth-lambda` | nomes de funções, secrets, issuer, JWKS, artefatos e contratos de integração usados pela autenticação e notificações. |
+| `oficina-auth-lambda` | nomes de funções, secrets, issuer, JWKS, artefatos e contratos de integração usados pela autenticação, sincronização e notificações. |
 
 Critério de pronto:
 

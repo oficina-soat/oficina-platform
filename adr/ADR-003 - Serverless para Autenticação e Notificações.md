@@ -30,12 +30,12 @@ Atualmente, essas responsabilidades estariam acopladas ao backend principal, aum
 
 ## Decisão
 
-Será adotado AWS Lambda integrado ao Amazon API Gateway para implementação dos fluxos serverless de autenticação e notificações.
+Será adotado AWS Lambda para implementação dos fluxos serverless de autenticação, sincronização do cadastro operacional e notificações. As funções HTTP usam Amazon API Gateway; a sincronização usa eventos publicados em Amazon SNS e entregues por Amazon SQS.
 
 A configuração inicial será enxuta, priorizando baixo custo e simplicidade operacional:
 
 - gateway: Amazon API Gateway (HTTP API)
-- funções: AWS Lambda separadas por responsabilidade (autenticação e notificações)
+- funções: AWS Lambda separadas por responsabilidade (`oficina-auth-lambda`, `oficina-auth-sync-lambda` e `oficina-notificacao-lambda`)
 - runtime: Quarkus em modo nativo (GraalVM), visando baixo cold start
 - integração com banco: acesso ao PostgreSQL no RDS (quando necessário)
 - autenticação: geração de JWT própria
@@ -46,8 +46,21 @@ A configuração inicial será enxuta, priorizando baixo custo e simplicidade op
 ### Responsabilidades da Lambda de autenticação
 
 - validar o CPF
-- consultar existência e status do cliente
+- consultar existência, ativação e status do usuário no store próprio de autenticação
 - gerar e retornar token JWT
+- gerar token de ativação de uso único para administradores
+- receber a senha inicial diretamente do usuário, sem transportá-la pelo `oficina-os-service`
+
+### Responsabilidades da Lambda de sincronização da autenticação
+
+- consumir de forma idempotente os eventos `usuarioAdicionado`, `usuarioAtualizado` e `usuarioExcluido`
+- projetar CPF, nome, status e papéis do cadastro operacional no store próprio de autenticação
+- reconhecer os estados `ATIVO`, `INATIVO` e `BLOQUEADO`
+- impedir que snapshots antigos sobrescrevam a projeção mais recente, comparando `aggregateId` e `occurredAt`
+- usar resposta parcial de lote no event source mapping e encaminhar falhas recorrentes às DLQs canônicas
+- nunca receber, publicar ou registrar senha, hash ou token de ativação nos eventos
+
+O caminho de login não consulta o `oficina-os-service`. O isolamento de disponibilidade é preservado por Outbox, SNS/SQS e consistência eventual da projeção de autenticação.
 
 ### Responsabilidades da Lambda de notificações
 
@@ -69,7 +82,7 @@ A configuração inicial será enxuta, priorizando baixo custo e simplicidade op
 
 - aderência direta à diretriz de uso de serverless
 - custo proporcional ao uso, adequado para cargas intermitentes
-- isolamento de autenticação e notificações do backend principal
+- isolamento de autenticação, sincronização e notificações do backend principal
 - escalabilidade independente por tipo de fluxo
 - redução do impacto de cold start com uso de Quarkus nativo
 - melhoria na segurança ao separar o ponto de entrada
@@ -80,6 +93,8 @@ A configuração inicial será enxuta, priorizando baixo custo e simplicidade op
 - aumento da complexidade de deploy e versionamento (múltiplas funções)
 - necessidade de padronizar observabilidade entre componentes distintos
 - necessidade de definir estratégia de comunicação para notificações (eventos, filas, etc.)
+- consistência eventual entre uma mutação administrativa e sua aplicação no store de autenticação
+- necessidade de operar filas e DLQs da sincronização de usuários
 
 ---
 
@@ -89,6 +104,9 @@ A configuração inicial será enxuta, priorizando baixo custo e simplicidade op
 - iniciar com configuração mínima de memória e ajustar com base em métricas
 - padronizar logs, métricas e tracing desde o início
 - definir padrão de eventos para desacoplar notificações do domínio
+- usar Outbox transacional no `oficina-os-service` e consumo idempotente por `eventId` na sincronização
+- manter o token de ativação somente como hash, com uso único e expiração padrão de 24 horas
+- bloquear autenticação de usuários sem senha ativada ou com status `INATIVO` ou `BLOQUEADO`
 - evitar uso excessivo de integrações proprietárias além do necessário
 - monitorar continuamente latência e custo das funções
 - manter lógica de negócio desacoplada para facilitar evolução futura

@@ -98,7 +98,9 @@ O `oficina-os-service` mantém o cadastro operacional agregado de Pessoa e Usuá
 
 Todas as operações desta seção exigem JWT válido com o papel `administrativo`. Um token válido sem esse papel deve receber `403 Forbidden` com `code=ACCESS_DENIED`, conforme o [Contrato de Erros REST](error-model.md).
 
-O recurso não aceita nem devolve senha, hash ou qualquer outra credencial. Login, validação de senha e emissão de JWT continuam sob responsabilidade do `oficina-auth-lambda`, conforme a [ADR-003 - Serverless para Autenticação e Notificações](../adr/ADR-003%20-%20Serverless%20para%20Autenticação%20e%20Notificações.md). A sincronização do cadastro operacional com o store de autenticação permanece no item `[B2-AUTH-USERS-IMPL-001]` do [ROADMAP](../ROADMAP.md).
+O recurso não aceita nem devolve senha, hash, token de ativação ou qualquer outra credencial. Login, ativação de credencial, validação de senha e emissão de JWT continuam sob responsabilidade do `oficina-auth-lambda`, conforme a [ADR-003 - Serverless para Autenticação e Notificações](../adr/ADR-003%20-%20Serverless%20para%20Autenticação%20e%20Notificações.md).
+
+As mutações bem-sucedidas publicam, pela Outbox transacional, os eventos [usuarioAdicionado](events/usuarioAdicionado.md), [usuarioAtualizado](events/usuarioAtualizado.md) e [usuarioExcluido](events/usuarioExcluido.md). O `oficina-auth-sync-lambda` projeta CPF, nome, status e papéis no store próprio de autenticação sem transportar credenciais e sem colocar uma chamada ao `oficina-os-service` no caminho de login.
 
 ### Criar usuário operacional
 
@@ -146,7 +148,7 @@ PUT /api/v1/usuarios/{usuarioId}
 DELETE /api/v1/usuarios/{usuarioId}
 ```
 
-A exclusão é lógica e idempotente: altera o status para `INATIVO`, retorna `204 No Content` e preserva Pessoa e papéis para auditoria e eventual reativação por `PUT`. O CRUD operacional não publica eventos de usuário enquanto não houver contrato explícito para a sincronização com o `oficina-auth-lambda`.
+A exclusão é lógica e idempotente: altera o status para `INATIVO`, retorna `204 No Content` e preserva Pessoa e papéis para auditoria e eventual reativação por `PUT`. A primeira transição para `INATIVO` publica `usuarioExcluido`; repetições que não alteram o estado não publicam outro evento.
 
 O contrato implementável completo, incluindo schemas, exemplos e códigos HTTP, está no [OpenAPI do oficina-os-service](openapi/oficina-os-service.yaml).
 
@@ -255,6 +257,49 @@ PATCH /api/v1/ordens-servico/{ordemServicoId}/estado
 ```http
 POST /api/v1/ordens-servico/{ordemServicoId}/cancelamento
 ```
+
+---
+
+# Componente serverless: oficina-auth-lambda
+
+## Responsabilidades
+
+- autenticar CPF e senha no store próprio;
+- emitir JWT com os papéis sincronizados;
+- gerar tokens de ativação de credencial para administradores;
+- receber a senha inicial diretamente do usuário durante a ativação.
+
+O `oficina-auth-lambda` não consulta o `oficina-os-service` no caminho de login e não acessa o database `oficina_os`. O componente recebe a projeção operacional exclusivamente pelo consumidor assíncrono `oficina-auth-sync-lambda`, que compartilha apenas o store de autenticação serverless.
+
+Usuários `INATIVO`, `BLOQUEADO` ou sem senha ativada não podem autenticar. Tokens de ativação são aleatórios, de uso único, armazenados somente como hash e expiram após 24 horas por padrão. A validade pode ser configurada no runtime sem mudar o contrato.
+
+### Solicitar ativação de credencial
+
+```http
+POST /auth/usuarios/{usuarioId}/ativacao
+Authorization: Bearer <jwt-administrativo>
+```
+
+A operação exige o papel `administrativo`, localiza o usuário pelo UUID canônico do cadastro operacional e somente aceita usuários `ATIVO` ainda sem credencial ativada. A resposta `201 Created` devolve o token em texto claro uma única vez e seu `expiresAt`; apenas o hash é persistido. Solicitar um novo token invalida tokens anteriores ainda não utilizados.
+
+O administrador deve entregar o token ao usuário por canal externo confiável. O token não deve ser enviado ao `oficina-os-service`, gravado em logs ou incluído em eventos.
+
+### Concluir ativação de credencial
+
+```http
+POST /auth/ativacoes
+```
+
+```json
+{
+  "token": "<token-de-uso-unico>",
+  "password": "uma-senha-com-pelo-menos-12-caracteres"
+}
+```
+
+A operação é pública porque o token aleatório funciona como segredo de posse. O token deve possuir entropia mínima de 256 bits, e a senha deve ter entre 12 e 128 caracteres. Token inexistente, expirado, invalidado ou já utilizado recebe a mesma resposta genérica, sem revelar o estado do usuário. O sucesso retorna `204 No Content`, grava somente o hash BCrypt da senha e marca o token como utilizado na mesma transação.
+
+O contrato implementável completo está no [OpenAPI do oficina-auth-lambda](openapi/oficina-auth-lambda.yaml).
 
 ---
 

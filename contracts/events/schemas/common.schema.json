@@ -51,6 +51,66 @@
       "type": "string",
       "format": "date-time"
     },
+    "statusUsuarioOperacional": {
+      "type": "string",
+      "enum": [
+        "ATIVO",
+        "INATIVO",
+        "BLOQUEADO"
+      ]
+    },
+    "papelUsuarioOperacional": {
+      "type": "string",
+      "enum": [
+        "administrativo",
+        "mecanico",
+        "recepcionista"
+      ]
+    },
+    "usuarioOperacionalSnapshot": {
+      "type": "object",
+      "required": [
+        "usuarioId",
+        "pessoaId",
+        "nome",
+        "documento",
+        "status",
+        "papeis",
+        "atualizadoEm"
+      ],
+      "properties": {
+        "usuarioId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "pessoaId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "nome": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "documento": {
+          "type": "string",
+          "pattern": "^[0-9]{11}$"
+        },
+        "status": {
+          "$ref": "#/$defs/statusUsuarioOperacional"
+        },
+        "papeis": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/papelUsuarioOperacional"
+          }
+        },
+        "atualizadoEm": {
+          "$ref": "#/$defs/dateTime"
+        }
+      },
+      "additionalProperties": false
+    },
     "money": {
       "type": "number",
       "minimum": 0

@@ -54,6 +54,14 @@ orcamentoAprovado
 
 ---
 
+# Eventos Relacionados a Usuários Operacionais
+
+- [usuarioAdicionado](events/usuarioAdicionado.md)
+- [usuarioAtualizado](events/usuarioAtualizado.md)
+- [usuarioExcluido](events/usuarioExcluido.md)
+
+---
+
 # Eventos de Saga
 
 - [sagaCompensada](events/sagaCompensada.md)
@@ -84,6 +92,9 @@ A tabela abaixo é a referência normativa para implementação de produtores, c
 | `pagamentoRecusado` | `oficina.billing.pagamento-recusado` | `oficina-billing-service` | `oficina-os-service` |
 | `estoqueAcrescentado` | `oficina.execution.estoque-acrescentado` | `oficina-execution-service` | `oficina-billing-service` |
 | `estoqueBaixado` | `oficina.execution.estoque-baixado` | `oficina-execution-service` | `oficina-billing-service` |
+| `usuarioAdicionado` | `oficina.os.usuario-adicionado` | `oficina-os-service` | `oficina-auth-sync-lambda` |
+| `usuarioAtualizado` | `oficina.os.usuario-atualizado` | `oficina-os-service` | `oficina-auth-sync-lambda` |
+| `usuarioExcluido` | `oficina.os.usuario-excluido` | `oficina-os-service` | `oficina-auth-sync-lambda` |
 | `sagaCompensada` | `oficina.saga.saga-compensada` | `oficina-os-service` | `oficina-billing-service`, `oficina-execution-service` |
 | `sagaFinalizadaComSucesso` | `oficina.saga.saga-finalizada-com-sucesso` | `oficina-os-service` | `oficina-billing-service`, `oficina-execution-service` |
 
@@ -125,10 +136,6 @@ pecaExcluida
 servicoAdicionado
 servicoAtualizado
 servicoExcluido
-
-usuarioAdicionado
-usuarioAtualizado
-usuarioExcluido
 
 pessoaAdicionada
 pessoaAtualizada

@@ -225,6 +225,7 @@ Tabela de Outbox local para publicação confiável de eventos.
 | `nextAttemptAt` | Não | Próxima tentativa |
 | `publishedAt` | Não | Data de publicação |
 | `expiresAt` | Condicional | TTL para eventos publicados |
+| `lastError` | Não | Último erro de publicação registrado pelo publicador |
 | `correlationId` | Sim | Correlação do fluxo |
 | `createdAt` | Sim | Criação |
 | `updatedAt` | Sim | Última atualização |

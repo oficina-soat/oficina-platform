@@ -58,6 +58,7 @@ Para aplicar em um cluster, o repositório de infraestrutura deve substituir:
 - O secret `oficina-jwt-keys` é montado em `/jwt`, mantendo compatibilidade com a autenticação da suíte.
 - `oficina-os-service` e `oficina-billing-service` usam secrets Kubernetes separados para materializar `JDBC_DATABASE_URL`, `REACTIVE_DATABASE_URL`, `DB_USERNAME` e `DB_PASSWORD`.
 - `oficina-execution-service` usa as variáveis DynamoDB canônicas do ambiente `lab`.
+- Os três ConfigMaps habilitam explicitamente a mensageria; OS e Billing também fixam `OFICINA_PERSISTENCE_KIND=postgresql`. Esses valores participam da [validação fail-fast do runtime protegido](../../../docs/infrastructure/infra-runtime-naming.md#runtime-protegido-e-validação-fail-fast).
 
 ## Fora do escopo
 

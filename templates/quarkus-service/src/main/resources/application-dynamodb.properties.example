@@ -5,3 +5,9 @@ oficina.dynamodb.table-prefix=${OFICINA_DYNAMODB_TABLE_PREFIX:oficina-execution-
 
 %dev.quarkus.dynamodb.endpoint-override=${DYNAMODB_ENDPOINT_OVERRIDE:http://localhost:8000}
 %test.quarkus.dynamodb.endpoint-override=${DYNAMODB_ENDPOINT_OVERRIDE:http://localhost:8000}
+
+%prod.quarkus.dynamodb.aws.region=${AWS_REGION}
+%prod.oficina.dynamodb.table-prefix=${OFICINA_DYNAMODB_TABLE_PREFIX}
+
+%lab.quarkus.dynamodb.aws.region=${AWS_REGION}
+%lab.oficina.dynamodb.table-prefix=${OFICINA_DYNAMODB_TABLE_PREFIX}

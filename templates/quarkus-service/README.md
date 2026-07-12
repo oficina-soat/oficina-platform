@@ -151,6 +151,8 @@ Para serviços PostgreSQL, incorporar os valores de `application-postgresql.prop
 
 Para o `oficina-execution-service`, incorporar os valores de `application-dynamodb.properties.example`.
 
+Quando o serviço possuir persistência ou mensageria reais, ele também deve implementar validação fail-fast no startup conforme [Nomes de runtime, secrets e infraestrutura](../../docs/infrastructure/infra-runtime-naming.md#runtime-protegido-e-validação-fail-fast). Os profiles `prod` e `lab`, assim como o ambiente `lab`, não podem aceitar store em memória, endpoints locais, mensageria desabilitada, secrets obrigatórios vazios ou dependências inacessíveis. O template distingue telemetria local e de teste com `deployment.environment=local` e `deployment.environment=test`; isso não autoriza execução local com profile `prod`.
+
 ## Health checks
 
 O template mantém o padrão atual do `oficina-app`:

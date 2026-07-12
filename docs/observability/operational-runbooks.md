@@ -56,12 +56,14 @@ Use quando readiness falhar, pods reiniciarem continuamente, rollout ficar preso
 - [ ] verificar logs recentes: `kubectl logs deployment/<servico> -n <namespace> --since=30m`;
 - [ ] conferir probes `/q/health/live` e `/q/health/ready`;
 - [ ] verificar se a imagem, variáveis e secrets do `Deployment` batem com os nomes canônicos em [Nomes de runtime, secrets e infraestrutura](../infrastructure/infra-runtime-naming.md).
+- [ ] quando o processo encerrar durante o startup, identificar qual validação fail-fast falhou: PostgreSQL, DynamoDB, SNS, SQS, autenticação ou configuração protegida.
 
 ### Contenção
 
 - [ ] se a falha começou após deploy, seguir o runbook [Rollback de deploy](#rollback-de-deploy);
 - [ ] se a causa for secret ou ConfigMap ausente, corrigir no `oficina-infra` e reaplicar apenas o recurso afetado;
 - [ ] se a causa for dependência indisponível, seguir o runbook de banco, mensageria ou pagamento aplicável;
+- [ ] não desabilitar a validação, a mensageria ou trocar para store em memória para contornar falha no ambiente `lab`;
 - [ ] não reiniciar todos os serviços se apenas um `Deployment` estiver degradado.
 
 ### Encerramento

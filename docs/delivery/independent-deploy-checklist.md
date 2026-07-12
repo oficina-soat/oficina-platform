@@ -36,6 +36,8 @@ Antes de manter `ENABLE_IMAGE_PUBLISH` e `ENABLE_K8S_DEPLOY` ativos por padrão 
 - [ ] os manifests executáveis estão materializados no `../oficina-infra/k8s/base/microservices/<servico>/` e referenciados pelo overlay `../oficina-infra/k8s/overlays/lab/`;
 - [ ] o overlay `lab` renderiza sem erro com `kubectl kustomize k8s/overlays/lab` no `oficina-infra`;
 - [ ] secrets, ConfigMaps, service accounts e políticas IAM necessárias ao serviço estão disponíveis no ambiente `lab`;
+- [ ] as policies permitem validar dependências sem tráfego sintético: `sns:GetTopicAttributes` nos tópicos produzidos, `sqs:GetQueueUrl` nas filas consumidas e, para Execution, `dynamodb:DescribeTable` nas tabelas próprias;
+- [ ] a configuração do runtime protegido habilita mensageria, fixa persistência PostgreSQL para OS/Billing e não contém endpoints locais;
 - [ ] a imagem atualmente publicada, a release `v<project.version>` e a versão em `pom.xml` estão coerentes com a regra de versionamento do workflow;
 - [ ] qualquer versão já existente como GitHub Release ou tag de imagem ECR pertence ao build anterior esperado; para novo build, release ou rollout, planejar uma nova versão SemVer fechada.
 
@@ -79,6 +81,7 @@ Após rollout bem-sucedido de um serviço:
 - [ ] confirmar `kubectl rollout status deployment/<servico> -n <namespace>`;
 - [ ] confirmar que a imagem do `Deployment` usa a tag e digest esperados;
 - [ ] confirmar readiness e liveness do pod pelo Kubernetes;
+- [ ] confirmar que startup e readiness concluíram com persistência e mensageria reais, sem fallback; em teste controlado, confirmar que configuração ou dependência obrigatória ausente impede o pod de ficar ready;
 - [ ] chamar uma rota de negócio simples do serviço pelo caminho esperado no ambiente;
 - [ ] não expor `/q/health`, `/q/metrics`, `/q/openapi`, `/q/swagger-ui` ou `/api/v1/status` como API pública permanente, conforme [Rotas públicas do API Gateway](../infrastructure/api-gateway-public-routes.md);
 - [ ] verificar logs estruturados com `service.name`, `deployment.environment` e `correlationId` quando houver chamada HTTP;

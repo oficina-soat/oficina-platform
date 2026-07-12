@@ -54,6 +54,33 @@ OTEL_LOGS_EXPORTER=none
 
 O exportador de traces Quarkus é configuração build-time e deve permanecer fixado como `quarkus.otel.traces.exporter=cdi` no `application.properties` dos microsserviços. Não trate `QUARKUS_OTEL_TRACES_EXPORTER` como variável operacional para alternar tracing em runtime; use `OFICINA_OBSERVABILITY_TRACING_ENABLED=false` em execuções locais controladas.
 
+### Runtime protegido e validação fail-fast
+
+Os três microsserviços tratam como runtime protegido qualquer inicialização com profile Quarkus `prod` ou `lab`, ou com `DEPLOYMENT_ENVIRONMENT=lab`. Nesses contextos, a aplicação deve validar configuração e dependências antes de aceitar tráfego. Ausência, inacessibilidade ou configuração local indevida deve interromper a inicialização; não é permitido degradar silenciosamente para store em memória nem iniciar com mensageria desabilitada.
+
+Matriz mínima de validação:
+
+| Escopo | Validação obrigatória no startup protegido |
+|---|---|
+| Todos os serviços | Nome canônico do serviço, `AWS_REGION`, issuer, audience canônica e localização da chave pública/JWKS não vazios. |
+| `oficina-os-service` | `OFICINA_PERSISTENCE_KIND=postgresql`, variáveis PostgreSQL obrigatórias e conexão válida com `oficina_os`. |
+| `oficina-billing-service` | `OFICINA_PERSISTENCE_KIND=postgresql`, variáveis PostgreSQL obrigatórias e conexão válida com `oficina_billing`; token Mercado Pago obrigatório apenas quando a integração estiver habilitada. |
+| `oficina-execution-service` | Prefixo e cinco tabelas DynamoDB canônicas acessíveis, sem `DYNAMODB_ENDPOINT_OVERRIDE`. |
+| Todos os serviços | Publisher, consumer e worker habilitados; sem `OFICINA_MESSAGING_ENDPOINT_OVERRIDE`; identidade AWS resolvível; tópicos SNS produzidos e filas SQS consumidas acessíveis. |
+
+Variáveis explícitas esperadas nos manifests do ambiente `lab`:
+
+```text
+OFICINA_MESSAGING_ENABLED=true
+
+# somente oficina-os-service e oficina-billing-service
+OFICINA_PERSISTENCE_KIND=postgresql
+```
+
+Credenciais AWS estáticas não são obrigatórias no pod. A validação deve aceitar a cadeia padrão do AWS SDK e a identidade IAM da ServiceAccount. Quando credenciais estáticas forem informadas, `AWS_ACCESS_KEY_ID` e `AWS_SECRET_ACCESS_KEY` formam o par obrigatório; `AWS_SESSION_TOKEN` é opcional para credencial básica e, quando presente, deve ser usado com o par para formar a credencial temporária. Para permitir a verificação sem eventos sintéticos, a policy produtora usa `sns:GetTopicAttributes` e `sns:Publish` apenas nos tópicos do serviço; a policy consumidora inclui `sqs:GetQueueUrl` apenas nas filas do serviço; e a policy DynamoDB do Execution inclui `dynamodb:DescribeTable` nas tabelas próprias.
+
+O modo em memória e endpoints locais permanecem permitidos somente em `test` ou em execução local deliberada com profile `dev` e `DEPLOYMENT_ENVIRONMENT=local`. O ambiente local integrado e seus comandos estão documentados em [Ambiente local integrado](../../../oficina-infra/docs/local-integration.md). Alterar apenas `DEPLOYMENT_ENVIRONMENT` não libera um processo executado com profile `prod`.
+
 ### Observabilidade New Relic
 
 O backend canônico para dashboards, alertas, logs, métricas e traces dos microsserviços é New Relic, conforme o [Padrão de Observabilidade Distribuída](../observability/observability.md).

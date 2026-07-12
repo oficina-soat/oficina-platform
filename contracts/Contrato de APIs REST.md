@@ -83,11 +83,72 @@ Todas as respostas de erro devem seguir o contrato padronizado em [Contrato de E
 
 ## Responsabilidades
 
+- Pessoas e usuários operacionais
 - Clientes
 - Veículos
 - Ordens de serviço
 - Estados da OS
 - Histórico da OS
+
+---
+
+## Usuários operacionais
+
+O `oficina-os-service` mantém o cadastro operacional agregado de Pessoa e Usuário. O usuário operacional é sempre uma pessoa física identificada por CPF, possui um ou mais papéis entre `administrativo`, `mecanico` e `recepcionista`, e usa um dos estados `ATIVO`, `INATIVO` ou `BLOQUEADO`.
+
+Todas as operações desta seção exigem JWT válido com o papel `administrativo`. Um token válido sem esse papel deve receber `403 Forbidden` com `code=ACCESS_DENIED`, conforme o [Contrato de Erros REST](error-model.md).
+
+O recurso não aceita nem devolve senha, hash ou qualquer outra credencial. Login, validação de senha e emissão de JWT continuam sob responsabilidade do `oficina-auth-lambda`, conforme a [ADR-003 - Serverless para Autenticação e Notificações](../adr/ADR-003%20-%20Serverless%20para%20Autenticação%20e%20Notificações.md). A sincronização do cadastro operacional com o store de autenticação permanece no item `[B2-AUTH-USERS-IMPL-001]` do [ROADMAP](../ROADMAP.md).
+
+### Criar usuário operacional
+
+```http
+POST /api/v1/usuarios
+X-Idempotency-Key: <chave>
+```
+
+```json
+{
+  "nome": "Ana Silva",
+  "documento": "84191404067",
+  "status": "ATIVO",
+  "papeis": ["mecanico"]
+}
+```
+
+O campo `status` é opcional na criação e assume `ATIVO`. `nome`, `documento` e ao menos um papel são obrigatórios. Se o CPF já identificar uma Pessoa sem Usuário, a operação reutiliza essa Pessoa e atualiza seu nome canônico; se já existir Usuário para o CPF, retorna `409 Conflict` com `code=DUPLICATE_RESOURCE`.
+
+### Consultar usuários operacionais
+
+```http
+GET /api/v1/usuarios?page=0&size=20
+```
+
+A resposta usa o envelope paginado canônico e inclui `usuarioId`, `pessoaId`, dados da Pessoa, status, papéis e timestamps.
+
+### Consultar usuário operacional
+
+```http
+GET /api/v1/usuarios/{usuarioId}
+```
+
+### Atualizar usuário operacional
+
+```http
+PUT /api/v1/usuarios/{usuarioId}
+```
+
+`PUT` substitui integralmente nome, CPF, status e papéis. O CPF não pode pertencer a outra Pessoa; esse caso retorna `409 Conflict` com `code=DUPLICATE_RESOURCE`.
+
+### Excluir usuário operacional
+
+```http
+DELETE /api/v1/usuarios/{usuarioId}
+```
+
+A exclusão é lógica e idempotente: altera o status para `INATIVO`, retorna `204 No Content` e preserva Pessoa e papéis para auditoria e eventual reativação por `PUT`. O CRUD operacional não publica eventos de usuário enquanto não houver contrato explícito para a sincronização com o `oficina-auth-lambda`.
+
+O contrato implementável completo, incluindo schemas, exemplos e códigos HTTP, está no [OpenAPI do oficina-os-service](openapi/oficina-os-service.yaml).
 
 ---
 

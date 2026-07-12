@@ -14,6 +14,8 @@ Neste contexto, "pública" significa roteável pela entrada pública da platafor
 
 Não foram identificadas, nas OpenAPI canônicas, rotas administrativas, callbacks internos, webhooks internos ou endpoints de banco/mensageria que devam ficar privados dentro do conjunto de APIs de negócio. A exposição pública deve ser limitada às rotas listadas neste documento.
 
+O CRUD de usuários operacionais é administrativo, mas continua roteável pela entrada pública: todas as operações em `/api/v1/usuarios` exigem JWT com o papel `administrativo` no `oficina-os-service`. Exposição no API Gateway não equivale a acesso anônimo nem substitui a autorização no microsserviço.
+
 ## Rotas públicas por serviço
 
 ### `oficina-os-service`
@@ -22,6 +24,11 @@ Fonte canônica: [OpenAPI do oficina-os-service](../../contracts/openapi/oficina
 
 | Método | Rota pública |
 |---|---|
+| `POST` | `/api/v1/usuarios` |
+| `GET` | `/api/v1/usuarios` |
+| `GET` | `/api/v1/usuarios/{usuarioId}` |
+| `PUT` | `/api/v1/usuarios/{usuarioId}` |
+| `DELETE` | `/api/v1/usuarios/{usuarioId}` |
 | `POST` | `/api/v1/clientes` |
 | `GET` | `/api/v1/clientes` |
 | `GET` | `/api/v1/clientes/{clienteId}` |

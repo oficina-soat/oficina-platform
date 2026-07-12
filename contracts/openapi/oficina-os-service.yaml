@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
   title: oficina-os-service API
-  version: 1.0.0
-  description: Contrato REST v1 para clientes, veiculos, ordens de servico, estados e historico da OS.
+  version: 1.1.0
+  description: Contrato REST v1 para usuários operacionais, clientes, veículos, ordens de serviço, estados e histórico da OS.
   license:
     name: Internal
     identifier: LicenseRef-Internal
@@ -11,6 +11,8 @@ servers:
 security:
   - bearerAuth: []
 tags:
+  - name: Usuarios
+    description: CRUD administrativo de pessoas e usuários operacionais. Todas as operações exigem o papel administrativo.
   - name: Clientes
     description: Operacoes de cadastro e consulta de clientes.
   - name: Veiculos
@@ -18,6 +20,149 @@ tags:
   - name: Ordens de Servico
     description: Operacoes de abertura, consulta, estado e historico de ordens de servico.
 paths:
+  /usuarios:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
+    post:
+      tags: [Usuarios]
+      summary: Criar usuário operacional
+      description: Cria o cadastro operacional de Pessoa e Usuário. Não recebe nem persiste credenciais de autenticação.
+      operationId: criarUsuario
+      x-required-roles: [administrativo]
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UsuarioCreateRequest"
+            examples:
+              mecanico:
+                value:
+                  nome: Ana Silva
+                  documento: "84191404067"
+                  status: ATIVO
+                  papeis: [mecanico]
+      responses:
+        "201":
+          description: Usuário operacional criado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Usuario"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    get:
+      tags: [Usuarios]
+      summary: Consultar usuários operacionais
+      operationId: consultarUsuarios
+      x-required-roles: [administrativo]
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Size"
+      responses:
+        "200":
+          description: Usuários operacionais encontrados.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageResponse"
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Usuario"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /usuarios/{usuarioId}:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
+    get:
+      tags: [Usuarios]
+      summary: Consultar usuário operacional
+      operationId: consultarUsuario
+      x-required-roles: [administrativo]
+      parameters:
+        - $ref: "#/components/parameters/UsuarioId"
+      responses:
+        "200":
+          description: Usuário operacional encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Usuario"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Usuarios]
+      summary: Atualizar usuário operacional
+      description: Substitui nome, CPF, status e papéis do cadastro operacional. Credenciais não pertencem a este recurso.
+      operationId: atualizarUsuario
+      x-required-roles: [administrativo]
+      parameters:
+        - $ref: "#/components/parameters/UsuarioId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UsuarioUpdateRequest"
+            examples:
+              bloqueio:
+                value:
+                  nome: Ana Silva
+                  documento: "84191404067"
+                  status: BLOQUEADO
+                  papeis: [mecanico]
+      responses:
+        "200":
+          description: Usuário operacional atualizado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Usuario"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    delete:
+      tags: [Usuarios]
+      summary: Inativar usuário operacional
+      description: Exclusão lógica e idempotente que altera o status para INATIVO, preservando Pessoa e papéis para auditoria.
+      operationId: inativarUsuario
+      x-required-roles: [administrativo]
+      parameters:
+        - $ref: "#/components/parameters/UsuarioId"
+      responses:
+        "204":
+          description: Usuário operacional inativado, inclusive quando já estava inativo.
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /clientes:
     parameters:
       - $ref: "#/components/parameters/CorrelationId"
@@ -415,6 +560,13 @@ components:
         type: string
         minLength: 1
         maxLength: 128
+    UsuarioId:
+      name: usuarioId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
     ClienteId:
       name: clienteId
       in: path
@@ -497,6 +649,17 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Token JWT válido sem o papel administrativo exigido pela operação.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+        traceparent:
+          $ref: "#/components/headers/Traceparent"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
     NotFound:
       description: Recurso nao encontrado.
       headers:
@@ -522,6 +685,86 @@ components:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
   schemas:
+    UsuarioCreateRequest:
+      type: object
+      required: [nome, documento, papeis]
+      properties:
+        nome:
+          type: string
+          minLength: 1
+          maxLength: 255
+        documento:
+          type: string
+          pattern: "^[0-9]{11}$"
+          description: CPF da pessoa física, sem formatação.
+        status:
+          allOf:
+            - $ref: "#/components/schemas/StatusUsuario"
+          default: ATIVO
+        papeis:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/PapelUsuario"
+    UsuarioUpdateRequest:
+      type: object
+      required: [nome, documento, status, papeis]
+      properties:
+        nome:
+          type: string
+          minLength: 1
+          maxLength: 255
+        documento:
+          type: string
+          pattern: "^[0-9]{11}$"
+          description: CPF da pessoa física, sem formatação.
+        status:
+          $ref: "#/components/schemas/StatusUsuario"
+        papeis:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/PapelUsuario"
+    Usuario:
+      type: object
+      required: [usuarioId, pessoaId, nome, documento, tipoPessoa, status, papeis, criadoEm, atualizadoEm]
+      properties:
+        usuarioId:
+          type: string
+          format: uuid
+        pessoaId:
+          type: string
+          format: uuid
+        nome:
+          type: string
+        documento:
+          type: string
+          pattern: "^[0-9]{11}$"
+        tipoPessoa:
+          type: string
+          enum: [FISICA]
+        status:
+          $ref: "#/components/schemas/StatusUsuario"
+        papeis:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/PapelUsuario"
+        criadoEm:
+          type: string
+          format: date-time
+        atualizadoEm:
+          type: string
+          format: date-time
+    StatusUsuario:
+      type: string
+      enum: [ATIVO, INATIVO, BLOQUEADO]
+    PapelUsuario:
+      type: string
+      enum: [administrativo, mecanico, recepcionista]
     ClienteCreateRequest:
       type: object
       required: [nome, documento]

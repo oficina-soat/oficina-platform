@@ -32,6 +32,7 @@ Na decomposição da Fase 4:
 - Cada orçamento deve possuir no máximo um pagamento na Fase 4, usando restrição única em `pagamento.orcamento_id`.
 - Criar Outbox em cada database PostgreSQL para publicação confiável dos eventos de domínio.
 - A Outbox PostgreSQL deve usar apenas os estados `PENDING`, `PUBLISHED` e `FAILED`, sem estado intermediário `PROCESSING`; concorrência deve ser controlada pelo publicador com lock transacional.
+- Não persistir senha ou hash no `oficina-os-service`; credenciais pertencem ao `oficina-auth-lambda`. A coluna histórica `usuario.password_hash` deve ser removida por migration incremental.
 
 ## oficina-os-service
 
@@ -65,6 +66,12 @@ Tabelas que não devem ir para o PostgreSQL do OS Service:
 - `estoque_saldo`
 - `estoque_movimento`
 - `dominio_tipo_movimento_estoque`
+
+### Cadastro operacional de usuários
+
+`pessoa`, `usuario`, `papel` e `usuario_papel` sustentam o CRUD agregado definido no [Contrato de APIs REST](../../contracts/Contrato%20de%20APIs%20REST.md). Usuários operacionais são pessoas físicas identificadas por CPF, podem acumular os papéis `administrativo`, `mecanico` e `recepcionista`, e usam os estados `ATIVO`, `INATIVO` ou `BLOQUEADO`.
+
+O database `oficina_os` não é store de autenticação. A migration incremental `V5__remove_usuario_password_hash.sql` remove `usuario.password_hash`; login, senha e JWT continuam no `oficina-auth-lambda`. A exclusão REST é lógica e mantém Pessoa, Usuário e papéis persistidos com status `INATIVO`.
 
 ### Ajuste principal em itens da OS
 

@@ -79,6 +79,8 @@ OFICINA_PERSISTENCE_KIND=postgresql
 
 Credenciais AWS estáticas não são obrigatórias no pod. A validação deve aceitar a cadeia padrão do AWS SDK e a identidade IAM da ServiceAccount. Quando credenciais estáticas forem informadas, `AWS_ACCESS_KEY_ID` e `AWS_SECRET_ACCESS_KEY` formam o par obrigatório; `AWS_SESSION_TOKEN` é opcional para credencial básica e, quando presente, deve ser usado com o par para formar a credencial temporária. Para permitir a verificação sem eventos sintéticos, a policy produtora usa `sns:GetTopicAttributes` e `sns:Publish` apenas nos tópicos do serviço; a policy consumidora inclui `sqs:GetQueueUrl` apenas nas filas do serviço; e a policy DynamoDB do Execution inclui `dynamodb:DescribeTable` nas tabelas próprias.
 
+No VocLabs, managed policies criadas pelo Terraform usam nome content-addressed com os 12 primeiros caracteres do SHA-256 da descrição e do documento IAM. Os padrões físicos são `oficina-lab-domain-messaging-<servico>-producer-<hash-12>`, `oficina-lab-domain-messaging-<servico>-consumer-<hash-12>` e `oficina-execution-lab-runtime-dynamodb-<hash-12>`. Essa estratégia substitui a policy quando o conteúdo muda, pois a role de laboratório pode negar `iam:CreatePolicyVersion`. ARNs com hash não devem ser fixados em código; anexações futuras devem ser gerenciadas pelo Terraform a partir dos outputs do `oficina-infra`, conforme [DynamoDB e mensageria da Fase 4](../../../oficina-infra/docs/dynamodb-messaging.md).
+
 O modo em memória e endpoints locais permanecem permitidos somente em `test` ou em execução local deliberada com profile `dev` e `DEPLOYMENT_ENVIRONMENT=local`. O ambiente local integrado e seus comandos estão documentados em [Ambiente local integrado](../../../oficina-infra/docs/local-integration.md). Alterar apenas `DEPLOYMENT_ENVIRONMENT` não libera um processo executado com profile `prod`.
 
 ### Observabilidade New Relic
@@ -409,7 +411,7 @@ Nomes canônicos:
 
 ```text
 IAM role: oficina-execution-service-lab
-IAM policy: oficina-execution-service-lab-dynamodb
+IAM policy: oficina-execution-lab-runtime-dynamodb-<hash-12>
 ```
 
 O sufixo `lab` deve ser usado em recursos AWS globais ou regionais do ambiente de laboratório.

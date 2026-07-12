@@ -37,6 +37,7 @@ Antes de manter `ENABLE_IMAGE_PUBLISH` e `ENABLE_K8S_DEPLOY` ativos por padrão 
 - [ ] o overlay `lab` renderiza sem erro com `kubectl kustomize k8s/overlays/lab` no `oficina-infra`;
 - [ ] secrets, ConfigMaps, service accounts e políticas IAM necessárias ao serviço estão disponíveis no ambiente `lab`;
 - [ ] as policies permitem validar dependências sem tráfego sintético: `sns:GetTopicAttributes` nos tópicos produzidos, `sqs:GetQueueUrl` nas filas consumidas e, para Execution, `dynamodb:DescribeTable` nas tabelas próprias;
+- [ ] anexações IAM usam os outputs Terraform atuais e não fixam ARNs de managed policies content-addressed;
 - [ ] a configuração do runtime protegido habilita mensageria, fixa persistência PostgreSQL para OS/Billing e não contém endpoints locais;
 - [ ] a imagem atualmente publicada, a release `v<project.version>` e a versão em `pom.xml` estão coerentes com a regra de versionamento do workflow;
 - [ ] qualquer versão já existente como GitHub Release ou tag de imagem ECR pertence ao build anterior esperado; para novo build, release ou rollout, planejar uma nova versão SemVer fechada.

@@ -87,15 +87,65 @@ A cobrança foi repetida com os seguintes identificadores:
 | `traceId` no pod | `8eb8e4a508a9d17f0ea652c953df5082` |
 | `requestId` no pod | `bf7c4746-990d-4740-aeb3-190c822867f7` |
 
-Uma chamada diagnóstica direta ao mesmo endpoint do provedor, com resposta sanitizada, revelou o erro `2034` (`Invalid users involved`). A consulta autenticada a `/users/me` confirmou que o token implantado representa a conta produtiva do vendedor. Como o payload usa `test_user_br@testuser.com`, a chamada mistura um vendedor produtivo com um comprador de teste, combinação recusada pelo Mercado Pago.
+Uma chamada diagnóstica direta ao mesmo endpoint do provedor, com resposta sanitizada, revelou o erro `2034` (`Invalid users involved`). A inspeção segura do Secret implantado confirmou posteriormente que a credencial pertence à classe `TEST`; portanto, a hipótese inicial de credencial produtiva estava incorreta.
 
-O avanço de HTTP `401` para HTTP `400` comprova que a nova credencial é reconhecida, mas não é a credencial sandbox necessária para esta evidência. Para o fluxo de teste, deve ser usado o **Access Token de teste** exibido em Dados da integração > Testes > Credenciais de teste da nova aplicação. A [documentação oficial de contas de teste](https://www.mercadopago.com.br/developers/pt/docs/checkout-api-orders/resources/test-accounts) exige que vendedor e comprador sejam contas de teste do mesmo país.
+A causa era o e-mail `test_user_br@testuser.com`. Esse valor pertence ao roteiro de teste do Checkout Transparente via `/v1/orders`, enquanto o Billing usa a API legada `/v1/payments`, documentada no fluxo do Checkout Bricks. A [documentação oficial de teste do Checkout Bricks](https://www.mercadopago.com.br/developers/pt/docs/checkout-bricks/integration-test/test-payment-flow) orienta explicitamente a não usar e-mail de usuário de teste e a informar um e-mail comum diferente do e-mail da conta Mercado Pago. Uma chamada direta com `cliente.local@oficina.com` retornou HTTP `201`, transação `1348556009`, status `pending` e `external_reference=e0b09832-eab6-4ee4-a57a-29bb29585f6c`.
+
+### Cobrança PIX concluída pelo fluxo real
+
+A variável `OFICINA_MERCADO_PAGO_PAYER_EMAIL` foi corrigida para `cliente.local@oficina.com`, e o [run 29286908886](https://github.com/oficina-soat/oficina-infra/actions/runs/29286908886) reaplicou a configuração e concluiu o rollout do Billing. Como os orçamentos aprovados do seed já possuíam pagamento, o orçamento `91000000-0000-4000-8000-000000000001` foi aprovado pela API pública antes da cobrança, sem alteração direta no banco.
+
+Request funcional:
+
+```http
+POST /api/v1/pagamentos
+X-Correlation-Id: b2-mp-evid-001-20260713T214100Z
+Idempotency-Key: ecdf4cc0-7a17-4c6c-88f0-610481a47da5
+Content-Type: application/json
+
+{
+  "ordemServicoId": "5b2276e8-fa72-4f4c-a3b0-2c5b1bf427ef",
+  "orcamentoId": "91000000-0000-4000-8000-000000000001",
+  "valor": 220.00,
+  "metodo": "PIX"
+}
+```
+
+Resposta HTTP `201`:
+
+```json
+{
+  "pagamentoId": "1d43fc0b-8802-4b20-bc7f-483c722e3468",
+  "ordemServicoId": "5b2276e8-fa72-4f4c-a3b0-2c5b1bf427ef",
+  "orcamentoId": "91000000-0000-4000-8000-000000000001",
+  "valor": 220.00,
+  "metodo": "PIX",
+  "status": "CRIADO",
+  "provedor": "mercado-pago",
+  "transacaoExternaId": "1327656764"
+}
+```
+
+O `GET /api/v1/pagamentos/1d43fc0b-8802-4b20-bc7f-483c722e3468` retornou HTTP `200` com os mesmos dados, comprovando a persistência local. O `GET /v1/payments/1327656764` na API do Mercado Pago também retornou HTTP `200`, `status=pending`, `status_detail=pending_waiting_transfer`, `payment_method_id=pix` e `external_reference=1d43fc0b-8802-4b20-bc7f-483c722e3468`.
+
+O pod registrou a requisição HTTP `201` e o evento Outbox `pagamentoSolicitado` com:
+
+| Campo | Valor |
+|---|---|
+| `eventId` | `99b5557e-1271-4257-9c98-532778b59455` |
+| `aggregateId` | `1d43fc0b-8802-4b20-bc7f-483c722e3468` |
+| `correlationId` | `b2-mp-evid-001-20260713T214100Z` |
+| `traceId` | `a8806fb6555e7695f3e7772223e4149b` |
+| `spanId` | `ec1ab93b801be5b1` |
+| Tópico | `oficina.billing.pagamento-solicitado` |
 
 ## Pendência
 
-`[B2-MP-EVID-001]` permanece aberto. Para concluí-lo:
+`[B2-MP-EVID-001]` permanece aberto somente pela comprovação no New Relic. A cobrança, a persistência local, a consulta na API sandbox, o `external_reference`, os logs, o trace e o evento Outbox já foram confirmados. A tentativa de consultar o evento por NerdGraph com a licença do collector retornou HTTP `401`, comportamento esperado porque essa chave autoriza ingestão, não consultas. Para concluir, executar com uma New Relic User API Key:
 
-1. substituir `OFICINA_MERCADO_PAGO_ACCESS_TOKEN` pelo Access Token de teste da nova aplicação, garantindo que `/users/me` não represente a conta produtiva;
-2. reaplicar o workflow `Deploy Lab` para atualizar o Secret Kubernetes e o checksum do Deployment;
-3. repetir a cobrança com nova chave de idempotência e novo `correlationId`;
-4. registrar a resposta com `provedor=mercado-pago`, `pagamentoId`, `transacaoExternaId`, `external_reference`, consulta na API ou painel sandbox e sinais correspondentes no New Relic.
+```nrql
+FROM Log SELECT count(*)
+WHERE correlationId = 'b2-mp-evid-001-20260713T214100Z'
+  AND domainEventType = 'pagamentoSolicitado'
+SINCE 30 minutes ago
+```

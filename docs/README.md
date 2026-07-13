@@ -37,6 +37,7 @@ Este diretório concentra a documentação normativa da plataforma em grupos tem
 - [Enunciado Fase 4](delivery/Enunciado%20Fase%204.md)
 - [Padrão BDD, Cobertura e Qualidade](delivery/bdd-testing.md)
 - [Proteção da branch main dos microsserviços](delivery/github-branch-protection.md)
+- [Evidência de Proteção da Branch main](delivery/github-branch-protection-evidence.md)
 - [Checklist de Deploy Independente](delivery/independent-deploy-checklist.md)
 - [Checklist Final de Entrega da Fase 4](delivery/phase-4-delivery-checklist.md)
 - [Roteiro do Vídeo de Demonstração da Fase 4](delivery/video-demonstration-script.md)

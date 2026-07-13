@@ -4,7 +4,7 @@
 
 Este documento registra as validações remotas de `[B2-MP-REM-001]` e as tentativas de `[B2-MP-EVID-001]` no ambiente `lab`, conforme os [nomes de runtime, secrets e infraestrutura](../infrastructure/infra-runtime-naming.md) e o [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md).
 
-Nenhum access token, JWT, segredo AWS ou conteúdo de Secret Kubernetes foi consultado ou registrado.
+Nenhum access token, JWT, segredo AWS ou conteúdo de Secret Kubernetes foi exibido ou registrado. As consultas automatizadas usaram as credenciais apenas em memória e registraram somente metadados e respostas sanitizadas.
 
 ## Habilitação do Runtime
 
@@ -71,11 +71,31 @@ A cobrança foi repetida com identificadores inéditos:
 
 Essa revalidação confirma que a credencial consumida pelo workflow continuou sendo rejeitada pelo provedor. O token deve ser atualizado no escopo que disponibiliza `OFICINA_MERCADO_PAGO_ACCESS_TOKEN` ao repositório `oficina-soat/oficina-infra`; atualizar um secret homônimo apenas no repositório do Billing não altera o workflow central de infraestrutura.
 
+### Revalidação com a nova aplicação
+
+Após a criação de uma aplicação configurada para Checkout Transparente e API de Pagamentos, o [run 29286065300](https://github.com/oficina-soat/oficina-infra/actions/runs/29286065300) concluiu com sucesso. O deploy registrou `secret/oficina-billing-service-mercado-pago-env configured` e atualizou o checksum do `oficina-billing-service`, confirmando que o pod recebeu a nova configuração sem expor a credencial.
+
+A cobrança foi repetida com os seguintes identificadores:
+
+| Campo | Valor |
+|---|---|
+| `correlationId` | `b2-mp-evid-001-20260713T212500Z` |
+| `Idempotency-Key` | `c815e422-667d-49af-8fe0-1c855b9a188a` |
+| Status HTTP local | `502` |
+| Código local | `DEPENDENCY_FAILURE` |
+| Resposta do Mercado Pago | HTTP `400` |
+| `traceId` no pod | `8eb8e4a508a9d17f0ea652c953df5082` |
+| `requestId` no pod | `bf7c4746-990d-4740-aeb3-190c822867f7` |
+
+Uma chamada diagnóstica direta ao mesmo endpoint do provedor, com resposta sanitizada, revelou o erro `2034` (`Invalid users involved`). A consulta autenticada a `/users/me` confirmou que o token implantado representa a conta produtiva do vendedor. Como o payload usa `test_user_br@testuser.com`, a chamada mistura um vendedor produtivo com um comprador de teste, combinação recusada pelo Mercado Pago.
+
+O avanço de HTTP `401` para HTTP `400` comprova que a nova credencial é reconhecida, mas não é a credencial sandbox necessária para esta evidência. Para o fluxo de teste, deve ser usado o **Access Token de teste** exibido em Dados da integração > Testes > Credenciais de teste da nova aplicação. A [documentação oficial de contas de teste](https://www.mercadopago.com.br/developers/pt/docs/checkout-api-orders/resources/test-accounts) exige que vendedor e comprador sejam contas de teste do mesmo país.
+
 ## Pendência
 
 `[B2-MP-EVID-001]` permanece aberto. Para concluí-lo:
 
-1. substituir `OFICINA_MERCADO_PAGO_ACCESS_TOKEN` por um access token sandbox válido e liberado para a API de pagamentos;
+1. substituir `OFICINA_MERCADO_PAGO_ACCESS_TOKEN` pelo Access Token de teste da nova aplicação, garantindo que `/users/me` não represente a conta produtiva;
 2. reaplicar o workflow `Deploy Lab` para atualizar o Secret Kubernetes e o checksum do Deployment;
 3. repetir a cobrança com nova chave de idempotência e novo `correlationId`;
 4. registrar a resposta com `provedor=mercado-pago`, `pagamentoId`, `transacaoExternaId`, `external_reference`, consulta na API ou painel sandbox e sinais correspondentes no New Relic.

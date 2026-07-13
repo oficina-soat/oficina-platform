@@ -2,7 +2,7 @@
 
 ## Escopo
 
-Este documento registra as validações remotas de `[B2-MP-REM-001]` e as tentativas de `[B2-MP-EVID-001]` no ambiente `lab`, conforme os [nomes de runtime, secrets e infraestrutura](../infrastructure/infra-runtime-naming.md) e o [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md).
+Este documento registra as validações remotas de `[B2-MP-REM-001]` e a conclusão de `[B2-MP-EVID-001]` no ambiente `lab`, conforme os [nomes de runtime, secrets e infraestrutura](../infrastructure/infra-runtime-naming.md) e o [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md).
 
 Nenhum access token, JWT, segredo AWS ou conteúdo de Secret Kubernetes foi exibido ou registrado. As consultas automatizadas usaram as credenciais apenas em memória e registraram somente metadados e respostas sanitizadas.
 
@@ -139,13 +139,24 @@ O pod registrou a requisição HTTP `201` e o evento Outbox `pagamentoSolicitado
 | `spanId` | `ec1ab93b801be5b1` |
 | Tópico | `oficina.billing.pagamento-solicitado` |
 
-## Pendência
+## Confirmação no New Relic
 
-`[B2-MP-EVID-001]` permanece aberto somente pela comprovação no New Relic. A cobrança, a persistência local, a consulta na API sandbox, o `external_reference`, os logs, o trace e o evento Outbox já foram confirmados. A tentativa de consultar o evento por NerdGraph com a licença do collector retornou HTTP `401`, comportamento esperado porque essa chave autoriza ingestão, não consultas. Para concluir, executar com uma New Relic User API Key:
+A licença do collector retornou HTTP `401` no NerdGraph, comportamento esperado porque essa chave autoriza ingestão, não consultas. A consulta foi então repetida com uma New Relic User API Key:
 
 ```nrql
 FROM Log SELECT count(*)
 WHERE correlationId = 'b2-mp-evid-001-20260713T214100Z'
   AND domainEventType = 'pagamentoSolicitado'
-SINCE 30 minutes ago
+SINCE 2 hours ago
 ```
+
+O NerdGraph retornou HTTP `200`, sem erros, e exatamente um evento. Os atributos recuperados coincidem com os registros do pod:
+
+| Campo | Resultado New Relic |
+|---|---|
+| `eventCount` | `1` |
+| `eventId` | `99b5557e-1271-4257-9c98-532778b59455` |
+| `aggregateId` | `1d43fc0b-8802-4b20-bc7f-483c722e3468` |
+| `traceId` | `a8806fb6555e7695f3e7772223e4149b` |
+
+Com essa confirmação, `[B2-MP-EVID-001]` está concluído: a cobrança PIX sandbox percorreu o endpoint público e o Billing real, foi persistida, foi confirmada na API do Mercado Pago com `external_reference` associado ao `pagamentoId` e produziu logs, trace e evento financeiro correlacionados no New Relic.

@@ -59,7 +59,7 @@ Cada repositório de microsserviço deve possuir:
 | Comunicação REST | Rotas aderentes ao [Contrato de APIs REST](../../contracts/Contrato%20de%20APIs%20REST.md), às OpenAPI dos três serviços e às [Rotas públicas do API Gateway](../infrastructure/api-gateway-public-routes.md). | A preencher |
 | Mensageria assíncrona | Eventos e tópicos aderentes ao [Contrato de Eventos de Domínio](../../contracts/Contrato%20de%20Eventos%20de%20Domínio.md) e ao [Contrato de Tópicos de Mensageria](../../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md). | A preencher |
 | Saga Pattern | Orquestração pelo `oficina-os-service`, com caminho feliz e falha compensada. | A preencher |
-| Mercado Pago | Integração financeira documentada e evidência de cobrança PIX sandbox executada pelo `oficina-billing-service`, com `pagamentoId`, `transacaoExternaId`, referência externa do Mercado Pago, logs/traces por `correlationId` e evento financeiro correspondente. | [Habilitação concluída; cobrança pendente por credencial rejeitada](mercado-pago-sandbox-evidence.md) |
+| Mercado Pago | Integração financeira documentada e evidência de cobrança PIX sandbox executada pelo `oficina-billing-service`, com `pagamentoId`, `transacaoExternaId`, referência externa do Mercado Pago, logs/traces por `correlationId` e evento financeiro correspondente. | [Cobrança PIX sandbox e correlação no New Relic concluídas](mercado-pago-sandbox-evidence.md) |
 | Observabilidade | Logs estruturados, métricas, traces e dashboards mínimos conforme [Padrão de Observabilidade Distribuída](../observability/observability.md). | A preencher |
 | Diagrama geral | Arquitetura final alinhada ao [Diagrama Geral da Arquitetura Final](../architecture/architecture-diagram.md). | [Diagrama Geral da Arquitetura Final](../architecture/architecture-diagram.md) |
 
@@ -76,7 +76,7 @@ O vídeo de até 15 minutos deve demonstrar:
 - [ ] Quality Gate externo aprovado quando SonarCloud estiver configurado, ou pendência/evidência alternativa registrada;
 - [ ] deploy automatizado de pelo menos um microsserviço em Kubernetes;
 - [ ] rastreamento distribuído com `correlationId` em logs e traces;
-- [ ] cobrança PIX sandbox no Mercado Pago pelo fluxo real `POST /api/v1/pagamentos`, sem simulação manual de confirmação;
+- [x] cobrança PIX sandbox no Mercado Pago pelo fluxo real `POST /api/v1/pagamentos`, sem simulação manual de confirmação;
 - [ ] painel ou consulta New Relic com métricas de consumo Mercado Pago do `oficina-billing-service`;
 - [ ] consulta de Swagger/OpenAPI ou collection Postman atualizada.
 

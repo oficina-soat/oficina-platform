@@ -16,7 +16,9 @@ Para instalar de uma só vez todo o ferramental deste guia, incluindo Terraform 
 scripts/setup/install-validation-tools.sh
 ```
 
-O script suporta Linux x86_64 e ARM64, instala dependências do sistema com `apt-get` e mantém os demais binários em `~/.local/bin`. Execute-o como usuário normal; ele solicitará `sudo` apenas para os pacotes do sistema. Ao final, a autenticação do GitHub CLI continua sendo uma ação explícita com `gh auth login`.
+O script suporta Linux x86_64 e ARM64, instala OpenJDK 25, Docker Engine e dependências do sistema com `apt-get`, e mantém os demais binários em `~/.local/bin`. Execute-o como usuário normal; ele solicitará `sudo` para os pacotes do sistema, para iniciar o daemon Docker quando systemd estiver ativo e para adicionar o usuário ao grupo `docker`. Ao final, a autenticação do GitHub CLI continua sendo uma ação explícita com `gh auth login`.
+
+Após a primeira instalação do Docker, abra uma nova sessão para que a associação ao grupo `docker` seja aplicada. Esse grupo permite controlar o daemon e concede privilégios equivalentes a root; restrinja a associação aos usuários que realmente executam builds e testes com containers.
 
 Para instalação manual, use os comandos a seguir.
 
@@ -27,7 +29,17 @@ grep -qxF 'export PATH="$HOME/.local/bin:$PATH"' ~/.bashrc 2>/dev/null || echo '
 grep -qxF 'export PATH="$HOME/.local/bin:$PATH"' ~/.profile 2>/dev/null || echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.profile
 
 sudo apt-get update
-sudo apt-get install -y curl unzip tar jq shellcheck shfmt
+sudo apt-get install -y curl docker.io jq openjdk-25-jdk shellcheck shfmt tar unzip
+sudo systemctl enable --now docker
+sudo usermod -aG docker "$USER"
+```
+
+Abra uma nova sessão e confirme os runtimes:
+
+```bash
+java -version
+javac -version
+docker version
 ```
 
 Instale `yq` v4, compatível com os comandos `yq e` usados nos workflows:
@@ -102,6 +114,7 @@ Se `gh` não estiver disponível no `apt` da distribuição, use as instruções
 | Scripts shell | `find scripts -type f -name '*.sh' -print0 | xargs -0 bash -n`, `shellcheck` e `shfmt -d` |
 | Terraform | `terraform fmt -check -recursive`, `terraform validate` e `tflint` |
 | Dockerfile | `hadolint Dockerfile` |
+| Testes Java com containers | OpenJDK 25, `docker info` e `./mvnw -B clean verify ...` |
 | Kubernetes YAML ou Kustomize | `yq`, `kubectl kustomize` e `kubeconform -strict -summary` |
 | Microsserviço Java publicável | `./mvnw -B clean verify ...`, presença de `target/jacoco-report/jacoco.xml` e SonarCloud local quando `SONAR_TOKEN` existir |
 | CI/CD remoto | `gh run view`, `gh run view --log` e `gh pr checks` |

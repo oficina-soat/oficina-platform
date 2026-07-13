@@ -3,9 +3,11 @@
 set -Eeuo pipefail
 
 readonly BIN_DIR="${BIN_DIR:-$HOME/.local/bin}"
+# shellcheck disable=SC2016 # A linha deve ser persistida com as variáveis literais.
 readonly PATH_EXPORT='export PATH="$HOME/.local/bin:$PATH"'
 
 tmp_dir=""
+docker_group_changed="false"
 
 log() {
   printf '\n==> %s\n' "$*"
@@ -55,11 +57,36 @@ install_system_packages() {
   "${privilege[@]}" apt-get install -y \
     ca-certificates \
     curl \
+    docker.io \
     jq \
+    openjdk-25-jdk \
     shellcheck \
     shfmt \
     tar \
     unzip
+}
+
+configure_docker() {
+  local target_user="${SUDO_USER:-${USER:-$(id -un)}}"
+  local -a privilege=()
+
+  if ((EUID != 0)); then
+    privilege=(sudo)
+  fi
+
+  log "Configurando Docker"
+  if command -v systemctl >/dev/null 2>&1 && [[ -d /run/systemd/system ]]; then
+    "${privilege[@]}" systemctl enable --now docker
+  else
+    printf 'Aviso: systemd não está ativo; inicie o daemon Docker conforme o gerenciador de serviços do ambiente.\n'
+  fi
+
+  getent group docker >/dev/null 2>&1 ||
+    fail "o pacote docker.io não criou o grupo docker esperado"
+  if ! id -nG "$target_user" | tr ' ' '\n' | grep -qx docker; then
+    "${privilege[@]}" usermod -aG docker "$target_user"
+    docker_group_changed="true"
+  fi
 }
 
 download() {
@@ -194,10 +221,16 @@ show_versions() {
   terraform version | sed -n '1p'
   kubectl version --client=true
   gh --version | sed -n '1p'
+  java -version 2>&1 | sed -n '1p'
+  javac -version
+  docker --version
 
   printf '\nInstalação concluída em %s.\n' "$BIN_DIR"
   printf 'Abra um novo shell ou execute: %s\n' "$PATH_EXPORT"
   printf 'Para autenticar o GitHub CLI, execute: gh auth login\n'
+  if [[ "$docker_group_changed" == "true" ]]; then
+    printf 'Abra uma nova sessão para usar Docker sem sudo; o grupo docker concede privilégios equivalentes a root.\n'
+  fi
 }
 
 main() {
@@ -207,22 +240,23 @@ main() {
   fi
 
   case "$(uname -m)" in
-    x86_64 | amd64)
-      readonly release_arch="amd64"
-      readonly hadolint_arch="x86_64"
-      ;;
-    aarch64 | arm64)
-      readonly release_arch="arm64"
-      readonly hadolint_arch="arm64"
-      ;;
-    *)
-      fail "arquitetura não suportada: $(uname -m)"
-      ;;
+  x86_64 | amd64)
+    readonly release_arch="amd64"
+    readonly hadolint_arch="x86_64"
+    ;;
+  aarch64 | arm64)
+    readonly release_arch="arm64"
+    readonly hadolint_arch="arm64"
+    ;;
+  *)
+    fail "arquitetura não suportada: $(uname -m)"
+    ;;
   esac
 
   tmp_dir="$(mktemp -d)"
   configure_path
   install_system_packages
+  configure_docker
   install_yq
   install_actionlint
   install_tflint

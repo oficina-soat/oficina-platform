@@ -208,11 +208,32 @@ Métricas de eventos mínimas:
 | `messaging.events.processing.duration` | Histogram | `service`, `eventType`, `topic` |
 | `messaging.dlq.count` | Counter | `service`, `eventType`, `topic` |
 
+Quando o transporte for SQS, `messaging.events.consumed.count`, `messaging.events.failed.count`, `messaging.events.processing.duration` e `messaging.dlq.count` também devem informar a dimensão categórica `queue`. A métrica `messaging.sqs.received.count`, com dimensões `service`, `queue` e `topic`, deve registrar cada mensagem entregue ao consumidor. Como o redrive é executado pelo SQS, `messaging.dlq.count` deve ser incrementada na falha de processamento cujo `ApproximateReceiveCount` atinge o `maxReceiveCount` configurado, imediatamente antes do encaminhamento automático para a DLQ.
+
+Métricas de persistência mínimas:
+
+| Métrica | Tipo | Dimensões |
+|---|---|---|
+| `persistence.operations.count` | Counter | `service`, `database`, `resource`, `operation`, `result`, `error` |
+| `persistence.operation.duration` | Histogram | `service`, `database`, `resource`, `operation`, `result`, `error` |
+
+`database` deve usar valores categóricos como `postgresql`, `dynamodb` ou `memory`. `resource` deve identificar apenas o agregado, tabela lógica ou grupo transacional, sem incluir nome físico com sufixo de ambiente. `result` deve ficar restrito a `success` ou `failure`, e `error` deve usar categorias estáveis como `none`, `conflict`, `not_found`, `timeout`, `unavailable` ou `other`.
+
+Métricas de idempotência mínimas:
+
+| Métrica | Tipo | Dimensões |
+|---|---|---|
+| `idempotency.retries.count` | Counter | `service`, `operation`, `status` |
+| `idempotency.conflicts.count` | Counter | `service`, `operation`, `reason` |
+
+`operation` deve representar apenas o verbo ou a operação categórica, sem URI concreta, subject ou chave. `status` deve distinguir replay de resposta e nova tentativa após falha recuperável. `reason` deve diferenciar ao menos chave em processamento e reutilização com payload divergente.
+
 Métricas de Outbox devem seguir o [Padrão Outbox por Serviço](../architecture/outbox-pattern.md):
 
 | Métrica | Tipo | Dimensões |
 |---|---|---|
 | `outbox.pending.count` | Gauge | `service`, `eventType` |
+| `outbox.publish.attempts.count` | Counter | `service`, `eventType`, `topic` |
 | `outbox.published.count` | Counter | `service`, `eventType`, `topic` |
 | `outbox.failed.count` | Counter | `service`, `eventType`, `topic` |
 | `outbox.publish.latency` | Histogram | `service`, `eventType`, `topic` |

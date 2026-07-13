@@ -10,6 +10,16 @@ As ferramentas abaixo são recomendadas, mas não devem bloquear trabalho em amb
 
 Os comandos abaixo assumem Linux x86_64, como Debian ou Ubuntu, com binários de usuário em `~/.local/bin`.
 
+Para instalar de uma só vez todo o ferramental deste guia, incluindo Terraform e `kubectl`, execute o [instalador de ferramentas de validação](../../scripts/setup/install-validation-tools.sh):
+
+```bash
+scripts/setup/install-validation-tools.sh
+```
+
+O script suporta Linux x86_64 e ARM64, instala dependências do sistema com `apt-get` e mantém os demais binários em `~/.local/bin`. Execute-o como usuário normal; ele solicitará `sudo` apenas para os pacotes do sistema. Ao final, a autenticação do GitHub CLI continua sendo uma ação explícita com `gh auth login`.
+
+Para instalação manual, use os comandos a seguir.
+
 ```bash
 mkdir -p ~/.local/bin
 export PATH="$HOME/.local/bin:$PATH"

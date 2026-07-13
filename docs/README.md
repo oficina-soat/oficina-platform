@@ -39,4 +39,5 @@ Este diretório concentra a documentação normativa da plataforma em grupos tem
 - [Proteção da branch main dos microsserviços](delivery/github-branch-protection.md)
 - [Checklist de Deploy Independente](delivery/independent-deploy-checklist.md)
 - [Checklist Final de Entrega da Fase 4](delivery/phase-4-delivery-checklist.md)
+- [Roteiro do Vídeo de Demonstração da Fase 4](delivery/video-demonstration-script.md)
 - [Ferramentas de validação local](delivery/validation-tooling.md)

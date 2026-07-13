@@ -558,7 +558,7 @@ Convenção de identificadores para itens abertos:
 - [x] `[D-OPS-IMPL-001]` Criar runbooks mínimos.
 - [x] Criar checklist final de entrega da Fase 4, cobrindo repositórios, cobertura, Swagger/OpenAPI, vídeo, PDF, diagrama geral, estratégia de Saga, justificativa de microsserviços e tecnologias.
 - [x] `[D-DIAG-IMPL-001]` Criar diagrama geral da arquitetura final com microsserviços, bancos, mensageria, Kubernetes, observabilidade e integração Mercado Pago.
-- [ ] `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração de até 15 minutos, incluindo fluxo completo da OS, Saga com falha/compensação, deploy automatizado e rastreamento distribuído.
+- [x] `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração de até 15 minutos, incluindo fluxo completo da OS, Saga com falha/compensação, deploy automatizado e rastreamento distribuído. Concluído localmente em 2026-07-13 com o [Roteiro do Vídeo de Demonstração da Fase 4](docs/delivery/video-demonstration-script.md), que reserva `14min30s` para arquitetura, CI/CD, rollout Kubernetes, caminho feliz, compensação por falha de estoque, correlação no New Relic, Mercado Pago sandbox, testes, cobertura, Quality Gate e OpenAPI, além de registrar pré-condições, segurança da gravação, contingências e critérios de aceite. A gravação, publicação e vinculação das evidências permanecem nos itens remotos `[D-VIDEO-EVID-001]` e `[D-DELIVERY-EVID-001]`.
 
 ---
 
@@ -641,8 +641,6 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 O próximo passo para agentes deve priorizar itens `IMPL` abertos no [Backlog orientado a agentes](#backlog-orientado-a-agentes). Itens `REM` e `EVID` ficam apartados em [Validações remotas e evidências externas](#validações-remotas-e-evidências-externas) e só devem ser tratados quando o usuário pedir explicitamente validação remota, homologação externa ou registro de evidências.
 
-A ordem local recomendada é:
-
-1. `[D-VIDEO-IMPL-001]` Preparar roteiro do vídeo de demonstração.
+Não há itens `IMPL` locais abertos. As próximas atividades dependem de ambiente remoto, credenciais, homologação ou produção de evidências e só devem ser executadas quando solicitadas explicitamente.
 
 As validações remotas prioritárias restantes, quando o ambiente externo estiver disponível, são `[B2-BILL-DB-REM-001]`, `[B2-OS-DB-REM-001]`, `[B2-EXEC-DDB-REM-001]`, `[B2-IDEMP-REM-001]`, `[B2-MSG-REM-001]`, `[B2-AUTH-USERS-REM-001]`, `[B2-MP-REM-001]`, `[B2-GH-REM-001]`, `[D-NR-REM-003]`, `[D-NR-REM-004]`, `[D-NR-REM-006]`, `[D-NR-REM-007]` e os itens `EVID` finais.

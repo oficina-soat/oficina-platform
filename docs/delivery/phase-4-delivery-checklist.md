@@ -65,6 +65,8 @@ Cada repositório de microsserviço deve possuir:
 
 ## Cenários de Demonstração
 
+Roteiro canônico: [Roteiro do Vídeo de Demonstração da Fase 4](video-demonstration-script.md).
+
 O vídeo de até 15 minutos deve demonstrar:
 
 - [ ] fluxo completo de uma OS passando por `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`;

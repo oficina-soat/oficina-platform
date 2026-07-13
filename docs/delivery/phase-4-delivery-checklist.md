@@ -35,7 +35,7 @@ Cada repositório de microsserviço deve possuir:
 - [ ] Dockerfile funcional;
 - [ ] pipeline independente de CI/CD;
 - [ ] deploy independente validado conforme o [Checklist de Deploy Independente](independent-deploy-checklist.md);
-- [ ] proteção da branch `main` com PR obrigatório e checagens automáticas; a [verificação remota atual](github-branch-protection-evidence.md) encontrou `develop-validate` no lugar de `service-ci-validate` nos três Rulesets;
+- [x] proteção da branch `main` com PR obrigatório e `service-ci-validate` exigido nos três microsserviços, conforme a [evidência remota dos Rulesets](github-branch-protection-evidence.md);
 - [ ] testes unitários e de integração;
 - [ ] evidência de cobertura mínima de 80%, conforme [Padrão BDD, Cobertura e Qualidade](bdd-testing.md);
 - [ ] Quality Gate SonarCloud externo ou equivalente aprovado;

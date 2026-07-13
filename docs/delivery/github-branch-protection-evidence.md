@@ -27,7 +27,7 @@ Os workflows locais dos três microsserviços confirmam a distinção:
 
 Exigir `develop-validate` na `main` não implementa a política canônica. O check pode não pertencer ao commit do PR que está sendo homologado e não substitui `service-ci-validate`.
 
-## Correção Administrativa Necessária
+## Correção Administrativa Indicada na Verificação Inicial
 
 Para cada repositório, um administrador deve acessar `Settings → Rules → Rulesets → Ruleset 1` e, na regra de status checks:
 
@@ -36,7 +36,19 @@ Para cada repositório, um administrador deve acessar `Settings → Rules → Ru
 3. manter a regra de pull request ativa;
 4. salvar o Ruleset como `Active`.
 
-A política do repositório proíbe agentes de solicitar, armazenar ou operar credenciais administrativas para aplicar branch protection. Por isso, esta verificação não altera os Rulesets remotamente e `[B2-GH-REM-001]` permanece aberto.
+A política do repositório proíbe agentes de solicitar, armazenar ou operar credenciais administrativas para aplicar branch protection. Por isso, esta verificação inicial não alterou os Rulesets remotamente.
+
+## Revalidação após a correção administrativa
+
+Em 13/07/2026, os detalhes dos mesmos Rulesets foram consultados novamente pela API autenticada do GitHub. Os três permanecem ativos, aplicam-se à branch padrão e mantêm as regras de pull request, bloqueio de deleção e bloqueio de atualização `non-fast-forward`.
+
+| Repositório | Ruleset ativo | Branch alvo | PR obrigatório | Check obrigatório | Integração | Resultado |
+|---|---:|---|---|---|---:|---|
+| `oficina-os-service` | `18530104` | `~DEFAULT_BRANCH` | Sim | `service-ci-validate` | GitHub Actions (`15368`) | Conforme |
+| `oficina-billing-service` | `18530103` | `~DEFAULT_BRANCH` | Sim | `service-ci-validate` | GitHub Actions (`15368`) | Conforme |
+| `oficina-execution-service` | `18530102` | `~DEFAULT_BRANCH` | Sim | `service-ci-validate` | GitHub Actions (`15368`) | Conforme |
+
+Nenhum dos Rulesets exige mais `develop-validate`. A configuração agora atende à [Política de Proteção da Branch Main](github-branch-protection.md), concluindo `[B2-GH-REM-001]`.
 
 ## Comando de Revalidação
 

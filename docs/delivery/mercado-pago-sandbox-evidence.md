@@ -55,6 +55,22 @@ Resposta recebida em `2026-07-13T20:27:56Z`:
 
 O resultado comprova que a integração habilitada chamou o Mercado Pago. Entretanto, a API do provedor rejeitou a credencial com HTTP `401`, antes da persistência do pagamento. Portanto, não foram gerados `pagamentoId`, `transacaoExternaId` nem `external_reference` comprovável pela API sandbox.
 
+### Revalidação após atualização informada do token
+
+Uma nova aplicação foi executada pelo [run 29283226983](https://github.com/oficina-soat/oficina-infra/actions/runs/29283226983). O workflow concluiu com sucesso, mas o Kubernetes registrou `secret/oficina-billing-service-mercado-pago-env unchanged`, indicando que o valor efetivamente entregue ao `oficina-infra` era idêntico ao da execução anterior. O Deployment recebeu novamente o patch de checksum.
+
+A cobrança foi repetida com identificadores inéditos:
+
+| Campo | Valor |
+|---|---|
+| `correlationId` | `b2-mp-evid-001-20260713T204200Z` |
+| `Idempotency-Key` | `14c79872-2a6c-4ab6-ac52-541ed35e4142` |
+| Status HTTP local | `502` |
+| Código local | `DEPENDENCY_FAILURE` |
+| Resposta do Mercado Pago | HTTP `401` |
+
+Essa revalidação confirma que a credencial consumida pelo workflow continuou sendo rejeitada pelo provedor. O token deve ser atualizado no escopo que disponibiliza `OFICINA_MERCADO_PAGO_ACCESS_TOKEN` ao repositório `oficina-soat/oficina-infra`; atualizar um secret homônimo apenas no repositório do Billing não altera o workflow central de infraestrutura.
+
 ## Pendência
 
 `[B2-MP-EVID-001]` permanece aberto. Para concluí-lo:

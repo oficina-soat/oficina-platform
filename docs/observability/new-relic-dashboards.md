@@ -10,7 +10,7 @@ Os templates seguem o [Padrão de Observabilidade Distribuída](observability.md
 |---|---|---|
 | Microsserviços Lab | [Dashboard operacional dos microsserviços](new-relic-dashboard-operational.json) | Golden signals, falhas HTTP, logs, traces, CPU, memória, restarts, readiness de Deployments e busca por `correlationId`. |
 | Saga e Ordem de Serviço Lab | [Dashboard da Saga e OS](new-relic-dashboard-saga.json) | Fluxo da OS, eventos da Saga, compensações, falha manual, Outbox e correlação por `aggregateId` e `correlationId`. |
-| Persistência e Mensageria Lab | Dashboard remoto criado via NerdGraph | Operações e latência de persistência, backlog e idade da Outbox, publicação e consumo de eventos, SQS, DLQ, retries e conflitos de idempotência. |
+| Persistência e Mensageria Lab | [Dashboard de persistência e mensageria](new-relic-dashboard-persistence-messaging.json) | Operações e latência de persistência, backlog e idade da Outbox, publicação e consumo de eventos, SQS, DLQ, retries e conflitos de idempotência. |
 
 ## Como Importar
 
@@ -36,7 +36,7 @@ Para informar o account ID uma única vez e gerar cópias prontas para colar na 
 ```bash
 NEW_RELIC_ACCOUNT_ID=1234567
 
-for dashboard in docs/observability/new-relic-dashboard-operational.json docs/observability/new-relic-dashboard-saga.json; do
+for dashboard in docs/observability/new-relic-dashboard-operational.json docs/observability/new-relic-dashboard-saga.json docs/observability/new-relic-dashboard-persistence-messaging.json; do
   output="/tmp/$(basename "${dashboard}")"
   jq --argjson account_id "${NEW_RELIC_ACCOUNT_ID}" \
     'walk(if type == "object" and has("accountIds") then .accountIds = [$account_id] else . end)' \

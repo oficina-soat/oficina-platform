@@ -1,0 +1,95 @@
+{
+  "name": "Oficina SOAT - Persistencia e Mensageria Lab",
+  "description": "Persistencia PostgreSQL e DynamoDB, Outbox, SNS/SQS, DLQ e idempotencia dos microsservicos no ambiente lab. Substitua accountIds [0] pelo ID da conta New Relic antes de importar.",
+  "permissions": "PUBLIC_READ_WRITE",
+  "pages": [
+    {
+      "guid": "MHxWSVp8REFTSEJPQVJEfDkwMDAwMzAwMQ",
+      "name": "Dependencias",
+      "description": "Sinais operacionais de persistencia, mensageria, Outbox e idempotencia.",
+      "widgets": [
+        {
+          "id": "930001001",
+          "title": "Operacoes de persistencia por resultado",
+          "layout": { "column": 1, "row": 1, "width": 6, "height": 3 },
+          "linkedEntityGuids": null,
+          "visualization": { "id": "viz.line" },
+          "rawConfiguration": { "nrqlQueries": [{ "accountIds": [0], "query": "FROM Metric SELECT rate(sum(persistence_operations_count_total), 1 minute) AS 'operacoes/min' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' FACET service.name, database, result TIMESERIES" }] }
+        },
+        {
+          "id": "930001002",
+          "title": "Latencia maxima de persistencia",
+          "layout": { "column": 7, "row": 1, "width": 6, "height": 3 },
+          "linkedEntityGuids": null,
+          "visualization": { "id": "viz.line" },
+          "rawConfiguration": { "nrqlQueries": [{ "accountIds": [0], "query": "FROM Metric SELECT max(persistence_operation_duration_seconds_max) * 1000 AS 'max ms' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' FACET service.name, database, resource TIMESERIES" }] }
+        },
+        {
+          "id": "930001003",
+          "title": "Outbox pendente",
+          "layout": { "column": 1, "row": 4, "width": 4, "height": 3 },
+          "linkedEntityGuids": null,
+          "visualization": { "id": "viz.billboard" },
+          "rawConfiguration": { "nrqlQueries": [{ "accountIds": [0], "query": "FROM Metric SELECT latest(outbox_pending_count) AS 'pendentes' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' FACET service.name, eventType" }] }
+        },
+        {
+          "id": "930001004",
+          "title": "Idade do evento mais antigo da Outbox",
+          "layout": { "column": 5, "row": 4, "width": 4, "height": 3 },
+          "linkedEntityGuids": null,
+          "visualization": { "id": "viz.billboard" },
+          "rawConfiguration": { "nrqlQueries": [{ "accountIds": [0], "query": "FROM Metric SELECT latest(outbox_oldest_pending_age) AS 'segundos' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' FACET service.name" }] }
+        },
+        {
+          "id": "930001005",
+          "title": "Publicacoes da Outbox",
+          "layout": { "column": 9, "row": 4, "width": 4, "height": 3 },
+          "linkedEntityGuids": null,
+          "visualization": { "id": "viz.line" },
+          "rawConfiguration": { "nrqlQueries": [{ "accountIds": [0], "query": "FROM Metric SELECT rate(sum(outbox_published_count_total), 1 minute) AS 'publicados/min' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' FACET service.name, eventType, topic TIMESERIES" }] }
+        },
+        {
+          "id": "930001006",
+          "title": "Eventos publicados, consumidos e com falha",
+          "layout": { "column": 1, "row": 7, "width": 6, "height": 3 },
+          "linkedEntityGuids": null,
+          "visualization": { "id": "viz.line" },
+          "rawConfiguration": { "nrqlQueries": [{ "accountIds": [0], "query": "FROM Metric SELECT rate(sum(messaging_events_published_count_total), 1 minute) AS 'publicados/min', rate(sum(messaging_events_consumed_count_total), 1 minute) AS 'consumidos/min', rate(sum(messaging_events_failed_count_total), 1 minute) AS 'falhas/min' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' FACET service.name TIMESERIES" }] }
+        },
+        {
+          "id": "930001007",
+          "title": "Recebimento SQS por fila",
+          "layout": { "column": 7, "row": 7, "width": 6, "height": 3 },
+          "linkedEntityGuids": null,
+          "visualization": { "id": "viz.line" },
+          "rawConfiguration": { "nrqlQueries": [{ "accountIds": [0], "query": "FROM Metric SELECT rate(sum(messaging_sqs_received_count_total), 1 minute) AS 'recebidas/min' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' FACET service.name, queue, topic TIMESERIES" }] }
+        },
+        {
+          "id": "930001008",
+          "title": "Mensagens encaminhadas para DLQ",
+          "layout": { "column": 1, "row": 10, "width": 4, "height": 3 },
+          "linkedEntityGuids": null,
+          "visualization": { "id": "viz.billboard" },
+          "rawConfiguration": { "nrqlQueries": [{ "accountIds": [0], "query": "FROM Metric SELECT sum(messaging_dlq_count_total) AS 'DLQ' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' FACET service.name, queue, topic SINCE 24 hours ago" }] }
+        },
+        {
+          "id": "930001009",
+          "title": "Retries de idempotencia",
+          "layout": { "column": 5, "row": 10, "width": 4, "height": 3 },
+          "linkedEntityGuids": null,
+          "visualization": { "id": "viz.bar" },
+          "rawConfiguration": { "nrqlQueries": [{ "accountIds": [0], "query": "FROM Metric SELECT sum(idempotency_retries_count_total) AS 'retries' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' FACET service.name, operation, status SINCE 24 hours ago" }] }
+        },
+        {
+          "id": "930001010",
+          "title": "Conflitos de idempotencia",
+          "layout": { "column": 9, "row": 10, "width": 4, "height": 3 },
+          "linkedEntityGuids": null,
+          "visualization": { "id": "viz.bar" },
+          "rawConfiguration": { "nrqlQueries": [{ "accountIds": [0], "query": "FROM Metric SELECT sum(idempotency_conflicts_count_total) AS 'conflitos' WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' FACET service.name, operation, reason SINCE 24 hours ago" }] }
+        }
+      ]
+    }
+  ],
+  "variables": []
+}

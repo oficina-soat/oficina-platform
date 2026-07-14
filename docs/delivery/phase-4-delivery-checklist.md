@@ -42,7 +42,7 @@ Cada repositório de microsserviço deve possuir:
 - [ ] link para Swagger, OpenAPI ou collection Postman atualizada;
 - [ ] autenticação JWT configurada conforme contratos da suíte;
 - [ ] tratamento de erros conforme [Contrato de Erros REST](../../contracts/error-model.md);
-- [ ] idempotência conforme [Contrato de Idempotência](../../contracts/idempotency.md);
+- [x] idempotência conforme o [Contrato de Idempotência](../../contracts/idempotency.md), validada nos três microsserviços antes e depois de restart conforme a [evidência remota do lab](idempotency-lab-evidence.md);
 - [ ] propagação de `correlationId` em HTTP, eventos, logs e traces;
 - [ ] documentação da Saga orquestrada pelo `oficina-os-service`, com links para [ADR-009](../../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), [Fluxos da Saga da Ordem de Serviço](../architecture/saga-flows.md) e [Contrato de Saga do oficina-os-service](../../contracts/saga/oficina-os-saga-v1.md);
 - [ ] evidência de manifests Kubernetes aplicáveis, conforme a [Estratégia de entrega dos manifestos Kubernetes](../infrastructure/kubernetes-manifest-strategy.md).

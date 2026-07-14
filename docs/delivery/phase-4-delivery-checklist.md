@@ -20,47 +20,47 @@ Este checklist complementa o [Enunciado Fase 4](Enunciado%20Fase%204.md), o [ROA
 
 | Repositório | Link remoto | README final | Cobertura | Swagger/OpenAPI | Pipeline | Kubernetes | Status |
 |---|---|---|---|---|---|---|---|
-| `oficina-os-service` | `git@github.com:oficina-soat/oficina-os-service.git` | A preencher | A preencher | [OpenAPI canônica](../../contracts/openapi/oficina-os-service.yaml) | A preencher | A preencher | Pendente |
-| `oficina-billing-service` | `git@github.com:oficina-soat/oficina-billing-service.git` | A preencher | A preencher | [OpenAPI canônica](../../contracts/openapi/oficina-billing-service.yaml) | A preencher | A preencher | Pendente |
-| `oficina-execution-service` | `git@github.com:oficina-soat/oficina-execution-service.git` | A preencher | A preencher | [OpenAPI canônica](../../contracts/openapi/oficina-execution-service.yaml) | A preencher | A preencher | Pendente |
-| `oficina-infra` | A preencher | A preencher | Não aplicável | Não aplicável | A preencher | A preencher | Pendente |
+| `oficina-os-service` | [GitHub](https://github.com/oficina-soat/oficina-os-service) | [README](https://github.com/oficina-soat/oficina-os-service#readme) | [Evidência no README](https://github.com/oficina-soat/oficina-os-service#cobertura) | [OpenAPI canônica](../../contracts/openapi/oficina-os-service.yaml) | [Service CI/CD](https://github.com/oficina-soat/oficina-os-service/actions/workflows/service-ci.yml) | [Manifest canônico](https://github.com/oficina-soat/oficina-infra/tree/main/k8s/base/microservices/oficina-os-service) | Implementado; evidências finais pendentes |
+| `oficina-billing-service` | [GitHub](https://github.com/oficina-soat/oficina-billing-service) | [README](https://github.com/oficina-soat/oficina-billing-service#readme) | [Evidência no README](https://github.com/oficina-soat/oficina-billing-service#cobertura) | [OpenAPI canônica](../../contracts/openapi/oficina-billing-service.yaml) | [Service CI/CD](https://github.com/oficina-soat/oficina-billing-service/actions/workflows/service-ci.yml) | [Manifest canônico](https://github.com/oficina-soat/oficina-infra/tree/main/k8s/base/microservices/oficina-billing-service) | Implementado; evidências finais pendentes |
+| `oficina-execution-service` | [GitHub](https://github.com/oficina-soat/oficina-execution-service) | [README](https://github.com/oficina-soat/oficina-execution-service#readme) | [Evidência no README](https://github.com/oficina-soat/oficina-execution-service#cobertura) | [OpenAPI canônica](../../contracts/openapi/oficina-execution-service.yaml) | [Service CI/CD](https://github.com/oficina-soat/oficina-execution-service/actions/workflows/service-ci.yml) | [Manifest canônico](https://github.com/oficina-soat/oficina-infra/tree/main/k8s/base/microservices/oficina-execution-service) | Implementado; evidências finais pendentes |
+| `oficina-infra` | [GitHub](https://github.com/oficina-soat/oficina-infra) | [README](https://github.com/oficina-soat/oficina-infra#readme) | Não aplicável | Não aplicável | [Deploy Lab](https://github.com/oficina-soat/oficina-infra/actions/workflows/deploy-lab.yml) | [Kubernetes](https://github.com/oficina-soat/oficina-infra/tree/main/k8s) | Implementado; evidências finais pendentes |
 | `oficina-auth-lambda` | A preencher | A preencher | A preencher | [OpenAPI canônica](../../contracts/openapi/oficina-auth-lambda.yaml) | A preencher | Não aplicável | Pendente |
 
 ## Checklist por Microsserviço
 
 Cada repositório de microsserviço deve possuir:
 
-- [ ] código-fonte do serviço, sem dependência runtime do `oficina-app`;
-- [ ] `README.md` com setup local, variáveis de ambiente, execução, testes, build, Docker, deploy e links de evidências;
-- [ ] Dockerfile funcional;
-- [ ] pipeline independente de CI/CD;
-- [ ] deploy independente validado conforme o [Checklist de Deploy Independente](independent-deploy-checklist.md);
+- [x] código-fonte do serviço, sem dependência runtime do `oficina-app`;
+- [x] `README.md` com setup local, variáveis de ambiente, execução, testes, build, Docker, deploy e links de evidências;
+- [x] Dockerfile funcional;
+- [x] pipeline independente de CI/CD;
+- [x] deploy independente validado no ambiente `lab`, com publicação de imagem e rollout registrados nas evidências de [OS](os-postgresql-lab-evidence.md), [Billing](billing-postgresql-lab-evidence.md) e [Execution](execution-dynamodb-lab-evidence.md);
 - [x] proteção da branch `main` com PR obrigatório e `service-ci-validate` exigido nos três microsserviços, conforme a [evidência remota dos Rulesets](github-branch-protection-evidence.md);
-- [ ] testes unitários e de integração;
-- [ ] evidência de cobertura mínima de 80%, conforme [Padrão BDD, Cobertura e Qualidade](bdd-testing.md);
-- [ ] Quality Gate SonarCloud externo ou equivalente aprovado;
-- [ ] link para Swagger, OpenAPI ou collection Postman atualizada;
-- [ ] autenticação JWT configurada conforme contratos da suíte;
-- [ ] tratamento de erros conforme [Contrato de Erros REST](../../contracts/error-model.md);
+- [x] testes unitários e de integração executados pelo ciclo Maven `verify` dos três microsserviços;
+- [x] evidência de cobertura mínima de 80% registrada nos READMEs e validada pelo `service-ci-validate`, conforme [Padrão BDD, Cobertura e Qualidade](bdd-testing.md);
+- [x] Quality Gate SonarCloud aprovado nos três projetos e exigido pelo `service-ci-validate`;
+- [x] links para Swagger/OpenAPI atualizada registrados nos READMEs dos três microsserviços;
+- [x] autenticação JWT configurada conforme contratos da suíte;
+- [x] tratamento de erros conforme [Contrato de Erros REST](../../contracts/error-model.md), coberto por testes de contrato;
 - [x] idempotência conforme o [Contrato de Idempotência](../../contracts/idempotency.md), validada nos três microsserviços antes e depois de restart conforme a [evidência remota do lab](idempotency-lab-evidence.md);
-- [ ] propagação de `correlationId` em HTTP, eventos, logs e traces;
-- [ ] documentação da Saga orquestrada pelo `oficina-os-service`, com links para [ADR-009](../../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), [Fluxos da Saga da Ordem de Serviço](../architecture/saga-flows.md) e [Contrato de Saga do oficina-os-service](../../contracts/saga/oficina-os-saga-v1.md);
-- [ ] evidência de manifests Kubernetes aplicáveis, conforme a [Estratégia de entrega dos manifestos Kubernetes](../infrastructure/kubernetes-manifest-strategy.md).
+- [x] propagação de `correlationId` em HTTP, eventos, logs e traces comprovada no [E2E do ambiente lab](../observability/d-nr-rem-005-e2e-lab-report.md);
+- [x] documentação da Saga orquestrada pelo `oficina-os-service` registrada nos READMEs, com links para [ADR-009](../../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), [Fluxos da Saga da Ordem de Serviço](../architecture/saga-flows.md) e [Contrato de Saga do oficina-os-service](../../contracts/saga/oficina-os-saga-v1.md);
+- [x] manifests Kubernetes aplicáveis materializados no `oficina-infra` e referenciados pelos READMEs, conforme a [Estratégia de entrega dos manifestos Kubernetes](../infrastructure/kubernetes-manifest-strategy.md).
 - [ ] runbooks aplicáveis revisados conforme os [Runbooks Operacionais Mínimos](../observability/operational-runbooks.md).
 
 ## Checklist de Domínio e Contratos
 
 | Requisito | Evidência esperada | Link |
 |---|---|---|
-| Separação em três microsserviços | Repositórios independentes e responsabilidades alinhadas à [Matriz de Ownership por Microsserviço](../architecture/service-ownership.md). | A preencher |
-| Banco próprio por microsserviço | `oficina_os`, `oficina_billing` e tabelas DynamoDB do `oficina-execution-service`. | A preencher |
+| Separação em três microsserviços | Repositórios independentes e responsabilidades alinhadas à [Matriz de Ownership por Microsserviço](../architecture/service-ownership.md). | [OS](https://github.com/oficina-soat/oficina-os-service), [Billing](https://github.com/oficina-soat/oficina-billing-service) e [Execution](https://github.com/oficina-soat/oficina-execution-service) |
+| Banco próprio por microsserviço | `oficina_os`, `oficina_billing` e tabelas DynamoDB do `oficina-execution-service`. | [OS](os-postgresql-lab-evidence.md), [Billing](billing-postgresql-lab-evidence.md) e [Execution](execution-dynamodb-lab-evidence.md) |
 | Banco SQL | PostgreSQL em RDS compartilhado com databases isolados, conforme [Padrão de isolamento PostgreSQL no RDS compartilhado](../infrastructure/rds-postgresql-isolation.md). | [Billing validado no PostgreSQL real](billing-postgresql-lab-evidence.md) e [OS validado com isolamento entre databases e restart](os-postgresql-lab-evidence.md) |
 | Banco NoSQL | DynamoDB do `oficina-execution-service`, conforme [Padrão DynamoDB do oficina-execution-service](../infrastructure/dynamodb-execution-service.md). | [Execution validado nas cinco tabelas reais, inclusive após restart](execution-dynamodb-lab-evidence.md) |
-| Comunicação REST | Rotas aderentes ao [Contrato de APIs REST](../../contracts/Contrato%20de%20APIs%20REST.md), às OpenAPI dos três serviços e às [Rotas públicas do API Gateway](../infrastructure/api-gateway-public-routes.md). | A preencher |
+| Comunicação REST | Rotas aderentes ao [Contrato de APIs REST](../../contracts/Contrato%20de%20APIs%20REST.md), às OpenAPI dos três serviços e às [Rotas públicas do API Gateway](../infrastructure/api-gateway-public-routes.md). | [Rotas públicas materializadas e validadas](../infrastructure/api-gateway-public-routes.md) |
 | Mensageria assíncrona | Eventos e tópicos aderentes ao [Contrato de Eventos de Domínio](../../contracts/Contrato%20de%20Eventos%20de%20Domínio.md) e ao [Contrato de Tópicos de Mensageria](../../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md). | [Fluxo real Outbox, SNS, SQS, persistência e DLQ validado no lab](messaging-lab-evidence.md) |
-| Saga Pattern | Orquestração pelo `oficina-os-service`, com caminho feliz e falha compensada. | A preencher |
+| Saga Pattern | Orquestração pelo `oficina-os-service`, com caminho feliz e falha compensada. | [BDD e E2E no ambiente lab](../observability/d-nr-rem-005-e2e-lab-report.md) |
 | Mercado Pago | Integração financeira documentada e evidência de cobrança PIX sandbox executada pelo `oficina-billing-service`, com `pagamentoId`, `transacaoExternaId`, referência externa do Mercado Pago, logs/traces por `correlationId` e evento financeiro correspondente. | [Cobrança PIX sandbox e correlação no New Relic concluídas](mercado-pago-sandbox-evidence.md) |
-| Observabilidade | Logs estruturados, métricas, traces e dashboards mínimos conforme [Padrão de Observabilidade Distribuída](../observability/observability.md). | A preencher |
+| Observabilidade | Logs estruturados, métricas, traces e dashboard operacional conforme [Padrão de Observabilidade Distribuída](../observability/observability.md). Alertas e visões complementares ainda permanecem pendentes. | [E2E no ambiente lab](../observability/d-nr-rem-005-e2e-lab-report.md) e [Dashboards New Relic](../observability/new-relic-dashboards.md) |
 | Diagrama geral | Arquitetura final alinhada ao [Diagrama Geral da Arquitetura Final](../architecture/architecture-diagram.md). | [Diagrama Geral da Arquitetura Final](../architecture/architecture-diagram.md) |
 
 ## Cenários de Demonstração
@@ -118,7 +118,7 @@ O diagrama final deve mostrar:
 
 Antes de fechar a entrega:
 
-- [ ] comparar READMEs dos microsserviços com este checklist;
+- [x] comparar READMEs dos microsserviços com este checklist;
 - [ ] validar links para OpenAPI, contratos, cobertura e pipelines;
 - [ ] confirmar que os nomes de serviços, eventos, tópicos, bancos, secrets e variáveis seguem os contratos canônicos;
 - [ ] conferir que o vídeo e o PDF usam os mesmos nomes canônicos dos contratos;

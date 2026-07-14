@@ -130,7 +130,6 @@ tflint --chdir terraform/environments/lab
 find scripts -type f -name '*.sh' -print0 | xargs -0 bash -n
 find scripts -type f -name '*.sh' -print0 | xargs -0 shellcheck
 shfmt -d scripts
-kubectl kustomize k8s/base/microservices | kubeconform -strict -summary
 kubectl kustomize k8s/overlays/lab | kubeconform -strict -summary
 actionlint
 ```
@@ -140,6 +139,7 @@ Nos microsserviços:
 ```bash
 MAVEN_PROFILE="${MAVEN_PROFILE:-postgresql}"
 ./mvnw -B clean verify -P"${MAVEN_PROFILE}" -DskipITs=false -DfailIfNoTests=false
+kubectl kustomize k8s/base | kubeconform -strict -summary
 test -s target/jacoco-report/jacoco.xml
 actionlint
 hadolint Dockerfile

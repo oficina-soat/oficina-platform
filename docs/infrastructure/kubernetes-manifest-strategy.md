@@ -8,7 +8,7 @@ Esta decisão concilia o requisito do [Enunciado Fase 4](../delivery/Enunciado%2
 
 ## Decisão
 
-O repositório `oficina-infra` é a fonte canônica dos manifestos Kubernetes executáveis da Fase 4.
+Cada repositório de microsserviço é a fonte canônica de sua base Kubernetes executável em `k8s/base/`.
 
 O `oficina-platform` mantém os templates normativos em [Template Kubernetes Base](../../templates/kubernetes/base/README.md), e os repositórios `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service` documentam em seus READMEs onde ficam:
 
@@ -16,22 +16,20 @@ O `oficina-platform` mantém os templates normativos em [Template Kubernetes Bas
 - o destino canônico no `oficina-infra`;
 - a condição para habilitar deploy automatizado pelo workflow do serviço.
 
-Os repositórios dos microsserviços não devem manter cópias executáveis dos manifests enquanto o `oficina-infra` for a fonte canônica. Essa regra evita drift entre cópias, impede deploy com valores divergentes e mantém secrets, overlays, imagens e nomes de cluster sob responsabilidade do repositório de infraestrutura.
-
-Se uma avaliação exigir arquivos Kubernetes dentro de cada repositório de microsserviço, as cópias devem ser registradas como referência não canônica e apontar para esta estratégia. O deploy real continua pertencendo ao `oficina-infra`.
+O `oficina-infra` não mantém cópias dessas bases. Ele é responsável pelos componentes compartilhados, pelos valores e secrets do ambiente `lab` e pelo script que compõe a base selecionada com a imagem publicada. Assim, mudanças de Deployment, Service, ServiceAccount e ConfigMap acompanham o ciclo de vida do serviço sem duplicação.
 
 ## Fontes e destinos
 
-| Serviço | Template normativo | Destino canônico no `oficina-infra` |
+| Serviço | Template normativo | Base executável canônica |
 |---|---|---|
-| `oficina-os-service` | [templates/kubernetes/base/oficina-os-service/](../../templates/kubernetes/base/oficina-os-service/) | `../oficina-infra/k8s/base/microservices/oficina-os-service/` |
-| `oficina-billing-service` | [templates/kubernetes/base/oficina-billing-service/](../../templates/kubernetes/base/oficina-billing-service/) | `../oficina-infra/k8s/base/microservices/oficina-billing-service/` |
-| `oficina-execution-service` | [templates/kubernetes/base/oficina-execution-service/](../../templates/kubernetes/base/oficina-execution-service/) | `../oficina-infra/k8s/base/microservices/oficina-execution-service/` |
+| `oficina-os-service` | [templates/kubernetes/base/oficina-os-service/](../../templates/kubernetes/base/oficina-os-service/) | `../oficina-os-service/k8s/base/` |
+| `oficina-billing-service` | [templates/kubernetes/base/oficina-billing-service/](../../templates/kubernetes/base/oficina-billing-service/) | `../oficina-billing-service/k8s/base/` |
+| `oficina-execution-service` | [templates/kubernetes/base/oficina-execution-service/](../../templates/kubernetes/base/oficina-execution-service/) | `../oficina-execution-service/k8s/base/` |
 
-No `oficina-infra`, os manifests executáveis ficam materializados por serviço em:
+Em cada serviço, os manifests executáveis ficam materializados em:
 
 ```text
-../oficina-infra/k8s/base/microservices/<nome-do-servico>/
+../<nome-do-servico>/k8s/base/
 ```
 
 O overlay `lab` permanece responsável por componentes compartilhados do cluster. A aplicação dos microsserviços é feita por `../oficina-infra/scripts/manual/apply-microservices.sh`, que gera um `kustomization.yaml` temporário com os serviços selecionados, substitui a imagem ECR e os valores de autenticação e aplica apenas os serviços com imagem disponível.
@@ -41,7 +39,8 @@ O overlay `lab` permanece responsável por componentes compartilhados do cluster
 | Artefato | Fonte canônica | Regra |
 |---|---|---|
 | Convenções de recursos Kubernetes | `oficina-platform` | Definidas no [Template Kubernetes Base](../../templates/kubernetes/base/README.md). |
-| Manifests executáveis de deploy | `oficina-infra` | Adaptam os templates para o ambiente `lab`, imagens ECR, overlays, secrets e integração com EKS. |
+| Base executável de deploy | Repositório do microsserviço | Mantém Deployment, Service, ServiceAccount, ConfigMap e kustomization junto do código. |
+| Composição do ambiente `lab` | `oficina-infra` | Mantém componentes compartilhados, imagens ECR, secrets e integração com EKS. |
 | Dockerfile | Repositório do microsserviço | Cada serviço mantém seu próprio build de imagem. |
 | Workflow de deploy | Repositório do microsserviço | Publica imagem, cria release e materializa ou atualiza o Deployment do próprio serviço por padrão, salvo quando `ENABLE_K8S_DEPLOY=false`. |
 | Valores sensíveis | `oficina-infra` e AWS | Não devem ser copiados para `oficina-platform` nem para os repositórios dos serviços. |
@@ -52,7 +51,7 @@ O overlay `lab` permanece responsável por componentes compartilhados do cluster
 O job de deploy dos microsserviços fica ativo por padrão no push para `main` e deve ser mantido assim quando as seguintes condições estiverem atendidas:
 
 - o nome do Deployment e do container for igual ao nome canônico do serviço;
-- o manifest executável estiver materializado no `oficina-infra`;
+- a base executável estiver materializada em `k8s/base/` do próprio serviço;
 - o script `scripts/manual/apply-microservices.sh` do `oficina-infra` conseguir criar ou atualizar os secrets e ConfigMaps esperados pelo serviço;
 - a imagem ECR do serviço puder ser publicada pelo workflow;
 - o workflow do serviço conseguir fazer checkout do `oficina-infra`;
@@ -68,10 +67,15 @@ No `oficina-platform`, validar os templates:
 kubectl kustomize templates/kubernetes/base
 ```
 
-No `oficina-infra`, validar a base de microsserviços e o overlay compartilhado:
+Em cada repositório de microsserviço, validar sua base:
 
 ```bash
-kubectl kustomize k8s/base/microservices
+kubectl kustomize k8s/base
+```
+
+No `oficina-infra`, validar o overlay compartilhado:
+
+```bash
 kubectl kustomize k8s/overlays/lab
 ```
 
@@ -83,6 +87,7 @@ A estratégia está resolvida quando:
 
 - esta decisão está documentada no `oficina-platform`;
 - o [Template Kubernetes Base](../../templates/kubernetes/base/README.md) aponta para esta decisão;
-- o `oficina-infra` declara que é a fonte canônica dos manifests executáveis;
+- cada microsserviço contém e valida sua base executável em `k8s/base/`;
+- o `oficina-infra` declara sua responsabilidade pela composição do ambiente;
 - os três READMEs dos microsserviços apontam para o template aplicável e para o destino canônico no `oficina-infra`;
 - o [ROADMAP](../../ROADMAP.md) registra que a estratégia de entrega dos manifests foi fechada.

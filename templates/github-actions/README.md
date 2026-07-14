@@ -73,7 +73,7 @@ As variáveis `ENABLE_IMAGE_PUBLISH` e `ENABLE_K8S_DEPLOY` controlam a separaç�
 
 O workflow não declara GitHub Environment para evitar aprovações manuais nos jobs. Em trabalhos acadêmicos, o ponto de controle manual é o merge do PR para `main`: pushes em `develop` abrem ou atualizam automaticamente o PR, e a entrega em AWS só roda depois que esse PR é aceito.
 
-Antes de manter o deploy automático ativo, confirme que EKS, ECR, namespace, credenciais AWS e fonte canônica dos manifests estão definidos no `oficina-infra`. O workflow do serviço faz checkout do `oficina-infra`, chama `scripts/manual/apply-microservices.sh` apenas para o próprio serviço e usa a imagem exata publicada pelo workflow.
+Antes de manter o deploy automático ativo, confirme que EKS, ECR, namespace e credenciais AWS estão definidos no `oficina-infra`, e que a base canônica renderiza em `k8s/base/` do serviço. O workflow faz checkout do `oficina-infra`, chama `scripts/manual/apply-microservices.sh` apenas para o próprio serviço e usa a imagem exata publicada pelo workflow.
 
 ## Fluxo
 

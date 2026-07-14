@@ -10,7 +10,7 @@ Fornecer manifests Kubernetes base para os três microsserviços canônicos da p
 
 Este template complementa o [Template Quarkus de Microsserviço](../../quarkus-service/README.md), o [Padrão de Observabilidade Distribuída](../../../docs/observability/observability.md), os [Nomes de runtime, secrets e infraestrutura](../../../docs/infrastructure/infra-runtime-naming.md) e a definição de [Conta, região e ambientes AWS](../../../docs/infrastructure/aws-environments.md).
 
-A estratégia de entrega está definida em [Estratégia de entrega dos manifestos Kubernetes](../../../docs/infrastructure/kubernetes-manifest-strategy.md): este diretório é a referência normativa, enquanto o `oficina-infra` é a fonte canônica dos manifests executáveis de deploy.
+A estratégia de entrega está definida em [Estratégia de entrega dos manifestos Kubernetes](../../../docs/infrastructure/kubernetes-manifest-strategy.md): este diretório é a referência normativa, cada microsserviço mantém sua base executável e o `oficina-infra` mantém a composição do ambiente.
 
 ## Estrutura
 

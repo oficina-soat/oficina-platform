@@ -33,7 +33,7 @@ Antes de manter `ENABLE_IMAGE_PUBLISH` e `ENABLE_K8S_DEPLOY` ativos por padrão 
 - [ ] o SonarScanner for Maven importa `target/jacoco-report/jacoco.xml` e aguarda o Quality Gate quando o SonarCloud for usado como evidência da entrega;
 - [ ] o repositório ECR do serviço existe no `oficina-infra`;
 - [ ] o `Deployment` e o container Kubernetes usam exatamente o nome canônico do serviço;
-- [ ] os manifests executáveis estão materializados no `../oficina-infra/k8s/base/microservices/<servico>/` e referenciados pelo overlay `../oficina-infra/k8s/overlays/lab/`;
+- [ ] a base executável está materializada e renderiza em `../<servico>/k8s/base/`, enquanto o `oficina-infra` mantém a composição e os componentes compartilhados do ambiente `lab`;
 - [ ] o overlay `lab` renderiza sem erro com `kubectl kustomize k8s/overlays/lab` no `oficina-infra`;
 - [ ] secrets, ConfigMaps, service accounts e políticas IAM necessárias ao serviço estão disponíveis no ambiente `lab`;
 - [ ] as policies permitem validar dependências sem tráfego sintético: `sns:GetTopicAttributes` nos tópicos produzidos, `sqs:GetQueueUrl` nas filas consumidas e, para Execution, `dynamodb:DescribeTable` nas tabelas próprias;

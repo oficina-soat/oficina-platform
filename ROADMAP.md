@@ -606,6 +606,14 @@ Esta seção concentra tarefas que dependem de ambiente externo, credenciais adm
 
 ---
 
+## Melhorias futuras
+
+Esta seção registra evoluções desejáveis que não fazem parte da sequência atual de implementação, homologação ou entrega. Seus itens não devem ser tratados como a “próxima tarefa” enquanto não forem explicitamente promovidos para o [Backlog orientado a agentes](#backlog-orientado-a-agentes).
+
+- [ ] `[FUT-AUTH-DB-001]` Isolar o store PostgreSQL da autenticação em database e usuário próprios, substituindo o database legado genérico `app` por nomes canônicos como `oficina_auth` e `oficina_auth_user`. A evolução deve abranger Terraform e bootstrap do `oficina-infra`, secret de conexão exclusivo, configuração das Lambdas `auth-lambda` e `auth-sync-lambda`, migração segura de usuários, papéis, hashes BCrypt e tokens de ativação, privilégio mínimo sem acesso aos databases `oficina_os` e `oficina_billing`, compatibilidade de rollback e validação de login e sincronização após a migração. O cadastro operacional continua pertencendo ao `oficina-os-service` no database `oficina_os`; somente a projeção necessária ao login e as credenciais pertencem ao database de autenticação.
+
+---
+
 ## Ordem sugerida para execução com agentes
 
 1. **Agente de contratos:** normalizar eventos, tópicos e schemas.

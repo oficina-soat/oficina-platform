@@ -10,6 +10,7 @@ Os templates seguem o [Padrão de Observabilidade Distribuída](observability.md
 |---|---|---|
 | Microsserviços Lab | [Dashboard operacional dos microsserviços](new-relic-dashboard-operational.json) | Golden signals, falhas HTTP, logs, traces, CPU, memória, restarts, readiness de Deployments e busca por `correlationId`. |
 | Saga e Ordem de Serviço Lab | [Dashboard da Saga e OS](new-relic-dashboard-saga.json) | Fluxo da OS, eventos da Saga, compensações, falha manual, Outbox e correlação por `aggregateId` e `correlationId`. |
+| Persistência e Mensageria Lab | Dashboard remoto criado via NerdGraph | Operações e latência de persistência, backlog e idade da Outbox, publicação e consumo de eventos, SQS, DLQ, retries e conflitos de idempotência. |
 
 ## Como Importar
 
@@ -76,6 +77,9 @@ Em 2026-07-11, os dashboards existentes na conta New Relic `8254132` foram atual
 |---|---|---|---|
 | Microsserviços Lab | `ODI1NDEzMnxWSVp8REFTSEJPQVJEfGRhOjEyODcwMzQ1` | `Operacional` | 15 widgets salvos; falhas HTTP, logs, métricas Prometheus, CPU, memória, restarts e readiness retornando dados. |
 | Saga e Ordem de Serviço Lab | `ODI1NDEzMnxWSVp8REFTSEJPQVJEfGRhOjEyODcwMzQ2` | `Saga OS` | 14 widgets salvos; eventos, Outbox, `aggregateId`, `correlationId`, traces lentos e falhas relacionadas retornando dados. |
+| Persistência e Mensageria Lab | `ODI1NDEzMnxWSVp8REFTSEJPQVJEfGRhOjEyODgzNTkw` | `Dependencias` | 10 widgets criados em 2026-07-14; consultas de persistência, Outbox, mensageria, DLQ e idempotência validadas via NerdGraph com dados reais e sem erros NRQL. |
+
+As métricas `payment_provider_*` ainda não aparecem no inventário `Metric` da conta, embora estejam implementadas no `oficina-billing-service`. O dashboard específico do Mercado Pago deve ser criado somente depois de corrigir e comprovar a emissão ou coleta dessas séries. A visão completa de duração por etapa da Saga também depende da emissão das métricas `saga.instances.*` e `saga.step.duration` pelo `oficina-os-service`.
 
 O widget `Traces com erro` do dashboard operacional pode retornar zero linhas quando não houver spans com `error IS true`, `otel.status_code = 'ERROR'` ou status HTTP `5xx`. Esse resultado não indica falha de coleta: validações `400` e conflitos de negócio `409` aparecem nos widgets de falhas HTTP baseados em `Log`.
 

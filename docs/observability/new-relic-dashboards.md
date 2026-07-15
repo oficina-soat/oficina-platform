@@ -76,7 +76,7 @@ Em 2026-07-11, os dashboards existentes na conta New Relic `8254132` foram atual
 | Dashboard | GUID | Página | Resultado |
 |---|---|---|---|
 | Microsserviços Lab | `ODI1NDEzMnxWSVp8REFTSEJPQVJEfGRhOjEyODcwMzQ1` | `Operacional` | 15 widgets salvos; falhas HTTP, logs, métricas Prometheus, CPU, memória, restarts e readiness retornando dados. |
-| Saga e Ordem de Serviço Lab | `ODI1NDEzMnxWSVp8REFTSEJPQVJEfGRhOjEyODcwMzQ2` | `Saga OS` | 14 widgets salvos; eventos, Outbox, `aggregateId`, `correlationId`, traces lentos e falhas relacionadas retornando dados. |
+| Saga e Ordem de Serviço Lab | `ODI1NDEzMnxWSVp8REFTSEJPQVJEfGRhOjEyODcwMzcz` | `Saga OS` | 14 widgets; os cinco painéis principais usam `saga_instances_*` e `saga_step_duration_seconds`; atualização e releitura via NerdGraph validadas em 2026-07-15. Evidência em [Métricas e Dashboard da Saga no Lab](saga-metrics-lab-evidence.md). |
 | Persistência e Mensageria Lab | `ODI1NDEzMnxWSVp8REFTSEJPQVJEfGRhOjEyODgzNTkw` | `Dependencias` | 10 widgets criados em 2026-07-14; consultas de persistência, Outbox, mensageria, DLQ e idempotência validadas via NerdGraph com dados reais e sem erros NRQL. |
 
 As seis famílias `payment_provider_*` foram confirmadas no inventário `Metric` da conta em 2026-07-15, com emissão, scrape, labels e ingestão registrados na [Evidência das Métricas do Mercado Pago no Lab](payment-provider-metrics-lab-evidence.md). O dashboard específico do Mercado Pago pode agora ser criado e validado em `[D-NR-REM-006]`. A visão completa de duração por etapa da Saga também depende da ingestão remota das métricas `saga.instances.*` e `saga.step.duration` pelo `oficina-os-service`.

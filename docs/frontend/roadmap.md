@@ -75,7 +75,7 @@ src/app/
 
 - [x] `[UI-AUTH-001]` Implementar login por CPF e senha, sessão inicialmente em memória, expiração, logout e tratamento de usuário bloqueado, inativo ou sem credencial ativada. Concluído no commit `240cfd7` do `oficina-ui`; enquanto o contrato retorna o mesmo motivo para esses três estados, a interface apresenta uma orientação segura e genérica.
 - [x] `[UI-AUTH-002]` Implementar ativação de credencial conforme o contrato serverless, sem registrar senha, token de ativação ou JWT. Concluído no commit `f17ee06` do `oficina-ui`, incluindo geração administrativa do token de uso único e conclusão pública da ativação.
-- [ ] `[UI-AUTH-003]` Implementar guards e navegação por papel apenas como recurso de experiência; documentar e testar que a autorização definitiva permanece nas APIs.
+- [x] `[UI-AUTH-003]` Implementar guards e navegação por papel apenas como recurso de experiência; documentar e testar que a autorização definitiva permanece nas APIs. Concluído no commit `0abbe07` do `oficina-ui`, usando somente papéis conhecidos do claim `groups` para navegação visual.
 - [ ] `[UI-SHELL-001]` Criar shell responsivo com menu, identidade do usuário, breadcrumb, página não encontrada e tratamento global de indisponibilidade.
 
 ### Fase 3 — MVP de atendimento

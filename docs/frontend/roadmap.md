@@ -4,7 +4,7 @@
 
 Orientar a criação incremental do futuro `oficina-ui`: uma SPA Angular simples para uso interno de pessoas com os papéis `administrativo`, `recepcionista` e `mecanico`.
 
-Este roadmap passa a ser executável depois que o usuário criar o novo repositório e informar seu caminho. Até lá, ele não altera a prioridade do [roadmap da plataforma](../../ROADMAP.md).
+O repositório foi criado em `../oficina-ui`. Este roadmap está executável quando o usuário solicitar trabalho no frontend, sem alterar automaticamente a prioridade do [roadmap geral da plataforma](../../ROADMAP.md).
 
 ## Restrições arquiteturais
 
@@ -57,10 +57,10 @@ src/app/
 
 ### Fase 0 — Governança e contratos
 
-- [ ] `[UI-ADR-001]` Criar ADR na plataforma para registrar repositório independente, Angular SPA, ausência inicial de BFF/SSR, fronteira sem regras de negócio, S3/CloudFront e ownership do frontend.
-- [ ] `[UI-SCOPE-001]` Documentar personas, mapa de navegação e escopo do MVP para `administrativo`, `recepcionista` e `mecanico`, excluindo portal do cliente.
-- [ ] `[UI-CONTRACT-001]` Auditar OpenAPI e rotas públicas para login, clientes, veículos, OS, histórico, fila, diagnóstico e reparo; registrar lacunas de consulta, filtros, paginação, CORS e ações permitidas sem criar decisões de negócio na UI.
-- [ ] `[UI-UX-001]` Criar wireframes responsivos dos fluxos do MVP, incluindo loading, vazio, erro, expiração de sessão, confirmação e rejeição da API.
+- [x] `[UI-ADR-001]` Criar ADR na plataforma para registrar repositório independente, Angular SPA, ausência inicial de BFF/SSR, fronteira sem regras de negócio, S3/CloudFront e ownership do frontend. Concluído na [ADR-013](../../adr/ADR-013%20-%20Frontend%20Operacional%20Angular.md).
+- [x] `[UI-SCOPE-001]` Documentar personas, mapa de navegação e escopo do MVP para `administrativo`, `recepcionista` e `mecanico`, excluindo portal do cliente. Concluído em `oficina-ui/docs/product-scope.md`.
+- [x] `[UI-CONTRACT-001]` Auditar OpenAPI e rotas públicas para login, clientes, veículos, OS, histórico, fila, diagnóstico e reparo; registrar lacunas de consulta, filtros, paginação, CORS e ações permitidas sem criar decisões de negócio na UI. Concluído em `oficina-ui/docs/api-readiness.md`, com lacunas de CORS, busca e paginação da fila registradas.
+- [x] `[UI-UX-001]` Criar wireframes responsivos dos fluxos do MVP, incluindo loading, vazio, erro, expiração de sessão, confirmação e rejeição da API. Concluído em `oficina-ui/docs/wireframes.md`.
 
 ### Fase 1 — Fundação do repositório
 
@@ -84,7 +84,7 @@ src/app/
 - [ ] `[UI-VEHICLE-001]` Implementar consulta e cadastro de veículos vinculados ao cliente.
 - [ ] `[UI-OS-001]` Implementar abertura, consulta e listagem de ordens de serviço.
 - [ ] `[UI-OS-002]` Implementar detalhes, histórico e ações retornadas/aceitas pela API, sem codificar transições válidas no Angular.
-- [ ] `[UI-QUEUE-001]` Implementar fila do mecânico com paginação, atualização manual e estados retornados pelo Execution.
+- [ ] `[UI-QUEUE-001]` Implementar fila do mecânico com atualização manual e estados retornados pelo Execution; paginação só deve ser adicionada depois de contratada no backend.
 - [ ] `[UI-EXEC-001]` Implementar início/conclusão de diagnóstico e reparo, apresentando sucesso, rejeição e conflito canônicos do backend.
 
 ### Fase 4 — Qualidade, segurança e entrega do MVP

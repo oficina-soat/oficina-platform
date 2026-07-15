@@ -29,6 +29,7 @@ Este repositório faz parte de uma suíte maior. Alguns repositórios irmãos ex
 - `../oficina-infra-db`
 - `../oficina-infra-k8s`
 - `../oficina-infra`
+- `../oficina-ui`
 
 Quando esses repositórios estiverem disponíveis, eles devem ser consultados para manter consistência de nomes, contratos e integrações compartilhadas da suíte, especialmente:
 
@@ -47,6 +48,8 @@ Durante a decomposição e consolidação da Fase 4, trate `../oficina-app`, `..
 - artefatos de infraestrutura de `oficina-infra-db` e `oficina-infra-k8s` devem ser adaptados em `../oficina-infra`.
 
 O `../oficina-auth-lambda` é exceção: quando a mudança pertencer aos fluxos de autenticação ou notificações, faça o ajuste diretamente nesse repositório, preservando os nomes e contratos compartilhados documentados aqui.
+
+O `../oficina-ui` contém apenas a interface operacional. Preserve a [ADR-013](adr/ADR-013%20-%20Frontend%20Operacional%20Angular.md): nenhuma regra de negócio deve ser implementada no frontend; quando faltar estado, filtro, autorização ou ação canônica, evolua o contrato e o backend responsável.
 
 ## Diretrizes Gerais
 

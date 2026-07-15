@@ -10,6 +10,7 @@ Os microsserviços canônicos da plataforma possuem repositórios independentes 
 | `../oficina-os-service` | Gestão da Ordem de Serviço, cadastros principais e orquestração da Saga. |
 | `../oficina-billing-service` | Cobrança, pagamentos e integrações financeiras. |
 | `../oficina-execution-service` | Catálogo técnico de peças e serviços, diagnóstico, execução, estoque operacional e finalização do serviço. |
+| `../oficina-ui` | Interface operacional Angular, sem regras de negócio, para recepção, administração e mecânicos. |
 
 Os repositórios remotos verificados seguem a organização `oficina-soat` no GitHub:
 
@@ -27,7 +28,7 @@ Este repositório continua sendo a fonte normativa para ADRs, contratos, OpenAPI
 
 O planejamento incremental da plataforma, incluindo lacunas restantes e backlog orientado a agentes, está documentado em [ROADMAP.md](ROADMAP.md).
 
-O planejamento do futuro frontend Angular está separado no [Roadmap do frontend operacional](docs/frontend/roadmap.md) e só entra na sequência ativa depois que o repositório `oficina-ui` for criado e informado pelo usuário.
+O planejamento do frontend Angular está separado no [Roadmap do frontend operacional](docs/frontend/roadmap.md) e é executado quando o usuário direcionar o trabalho ao `oficina-ui`.
 
 ## Documentação
 

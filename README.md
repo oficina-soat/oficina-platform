@@ -27,6 +27,8 @@ Este repositório continua sendo a fonte normativa para ADRs, contratos, OpenAPI
 
 O planejamento incremental da plataforma, incluindo lacunas restantes e backlog orientado a agentes, está documentado em [ROADMAP.md](ROADMAP.md).
 
+O planejamento do futuro frontend Angular está separado no [Roadmap do frontend operacional](docs/frontend/roadmap.md) e só entra na sequência ativa depois que o repositório `oficina-ui` for criado e informado pelo usuário.
+
 ## Documentação
 
 A documentação normativa está organizada por tema em [docs/](docs/README.md):

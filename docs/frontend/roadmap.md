@@ -82,7 +82,7 @@ src/app/
 
 - [x] `[UI-CLIENT-001]` Implementar listagem paginada e cadastro idempotente de clientes conforme o contrato atual, sem pesquisa local. Concluído no commit `f812c67` do `oficina-ui` e validado em leitura contra o `lab`.
 - [ ] `[UI-CLIENT-002]` Implementar pesquisa de clientes por filtros operacionais somente depois que o `oficina-os-service` e sua OpenAPI oferecerem filtros por nome, CPF ou e-mail; a lacuna está detalhada em `oficina-ui/docs/api-readiness.md`.
-- [ ] `[UI-VEHICLE-001]` Implementar consulta e cadastro de veículos vinculados ao cliente.
+- [x] `[UI-VEHICLE-001]` Implementar consulta e cadastro de veículos vinculados ao cliente. Concluído no commit `174a56a` do `oficina-ui`, com navegação a partir da listagem de clientes e validação de leitura no `lab`.
 - [ ] `[UI-OS-001]` Implementar abertura, consulta e listagem de ordens de serviço.
 - [ ] `[UI-OS-002]` Implementar detalhes, histórico e ações retornadas/aceitas pela API, sem codificar transições válidas no Angular.
 - [ ] `[UI-QUEUE-001]` Implementar fila do mecânico com atualização manual e estados retornados pelo Execution; paginação só deve ser adicionada depois de contratada no backend.

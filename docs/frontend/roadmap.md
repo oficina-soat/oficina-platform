@@ -90,7 +90,7 @@ src/app/
 
 ### Fase 4 — Qualidade, segurança e entrega do MVP
 
-- [ ] `[UI-TEST-001]` Criar testes unitários de apresentação/aplicação, testes dos adapters com HTTP simulado e testes de arquitetura.
+- [x] `[UI-TEST-001]` Criar testes unitários de apresentação/aplicação, testes dos adapters com HTTP simulado e testes de arquitetura. Concluído no `oficina-ui` com 63 testes em 22 arquivos, cobertura global acima dos pisos obrigatórios, adapters HTTP simulados e guardrails executáveis para as fronteiras arquiteturais.
 - [ ] `[UI-E2E-001]` Criar testes E2E para login, atendimento e fila do mecânico, cobrindo caminho feliz, rejeição, autorização, idempotência visual e expiração de sessão.
 - [ ] `[UI-A11Y-001]` Validar navegação por teclado, foco, labels, contraste, leitores de tela e comportamento responsivo.
 - [ ] `[UI-SEC-001]` Configurar CSP, headers de segurança, auditoria de dependências e verificação de que build, logs e source maps públicos não expõem credenciais ou dados sensíveis.

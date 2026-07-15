@@ -80,7 +80,8 @@ src/app/
 
 ### Fase 3 — MVP de atendimento
 
-- [ ] `[UI-CLIENT-001]` Implementar pesquisa, listagem e cadastro de clientes usando filtros e paginação fornecidos pela API.
+- [x] `[UI-CLIENT-001]` Implementar listagem paginada e cadastro idempotente de clientes conforme o contrato atual, sem pesquisa local. Concluído no commit `f812c67` do `oficina-ui` e validado em leitura contra o `lab`.
+- [ ] `[UI-CLIENT-002]` Implementar pesquisa de clientes por filtros operacionais somente depois que o `oficina-os-service` e sua OpenAPI oferecerem filtros por nome, CPF ou e-mail; a lacuna está detalhada em `oficina-ui/docs/api-readiness.md`.
 - [ ] `[UI-VEHICLE-001]` Implementar consulta e cadastro de veículos vinculados ao cliente.
 - [ ] `[UI-OS-001]` Implementar abertura, consulta e listagem de ordens de serviço.
 - [ ] `[UI-OS-002]` Implementar detalhes, histórico e ações retornadas/aceitas pela API, sem codificar transições válidas no Angular.

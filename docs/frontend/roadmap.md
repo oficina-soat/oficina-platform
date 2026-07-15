@@ -103,8 +103,8 @@ src/app/
 
 Esta trilha oferece acesso operacional conveniente à UI, mas não integra os requisitos obrigatórios da infraestrutura da solução. Sua execução, falha ou remoção não pode bloquear deploys, validações ou destruição controlada dos backends e dos componentes exigidos.
 
-- [ ] `[UI-INFRA-001]` Criar no `oficina-infra` uma composição Terraform opcional para a hospedagem, em root module próprio e com backend/state independente de `terraform/environments/lab`. Incluir S3 privado, CloudFront, Origin Access Control, fallback de rotas para `index.html`, headers, cache e outputs, sem domínio próprio inicialmente; aplicar ou destruir essa stack não pode alterar nenhum recurso obrigatório.
-- [ ] `[UI-DEPLOY-001]` Publicar pelo pipeline independente do `oficina-ui` os artefatos com hash e cache longo, `index.html` sem cache prolongado, configuração de runtime, invalidação seletiva do CloudFront e versão rastreável do deploy. O pipeline deve depender apenas dos outputs da stack opcional e não participar dos pipelines dos serviços.
+- [x] `[UI-INFRA-001]` Criar no `oficina-infra` uma composição Terraform opcional para a hospedagem, em root module próprio e com backend/state independente de `terraform/environments/lab`. Concluído no commit `cabb066` do `oficina-infra` com S3 privado, CloudFront, Origin Access Control, fallback de rotas para `index.html`, headers de segurança, políticas distintas de cache, outputs e workflow Terraform manual próprio. A composição e seu state não possuem dependências dos recursos obrigatórios.
+- [ ] `[UI-DEPLOY-001]` Publicar pelo pipeline independente do `oficina-ui` os artefatos com hash e cache longo, `index.html` sem cache prolongado, configuração de runtime, invalidação seletiva do CloudFront e versão rastreável do deploy. O pipeline foi implementado no commit `ead31a7` do `oficina-ui`, consumindo somente os outputs do state opcional e sem participar dos pipelines dos serviços; falta publicá-lo no GitHub, aplicar a stack e validar o primeiro deploy para concluir a tarefa.
 
 ## Evoluções posteriores ao MVP
 

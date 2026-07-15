@@ -69,7 +69,7 @@ src/app/
 - [x] `[UI-ARCH-002]` Criar testes arquiteturais que impeçam `HttpClient` em componentes, imports de Angular na lógica pura de aplicação, dependência de detalhes internos entre features e uso de DTO externo como estado global da UI. Concluído no commit `6a4647c` do `oficina-ui`.
 - [x] `[UI-API-001]` Gerar ou validar clientes a partir das OpenAPI e encapsulá-los em adapters; mapear respostas para modelos de apresentação sem reinterpretar estados do backend. Concluído no commit `4817f77` do `oficina-ui`.
 - [x] `[UI-CORE-001]` Implementar interceptors de autenticação, `X-Correlation-Id`, erros canônicos e idempotency key para comandos mutáveis, preservando o backend como autoridade do resultado. Concluído no commit `7668d11` do `oficina-ui`.
-- [ ] `[UI-DESIGN-001]` Criar tokens visuais e componentes básicos acessíveis: layout, navegação, formulário, tabela, paginação, alerta, confirmação, loading e estado vazio.
+- [x] `[UI-DESIGN-001]` Criar tokens visuais e componentes básicos acessíveis: layout, navegação, formulário, tabela, paginação, alerta, confirmação, loading e estado vazio. Concluído no commit `d1ef93d` do `oficina-ui`.
 
 ### Fase 2 — Autenticação e shell operacional
 

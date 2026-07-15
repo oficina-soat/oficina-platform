@@ -67,7 +67,7 @@ src/app/
 - [x] `[UI-BOOT-001]` Criar o workspace com Angular estável, standalone components, routing, strict mode, SCSS, lint, formatter, testes e configuração separada de runtime para API e autenticação. Concluído no commit `6a4647c` do `oficina-ui`.
 - [x] `[UI-ARCH-001]` Materializar a estrutura por feature e as fronteiras `presentation -> application <- infrastructure`, sem camada de domínio rica e sem regra de negócio no navegador. Concluído no commit `6a4647c` do `oficina-ui`.
 - [x] `[UI-ARCH-002]` Criar testes arquiteturais que impeçam `HttpClient` em componentes, imports de Angular na lógica pura de aplicação, dependência de detalhes internos entre features e uso de DTO externo como estado global da UI. Concluído no commit `6a4647c` do `oficina-ui`.
-- [ ] `[UI-API-001]` Gerar ou validar clientes a partir das OpenAPI e encapsulá-los em adapters; mapear respostas para modelos de apresentação sem reinterpretar estados do backend.
+- [x] `[UI-API-001]` Gerar ou validar clientes a partir das OpenAPI e encapsulá-los em adapters; mapear respostas para modelos de apresentação sem reinterpretar estados do backend. Concluído no commit `4817f77` do `oficina-ui`.
 - [ ] `[UI-CORE-001]` Implementar interceptors de autenticação, `X-Correlation-Id`, erros canônicos e idempotency key para comandos mutáveis, preservando o backend como autoridade do resultado.
 - [ ] `[UI-DESIGN-001]` Criar tokens visuais e componentes básicos acessíveis: layout, navegação, formulário, tabela, paginação, alerta, confirmação, loading e estado vazio.
 

@@ -849,7 +849,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/OrdemServicoCreateRequest"
         - type: object
-          required: [ordemServicoId, estado, criadoEm, atualizadoEm]
+          required: [ordemServicoId, estado, criadoEm, atualizadoEm, acoesPermitidas]
           properties:
             ordemServicoId:
               type: string
@@ -862,6 +862,13 @@ components:
             atualizadoEm:
               type: string
               format: date-time
+            acoesPermitidas:
+              type: array
+              items:
+                $ref: "#/components/schemas/AcaoPermitidaOrdemServico"
+    AcaoPermitidaOrdemServico:
+      type: string
+      enum: [INICIAR_DIAGNOSTICO, CONCLUIR_DIAGNOSTICO, RETOMAR_DIAGNOSTICO, INICIAR_EXECUCAO, FINALIZAR, ENTREGAR, CANCELAR]
     EstadoOrdemServico:
       type: string
       enum: [RECEBIDA, EM_DIAGNOSTICO, AGUARDANDO_APROVACAO, EM_EXECUCAO, FINALIZADA, ENTREGUE]

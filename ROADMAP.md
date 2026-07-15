@@ -569,10 +569,10 @@ Convenção de identificadores para itens abertos:
 
 ### Épico D — Simulação operacional
 
-- [ ] `[D-SIM-IMPL-001]` Criar no `oficina-infra` o núcleo determinístico do simulador de operação cotidiana da oficina, consumindo as APIs públicas reais somente em ambientes não produtivos. Disponibilizar uma CLI reproduzível, configurável por duração, intensidade, perfil e `seed`, com modo `dry-run`, limites explícitos de volume e custo, autenticação segura sem registrar tokens e narrativa legível no console com timestamp, cenário e resultado HTTP.
-- [ ] `[D-SIM-IMPL-002]` Implementar o catálogo e a distribuição ponderada dos cenários do simulador: chegada e cadastro de clientes e veículos, abertura e evolução de ordens de serviço como fluxo predominante; catálogo, estoque, orçamento, execução e pagamento com frequência intermediária; e cadastro, ativação, bloqueio ou inativação de usuários com baixa frequência. Incluir caminhos felizes e falhas controladas, como orçamento recusado, estoque insuficiente, pagamento recusado, retry idempotente, payload inválido e operação não autorizada.
-- [ ] `[D-SIM-IMPL-003]` Implementar as proteções e o diagnóstico do simulador: restringir alterações aos dados sintéticos criados pela própria execução, marcar esses dados, mascarar identificadores de correlação, aguardar efeitos assíncronos, oferecer cleanup opcional e classificar automaticamente falhas esperadas e regressões. Emitir resumo final com eventos executados, aprovados, esperadamente rejeitados e inesperadamente falhos.
-- [ ] `[D-SIM-IMPL-004]` Validar e documentar o simulador com testes automatizados do motor determinístico e da classificação de resultados, exemplos de perfis e comandos, execução local em `dry-run` e uma execução controlada contra o ambiente não produtivo. Skills específicas podem ser criadas posteriormente como interface de configuração, execução e diagnóstico, sem substituir o script reproduzível; um subagente permanece opcional apenas para sessões exploratórias.
+- [x] `[D-SIM-IMPL-001]` Criar no `oficina-infra` o núcleo determinístico do simulador de operação cotidiana da oficina, consumindo as APIs públicas reais somente em ambientes não produtivos. Concluído no commit `0e81bf4` com CLI Python sem dependências externas, perfis ponderados, `seed`, `dry-run`, limites de volume/custo, token somente por ambiente, narrativa e correlação mascarada.
+- [x] `[D-SIM-IMPL-002]` Implementar o catálogo e a distribuição ponderada dos cenários do simulador. Concluído no commit `0e81bf4` com cliente → veículo → OS, consulta da fila, catálogo e estoque insuficiente, orçamento recusado quando houver OS da sessão, retry idempotente, payload inválido, operação sem autorização e ciclo de bloqueio/reativação de usuário. Os cenários financeiros não criam cobranças reais fora de uma sessão explicitamente configurada.
+- [x] `[D-SIM-IMPL-003]` Implementar as proteções e o diagnóstico do simulador. Concluído no commit `0e81bf4` com marcação `SIM-<seed>-<sequência>`, domínio reservado, interrupção de encadeamentos após falha, cleanup restrito a usuários criados na sessão, espera assíncrona e classificação entre sucesso, rejeição esperada e regressão com código de saída não zero.
+- [x] `[D-SIM-IMPL-004]` Validar e documentar o simulador. Concluído no commit `0e81bf4` com 13 testes automatizados, integração à validação padrão, exemplos de perfis e execução `dry-run`. Uma execução controlada no `lab` em 2026-07-15, limitada a um evento e custo estimado de `R$ 0,001`, criou cliente, veículo e OS com três respostas HTTP `201` e nenhuma regressão; a evidência operacional está em `oficina-infra/docs/workshop-simulator.md`.
 
 ---
 
@@ -658,9 +658,9 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-O próximo item da sequência é `[D-SIM-IMPL-001]`: criar no `oficina-infra` o núcleo determinístico e a CLI segura do simulador de operação cotidiana. Em seguida devem ser executados, nesta ordem, `[D-SIM-IMPL-002]`, `[D-SIM-IMPL-003]` e `[D-SIM-IMPL-004]`.
+As quatro tarefas da simulação operacional foram concluídas. Não há item `IMPL` aberto na sequência ativa.
 
-As validações remotas prioritárias foram concluídas. `[FUT-AUTH-DB-001]` permanece fora da sequência ativa e só poderá ser promovido depois das quatro tarefas da simulação. Os itens de encerramento final continuam deliberadamente no fim do roadmap.
+As validações remotas prioritárias foram concluídas. `[FUT-AUTH-DB-001]` volta a ser a próxima candidata de evolução, mas permanece fora da sequência ativa até promoção explícita. Os itens de encerramento final continuam deliberadamente no fim do roadmap.
 
 ---
 

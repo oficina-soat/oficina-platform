@@ -608,9 +608,6 @@ Esta seção concentra tarefas que dependem de ambiente externo, credenciais adm
 - [x] `[D-NR-EVID-001]` Registrar evidências de observabilidade distribuída no checklist final da Fase 4, incluindo links ou identificadores dos dashboards, alertas, traces e consultas de logs usadas na validação. Concluído em 2026-07-15 com os GUIDs dos quatro dashboards, policy `7756164`, links das evidências remotas, `correlationId` dos cenários E2E e consultas NRQL representativas de logs, Saga, Mercado Pago e DLQ.
 - [x] `[D-AWS-REM-001]` Aplicar o RDS PostgreSQL compartilhado em AWS usando valores variáveis do ambiente `lab`, como `vpc_id`, subnets e security groups resolvidos por Terraform outputs, variáveis de pipeline ou descoberta em tempo de deploy. Evidência conferida em 2026-07-10: a instância `oficina-postgres-lab` estava `available`, com endpoint RDS, security group e subnet group resolvidos no ambiente AWS `lab`.
 - [x] `[D-API-REM-001]` Materializar e validar no `oficina-infra` as rotas públicas do API Gateway quando os backends reais e `integration_uri` dos microsserviços estiverem disponíveis no ambiente `lab`. Evidência conferida em 2026-07-10: o HTTP API `eks-lab-http-api` expôs rotas específicas para os três microsserviços; chamadas públicas representativas retornaram respostas dos serviços corretos e endpoints operacionais como `/q/health` e `/api/v1/status` permaneceram sem rota pública.
-- [ ] `[D-DELIVERY-EVID-001]` Registrar data de entrega da Fase 4, participantes, links dos repositórios e link do vídeo no checklist final ou no documento de entrega.
-- [ ] `[D-VIDEO-EVID-001]` Registrar evidências finais do vídeo de demonstração de até 15 minutos após gravação e homologação do ambiente.
-
 ---
 
 ## Melhorias futuras
@@ -657,4 +654,13 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 Não há item `IMPL` aberto na sequência atual. Itens `REM` e `EVID` ficam apartados em [Validações remotas e evidências externas](#validações-remotas-e-evidências-externas) e só devem ser tratados quando o usuário pedir explicitamente validação remota, homologação externa ou registro de evidências.
 
-As validações remotas prioritárias foram concluídas. Permanecem os itens `EVID` finais, que dependem da consolidação da entrega, dos participantes e do vídeo.
+As validações remotas prioritárias foram concluídas. Não há item ativo de implementação ou homologação antes do encerramento final. As melhorias `FUT` permanecem fora da sequência até promoção explícita para o backlog orientado a agentes.
+
+---
+
+## Encerramento final da entrega
+
+Estes itens ficam deliberadamente no fim do roadmap e só devem ser executados quando os materiais finais estiverem disponíveis:
+
+- [ ] `[D-DELIVERY-EVID-001]` Registrar data de entrega da Fase 4, participantes, links dos repositórios e link do vídeo no checklist final ou no documento de entrega.
+- [ ] `[D-VIDEO-EVID-001]` Registrar evidências finais do vídeo de demonstração de até 15 minutos após gravação e homologação do ambiente.

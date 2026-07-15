@@ -38,6 +38,7 @@ Este diretório concentra a documentação normativa da plataforma em grupos tem
 
 ## Entrega e Validação
 
+- [Histórico consolidado do roadmap](delivery/roadmap-history.md)
 - [Enunciado Fase 4](delivery/Enunciado%20Fase%204.md)
 - [Padrão BDD, Cobertura e Qualidade](delivery/bdd-testing.md)
 - [Proteção da branch main dos microsserviços](delivery/github-branch-protection.md)

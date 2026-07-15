@@ -11,6 +11,7 @@ Os templates seguem o [Padrão de Observabilidade Distribuída](observability.md
 | Microsserviços Lab | [Dashboard operacional dos microsserviços](new-relic-dashboard-operational.json) | Golden signals, falhas HTTP, logs, traces, CPU, memória, restarts, readiness de Deployments e busca por `correlationId`. |
 | Saga e Ordem de Serviço Lab | [Dashboard da Saga e OS](new-relic-dashboard-saga.json) | Fluxo da OS, eventos da Saga, compensações, falha manual, Outbox e correlação por `aggregateId` e `correlationId`. |
 | Persistência e Mensageria Lab | [Dashboard de persistência e mensageria](new-relic-dashboard-persistence-messaging.json) | Operações e latência de persistência, backlog e idade da Outbox, publicação e consumo de eventos, SQS, DLQ, retries e conflitos de idempotência. |
+| Mercado Pago Lab | [Dashboard Mercado Pago](new-relic-dashboard-mercado-pago.json) | Volume, desfechos, latência, valores, indisponibilidade e correlação da integração financeira. |
 
 ## Como Importar
 
@@ -36,7 +37,7 @@ Para informar o account ID uma única vez e gerar cópias prontas para colar na 
 ```bash
 NEW_RELIC_ACCOUNT_ID=1234567
 
-for dashboard in docs/observability/new-relic-dashboard-operational.json docs/observability/new-relic-dashboard-saga.json docs/observability/new-relic-dashboard-persistence-messaging.json; do
+for dashboard in docs/observability/new-relic-dashboard-operational.json docs/observability/new-relic-dashboard-saga.json docs/observability/new-relic-dashboard-persistence-messaging.json docs/observability/new-relic-dashboard-mercado-pago.json; do
   output="/tmp/$(basename "${dashboard}")"
   jq --argjson account_id "${NEW_RELIC_ACCOUNT_ID}" \
     'walk(if type == "object" and has("accountIds") then .accountIds = [$account_id] else . end)' \
@@ -78,8 +79,9 @@ Em 2026-07-11, os dashboards existentes na conta New Relic `8254132` foram atual
 | Microsserviços Lab | `ODI1NDEzMnxWSVp8REFTSEJPQVJEfGRhOjEyODcwMzQ1` | `Operacional` | 15 widgets salvos; falhas HTTP, logs, métricas Prometheus, CPU, memória, restarts e readiness retornando dados. |
 | Saga e Ordem de Serviço Lab | `ODI1NDEzMnxWSVp8REFTSEJPQVJEfGRhOjEyODcwMzcz` | `Saga OS` | 14 widgets; os cinco painéis principais usam `saga_instances_*` e `saga_step_duration_seconds`; atualização e releitura via NerdGraph validadas em 2026-07-15. Evidência em [Métricas e Dashboard da Saga no Lab](saga-metrics-lab-evidence.md). |
 | Persistência e Mensageria Lab | `ODI1NDEzMnxWSVp8REFTSEJPQVJEfGRhOjEyODgzNTkw` | `Dependencias` | 10 widgets criados em 2026-07-14; consultas de persistência, Outbox, mensageria, DLQ e idempotência validadas via NerdGraph com dados reais e sem erros NRQL. |
+| Mercado Pago Lab | `ODI1NDEzMnxWSVp8REFTSEJPQVJEfGRhOjEyODg3MzE0` | `Mercado Pago` | 11 widgets; dez consultas validadas sem erro, com dados reais em nove delas. Evidência em [Dashboard Mercado Pago no Lab](mercado-pago-dashboard-lab-evidence.md). |
 
-As seis famílias `payment_provider_*` foram confirmadas no inventário `Metric` da conta em 2026-07-15, com emissão, scrape, labels e ingestão registrados na [Evidência das Métricas do Mercado Pago no Lab](payment-provider-metrics-lab-evidence.md). O dashboard específico do Mercado Pago pode agora ser criado e validado em `[D-NR-REM-006]`. A visão completa de duração por etapa da Saga também depende da ingestão remota das métricas `saga.instances.*` e `saga.step.duration` pelo `oficina-os-service`.
+As seis famílias `payment_provider_*` foram confirmadas no inventário `Metric` da conta em 2026-07-15, com emissão, scrape, labels e ingestão registrados na [Evidência das Métricas do Mercado Pago no Lab](payment-provider-metrics-lab-evidence.md). O dashboard específico foi criado em `[D-NR-REM-006]`. A ingestão e a visão de duração por etapa da Saga foram concluídas em `[D-NR-REM-003]`.
 
 O widget `Traces com erro` do dashboard operacional pode retornar zero linhas quando não houver spans com `error IS true`, `otel.status_code = 'ERROR'` ou status HTTP `5xx`. Esse resultado não indica falha de coleta: validações `400` e conflitos de negócio `409` aparecem nos widgets de falhas HTTP baseados em `Log`.
 
@@ -119,4 +121,4 @@ FROM Metric SELECT keyset() WHERE service.namespace = 'oficina' SINCE 30 minutes
 
 O dashboard de Saga usa os atributos confirmados em logs estruturados de Outbox: `domainEventType`, `event.type`, `aggregateId`, `producer`, `topic`, `messageStatus`, `correlationId`, `traceId` e `spanId`. O campo canônico emitido pelos microsserviços continua sendo `eventType`; no New Relic, use `domainEventType` ou `event.type`, porque `eventType` é reservado pela ingestão e pode não aparecer como atributo consultável.
 
-Campos específicos de uma futura instrumentação interna da Saga, como `sagaId`, `saga.etapa`, `saga.estado`, `saga.duracaoMs` e `ordemServicoId`, ainda não são emitidos como atributos estruturados. Quando eles forem adicionados aos logs dos serviços, novos widgets podem ser criados sem substituir os painéis atuais baseados em `aggregateId` e `domainEventType`.
+As transições da Saga emitem `sagaId`, `sagaStep`, `sagaState`, `previousSagaState`, `reason`, `ordemServicoId`, `correlationId`, `traceId` e `spanId`, conforme a [Evidência das Métricas e do Dashboard da Saga no Lab](saga-metrics-lab-evidence.md). Esses atributos complementam os painéis baseados em `aggregateId` e `domainEventType`.

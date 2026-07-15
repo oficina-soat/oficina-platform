@@ -29,6 +29,10 @@ Este diretório concentra a documentação normativa da plataforma em grupos tem
 - [Dashboards New Relic](observability/new-relic-dashboards.md)
 - [Dashboard operacional dos microsserviços](observability/new-relic-dashboard-operational.json)
 - [Dashboard da Saga e OS](observability/new-relic-dashboard-saga.json)
+- [Dashboard Mercado Pago](observability/new-relic-dashboard-mercado-pago.json)
+- [Policy de Alertas Mínimos](observability/new-relic-alert-policy.json)
+- [Evidência dos Alertas Mínimos no New Relic](observability/new-relic-alerts-lab-evidence.md)
+- [Evidência do Dashboard Mercado Pago no Lab](observability/mercado-pago-dashboard-lab-evidence.md)
 - [Runbooks Operacionais Mínimos](observability/operational-runbooks.md)
 - [Relatório D-NR-REM-005 — E2E no ambiente lab](observability/d-nr-rem-005-e2e-lab-report.md)
 

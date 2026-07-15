@@ -1,0 +1,105 @@
+{
+  "name": "Oficina SOAT - Mercado Pago Lab",
+  "description": "Dashboard New Relic para consumo do Mercado Pago pelo oficina-billing-service no ambiente lab.",
+  "permissions": "PUBLIC_READ_WRITE",
+  "pages": [
+    {
+      "guid": "MHxWSVp8REFTSEJPQVJEfDkwMDAwMTAwNA",
+      "name": "Mercado Pago",
+      "description": "Volume, desfechos, latencia, valores, indisponibilidade e correlacao da integracao financeira.",
+      "widgets": [
+        {
+          "id": "940001001",
+          "title": "Como usar",
+          "layout": {"column": 1, "row": 1, "width": 4, "height": 3},
+          "linkedEntityGuids": null,
+          "visualization": {"id": "viz.markdown"},
+          "rawConfiguration": {
+            "text": "## Oficina SOAT - Mercado Pago\n\nSubstitua `accountIds: [0]` pelo ID da conta ao importar. As metricas usam labels de baixa cardinalidade: `service`, `provider`, `method`, `outcome`, `providerStatus`, `reason` e `currency`. Identificadores como `pagamentoId`, `transacaoExternaId` e `correlationId` permanecem apenas em logs e traces."
+          }
+        },
+        {
+          "id": "940001002",
+          "title": "Integracao habilitada",
+          "layout": {"column": 5, "row": 1, "width": 2, "height": 3},
+          "linkedEntityGuids": null,
+          "visualization": {"id": "viz.billboard"},
+          "rawConfiguration": {"nrqlQueries": [{"accountIds": [0], "query": "FROM Metric SELECT latest(payment_provider_enabled) AS 'habilitada' WHERE service = 'oficina-billing-service' AND provider = 'mercado-pago' FACET environment"}]}
+        },
+        {
+          "id": "940001003",
+          "title": "Chamadas ao provedor",
+          "layout": {"column": 7, "row": 1, "width": 6, "height": 3},
+          "linkedEntityGuids": null,
+          "visualization": {"id": "viz.line"},
+          "rawConfiguration": {"nrqlQueries": [{"accountIds": [0], "query": "FROM Metric SELECT rate(sum(payment_provider_requests_count_total), 1 minute) AS 'chamadas/min' WHERE service = 'oficina-billing-service' AND provider = 'mercado-pago' FACET method, outcome TIMESERIES"}], "legend": {"enabled": true}}
+        },
+        {
+          "id": "940001004",
+          "title": "Taxa por desfecho",
+          "layout": {"column": 1, "row": 4, "width": 6, "height": 3},
+          "linkedEntityGuids": null,
+          "visualization": {"id": "viz.billboard"},
+          "rawConfiguration": {"nrqlQueries": [{"accountIds": [0], "query": "FROM Metric SELECT percentage(sum(payment_provider_requests_count_total), WHERE outcome = 'confirmed') AS 'sucesso %', percentage(sum(payment_provider_requests_count_total), WHERE outcome = 'rejected') AS 'recusa %', percentage(sum(payment_provider_requests_count_total), WHERE outcome = 'pending') AS 'pendente %', percentage(sum(payment_provider_requests_count_total), WHERE outcome = 'failure') AS 'erro %' WHERE service = 'oficina-billing-service' AND provider = 'mercado-pago'"}]}
+        },
+        {
+          "id": "940001005",
+          "title": "Status retornado pelo provedor",
+          "layout": {"column": 7, "row": 4, "width": 6, "height": 3},
+          "linkedEntityGuids": null,
+          "visualization": {"id": "viz.bar"},
+          "rawConfiguration": {"nrqlQueries": [{"accountIds": [0], "query": "FROM Metric SELECT sum(payment_provider_requests_count_total) AS 'chamadas' WHERE service = 'oficina-billing-service' AND provider = 'mercado-pago' FACET providerStatus, outcome, method LIMIT 30"}]}
+        },
+        {
+          "id": "940001006",
+          "title": "Latencia p95 e p99",
+          "layout": {"column": 1, "row": 7, "width": 6, "height": 3},
+          "linkedEntityGuids": null,
+          "visualization": {"id": "viz.line"},
+          "rawConfiguration": {"nrqlQueries": [{"accountIds": [0], "query": "FROM Metric SELECT percentile(payment_provider_request_duration_seconds, 95, 99) WHERE service = 'oficina-billing-service' AND provider = 'mercado-pago' FACET method, outcome TIMESERIES"}], "legend": {"enabled": true}}
+        },
+        {
+          "id": "940001007",
+          "title": "Valor por desfecho",
+          "layout": {"column": 7, "row": 7, "width": 6, "height": 3},
+          "linkedEntityGuids": null,
+          "visualization": {"id": "viz.bar"},
+          "rawConfiguration": {"nrqlQueries": [{"accountIds": [0], "query": "FROM Metric SELECT sum(payment_provider_amount_BRL) AS 'valor BRL' WHERE service = 'oficina-billing-service' AND provider = 'mercado-pago' FACET method, outcome, currency LIMIT 30"}]}
+        },
+        {
+          "id": "940001008",
+          "title": "Indisponibilidade por motivo",
+          "layout": {"column": 1, "row": 10, "width": 6, "height": 3},
+          "linkedEntityGuids": null,
+          "visualization": {"id": "viz.bar"},
+          "rawConfiguration": {"nrqlQueries": [{"accountIds": [0], "query": "FROM Metric SELECT sum(payment_provider_unavailable_count_total) AS 'indisponibilidades' WHERE service = 'oficina-billing-service' AND provider = 'mercado-pago' FACET reason LIMIT 30"}]}
+        },
+        {
+          "id": "940001009",
+          "title": "Falhas por motivo",
+          "layout": {"column": 7, "row": 10, "width": 6, "height": 3},
+          "linkedEntityGuids": null,
+          "visualization": {"id": "viz.bar"},
+          "rawConfiguration": {"nrqlQueries": [{"accountIds": [0], "query": "FROM Metric SELECT sum(payment_provider_failures_count_total) AS 'falhas' WHERE service = 'oficina-billing-service' AND provider = 'mercado-pago' FACET method, reason LIMIT 30"}]}
+        },
+        {
+          "id": "940001010",
+          "title": "Logs correlacionados de pagamento",
+          "layout": {"column": 1, "row": 13, "width": 6, "height": 3},
+          "linkedEntityGuids": null,
+          "visualization": {"id": "viz.table"},
+          "rawConfiguration": {"nrqlQueries": [{"accountIds": [0], "query": "FROM Log SELECT latest(timestamp) AS 'quando', latest(message) AS 'mensagem', latest(http.status) AS 'status', latest(traceId) AS 'traceId' WHERE service.name = 'oficina-billing-service' AND service.namespace = 'oficina' AND deployment.environment = 'lab' AND correlationId IS NOT NULL AND (http.path LIKE '%pagamentos%' OR domainEventType LIKE 'pagamento%') FACET correlationId LIMIT 50"}]}
+        },
+        {
+          "id": "940001011",
+          "title": "Traces da integracao financeira",
+          "layout": {"column": 7, "row": 13, "width": 6, "height": 3},
+          "linkedEntityGuids": null,
+          "visualization": {"id": "viz.table"},
+          "rawConfiguration": {"nrqlQueries": [{"accountIds": [0], "query": "FROM Span SELECT latest(trace.id) AS 'traceId', latest(name) AS 'span', max(duration.ms) AS 'duracao max ms' WHERE service.name = 'oficina-billing-service' AND service.namespace = 'oficina' AND deployment.environment = 'lab' AND (name LIKE '%MercadoPago%' OR name LIKE '%mercadopago%' OR http.url LIKE '%mercadopago%') FACET trace.id LIMIT 50"}]}
+        }
+      ]
+    }
+  ],
+  "variables": []
+}

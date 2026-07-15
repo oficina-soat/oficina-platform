@@ -1,0 +1,98 @@
+{
+  "name": "Oficina SOAT - Alertas Minimos Lab",
+  "incidentPreference": "PER_CONDITION_AND_TARGET",
+  "conditions": [
+    {
+      "name": "Servico indisponivel",
+      "description": "Readiness inferior a uma replica ou ausencia continua do sinal por cinco minutos.",
+      "query": "FROM Metric SELECT min(kube_deployment_status_replicas_ready) WHERE k8s.cluster.name = 'eks-lab' AND k8s.namespace.name = 'default' AND k8s.deployment.name IN ('oficina-os-service', 'oficina-billing-service', 'oficina-execution-service') FACET k8s.deployment.name",
+      "threshold": 1,
+      "operator": "BELOW",
+      "thresholdDuration": 300,
+      "thresholdOccurrences": "ALL",
+      "priority": "CRITICAL",
+      "expirationDuration": 300,
+      "openViolationOnExpiration": true
+    },
+    {
+      "name": "Erro HTTP elevado",
+      "description": "Mais de cinco respostas HTTP 5xx por servico em cinco minutos.",
+      "query": "FROM Log SELECT count(*) WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND numeric(http.status) >= 500 FACET service.name",
+      "threshold": 5,
+      "operator": "ABOVE",
+      "thresholdDuration": 300,
+      "thresholdOccurrences": "AT_LEAST_ONCE",
+      "priority": "CRITICAL"
+    },
+    {
+      "name": "Latencia HTTP p95 elevada",
+      "description": "Latencia p95 superior a dois segundos por servico durante cinco minutos.",
+      "query": "FROM Span SELECT percentile(duration.ms, 95) WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND (span.kind = 'server' OR span.kind = 'SERVER') FACET service.name",
+      "threshold": 2000,
+      "operator": "ABOVE",
+      "thresholdDuration": 300,
+      "thresholdOccurrences": "ALL",
+      "priority": "WARNING"
+    },
+    {
+      "name": "Outbox parada",
+      "description": "Evento mais antigo pendente na Outbox acima de 300 segundos.",
+      "query": "FROM Metric SELECT latest(outbox_oldest_pending_age) WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' FACET service.name",
+      "threshold": 300,
+      "operator": "ABOVE",
+      "thresholdDuration": 300,
+      "thresholdOccurrences": "ALL",
+      "priority": "CRITICAL"
+    },
+    {
+      "name": "Outbox com falha",
+      "description": "Qualquer incremento do contador de falhas de publicacao da Outbox.",
+      "query": "FROM Metric SELECT sum(outbox_failed_count_total) WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' FACET service.name, eventType, topic",
+      "threshold": 0,
+      "operator": "ABOVE",
+      "thresholdDuration": 60,
+      "thresholdOccurrences": "AT_LEAST_ONCE",
+      "priority": "CRITICAL"
+    },
+    {
+      "name": "DLQ recebendo mensagens",
+      "description": "Qualquer incremento do contador de mensagens encaminhadas para DLQ.",
+      "query": "FROM Metric SELECT sum(messaging_dlq_count_total) WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' FACET service.name, queue, topic",
+      "threshold": 0,
+      "operator": "ABOVE",
+      "thresholdDuration": 60,
+      "thresholdOccurrences": "AT_LEAST_ONCE",
+      "priority": "CRITICAL"
+    },
+    {
+      "name": "Saga em falha manual",
+      "description": "Qualquer Saga que alcance FALHA_MANUAL.",
+      "query": "FROM Metric SELECT sum(saga_instances_failed_count_total) WHERE service = 'oficina-os-service' AND sagaType = 'ordemServico' FACET reason",
+      "threshold": 0,
+      "operator": "ABOVE",
+      "thresholdDuration": 60,
+      "thresholdOccurrences": "AT_LEAST_ONCE",
+      "priority": "CRITICAL"
+    },
+    {
+      "name": "Pagamento indisponivel",
+      "description": "Duas ou mais falhas de indisponibilidade do Mercado Pago na janela avaliada.",
+      "query": "FROM Metric SELECT sum(payment_provider_unavailable_count_total) WHERE service = 'oficina-billing-service' AND provider = 'mercado-pago' FACET reason",
+      "threshold": 1,
+      "operator": "ABOVE",
+      "thresholdDuration": 300,
+      "thresholdOccurrences": "AT_LEAST_ONCE",
+      "priority": "CRITICAL"
+    },
+    {
+      "name": "Banco indisponivel",
+      "description": "Falha categorizada como indisponibilidade em operacoes PostgreSQL ou DynamoDB.",
+      "query": "FROM Metric SELECT sum(persistence_operations_count_total) WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' AND result = 'failure' AND error = 'unavailable' FACET service.name, database, resource",
+      "threshold": 0,
+      "operator": "ABOVE",
+      "thresholdDuration": 300,
+      "thresholdOccurrences": "AT_LEAST_ONCE",
+      "priority": "CRITICAL"
+    }
+  ]
+}

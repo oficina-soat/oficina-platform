@@ -20,10 +20,10 @@ Este checklist complementa o [Enunciado Fase 4](Enunciado%20Fase%204.md), o [ROA
 
 | Repositório | Link remoto | README final | Cobertura | Swagger/OpenAPI | Pipeline | Kubernetes | Status |
 |---|---|---|---|---|---|---|---|
-| `oficina-os-service` | [GitHub](https://github.com/oficina-soat/oficina-os-service) | [README](https://github.com/oficina-soat/oficina-os-service#readme) | [Evidência no README](https://github.com/oficina-soat/oficina-os-service#cobertura) | [OpenAPI canônica](../../contracts/openapi/oficina-os-service.yaml) | [Service CI/CD](https://github.com/oficina-soat/oficina-os-service/actions/workflows/service-ci.yml) | [Manifest canônico](https://github.com/oficina-soat/oficina-os-service/tree/main/k8s/base) | Implementado localmente; publicação pendente |
-| `oficina-billing-service` | [GitHub](https://github.com/oficina-soat/oficina-billing-service) | [README](https://github.com/oficina-soat/oficina-billing-service#readme) | [Evidência no README](https://github.com/oficina-soat/oficina-billing-service#cobertura) | [OpenAPI canônica](../../contracts/openapi/oficina-billing-service.yaml) | [Service CI/CD](https://github.com/oficina-soat/oficina-billing-service/actions/workflows/service-ci.yml) | [Manifest canônico](https://github.com/oficina-soat/oficina-billing-service/tree/main/k8s/base) | Implementado localmente; publicação pendente |
-| `oficina-execution-service` | [GitHub](https://github.com/oficina-soat/oficina-execution-service) | [README](https://github.com/oficina-soat/oficina-execution-service#readme) | [Evidência no README](https://github.com/oficina-soat/oficina-execution-service#cobertura) | [OpenAPI canônica](../../contracts/openapi/oficina-execution-service.yaml) | [Service CI/CD](https://github.com/oficina-soat/oficina-execution-service/actions/workflows/service-ci.yml) | [Manifest canônico](https://github.com/oficina-soat/oficina-execution-service/tree/main/k8s/base) | Implementado localmente; publicação pendente |
-| `oficina-infra` | [GitHub](https://github.com/oficina-soat/oficina-infra) | [README](https://github.com/oficina-soat/oficina-infra#readme) | Não aplicável | Não aplicável | [Deploy Lab](https://github.com/oficina-soat/oficina-infra/actions/workflows/deploy-lab.yml) | [Kubernetes](https://github.com/oficina-soat/oficina-infra/tree/main/k8s) | Implementado; evidências finais pendentes |
+| `oficina-os-service` | [GitHub](https://github.com/oficina-soat/oficina-os-service) | [README](https://github.com/oficina-soat/oficina-os-service#readme) | [Evidência no README](https://github.com/oficina-soat/oficina-os-service#cobertura) | [OpenAPI canônica](../../contracts/openapi/oficina-os-service.yaml) | [Service CI/CD](https://github.com/oficina-soat/oficina-os-service/actions/workflows/service-ci.yml) | [Manifest canônico](https://github.com/oficina-soat/oficina-os-service/tree/main/k8s/base) | Publicado e validado no `lab` |
+| `oficina-billing-service` | [GitHub](https://github.com/oficina-soat/oficina-billing-service) | [README](https://github.com/oficina-soat/oficina-billing-service#readme) | [Evidência no README](https://github.com/oficina-soat/oficina-billing-service#cobertura) | [OpenAPI canônica](../../contracts/openapi/oficina-billing-service.yaml) | [Service CI/CD](https://github.com/oficina-soat/oficina-billing-service/actions/workflows/service-ci.yml) | [Manifest canônico](https://github.com/oficina-soat/oficina-billing-service/tree/main/k8s/base) | Publicado e validado no `lab` |
+| `oficina-execution-service` | [GitHub](https://github.com/oficina-soat/oficina-execution-service) | [README](https://github.com/oficina-soat/oficina-execution-service#readme) | [Evidência no README](https://github.com/oficina-soat/oficina-execution-service#cobertura) | [OpenAPI canônica](../../contracts/openapi/oficina-execution-service.yaml) | [Service CI/CD](https://github.com/oficina-soat/oficina-execution-service/actions/workflows/service-ci.yml) | [Manifest canônico](https://github.com/oficina-soat/oficina-execution-service/tree/main/k8s/base) | Publicado e validado no `lab` |
+| `oficina-infra` | [GitHub](https://github.com/oficina-soat/oficina-infra) | [README](https://github.com/oficina-soat/oficina-infra#readme) | Não aplicável | Não aplicável | [Deploy Lab](https://github.com/oficina-soat/oficina-infra/actions/workflows/deploy-lab.yml) | [Kubernetes](https://github.com/oficina-soat/oficina-infra/tree/main/k8s) | Publicado e validado no `lab` |
 | `oficina-auth-lambda` | A preencher | A preencher | A preencher | [OpenAPI canônica](../../contracts/openapi/oficina-auth-lambda.yaml) | A preencher | Não aplicável | Pendente |
 
 ## Checklist por Microsserviço
@@ -60,8 +60,53 @@ Cada repositório de microsserviço deve possuir:
 | Mensageria assíncrona | Eventos e tópicos aderentes ao [Contrato de Eventos de Domínio](../../contracts/Contrato%20de%20Eventos%20de%20Domínio.md) e ao [Contrato de Tópicos de Mensageria](../../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md). | [Fluxo real Outbox, SNS, SQS, persistência e DLQ validado no lab](messaging-lab-evidence.md) |
 | Saga Pattern | Orquestração pelo `oficina-os-service`, com caminho feliz e falha compensada. | [BDD e E2E no ambiente lab](../observability/d-nr-rem-005-e2e-lab-report.md) |
 | Mercado Pago | Integração financeira documentada e evidência de cobrança PIX sandbox executada pelo `oficina-billing-service`, com `pagamentoId`, `transacaoExternaId`, referência externa do Mercado Pago, logs/traces por `correlationId` e evento financeiro correspondente. | [Cobrança PIX sandbox e correlação no New Relic concluídas](mercado-pago-sandbox-evidence.md) |
-| Observabilidade | Logs estruturados, métricas, traces e dashboard operacional conforme [Padrão de Observabilidade Distribuída](../observability/observability.md). Alertas e visões complementares ainda permanecem pendentes. | [E2E no ambiente lab](../observability/d-nr-rem-005-e2e-lab-report.md) e [Dashboards New Relic](../observability/new-relic-dashboards.md) |
+| Observabilidade | Logs estruturados, métricas, traces, quatro dashboards e nove alertas mínimos conforme [Padrão de Observabilidade Distribuída](../observability/observability.md). | [E2E no ambiente lab](../observability/d-nr-rem-005-e2e-lab-report.md), [Dashboards New Relic](../observability/new-relic-dashboards.md) e [Alertas mínimos](../observability/new-relic-alerts-lab-evidence.md) |
 | Diagrama geral | Arquitetura final alinhada ao [Diagrama Geral da Arquitetura Final](../architecture/architecture-diagram.md). | [Diagrama Geral da Arquitetura Final](../architecture/architecture-diagram.md) |
+
+## Evidências Consolidadas de Bancos e Mensageria
+
+| Escopo | Recurso físico ou identificador | Evidência consolidada |
+|---|---|---|
+| PostgreSQL compartilhado | RDS `oficina-postgres-lab`; databases `oficina_os` e `oficina_billing`; usuários próprios | [OS](os-postgresql-lab-evidence.md) e [Billing](billing-postgresql-lab-evidence.md) comprovam migrations, registros sentinela, isolamento e preservação após substituição dos pods. |
+| DynamoDB | `oficina-execution-lab-catalogo`, `-estoque`, `-execucoes`, `-outbox` e `-idempotencia` | [Execution](execution-dynamodb-lab-evidence.md) comprova tabelas `ACTIVE`, nomes físicos, itens sentinela e contagens idênticas após restart. |
+| Outbox e caminho feliz | Evento `ordemDeServicoCriada`, tópico `oficina.os.ordem-de-servico-criada`, filas de Billing e Execution | [Mensageria SNS/SQS](messaging-lab-evidence.md) comprova `PUBLISHED`, `CONSUMED`, `ACKED`, persistência nos consumidores e filas zeradas após ACK. |
+| Retry e DLQ | Fila `oficina-billing-orcamento-gerado-oficina-os-service`; DLQ `oficina-billing-orcamento-gerado-dlq` | A mensagem sentinela foi recebida seis vezes e redirecionada à DLQ após o limite configurado. |
+| IAM e runtime EKS | Node group `eks-lab-ng-20260714092902417300000007`; role `LabRole`; policies content-addressed em `v1` | O fluxo real executou sem `AccessDenied`, credencial estática ou fallback local. |
+| Correlação | `b2-msg-rem-001-20260714111604`, `eventId=ff3631a6-52c6-43ec-81fd-3e843fcc82e4` | Logs estruturados ligam produtor, Outbox, SNS/SQS, consumidores e persistência pelos identificadores canônicos. |
+
+Essa matriz conclui `[B2-DB-MSG-EVID-001]` sem reproduzir conteúdo de Secrets, endpoints privados ou credenciais.
+
+## Evidências Consolidadas de Observabilidade
+
+| Artefato | Identificador | Evidência |
+|---|---|---|
+| Dashboard operacional | `ODI1NDEzMnxWSVp8REFTSEJPQVJEfGRhOjEyODcwMzQ1` | Golden signals, HTTP, Kubernetes, logs, traces e busca por `correlationId`. |
+| Dashboard da Saga | `ODI1NDEzMnxWSVp8REFTSEJPQVJEfGRhOjEyODcwMzcz` | 14 widgets, métricas `saga_instances_*`, duração por etapa e correlação; [evidência remota](../observability/saga-metrics-lab-evidence.md). |
+| Dashboard de persistência e mensageria | `ODI1NDEzMnxWSVp8REFTSEJPQVJEfGRhOjEyODgzNTkw` | 10 widgets de banco, Outbox, SNS/SQS, DLQ e idempotência. |
+| Dashboard Mercado Pago | `ODI1NDEzMnxWSVp8REFTSEJPQVJEfGRhOjEyODg3MzE0` | 11 widgets; volume, desfechos, p95/p99, valores, indisponibilidade, logs e traces; [evidência remota](../observability/mercado-pago-dashboard-lab-evidence.md). |
+| Policy de alertas | `7756164` | Nove condições ativas para disponibilidade, HTTP, latência, Outbox, DLQ, Saga, pagamento e banco; [evidência remota](../observability/new-relic-alerts-lab-evidence.md). |
+| Trace e logs E2E | `d-nr-rem-005-rerun-happy-20260711T151358Z` e `d-nr-rem-005-rerun-comp-20260711T151358Z` | [E2E no lab](../observability/d-nr-rem-005-e2e-lab-report.md) comprova sinais nos três microsserviços e eventos correlacionados. |
+| Cobrança sandbox | `d-obs-mp-success-20260715T110159Z-pagamento` | Métricas, logs e cobrança Mercado Pago associados na [evidência de coleta](../observability/payment-provider-metrics-lab-evidence.md). |
+
+Consultas NRQL representativas validadas via NerdGraph:
+
+```nrql
+FROM Log SELECT count(*) WHERE correlationId IN ('d-nr-rem-005-rerun-happy-20260711T151358Z', 'd-nr-rem-005-rerun-comp-20260711T151358Z') FACET service.name, correlationId
+```
+
+```nrql
+FROM Metric SELECT percentile(saga_step_duration_seconds, 95) WHERE service = 'oficina-os-service' AND sagaType = 'ordemServico' FACET step
+```
+
+```nrql
+FROM Metric SELECT sum(payment_provider_requests_count_total) WHERE service = 'oficina-billing-service' AND provider = 'mercado-pago' FACET method, outcome, providerStatus
+```
+
+```nrql
+FROM Metric SELECT sum(messaging_dlq_count_total) WHERE service.namespace = 'oficina' AND deployment.environment = 'lab' FACET service.name, queue, topic
+```
+
+Essa consolidação conclui `[D-NR-EVID-001]`. GUIDs, queries completas e resultados adicionais permanecem em [Dashboards New Relic](../observability/new-relic-dashboards.md) e nos relatórios vinculados.
 
 ## Cenários de Demonstração
 
@@ -77,7 +122,7 @@ O vídeo de até 15 minutos deve demonstrar:
 - [ ] deploy automatizado de pelo menos um microsserviço em Kubernetes;
 - [ ] rastreamento distribuído com `correlationId` em logs e traces;
 - [x] cobrança PIX sandbox no Mercado Pago pelo fluxo real `POST /api/v1/pagamentos`, sem simulação manual de confirmação;
-- [ ] painel ou consulta New Relic com métricas de consumo Mercado Pago do `oficina-billing-service`;
+- [x] painel ou consulta New Relic com métricas de consumo Mercado Pago do `oficina-billing-service`;
 - [ ] consulta de Swagger/OpenAPI ou collection Postman atualizada.
 
 ## PDF Final

@@ -49,6 +49,10 @@ Estes itens não pertencem à sequência ativa. A promoção deve mover o item p
 
 - [ ] `[FUT-AUTH-DB-001]` Isolar a autenticação em `oficina_auth` e `oficina_auth_user`: Terraform e bootstrap, secret exclusivo, configuração das Lambdas, migração segura de credenciais e tokens, privilégio mínimo, rollback e validação de login/sincronização. O cadastro operacional permanece no `oficina-os-service`; somente a projeção de login e as credenciais pertencem à autenticação.
 
+## Extensões opcionais
+
+Extensões não integram os requisitos obrigatórios nem a sequência ativa. A hospedagem AWS do frontend operacional é acompanhada no [roadmap do frontend](docs/frontend/roadmap.md#trilha-extra--hospedagem-opcional-na-aws) e, conforme a [ADR-013](adr/ADR-013%20-%20Frontend%20Operacional%20Angular.md#isolamento-da-infraestrutura-opcional), deve possuir composição, state e pipeline isolados da infraestrutura principal.
+
 ## Encerramento final
 
 Estes itens permanecem deliberadamente no fim e só devem ser executados quando os materiais finais estiverem disponíveis.

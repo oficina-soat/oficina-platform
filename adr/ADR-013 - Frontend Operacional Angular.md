@@ -20,7 +20,7 @@ Será criado o repositório independente `oficina-ui` com as seguintes direçõe
 - Signals e serviços de aplicação no MVP, sem NgRx;
 - ausência de SSR e BFF no primeiro incremento;
 - hospedagem estática em S3 privado com CloudFront e Origin Access Control;
-- infraestrutura declarada no `oficina-infra` e pipeline independente no `oficina-ui`;
+- infraestrutura opcional declarada no `oficina-infra`, mas isolada da infraestrutura obrigatória, e pipeline independente no `oficina-ui`;
 - escopo inicial limitado a login, atendimento e fila do mecânico;
 - portal do cliente, financeiro, estoque, administração avançada, tempo real e BFF tratados como evoluções posteriores.
 
@@ -66,6 +66,21 @@ O build Angular será armazenado em bucket S3 privado e servido por CloudFront. 
 
 O domínio padrão do CloudFront é suficiente inicialmente. Domínio próprio, Route 53 e WAF não são pré-requisitos do MVP.
 
+### Isolamento da infraestrutura opcional
+
+A hospedagem da UI é uma extensão operacional e não um requisito da infraestrutura obrigatória da solução. Quando materializada no `oficina-infra`, ela deve usar um root module próprio, por exemplo `terraform/optional/ui-hosting/lab`, com backend/state, variáveis, outputs, plano e aplicação independentes do root module `terraform/environments/lab`.
+
+Esse isolamento estabelece que:
+
+- aplicar ou destruir a hospedagem da UI não altera EKS, bancos, mensageria, API Gateway, Lambdas ou demais recursos obrigatórios;
+- falha, ausência ou remoção de S3/CloudFront não bloqueia os pipelines dos serviços nem invalida a infraestrutura exigida;
+- o pipeline da UI consome somente os outputs de sua própria stack e os endpoints públicos já contratados;
+- a stack opcional pode referenciar endpoints públicos por configuração, mas não por dependências Terraform que acoplem os states;
+- custos e recursos da extensão ficam identificáveis separadamente;
+- documentação e evidências distinguem explicitamente a solução obrigatória da conveniência operacional adicional.
+
+Módulos reutilizáveis podem continuar sob `terraform/modules`, desde que a composição e o state da hospedagem permaneçam separados.
+
 ## Consequências
 
 ### Positivas
@@ -73,6 +88,7 @@ O domínio padrão do CloudFront é suficiente inicialmente. Domínio próprio, 
 - baixo custo e ausência de servidor dedicado;
 - familiaridade com Angular no ambiente de trabalho do usuário;
 - deploy independente e compatível com a governança multi-repositório;
+- hospedagem opcional removível sem impacto nos requisitos obrigatórios;
 - fronteira explícita que evita duplicação de regras dos backends;
 - evolução incremental sem antecipar infraestrutura de BFF ou SSR.
 

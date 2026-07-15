@@ -32,7 +32,7 @@ Não é permitido duplicar no Angular uma decisão do backend para habilitar uma
 | Estado | Signals e serviços de aplicação; sem NgRx inicialmente |
 | Formulários | Reactive Forms |
 | Hospedagem | S3 privado e CloudFront com Origin Access Control |
-| Infraestrutura | Terraform no `oficina-infra` |
+| Infraestrutura | Extensão opcional no `oficina-infra`, com root module e state próprios |
 | Entrega | Pipeline independente no repositório `oficina-ui` |
 | Escopo inicial | Login, atendimento e fila do mecânico |
 
@@ -96,10 +96,15 @@ src/app/
 - [ ] `[UI-A11Y-001]` Validar navegação por teclado, foco, labels, contraste, leitores de tela e comportamento responsivo.
 - [ ] `[UI-SEC-001]` Configurar CSP, headers de segurança, auditoria de dependências e verificação de que build, logs e source maps públicos não expõem credenciais ou dados sensíveis.
 - [ ] `[UI-CI-001]` Criar pipeline com instalação reproduzível, lint, format check, testes, cobertura, build e Quality Gate antes da publicação.
-- [ ] `[UI-INFRA-001]` Criar no `oficina-infra` S3 privado, CloudFront, Origin Access Control, fallback de rotas para `index.html`, headers, cache e outputs, sem domínio próprio inicialmente.
-- [ ] `[UI-DEPLOY-001]` Publicar artefatos com hash e cache longo, `index.html` sem cache prolongado, invalidação seletiva do CloudFront e versão rastreável do deploy.
 - [ ] `[UI-OBS-001]` Instrumentar erros e desempenho do navegador sem CPF, JWT ou dados financeiros, propagando `correlationId` para permitir diagnóstico conjunto com os backends.
 - [ ] `[UI-MVP-REM-001]` Homologar no `lab` os três fluxos do MVP com os papéis reais e registrar evidências de segurança, acessibilidade, pipeline e operação.
+
+## Trilha extra — hospedagem opcional na AWS
+
+Esta trilha oferece acesso operacional conveniente à UI, mas não integra os requisitos obrigatórios da infraestrutura da solução. Sua execução, falha ou remoção não pode bloquear deploys, validações ou destruição controlada dos backends e dos componentes exigidos.
+
+- [ ] `[UI-INFRA-001]` Criar no `oficina-infra` uma composição Terraform opcional para a hospedagem, em root module próprio e com backend/state independente de `terraform/environments/lab`. Incluir S3 privado, CloudFront, Origin Access Control, fallback de rotas para `index.html`, headers, cache e outputs, sem domínio próprio inicialmente; aplicar ou destruir essa stack não pode alterar nenhum recurso obrigatório.
+- [ ] `[UI-DEPLOY-001]` Publicar pelo pipeline independente do `oficina-ui` os artefatos com hash e cache longo, `index.html` sem cache prolongado, configuração de runtime, invalidação seletiva do CloudFront e versão rastreável do deploy. O pipeline deve depender apenas dos outputs da stack opcional e não participar dos pipelines dos serviços.
 
 ## Evoluções posteriores ao MVP
 
@@ -114,4 +119,4 @@ Estes itens devem ser promovidos e detalhados somente depois da homologação do
 
 ## Critério de pronto do MVP
 
-O MVP estará pronto quando login, atendimento e fila do mecânico funcionarem no `lab`; nenhum componente contiver regra de negócio; as fronteiras arquiteturais forem verificadas automaticamente; APIs revalidarem todas as operações; testes, acessibilidade, segurança e Quality Gate estiverem aprovados; e o build Angular for servido por CloudFront a partir de bucket S3 privado.
+O MVP funcional da UI estará pronto quando login, atendimento e fila do mecânico funcionarem contra o `lab`; nenhum componente contiver regra de negócio; as fronteiras arquiteturais forem verificadas automaticamente; APIs revalidarem todas as operações; e testes, acessibilidade, segurança e Quality Gate estiverem aprovados. A publicação em S3/CloudFront pertence à trilha extra e não altera o atendimento dos requisitos obrigatórios da infraestrutura.

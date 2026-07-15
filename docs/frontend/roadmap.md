@@ -86,7 +86,7 @@ src/app/
 - [x] `[UI-OS-001]` Implementar abertura, consulta e listagem de ordens de serviço. Concluído no commit `14ba00b` do `oficina-ui`, com paginação, filtro canônico por estado, abertura a partir do veículo e validação de leitura no `lab`.
 - [x] `[UI-OS-002]` Implementar detalhes, histórico e ações retornadas/aceitas pela API, sem codificar transições válidas no Angular. Concluído no `oficina-ui` com histórico canônico, alteração genérica de estado e cancelamento assíncrono; transições inválidas continuam sendo rejeitadas exclusivamente pelo backend.
 - [x] `[UI-QUEUE-001]` Implementar fila do mecânico com atualização manual e estados retornados pelo Execution; paginação só deve ser adicionada depois de contratada no backend. Concluído no `oficina-ui` com rota protegida por papel para experiência, filtro canônico, ordem e posições preservadas da API e validação somente leitura no `lab`.
-- [ ] `[UI-EXEC-001]` Implementar início/conclusão de diagnóstico e reparo, apresentando sucesso, rejeição e conflito canônicos do backend.
+- [x] `[UI-EXEC-001]` Implementar início/conclusão de diagnóstico e reparo, apresentando sucesso, rejeição e conflito canônicos do backend. Concluído no `oficina-ui` com detalhe da execução, quatro comandos idempotentes e estado atualizado exclusivamente pela resposta da API; a consulta foi validada no `lab` sem avançar dados compartilhados.
 
 ### Fase 4 — Qualidade, segurança e entrega do MVP
 

@@ -574,6 +574,16 @@ Convenção de identificadores para itens abertos:
 - [x] `[D-SIM-IMPL-003]` Implementar as proteções e o diagnóstico do simulador. Concluído no commit `0e81bf4` com marcação `SIM-<seed>-<sequência>`, domínio reservado, interrupção de encadeamentos após falha, cleanup restrito a usuários criados na sessão, espera assíncrona e classificação entre sucesso, rejeição esperada e regressão com código de saída não zero.
 - [x] `[D-SIM-IMPL-004]` Validar e documentar o simulador. Concluído no commit `0e81bf4` com 13 testes automatizados, integração à validação padrão, exemplos de perfis e execução `dry-run`. Uma execução controlada no `lab` em 2026-07-15, limitada a um evento e custo estimado de `R$ 0,001`, criou cliente, veículo e OS com três respostas HTTP `201` e nenhuma regressão; a evidência operacional está em `oficina-infra/docs/workshop-simulator.md`.
 
+### Épico D — Diagramas nos repositórios canônicos
+
+Os diagramas deste épico devem ser escritos em Mermaid e incorporados diretamente ao `README.md` do respectivo repositório. Cada diagrama deve representar apenas componentes materializados ou contratos vigentes, permanecer legível na renderização do GitHub, usar nomes canônicos e apontar para documentação detalhada quando houver. Não duplicar diagramas extensos: o README deve oferecer a visão de entrada adequada ao escopo do repositório.
+
+- [ ] `[D-DIAG-INFRA-IMPL-001]` Adicionar ao `README.md` do `oficina-infra` um diagrama arquitetural Mermaid do ambiente `lab`, cobrindo entrada pelo API Gateway, Lambdas de autenticação/notificação, VPC Link e balanceamento, EKS e os três microsserviços, RDS PostgreSQL compartilhado com databases isolados, DynamoDB, SNS/SQS/DLQ, ECR, Secrets Manager e exportação de telemetria ao New Relic. Diferenciar visualmente recursos AWS, workloads Kubernetes, persistência, mensageria e observabilidade sem expor conta, endpoints ou secrets.
+- [ ] `[D-DIAG-OS-IMPL-001]` Adicionar ao `README.md` do `oficina-os-service` um diagrama Mermaid focado no código e nas responsabilidades do serviço: API REST, casos de uso e domínio, gateways PostgreSQL, Outbox/idempotência, orquestração da Saga, publicação SNS e consumo SQS. Evidenciar que Cliente, Veículo, OS e Saga pertencem ao serviço e que Billing e Execution são integrações externas por eventos.
+- [ ] `[D-DIAG-BILLING-IMPL-001]` Adicionar ao `README.md` do `oficina-billing-service` um diagrama Mermaid focado no código e no fluxo financeiro: API de orçamento/pagamento, aplicação e domínio, PostgreSQL, Outbox/idempotência, consumo e publicação de eventos e integração externa com Mercado Pago. Distinguir confirmação/recusa do provedor dos eventos financeiros internos.
+- [ ] `[D-DIAG-EXEC-IMPL-001]` Adicionar ao `README.md` do `oficina-execution-service` um diagrama Mermaid focado no código e na operação técnica: APIs de catálogo, estoque e execução, aplicação e domínio, tabelas DynamoDB, Outbox/idempotência, consumo/publicação SNS/SQS e relação assíncrona com a Saga orquestrada pelo OS.
+- [ ] `[D-DIAG-AUTH-IMPL-001]` Revisar e complementar os diagramas Mermaid já existentes no `README.md` do `oficina-auth-lambda`, consolidando a topologia dos módulos `auth-lambda`, `auth-sync-lambda` e `notificacao-lambda`, API Gateway, PostgreSQL da autenticação, eventos de usuários via SQS e emissão/validação JWT por issuer/JWKS. Evitar representar o cadastro operacional como responsabilidade da autenticação.
+
 ---
 
 ## Validações remotas e evidências externas
@@ -658,9 +668,9 @@ A plataforma pode ser considerada pronta para guiar os repositórios dos micross
 
 ## Próximo passo recomendado
 
-As quatro tarefas da simulação operacional foram concluídas. Não há item `IMPL` aberto na sequência ativa.
+O próximo item da sequência ativa é `[D-DIAG-INFRA-IMPL-001]`: adicionar ao `README.md` do `oficina-infra` a visão arquitetural Mermaid do ambiente `lab`. Em seguida, executar os diagramas focados no código de OS, Billing, Execution e Auth, nesta ordem.
 
-As validações remotas prioritárias foram concluídas. `[FUT-AUTH-DB-001]` volta a ser a próxima candidata de evolução, mas permanece fora da sequência ativa até promoção explícita. Os itens de encerramento final continuam deliberadamente no fim do roadmap.
+As validações remotas prioritárias foram concluídas. `[FUT-AUTH-DB-001]` permanece fora da sequência ativa até promoção explícita. Os itens de encerramento final continuam deliberadamente no fim do roadmap.
 
 ---
 

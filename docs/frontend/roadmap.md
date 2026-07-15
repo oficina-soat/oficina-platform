@@ -73,7 +73,7 @@ src/app/
 
 ### Fase 2 — Autenticação e shell operacional
 
-- [ ] `[UI-AUTH-001]` Implementar login por CPF e senha, sessão inicialmente em memória, expiração, logout e tratamento de usuário bloqueado, inativo ou sem credencial ativada.
+- [x] `[UI-AUTH-001]` Implementar login por CPF e senha, sessão inicialmente em memória, expiração, logout e tratamento de usuário bloqueado, inativo ou sem credencial ativada. Concluído no commit `240cfd7` do `oficina-ui`; enquanto o contrato retorna o mesmo motivo para esses três estados, a interface apresenta uma orientação segura e genérica.
 - [ ] `[UI-AUTH-002]` Implementar ativação de credencial conforme o contrato serverless, sem registrar senha, token de ativação ou JWT.
 - [ ] `[UI-AUTH-003]` Implementar guards e navegação por papel apenas como recurso de experiência; documentar e testar que a autorização definitiva permanece nas APIs.
 - [ ] `[UI-SHELL-001]` Criar shell responsivo com menu, identidade do usuário, breadcrumb, página não encontrada e tratamento global de indisponibilidade.

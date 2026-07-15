@@ -68,6 +68,26 @@ paths:
       parameters:
         - $ref: "#/components/parameters/Page"
         - $ref: "#/components/parameters/Size"
+        - name: nome
+          in: query
+          description: Trecho do nome, sem distinção entre maiúsculas e minúsculas.
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 120
+        - name: documento
+          in: query
+          description: CPF completo com 11 dígitos.
+          schema:
+            type: string
+            pattern: '^\d{11}$'
+        - name: email
+          in: query
+          description: Trecho do e-mail, sem distinção entre maiúsculas e minúsculas.
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 254
       responses:
         "200":
           description: Usuários operacionais encontrados.

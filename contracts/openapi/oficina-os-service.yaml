@@ -81,13 +81,16 @@ paths:
           schema:
             type: string
             pattern: '^\d{11}$'
-        - name: email
+        - name: status
           in: query
-          description: Trecho do e-mail, sem distinção entre maiúsculas e minúsculas.
+          description: Estado operacional canônico.
           schema:
-            type: string
-            minLength: 1
-            maxLength: 254
+            $ref: "#/components/schemas/StatusUsuario"
+        - name: papel
+          in: query
+          description: Papel operacional canônico.
+          schema:
+            $ref: "#/components/schemas/PapelUsuario"
       responses:
         "200":
           description: Usuários operacionais encontrados.
@@ -131,8 +134,8 @@ paths:
           $ref: "#/components/responses/NotFound"
     put:
       tags: [Usuarios]
-      summary: Atualizar usuário operacional
-      description: Substitui nome, CPF, status e papéis do cadastro operacional e persiste usuarioAtualizado na Outbox. Credenciais não pertencem a este recurso.
+      summary: Atualizar dados do usuário operacional
+      description: Substitui nome, CPF e papéis do cadastro operacional, preserva o estado atual e persiste usuarioAtualizado na Outbox. Credenciais não pertencem a este recurso.
       operationId: atualizarUsuario
       x-required-roles: [administrativo]
       x-publishes-events: [usuarioAtualizado]
@@ -144,16 +147,9 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/UsuarioUpdateRequest"
-            examples:
-              bloqueio:
-                value:
-                  nome: Ana Silva
-                  documento: "84191404067"
-                  status: BLOQUEADO
-                  papeis: [mecanico]
       responses:
         "200":
-          description: Usuário operacional atualizado.
+          description: Dados do usuário operacional atualizados.
           content:
             application/json:
               schema:
@@ -180,6 +176,58 @@ paths:
       responses:
         "204":
           description: Usuário operacional inativado, inclusive quando já estava inativo.
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /usuarios/{usuarioId}/bloqueio:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
+      - $ref: "#/components/parameters/UsuarioId"
+    post:
+      tags: [Usuarios]
+      summary: Bloquear usuário operacional
+      operationId: bloquearUsuario
+      x-required-roles: [administrativo]
+      x-publishes-events: [usuarioAtualizado]
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Usuário bloqueado ou representação atual quando já estava bloqueado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Usuario"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /usuarios/{usuarioId}/reativacao:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
+      - $ref: "#/components/parameters/UsuarioId"
+    post:
+      tags: [Usuarios]
+      summary: Reativar usuário operacional
+      operationId: reativarUsuario
+      x-required-roles: [administrativo]
+      x-publishes-events: [usuarioAtualizado]
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Usuário ativo ou representação atual quando já estava ativo.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Usuario"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":
@@ -811,7 +859,7 @@ components:
             $ref: "#/components/schemas/PapelUsuario"
     UsuarioUpdateRequest:
       type: object
-      required: [nome, documento, status, papeis]
+      required: [nome, documento, papeis]
       properties:
         nome:
           type: string
@@ -821,8 +869,6 @@ components:
           type: string
           pattern: "^[0-9]{11}$"
           description: CPF da pessoa física, sem formatação.
-        status:
-          $ref: "#/components/schemas/StatusUsuario"
         papeis:
           type: array
           minItems: 1
@@ -831,7 +877,7 @@ components:
             $ref: "#/components/schemas/PapelUsuario"
     Usuario:
       type: object
-      required: [usuarioId, pessoaId, nome, documento, tipoPessoa, status, papeis, criadoEm, atualizadoEm]
+      required: [usuarioId, pessoaId, nome, documento, tipoPessoa, status, papeis, acoesPermitidas, criadoEm, atualizadoEm]
       properties:
         usuarioId:
           type: string
@@ -855,6 +901,11 @@ components:
           uniqueItems: true
           items:
             $ref: "#/components/schemas/PapelUsuario"
+        acoesPermitidas:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/AcaoPermitidaUsuario"
         criadoEm:
           type: string
           format: date-time
@@ -867,6 +918,9 @@ components:
     PapelUsuario:
       type: string
       enum: [administrativo, mecanico, recepcionista]
+    AcaoPermitidaUsuario:
+      type: string
+      enum: [ATUALIZAR_DADOS, BLOQUEAR, REATIVAR, INATIVAR]
     ClienteCreateRequest:
       type: object
       required: [nome, documento]

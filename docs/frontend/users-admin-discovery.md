@@ -7,13 +7,13 @@ Tarefa: `[UI-FUT-USERS-CONTRACT-001]`
 
 Definir os contratos necessários para administrar usuários operacionais sem colocar autorização, transições de estado ou regras de credencial no Angular. O `oficina-os-service` continua responsável pelo cadastro operacional e o `oficina-auth-lambda` pela credencial.
 
-## Estado atual
+## Estado auditado
 
 O contrato do OS já oferece criação, paginação, detalhe, atualização integral e inativação lógica. Os estados são `ATIVO`, `INATIVO` e `BLOQUEADO`, e os papéis são `administrativo`, `mecanico` e `recepcionista`. Todas as operações exigem `administrativo` no backend.
 
 O Auth já oferece geração administrativa do token de ativação e conclusão pública da ativação. A UI possui essa tela, mas exige que o administrador copie manualmente o UUID do usuário e não consegue consultar o estado da credencial.
 
-Há divergências entre contrato e runtime no OS:
+As divergências encontradas antes da implementação eram:
 
 - a OpenAPI declara filtros `nome`, `documento` e `email`, mas o resource aceita apenas `page` e `size`;
 - o modelo operacional não possui e-mail, portanto o filtro `email` não tem fonte de dados;
@@ -78,9 +78,9 @@ CPF completo fica restrito às telas administrativas e nunca entra em telemetria
 
 ## Observação operacional
 
-Na homologação do MVP, a projeção de um novo usuário no Auth levou cerca de 90 segundos. A inspeção posterior comprovou que o atraso ocorreu antes do Auth: o OS registrou os eventos imediatamente, mas levou entre 71 e 95 segundos para publicá-los. O `DomainMessagingWorker` usa um único executor para publicar a Outbox e depois fazer long polling sequencial das filas; esse consumo bloqueante posterga o próximo ciclo de publicação.
+Na homologação do MVP, a projeção de um novo usuário no Auth levou cerca de 90 segundos. A inspeção comprovou que o atraso ocorreu antes do Auth: o OS registrou os eventos imediatamente, mas levou entre 71 e 95 segundos para publicá-los. A correção separou publisher e consumidores em executores independentes, com teste que garante que falha ou bloqueio de um fluxo não impede o outro.
 
-A DLQ de `usuarioAdicionado` contém duas mensagens históricas de 14/07, ambas com envelope e payload estruturalmente completos e sem `correlationId`, pois antecedem o contrato atual. A primeira coincide com falhas de inicialização da versão antiga do Auth Sync por datasource inativo. A segunda foi rejeitada pela versão `1.1.1` com `IllegalArgumentException`, mas o log antigo não preservou causa suficiente para detalhamento. Nenhuma nova mensagem entrou na DLQ durante a homologação atual. Antes de homologar esta trilha, o publisher deve ser desacoplado do long polling e as mensagens antigas devem ser reconciliadas antes de eventual redrive ou descarte.
+A DLQ de `usuarioAdicionado` continha duas mensagens históricas de 14/07, ambas com envelope e payload estruturalmente completos e sem `correlationId`, pois antecedem o contrato atual. A primeira coincide com falhas de inicialização da versão antiga do Auth Sync por datasource inativo. A segunda foi rejeitada pela versão `1.1.1` com `IllegalArgumentException`, mas o log antigo não preservou causa suficiente para detalhamento. Nenhuma nova mensagem entrou na DLQ durante a homologação atual. Em 16/07, uma tarefa controlada de redrive moveu as duas mensagens para a fila de origem a uma mensagem por segundo. A tarefa terminou como `COMPLETED`, origem e DLQ ficaram vazias e as duas invocações da Auth Sync terminaram sem erro.
 
 ## Fora do escopo
 

@@ -101,6 +101,31 @@ paths:
           $ref: "#/components/responses/NotFound"
         "409":
           $ref: "#/components/responses/Conflict"
+  /auth/usuarios/{usuarioId}/credencial:
+    get:
+      tags: [Ativacao]
+      summary: Consultar estado sanitizado da credencial
+      description: Retorna somente estado, expiração de ativação pendente e ações permitidas; nunca expõe senha, hash ou token.
+      operationId: consultarCredencial
+      security:
+        - bearerAuth: []
+      x-required-roles: [administrativo]
+      parameters:
+        - $ref: "#/components/parameters/UsuarioId"
+        - $ref: "#/components/parameters/CorrelationId"
+      responses:
+        "200":
+          description: Estado administrativo da credencial.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredencialStatusResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /auth/ativacoes:
     post:
       tags: [Ativacao]
@@ -234,6 +259,23 @@ components:
           type: string
           minLength: 12
           maxLength: 128
+      additionalProperties: false
+    CredencialStatusResponse:
+      type: object
+      required: [status, acoesPermitidas]
+      properties:
+        status:
+          type: string
+          enum: [NAO_ATIVADA, ATIVACAO_PENDENTE, ATIVA]
+        expiresAt:
+          type: string
+          format: date-time
+        acoesPermitidas:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            enum: [SOLICITAR_ATIVACAO]
       additionalProperties: false
     AuthError:
       type: object

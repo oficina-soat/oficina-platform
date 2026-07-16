@@ -33,15 +33,7 @@ Quando o usuário solicitar a “próxima tarefa”, deve ser executado o primei
 
 ## Sequência ativa
 
-### Diagramas nos repositórios canônicos
-
-Os diagramas devem ser escritos em Mermaid e incorporados diretamente ao `README.md` do respectivo repositório. Devem representar apenas componentes materializados ou contratos vigentes, usar nomes canônicos, renderizar corretamente no GitHub e apontar para documentos detalhados em vez de duplicá-los.
-
-- [ ] `[D-DIAG-INFRA-IMPL-001]` Adicionar ao `README.md` do `oficina-infra` a arquitetura do ambiente `lab`: API Gateway, Lambdas, VPC Link e balanceamento, EKS e microsserviços, RDS com databases isolados, DynamoDB, SNS/SQS/DLQ, ECR, Secrets Manager e New Relic. Diferenciar visualmente infraestrutura AWS, workloads Kubernetes, persistência, mensageria e observabilidade sem expor dados sensíveis.
-- [ ] `[D-DIAG-OS-IMPL-001]` Adicionar ao `README.md` do `oficina-os-service` a visão do serviço: API REST, aplicação e domínio, PostgreSQL, Outbox/idempotência, orquestração da Saga, SNS/SQS e ownership de Cliente, Veículo, OS e Saga.
-- [ ] `[D-DIAG-BILLING-IMPL-001]` Adicionar ao `README.md` do `oficina-billing-service` a visão do fluxo financeiro: APIs de orçamento e pagamento, aplicação e domínio, PostgreSQL, Outbox/idempotência, eventos e Mercado Pago, distinguindo respostas do provedor de eventos internos.
-- [ ] `[D-DIAG-EXEC-IMPL-001]` Adicionar ao `README.md` do `oficina-execution-service` a visão de catálogo, estoque e execução: APIs, aplicação e domínio, tabelas DynamoDB, Outbox/idempotência, SNS/SQS e integração assíncrona com a Saga do OS.
-- [ ] `[D-DIAG-AUTH-IMPL-001]` Revisar os diagramas Mermaid do `README.md` do `oficina-auth-lambda`: `auth-lambda`, `auth-sync-lambda`, `notificacao-lambda`, API Gateway, PostgreSQL da autenticação, eventos de usuários, issuer e JWKS, preservando o cadastro operacional como responsabilidade do OS.
+Não há tarefas na sequência ativa. Novos itens devem ser promovidos explicitamente a partir das candidatas futuras ou dos roadmaps temáticos.
 
 ## Candidatas futuras
 

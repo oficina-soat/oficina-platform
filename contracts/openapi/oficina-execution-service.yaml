@@ -60,6 +60,7 @@ paths:
       operationId: consultarServicos
       parameters:
         - $ref: "#/components/parameters/NomeFilter"
+        - $ref: "#/components/parameters/AtivoFilter"
         - $ref: "#/components/parameters/Page"
         - $ref: "#/components/parameters/Size"
       responses:
@@ -158,6 +159,7 @@ paths:
       operationId: consultarPecas
       parameters:
         - $ref: "#/components/parameters/NomeFilter"
+        - $ref: "#/components/parameters/AtivoFilter"
         - name: codigo
           in: query
           schema:
@@ -648,6 +650,12 @@ components:
       description: Trecho do nome sem distinção entre maiúsculas e minúsculas.
       schema:
         type: string
+    AtivoFilter:
+      name: ativo
+      in: query
+      description: Quando informado, retorna somente itens com a situação de atividade solicitada.
+      schema:
+        type: boolean
     Page:
       name: page
       in: query

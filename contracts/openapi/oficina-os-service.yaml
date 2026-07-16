@@ -500,6 +500,72 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
+  /ordens-servico/{ordemServicoId}/servicos:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
+    post:
+      tags: [Ordens de Servico]
+      summary: Incluir servico na OS
+      operationId: incluirServicoNaOrdemServico
+      parameters:
+        - $ref: "#/components/parameters/OrdemServicoId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IncluirServicoOrdemServicoRequest"
+      responses:
+        "200":
+          description: Servico incluido e composicao atualizada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrdemServico"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+  /ordens-servico/{ordemServicoId}/pecas:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
+    post:
+      tags: [Ordens de Servico]
+      summary: Incluir peca na OS
+      operationId: incluirPecaNaOrdemServico
+      parameters:
+        - $ref: "#/components/parameters/OrdemServicoId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IncluirPecaOrdemServicoRequest"
+      responses:
+        "200":
+          description: Peca incluida e composicao atualizada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrdemServico"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
   /ordens-servico/{ordemServicoId}/estado:
     parameters:
       - $ref: "#/components/parameters/CorrelationId"
@@ -707,6 +773,19 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+    ServiceUnavailable:
+      description: Dependencia necessaria para concluir a operacao esta indisponivel.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+        traceparent:
+          $ref: "#/components/headers/Traceparent"
+        Retry-After:
+          $ref: "#/components/headers/RetryAfter"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
   schemas:
     UsuarioCreateRequest:
       type: object
@@ -869,13 +948,21 @@ components:
       allOf:
         - $ref: "#/components/schemas/OrdemServicoCreateRequest"
         - type: object
-          required: [ordemServicoId, estado, criadoEm, atualizadoEm, acoesPermitidas]
+          required: [ordemServicoId, estado, servicos, pecas, criadoEm, atualizadoEm, acoesPermitidas]
           properties:
             ordemServicoId:
               type: string
               format: uuid
             estado:
               $ref: "#/components/schemas/EstadoOrdemServico"
+            servicos:
+              type: array
+              items:
+                $ref: "#/components/schemas/ItemServicoOrdemServico"
+            pecas:
+              type: array
+              items:
+                $ref: "#/components/schemas/ItemPecaOrdemServico"
             criadoEm:
               type: string
               format: date-time
@@ -888,7 +975,75 @@ components:
                 $ref: "#/components/schemas/AcaoPermitidaOrdemServico"
     AcaoPermitidaOrdemServico:
       type: string
-      enum: [INICIAR_DIAGNOSTICO, CONCLUIR_DIAGNOSTICO, RETOMAR_DIAGNOSTICO, INICIAR_EXECUCAO, FINALIZAR, ENTREGAR, CANCELAR]
+      enum: [INICIAR_DIAGNOSTICO, INCLUIR_SERVICO, INCLUIR_PECA, CONCLUIR_DIAGNOSTICO, RETOMAR_DIAGNOSTICO, INICIAR_EXECUCAO, FINALIZAR, ENTREGAR, CANCELAR]
+    IncluirServicoOrdemServicoRequest:
+      type: object
+      required: [servicoId, quantidade]
+      additionalProperties: false
+      properties:
+        servicoId:
+          type: string
+          format: uuid
+        quantidade:
+          type: number
+          format: decimal
+          exclusiveMinimum: 0
+    IncluirPecaOrdemServicoRequest:
+      type: object
+      required: [pecaId, quantidade]
+      additionalProperties: false
+      properties:
+        pecaId:
+          type: string
+          format: uuid
+        quantidade:
+          type: number
+          format: decimal
+          exclusiveMinimum: 0
+    ItemServicoOrdemServico:
+      type: object
+      required: [servicoId, nome, quantidade, valorUnitario, valorTotal]
+      additionalProperties: false
+      properties:
+        servicoId:
+          type: string
+          format: uuid
+        nome:
+          type: string
+        quantidade:
+          type: number
+          format: decimal
+          exclusiveMinimum: 0
+        valorUnitario:
+          type: number
+          format: decimal
+          minimum: 0
+        valorTotal:
+          type: number
+          format: decimal
+          minimum: 0
+    ItemPecaOrdemServico:
+      type: object
+      required: [pecaId, nome, quantidade, valorUnitario, valorTotal]
+      additionalProperties: false
+      properties:
+        pecaId:
+          type: string
+          format: uuid
+        nome:
+          type: string
+        quantidade:
+          type: number
+          format: decimal
+          exclusiveMinimum: 0
+        valorUnitario:
+          type: number
+          format: decimal
+          minimum: 0
+        valorTotal:
+          type: number
+          format: decimal
+          minimum: 0
     EstadoOrdemServico:
       type: string
       enum: [RECEBIDA, EM_DIAGNOSTICO, AGUARDANDO_APROVACAO, EM_EXECUCAO, FINALIZADA, ENTREGUE]

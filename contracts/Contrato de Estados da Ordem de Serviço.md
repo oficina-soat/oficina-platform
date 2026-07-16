@@ -91,6 +91,8 @@ Serviços somente podem ser incluídos quando a OS estiver no estado:
 EM_DIAGNOSTICO
 ```
 
+Quando a OS estiver nesse estado, sua representação inclui `INCLUIR_PECA` e `INCLUIR_SERVICO` em `acoesPermitidas`. A ausência dessas ações impede que clientes ofereçam os comandos, mas a autorização e a validação do estado continuam obrigatórias no backend.
+
 ### Alteração de estado
 
 Toda alteração de estado deve registrar:

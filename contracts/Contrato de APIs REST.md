@@ -246,6 +246,24 @@ GET /api/v1/ordens-servico/{ordemServicoId}
 GET /api/v1/ordens-servico/{ordemServicoId}/historico
 ```
 
+### Incluir serviço na OS
+
+```http
+POST /api/v1/ordens-servico/{ordemServicoId}/servicos
+X-Idempotency-Key: <chave-unica>
+```
+
+O cliente envia somente `servicoId` e `quantidade`. O `oficina-os-service` consulta o catálogo do `oficina-execution-service` e persiste nome e valor como snapshot. A operação somente é oferecida e aceita em `EM_DIAGNOSTICO`.
+
+### Incluir peça na OS
+
+```http
+POST /api/v1/ordens-servico/{ordemServicoId}/pecas
+X-Idempotency-Key: <chave-unica>
+```
+
+O cliente envia somente `pecaId` e `quantidade`. Disponibilidade e movimentos de estoque permanecem sob autoridade do `oficina-execution-service`; a UI não infere reserva ou consumo.
+
 ### Alterar estado
 
 ```http
@@ -470,6 +488,8 @@ POST /api/v1/servicos
 GET /api/v1/servicos
 ```
 
+A consulta aceita `nome`, `ativo`, `page` e `size`. Interfaces de composição devem solicitar `ativo=true` e não decidir localmente se um item inativo pode ser selecionado.
+
 ### Consultar serviço
 
 ```http
@@ -497,6 +517,8 @@ POST /api/v1/pecas
 ```http
 GET /api/v1/pecas
 ```
+
+A consulta aceita `nome`, `codigo`, `ativo`, `page` e `size`. Saldo não integra o catálogo e deve ser obtido pela API de estoque quando necessário.
 
 ### Consultar peça
 

@@ -38,6 +38,10 @@
         "aggregateId": {
           "$ref": "#/$defs/uuid"
         },
+        "correlationId": {
+          "type": "string",
+          "minLength": 1
+        },
         "payload": {
           "type": "object"
         }

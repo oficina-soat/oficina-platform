@@ -157,3 +157,5 @@ pessoaExcluida
 5. A publicação de eventos deve ocorrer através do padrão Outbox.
 
 6. Todos os eventos devem possuir identificador único e timestamp de ocorrência.
+
+7. `correlationId` é opcional no envelope para compatibilidade com eventos já publicados. Produtores devem preenchê-lo quando a operação tiver sido iniciada por uma requisição correlacionada ou pelo consumo de outro evento; consumidores devem preservá-lo nos eventos subsequentes. Na ausência do campo, o `eventId` é o identificador de correlação de fallback.

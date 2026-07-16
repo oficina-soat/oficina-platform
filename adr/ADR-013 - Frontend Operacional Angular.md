@@ -56,7 +56,7 @@ As fronteiras devem ser protegidas por testes arquiteturais e lint. Componentes 
 
 ## Segurança da sessão
 
-O MVP mantém o token apenas durante a sessão da aplicação, preferencialmente em memória. Guards e ocultação de controles servem à experiência, não à segurança. APIs e authorizers continuam responsáveis pela autorização.
+O MVP mantém o token em `sessionStorage`, limitado à aba do navegador e removido ao encerrar a sessão. Isso preserva a autenticação após recarregar a página sem compartilhar a credencial entre abas. Guards e ocultação de controles servem à experiência, não à segurança. APIs e authorizers continuam responsáveis pela autorização.
 
 Persistência mais longa de sessão exige nova avaliação. Um BFF com cookie `HttpOnly`, `Secure` e `SameSite` poderá ser considerado se o benefício justificar o custo operacional.
 
@@ -96,10 +96,10 @@ Módulos reutilizáveis podem continuar sob `terraform/modules`, desde que a com
 
 ### Negativas
 
-- token presente no processo do navegador durante a sessão;
+- token acessível ao JavaScript da mesma aba durante a sessão, exigindo CSP restritiva e prevenção contínua de XSS;
 - possíveis evoluções nas APIs para filtros, consultas agregadas ou ações permitidas;
 - necessidade de testes arquiteturais específicos para evitar erosão das fronteiras;
-- refresh da página pode exigir nova autenticação no desenho inicial em memória.
+- recarregar a página preserva a sessão da aba; fechar a aba ou limpar o armazenamento exige nova autenticação.
 - indisponibilidade da UI quando o EKS estiver suspenso, coerente com o ciclo de vida do lab.
 
 ## Referências

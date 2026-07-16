@@ -114,12 +114,12 @@ que decisões de negócio sejam reconstruídas no Angular.
 
 ### Estoque
 
-- [ ] `[UI-FUT-STOCK-CONTRACT-001]` Auditar e evoluir a OpenAPI do Execution para catálogo paginado, filtros, saldos, movimentações e ações permitidas, incluindo erros e idempotência canônicos.
-- [ ] `[UI-FUT-STOCK-BACKEND-001]` Implementar no Execution somente as consultas e ações ausentes identificadas na auditoria, com autorização e invariantes no backend.
-- [ ] `[UI-FUT-STOCK-CLIENT-001]` Criar modelos de apresentação, ports, mappers e adapters HTTP para o contrato de estoque, sem expor DTOs à apresentação.
-- [ ] `[UI-FUT-STOCK-VIEW-001]` Implementar catálogo e consulta de saldo com paginação, filtros remotos e estados de loading, vazio, erro e retry.
-- [ ] `[UI-FUT-STOCK-MOVE-001]` Implementar histórico de movimentações e comandos exibidos exclusivamente a partir das ações permitidas retornadas pela API.
-- [ ] `[UI-FUT-STOCK-TEST-001]` Cobrir aplicação, adapters, acessibilidade e o fluxo E2E principal de estoque.
+- [x] `[UI-FUT-STOCK-CONTRACT-001]` Auditar e evoluir a OpenAPI do Execution para catálogo paginado, filtros, saldos, movimentações e ações permitidas, incluindo erros e idempotência canônicos. Concluído localmente com paginação canônica, filtros remotos e `REGISTRAR_ENTRADA` fornecido no saldo.
+- [x] `[UI-FUT-STOCK-BACKEND-001]` Implementar no Execution somente as consultas e ações ausentes identificadas na auditoria, com autorização e invariantes no backend. Concluído localmente no `oficina-execution-service` 1.2.0.
+- [x] `[UI-FUT-STOCK-CLIENT-001]` Criar modelos de apresentação, ports, mappers e adapters HTTP para o contrato de estoque, sem expor DTOs à apresentação. Concluído localmente na feature `execution/stock`.
+- [x] `[UI-FUT-STOCK-VIEW-001]` Implementar catálogo e consulta de saldo com paginação, filtros remotos e estados de loading, vazio, erro e retry. Concluído localmente na rota `/estoque`.
+- [x] `[UI-FUT-STOCK-MOVE-001]` Implementar histórico de movimentações e comandos exibidos exclusivamente a partir das ações permitidas retornadas pela API. Concluído localmente com histórico paginado e entrada condicionada a `acoesPermitidas`.
+- [x] `[UI-FUT-STOCK-TEST-001]` Cobrir aplicação, adapters, acessibilidade e o fluxo E2E principal de estoque. Concluído localmente com testes de aplicação, HTTP, apresentação e Playwright com axe.
 
 ### Orçamento e pagamento
 

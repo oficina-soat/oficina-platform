@@ -58,15 +58,17 @@ paths:
       tags: [Servicos]
       summary: Consultar servicos
       operationId: consultarServicos
+      parameters:
+        - $ref: "#/components/parameters/NomeFilter"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Size"
       responses:
         "200":
           description: Servicos encontrados.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Servico"
+                $ref: "#/components/schemas/ServicoPage"
         "401":
           $ref: "#/components/responses/Unauthorized"
   /servicos/{servicoId}:
@@ -154,15 +156,21 @@ paths:
       tags: [Pecas]
       summary: Consultar pecas
       operationId: consultarPecas
+      parameters:
+        - $ref: "#/components/parameters/NomeFilter"
+        - name: codigo
+          in: query
+          schema:
+            type: string
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Size"
       responses:
         "200":
           description: Pecas encontradas.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Peca"
+                $ref: "#/components/schemas/PecaPage"
         "401":
           $ref: "#/components/responses/Unauthorized"
   /pecas/{pecaId}:
@@ -250,15 +258,19 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: tipo
+          in: query
+          schema:
+            $ref: "#/components/schemas/TipoMovimentoEstoque"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Size"
       responses:
         "200":
           description: Movimentacoes encontradas.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/MovimentoEstoque"
+                $ref: "#/components/schemas/MovimentoEstoquePage"
         "401":
           $ref: "#/components/responses/Unauthorized"
   /estoques/movimentos/entrada:
@@ -630,6 +642,29 @@ components:
       scheme: bearer
       bearerFormat: JWT
   parameters:
+    NomeFilter:
+      name: nome
+      in: query
+      description: Trecho do nome sem distinção entre maiúsculas e minúsculas.
+      schema:
+        type: string
+    Page:
+      name: page
+      in: query
+      description: Índice da página, iniciado em zero.
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    Size:
+      name: size
+      in: query
+      description: Quantidade por página, limitada a 100.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
     CorrelationId:
       name: X-Correlation-Id
       in: header
@@ -776,6 +811,16 @@ components:
             atualizadoEm:
               type: string
               format: date-time
+    ServicoPage:
+      allOf:
+        - $ref: "#/components/schemas/PageMetadata"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/Servico"
     PecaCreateRequest:
       type: object
       required: [nome, codigo, valorUnitario]
@@ -808,9 +853,19 @@ components:
             atualizadoEm:
               type: string
               format: date-time
+    PecaPage:
+      allOf:
+        - $ref: "#/components/schemas/PageMetadata"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/Peca"
     SaldoEstoque:
       type: object
-      required: [pecaId, quantidadeDisponivel, quantidadeReservada, atualizadoEm]
+      required: [pecaId, quantidadeDisponivel, quantidadeReservada, atualizadoEm, acoesPermitidas]
       properties:
         pecaId:
           type: string
@@ -824,6 +879,10 @@ components:
         atualizadoEm:
           type: string
           format: date-time
+        acoesPermitidas:
+          type: array
+          items:
+            $ref: "#/components/schemas/AcaoPermitidaEstoque"
     MovimentoEstoqueRequest:
       type: object
       required: [pecaId, quantidade]
@@ -856,6 +915,36 @@ components:
     TipoMovimentoEstoque:
       type: string
       enum: [ENTRADA, RESERVA, CONSUMO, ESTORNO]
+    AcaoPermitidaEstoque:
+      type: string
+      enum: [REGISTRAR_ENTRADA]
+    MovimentoEstoquePage:
+      allOf:
+        - $ref: "#/components/schemas/PageMetadata"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/MovimentoEstoque"
+    PageMetadata:
+      type: object
+      required: [page, size, totalElements, totalPages]
+      properties:
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+        totalElements:
+          type: integer
+          format: int64
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
     ExecucaoCreateRequest:
       type: object
       required: [ordemServicoId]

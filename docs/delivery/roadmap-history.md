@@ -27,7 +27,7 @@ A cronologia textual anterior à sanitização continua disponível no históric
 | Contratos | OpenAPI dos três serviços, eventos e schemas, tópicos, erros, idempotência, ownership e Saga foram formalizados em [Contratos](../../contracts/). | Épico `A` anterior à adoção uniforme de IDs |
 | Microsserviços | Baselines, domínios, APIs, persistência, seeds, Outbox, idempotência, mensageria, testes, BDD e CI/CD foram implementados nos três repositórios canônicos. | `B2-OS-DB-IMPL-001`, `B2-BILL-DB-IMPL-001`, `B2-BILL-EVENTSTORE-IMPL-001`, `B2-EXEC-DDB-IMPL-001`, `B2-IDEMP-IMPL-001`, `B2-MSG-IMPL-001` |
 | Usuários e autenticação | Cadastro operacional no OS e sincronização da projeção de autenticação foram implementados e homologados. | `B2-OS-USERS-IMPL-001`, `B2-AUTH-USERS-IMPL-001`, `B2-AUTH-USERS-REM-001` |
-| Banco da autenticação | Banco `oficina_auth`, role `oficina_auth_user`, secret JSON exclusivo, configuração das Lambdas, migração conservadora e rollback foram implementados e validados localmente; a aplicação e homologação no `lab` permanecem separadas. | `D-AUTH-DB-IMPL-001` |
+| Banco da autenticação | Banco `oficina_auth`, role `oficina_auth_user`, secret JSON exclusivo, migração conservadora e rollback foram implementados; a [homologação no lab](auth-database-lab-evidence.md) comprovou login, ativação, rejeição, sincronização idempotente e inativação. | `D-AUTH-DB-IMPL-001`, `D-AUTH-DB-REM-001` |
 | Infraestrutura | RDS, DynamoDB, mensageria, EKS, ECR, API Gateway, ambiente local e composição Kubernetes foram consolidados no `oficina-infra`. | `D-AWS-IMPL-001`, `D-INFRA-IMPL-001`, `D-K8S-OWNERSHIP-IMPL-001`, `D-AWS-REM-001`, `D-API-REM-001` |
 | Observabilidade | Logs, métricas, traces, Saga, Mercado Pago, persistência, mensageria, dashboards, alertas e New Relic foram implementados e validados. | `D-NR-IMPL-001`, `D-OBS-IMPL-001` a `004`, `D-OBS-SAGA-IMPL-001`, `D-OBS-MP-COLLECT-IMPL-001`, `D-NR-REM-000` a `007`, `D-NR-EVID-001` |
 | Operação e entrega | Runbooks, release, diagrama geral, roteiro do vídeo, proteção de branches, qualidade e checklist final foram preparados. | `D-OPS-IMPL-001`, `D-REL-IMPL-001`, `D-DIAG-IMPL-001`, `D-VIDEO-IMPL-001`, `B2-CI-REM-000` a `002`, `B2-GH-REM-001`, `B2-DB-MSG-EVID-001` |
@@ -44,6 +44,7 @@ A cronologia textual anterior à sanitização continua disponível no históric
 | Idempotência persistente | [Evidência de idempotência](idempotency-lab-evidence.md) |
 | SNS, SQS e DLQ | [Evidência de mensageria](messaging-lab-evidence.md) |
 | Usuários e autenticação | [Evidência da integração de usuários](auth-users-lab-evidence.md) |
+| Banco exclusivo da autenticação | [Evidência do banco de autenticação](auth-database-lab-evidence.md) |
 | Mercado Pago sandbox | [Evidência Mercado Pago](mercado-pago-sandbox-evidence.md) |
 | Quality Gate e proteção de branches | [Proteção de branches](github-branch-protection-evidence.md), [Checklist final](phase-4-delivery-checklist.md) |
 | E2E e correlação distribuída | [Relatório E2E no lab](../observability/d-nr-rem-005-e2e-lab-report.md) |

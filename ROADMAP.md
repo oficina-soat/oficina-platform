@@ -33,7 +33,7 @@ Quando o usuário solicitar a “próxima tarefa”, deve ser executado o primei
 
 ## Sequência ativa
 
-- [ ] `[D-AUTH-DB-REM-001]` Aplicar no `lab` o banco e a role exclusivos da autenticação, migrar os dados do database legado sem removê-los, publicar as Lambdas com o secret canônico e homologar login, ativação, rejeição de senha inválida, sincronização idempotente e rollback.
+Não há tarefas abertas na sequência ativa.
 
 ## Candidatas futuras
 

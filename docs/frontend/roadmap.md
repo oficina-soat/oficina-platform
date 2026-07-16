@@ -31,12 +31,12 @@ Não é permitido duplicar no Angular uma decisão do backend para habilitar uma
 | Linguagem | TypeScript em modo estrito |
 | Estado | Signals e serviços de aplicação; sem NgRx inicialmente |
 | Formulários | Reactive Forms |
-| Hospedagem | S3 privado e CloudFront com Origin Access Control |
+| Hospedagem | Container Nginx opcional no EKS, exposto pelo HTTP API compartilhado |
 | Infraestrutura | Extensão opcional no `oficina-infra`, com root module e state próprios |
 | Entrega | Pipeline independente no repositório `oficina-ui` |
 | Escopo inicial | Login, atendimento e fila do mecânico |
 
-Referências: [ciclo oficial de releases do Angular](https://angular.dev/reference/releases) e [site estático seguro com S3 e CloudFront](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/getting-started-secure-static-website-cloudformation-template.html).
+Referências: [ciclo oficial de releases do Angular](https://angular.dev/reference/releases), documentação do Nginx e padrões Kubernetes adotados pelos demais repositórios.
 
 ## Estrutura de referência
 
@@ -57,7 +57,7 @@ src/app/
 
 ### Fase 0 — Governança e contratos
 
-- [x] `[UI-ADR-001]` Criar ADR na plataforma para registrar repositório independente, Angular SPA, ausência inicial de BFF/SSR, fronteira sem regras de negócio, S3/CloudFront e ownership do frontend. Concluído na [ADR-013](../../adr/ADR-013%20-%20Frontend%20Operacional%20Angular.md).
+- [x] `[UI-ADR-001]` Criar ADR na plataforma para registrar repositório independente, Angular SPA, ausência inicial de BFF/SSR, fronteira sem regras de negócio e ownership do frontend. Concluído na [ADR-013](../../adr/ADR-013%20-%20Frontend%20Operacional%20Angular.md), posteriormente atualizada com a hospedagem compatível com o lab.
 - [x] `[UI-SCOPE-001]` Documentar personas, mapa de navegação e escopo do MVP para `administrativo`, `recepcionista` e `mecanico`, excluindo portal do cliente. Concluído em `oficina-ui/docs/product-scope.md`.
 - [x] `[UI-CONTRACT-001]` Auditar OpenAPI e rotas públicas para login, clientes, veículos, OS, histórico, fila, diagnóstico e reparo; registrar lacunas de consulta, filtros, paginação, CORS e ações permitidas sem criar decisões de negócio na UI. Concluído em `oficina-ui/docs/api-readiness.md`, com lacunas de CORS, busca e paginação da fila registradas.
 - [x] `[UI-UX-001]` Criar wireframes responsivos dos fluxos do MVP, incluindo loading, vazio, erro, expiração de sessão, confirmação e rejeição da API. Concluído em `oficina-ui/docs/wireframes.md`.
@@ -94,17 +94,17 @@ src/app/
 - [x] `[UI-TEST-001]` Criar testes unitários de apresentação/aplicação, testes dos adapters com HTTP simulado e testes de arquitetura. Concluído no `oficina-ui` com 63 testes em 22 arquivos, cobertura global acima dos pisos obrigatórios, adapters HTTP simulados e guardrails executáveis para as fronteiras arquiteturais.
 - [x] `[UI-E2E-001]` Criar testes E2E para login, atendimento e fila do mecânico, cobrindo caminho feliz, rejeição, autorização, idempotência visual e expiração de sessão. Concluído no `oficina-ui` com cinco cenários Playwright executados em Chromium contra a aplicação real e APIs simuladas apenas na fronteira HTTP, sem dependência ou mutação do `lab`.
 - [x] `[UI-A11Y-001]` Validar navegação por teclado, foco, labels, contraste, leitores de tela e comportamento responsivo. Concluído no commit `e045b67` do `oficina-ui` com foco no conteúdo após navegação, diálogo com confinamento e restauração de foco, suporte a movimento reduzido, ajustes responsivos, checklist manual documentado e testes automatizados WCAG 2.1 A/AA com axe-core em desktop e viewport móvel. Validação concluída com 64 testes unitários, 7 testes E2E, lint, guardrails arquiteturais, cobertura e build de produção aprovados.
-- [x] `[UI-SEC-001]` Configurar CSP, headers de segurança, auditoria de dependências e verificação de que build, logs e source maps públicos não expõem credenciais ou dados sensíveis. Concluído nos commits `5e0e017` do `oficina-ui` e `77de317` do `oficina-infra`: source maps e chunks nomeados estão explicitamente desabilitados, a configuração de runtime aceita somente campos contratados e endpoints relativos ou HTTPS, logs não serializam erros, e o build é inspecionado contra arquivos de chave, source maps e padrões de credenciais ou tokens. A hospedagem define CSP, HSTS, proteções de framing e MIME, políticas de referência, permissões e isolamento cross-origin. A validação aprovou 69 testes, lint, arquitetura, cobertura, build, scanner de 12 artefatos e auditoria com zero vulnerabilidades de produção.
+- [x] `[UI-SEC-001]` Configurar CSP, headers de segurança, auditoria de dependências e verificação de que build, logs e source maps públicos não expõem credenciais ou dados sensíveis. Concluído nos commits `5e0e017` do `oficina-ui` e `77de317` do `oficina-infra`: source maps e chunks nomeados estão explicitamente desabilitados, a configuração de runtime aceita somente campos contratados e endpoints relativos ou HTTPS, logs não serializam erros, e o build é inspecionado contra arquivos de chave, source maps e padrões de credenciais ou tokens. A entrega atual mantém esses headers no Nginx e acrescenta container não-root, capabilities removidas e filesystem somente leitura.
 - [x] `[UI-CI-001]` Criar pipeline com instalação reproduzível, lint, format check, testes, cobertura, build e Quality Gate antes da publicação. Concluído no commit `89b1409` do `oficina-ui` com workflow reutilizável em pull requests, execução manual e bloqueio obrigatório do deploy. O pipeline executa em paralelo o gate de build, testes, arquitetura, segurança e auditoria e o gate E2E com Chromium, teclado e axe; somente o artefato validado é entregue ao deploy, sem recompilação. A reprodução local aprovou `npm ci`, 69 testes com cobertura, 7 E2E, build, scanner de segurança e zero vulnerabilidades de produção.
 - [x] `[UI-OBS-001]` Instrumentar erros e desempenho do navegador sem CPF, JWT ou dados financeiros, propagando `correlationId` para permitir diagnóstico conjunto com os backends. Concluído no commit `ee7e7b0` do `oficina-ui` com instrumentação independente de fornecedor para falhas HTTP, erros globais e métricas de navegação, LCP, CLS e INP. Os envelopes usam allowlist e não carregam URL, rota, query string, payload, mensagem, stack ou conteúdo de formulários; o envio opcional por `sendBeacon` não possui persistência nem retry e falhas HTTP incluem apenas método, status, código canônico e `correlationId`. O gate aprovou 73 testes, 7 E2E, cobertura, build, scanner e auditoria; ingestão real e busca cruzada serão evidenciadas na homologação do `lab`.
 - [ ] `[UI-MVP-REM-001]` Homologar no `lab` os três fluxos do MVP com os papéis reais e registrar evidências de segurança, acessibilidade, pipeline e operação.
 
-## Trilha extra — hospedagem opcional na AWS
+## Trilha extra — workload opcional no lab
 
 Esta trilha oferece acesso operacional conveniente à UI, mas não integra os requisitos obrigatórios da infraestrutura da solução. Sua execução, falha ou remoção não pode bloquear deploys, validações ou destruição controlada dos backends e dos componentes exigidos.
 
-- [x] `[UI-INFRA-001]` Criar no `oficina-infra` uma composição Terraform opcional para a hospedagem, em root module próprio e com backend/state independente de `terraform/environments/lab`. Concluído no commit `cabb066` do `oficina-infra` com S3 privado, CloudFront, Origin Access Control, fallback de rotas para `index.html`, headers de segurança, políticas distintas de cache, outputs e workflow Terraform manual próprio. A composição e seu state não possuem dependências dos recursos obrigatórios.
-- [ ] `[UI-DEPLOY-001]` Publicar pelo pipeline independente do `oficina-ui` os artefatos com hash e cache longo, `index.html` sem cache prolongado, configuração de runtime, invalidação seletiva do CloudFront e versão rastreável do deploy. O pipeline foi implementado no commit `ead31a7` do `oficina-ui`, consumindo somente os outputs do state opcional e sem participar dos pipelines dos serviços; falta publicá-lo no GitHub, aplicar a stack e validar o primeiro deploy para concluir a tarefa.
+- [x] `[UI-INFRA-001]` Criar no `oficina-infra` uma composição Terraform opcional, em root module próprio e com backend/state independente de `terraform/environments/lab`. A primeira implementação usou S3 privado e CloudFront; após os bloqueios da role `voclabs`, a composição foi migrada para ECR, NLB interno e rota `$default`, preservando o isolamento operacional e o histórico da decisão.
+- [ ] `[UI-DEPLOY-001]` Publicar pelo pipeline independente do `oficina-ui` a imagem rastreável criada a partir do build validado, materializar configuração de runtime e realizar rollout seguro no EKS. Dockerfile, Nginx, manifests, infraestrutura opcional e pipeline estão implementados; falta aplicar no GitHub e validar o primeiro rollout para concluir a tarefa.
 
 ## Evoluções posteriores ao MVP
 
@@ -166,4 +166,4 @@ que decisões de negócio sejam reconstruídas no Angular.
 
 ## Critério de pronto do MVP
 
-O MVP funcional da UI estará pronto quando login, atendimento e fila do mecânico funcionarem contra o `lab`; nenhum componente contiver regra de negócio; as fronteiras arquiteturais forem verificadas automaticamente; APIs revalidarem todas as operações; e testes, acessibilidade, segurança e Quality Gate estiverem aprovados. A publicação em S3/CloudFront pertence à trilha extra e não altera o atendimento dos requisitos obrigatórios da infraestrutura.
+O MVP funcional da UI estará pronto quando login, atendimento e fila do mecânico funcionarem contra o `lab`; nenhum componente contiver regra de negócio; as fronteiras arquiteturais forem verificadas automaticamente; APIs revalidarem todas as operações; e testes, acessibilidade, segurança e Quality Gate estiverem aprovados. O workload no EKS pertence à trilha extra e não altera o atendimento dos requisitos obrigatórios da infraestrutura.

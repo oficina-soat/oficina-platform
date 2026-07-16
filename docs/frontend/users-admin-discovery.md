@@ -78,7 +78,9 @@ CPF completo fica restrito às telas administrativas e nunca entra em telemetria
 
 ## Observação operacional
 
-Na homologação do MVP, a projeção de um novo usuário no Auth levou cerca de 90 segundos, embora o event source mapping estivesse habilitado. Duas mensagens antigas já estavam na DLQ de `usuarioAdicionado`, sem aumento durante aquela jornada. A inspeção do conteúdo ficou pendente porque a sessão AWS expirou; ela deve ser retomada antes da homologação desta trilha.
+Na homologação do MVP, a projeção de um novo usuário no Auth levou cerca de 90 segundos. A inspeção posterior comprovou que o atraso ocorreu antes do Auth: o OS registrou os eventos imediatamente, mas levou entre 71 e 95 segundos para publicá-los. O `DomainMessagingWorker` usa um único executor para publicar a Outbox e depois fazer long polling sequencial das filas; esse consumo bloqueante posterga o próximo ciclo de publicação.
+
+A DLQ de `usuarioAdicionado` contém duas mensagens históricas de 14/07, ambas com envelope e payload estruturalmente completos e sem `correlationId`, pois antecedem o contrato atual. A primeira coincide com falhas de inicialização da versão antiga do Auth Sync por datasource inativo. A segunda foi rejeitada pela versão `1.1.1` com `IllegalArgumentException`, mas o log antigo não preservou causa suficiente para detalhamento. Nenhuma nova mensagem entrou na DLQ durante a homologação atual. Antes de homologar esta trilha, o publisher deve ser desacoplado do long polling e as mensagens antigas devem ser reconciliadas antes de eventual redrive ou descarte.
 
 ## Fora do escopo
 

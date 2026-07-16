@@ -37,6 +37,16 @@ As respostas públicas apresentaram CSP restritiva, HSTS, `X-Content-Type-Option
 
 O rollout foi aguardado pelo pipeline e terminou em sucesso. A tentativa adicional de consultar o endpoint privado do EKS a partir da estação local não resolveu o DNS privado do cluster; a publicação permanece comprovada pelo job de rollout e pelas respostas do workload através de API Gateway, VPC Link e NLB.
 
+## Composição técnica validada
+
+Em 2026-07-16, as rotas públicas de inclusão de serviço e peça foram acrescentadas ao API Gateway pelo state canônico do `oficina-infra`. O plano e o apply apresentaram exclusivamente quatro criações — duas rotas e duas integrações — sem alteração ou destruição de recursos.
+
+Uma OS técnica já existente, sem dados pessoais na evidência, recebeu um serviço de `R$ 150,00` e duas unidades de uma peça de `R$ 50,00`. Serviço e peça retornaram `200` tanto na primeira requisição quanto no retry com a mesma chave e o mesmo payload. A reutilização da chave da peça com quantidade diferente retornou `409`. A leitura seguinte apresentou total técnico de `R$ 250,00`; o saldo permaneceu com 50 unidades disponíveis, nenhuma reservada e nenhum movimento, comprovando que a mera composição não antecipa decisão de estoque.
+
+A UI efetivamente publicada foi exercitada em Chromium, sem interceptação ou mock. O login real abriu a visão operacional, o detalhe exibiu os dois snapshots, os formulários de inclusão apareceram somente porque a API informou `INCLUIR_SERVICO` e `INCLUIR_PECA`, e a página não apresentou violações automatizáveis WCAG 2.1 A/AA. Em viewport de `375 x 667`, o menu foi aberto por teclado e a navegação permaneceu acessível.
+
+O fechamento ponta a ponta ainda não pode ser registrado: a OS de homologação está em `EM_DIAGNOSTICO`, mas a execução vinculada já se encontra em `REPARO_CONCLUIDO` e não oferece ações. Por isso não foi emitido um novo `diagnosticoFinalizado`, e orçamento derivado, evento e correlação de consumidor não foram artificialmente declarados como aprovados. Essa inconsistência de dados do ambiente precisa ser corrigida ou substituída por uma nova jornada coerente.
+
 ## Validações restantes
 
 Para concluir `[UI-MVP-REM-001]`, ainda é necessário executar na UI publicada, sem mocks:
@@ -46,5 +56,7 @@ Para concluir `[UI-MVP-REM-001]`, ainda é necessário executar na UI publicada,
 - orçamento e pagamento com papel real autorizado;
 - navegação manual por teclado e verificação responsiva durante esses fluxos;
 - emissão controlada de telemetria e busca pelo mesmo `correlationId` no coletor configurado.
+
+A configuração pública atual também não contém o bloco opcional `observability`, pois `UI_OBSERVABILITY_ENDPOINT` não está configurada. Assim, a correlação da telemetria do navegador permanece objetivamente bloqueada até existir um endpoint de ingestão seguro para o lab.
 
 Nenhuma credencial, CPF, JWT, token, payload financeiro ou dado pessoal deve ser incluído nas evidências. IDs técnicos podem ser registrados apenas quando forem necessários para correlação e não identificarem uma pessoa.

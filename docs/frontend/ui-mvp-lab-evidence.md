@@ -2,7 +2,7 @@
 
 Data de início: 2026-07-16  
 Tarefa: `[UI-MVP-REM-001]`  
-Estado: parcial
+Estado: concluído
 
 ## Publicação validada
 
@@ -57,10 +57,12 @@ A stack opcional da UI passou a oferecer `POST /ui/telemetry` por API Gateway e 
 
 O endpoint respondeu `202` a um envelope sentinela e foi ativado na configuração runtime do workload. Uma nova execução em Chromium contra a UI publicada registrou `navigation`, `largest_contentful_paint` e `cumulative_layout_shift` com ambiente e revisão implantada. A inspeção do stream confirmou somente os campos allowlist e ausência das credenciais usadas no login. O workflow de deploy agora obtém esse endpoint do output Terraform quando `UI_OBSERVABILITY_ENDPOINT` não for informado.
 
-## Validações restantes
+## Homologação final com mecânico
 
-Para concluir `[UI-MVP-REM-001]`, ainda é necessário executar na UI publicada, sem mocks:
+Em 2026-07-16, a UI publicada foi exercitada sem mocks com uma credencial sentinela que possuía exclusivamente o papel `mecanico`. O guard liberou a fila e a execução e manteve indisponíveis as rotas administrativas. Pela interface real, o mecânico iniciou e concluiu diagnóstico e reparo usando somente ações oferecidas pelo backend. A credencial temporária foi inativada ao final.
 
-- fila e execução com uma credencial real exclusivamente mecânica, usando somente ações permitidas pelo backend. A credencial administrativa usada nas demais verificações foi corretamente redirecionada para acesso negado nessa rota.
+A OS sentinela recebeu um serviço e duas unidades de uma peça durante `EM_DIAGNOSTICO`. Após a conclusão do diagnóstico, o Billing criou automaticamente um único orçamento de `R$ 250,00`, sem chamada manual a `POST /orcamentos`. O orçamento foi aprovado, o pagamento criado pelo fluxo assíncrono foi confirmado pela ação canônica e uma segunda tentativa com outra chave idempotente retornou `409` com `DUPLICATE_RESOURCE`.
 
-Nenhuma credencial, CPF, JWT, token, payload financeiro ou dado pessoal deve ser incluído nas evidências. IDs técnicos podem ser registrados apenas quando forem necessários para correlação e não identificarem uma pessoa.
+A correlação `ui-mvp-final-1784235042529` apareceu nos três runtimes: 25 registros no OS, 19 no Execution e 71 no Billing. O mesmo evento `ordemDeServicoCriada`, identificado por `e82341fb-5635-49b2-92ed-4278b6c2871f`, foi registrado como `PENDING` na Outbox do OS e `CONSUMED` no Billing com a correlação preservada. A sincronização inicial da credencial OS → Auth levou cerca de 90 segundos nesta execução; o event source mapping permaneceu habilitado e a credencial foi materializada, mas a latência deve ser acompanhada operacionalmente.
+
+Com essa jornada, `[UI-MVP-REM-001]` está concluída. Nenhuma credencial, CPF, JWT, token, payload financeiro ou dado pessoal foi incluído nas evidências; somente IDs técnicos necessários à correlação foram registrados.

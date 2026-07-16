@@ -146,12 +146,12 @@ que decisões de negócio sejam reconstruídas no Angular.
 
 ### Administração de usuários
 
-- [ ] `[UI-FUT-USERS-CONTRACT-001]` Auditar o contrato administrativo de usuários para paginação, filtros, detalhes, papéis, estado da credencial e ações permitidas.
-- [ ] `[UI-FUT-USERS-BACKEND-001]` Implementar no backend as lacunas para bloqueio, reativação e inativação, com autorização e auditoria canônicas.
-- [ ] `[UI-FUT-USERS-CLIENT-001]` Criar modelos, ports, mappers e adapters administrativos sem transportar senha, token ou CPF completo para telemetria.
-- [ ] `[UI-FUT-USERS-VIEW-001]` Implementar lista, filtros remotos e detalhe administrativo do usuário.
-- [ ] `[UI-FUT-USERS-ACTIONS-001]` Implementar bloqueio, reativação e inativação exibindo somente ações retornadas pelo backend e exigindo confirmação acessível.
-- [ ] `[UI-FUT-USERS-TEST-001]` Cobrir autorização visual, aplicação, adapters, acessibilidade e fluxos E2E administrativos.
+- [x] `[UI-FUT-USERS-CONTRACT-001]` Auditar o contrato administrativo de usuários para paginação, filtros, detalhes, papéis, estado da credencial e ações permitidas. Concluído na [auditoria da administração de usuários](users-admin-discovery.md): foram identificados filtros declarados mas ausentes no runtime, ausência de ações canônicas e falta de consulta sanitizada do estado da credencial; o contrato alvo preserva OS e Auth como autoridades separadas.
+- [ ] `[UI-FUT-USERS-BACKEND-001]` Evoluir OS e Auth: filtros remotos por nome, CPF, estado e papel antes da paginação; `acoesPermitidas`; comandos idempotentes de bloqueio e reativação; e consulta sanitizada do estado da credencial, com autorização, Outbox e auditoria canônicas.
+- [ ] `[UI-FUT-USERS-CLIENT-001]` Criar a feature `administration/users` com modelos, ports, casos de uso, mappers e adapters separados para OS e Auth, sem transportar senha, token ou CPF para telemetria.
+- [ ] `[UI-FUT-USERS-VIEW-001]` Implementar lista paginada, filtros remotos, detalhe, edição de dados e papéis, além do estado da credencial com indisponibilidade parcial explícita.
+- [ ] `[UI-FUT-USERS-ACTIONS-001]` Implementar ativação, bloqueio, reativação e inativação exibindo somente ações retornadas pelas respectivas autoridades e exigindo confirmação acessível.
+- [ ] `[UI-FUT-USERS-TEST-001]` Cobrir contratos, autorização visual, idempotência, consistência eventual, aplicação, adapters, acessibilidade, falha parcial e fluxos E2E administrativos; homologar no `lab` com dados sentinela e investigar previamente a DLQ de `usuarioAdicionado`.
 
 ### Dashboard operacional
 

@@ -45,18 +45,22 @@ Uma OS técnica já existente, sem dados pessoais na evidência, recebeu um serv
 
 A UI efetivamente publicada foi exercitada em Chromium, sem interceptação ou mock. O login real abriu a visão operacional, o detalhe exibiu os dois snapshots, os formulários de inclusão apareceram somente porque a API informou `INCLUIR_SERVICO` e `INCLUIR_PECA`, e a página não apresentou violações automatizáveis WCAG 2.1 A/AA. Em viewport de `375 x 667`, o menu foi aberto por teclado e a navegação permaneceu acessível.
 
-O fechamento ponta a ponta ainda não pode ser registrado: a OS de homologação está em `EM_DIAGNOSTICO`, mas a execução vinculada já se encontra em `REPARO_CONCLUIDO` e não oferece ações. Por isso não foi emitido um novo `diagnosticoFinalizado`, e orçamento derivado, evento e correlação de consumidor não foram artificialmente declarados como aprovados. Essa inconsistência de dados do ambiente precisa ser corrigida ou substituída por uma nova jornada coerente.
+Como a primeira OS encontrada possuía estados incompatíveis entre OS e Execution, uma nova jornada sentinela foi criada. A Execution começou em `CRIADA`, avançou por diagnóstico e reparo e terminou em `REPARO_CONCLUIDO`. O Billing consumiu, nessa ordem, `ordemDeServicoCriada`, `pecaIncluidaNaOrdemDeServico`, `servicoIncluidoNaOrdemDeServico`, `diagnosticoFinalizado` e `execucaoFinalizada`. O orçamento derivado totalizou `R$ 250,00`, foi aprovado e o pagamento PIX de mesmo valor foi confirmado. As consultas e comandos usaram `ui-mvp-rem-20260716` como correlação operacional; os logs estruturados preservaram também `eventId`, `aggregateId`, produtor, consumidor e status de acknowledgment.
+
+O saldo da peça permaneceu com 50 unidades disponíveis, nenhuma reservada e nenhum movimento durante a composição. Isso comprova o comportamento contratado para este incremento: inclusão e orçamento não antecipam reserva ou consumo; decisões de estoque permanecem exclusivamente no Execution.
+
+Durante a repetição exploratória do pagamento, uma segunda chave idempotente para o mesmo orçamento encontrou a restrição `uk_pagamento_orcamento` e retornou `500`. O pagamento original permaneceu íntegro e foi consultado normalmente. Esse comportamento deve ser corrigido no Billing para retornar conflito canônico ou a representação já existente, sem expor erro de persistência.
+
+## Telemetria do navegador
+
+A stack opcional da UI passou a oferecer `POST /ui/telemetry` por API Gateway e Lambda, com retenção de sete dias no log group `/aws/lambda/oficina-ui-telemetry-lab`. O coletor limita o corpo a 4 KiB, valida o envelope e reconstrói somente campos allowlist antes de registrar o evento; não aceita URL, rota, payload, mensagem, stack, CPF, JWT ou valores financeiros.
+
+O endpoint respondeu `202` a um envelope sentinela e foi ativado na configuração runtime do workload. Uma nova execução em Chromium contra a UI publicada registrou `navigation`, `largest_contentful_paint` e `cumulative_layout_shift` com ambiente e revisão implantada. A inspeção do stream confirmou somente os campos allowlist e ausência das credenciais usadas no login. O workflow de deploy agora obtém esse endpoint do output Terraform quando `UI_OBSERVABILITY_ENDPOINT` não for informado.
 
 ## Validações restantes
 
 Para concluir `[UI-MVP-REM-001]`, ainda é necessário executar na UI publicada, sem mocks:
 
-- atendimento com papel real de recepção ou administração: cliente, veículo e ordem de serviço;
-- fila e execução com papel real de mecânico, usando somente ações permitidas pelo backend;
-- orçamento e pagamento com papel real autorizado;
-- navegação manual por teclado e verificação responsiva durante esses fluxos;
-- emissão controlada de telemetria e busca pelo mesmo `correlationId` no coletor configurado.
-
-A configuração pública atual também não contém o bloco opcional `observability`, pois `UI_OBSERVABILITY_ENDPOINT` não está configurada. Assim, a correlação da telemetria do navegador permanece objetivamente bloqueada até existir um endpoint de ingestão seguro para o lab.
+- fila e execução com uma credencial real exclusivamente mecânica, usando somente ações permitidas pelo backend. A credencial administrativa usada nas demais verificações foi corretamente redirecionada para acesso negado nessa rota.
 
 Nenhuma credencial, CPF, JWT, token, payload financeiro ou dado pessoal deve ser incluído nas evidências. IDs técnicos podem ser registrados apenas quando forem necessários para correlação e não identificarem uma pessoa.

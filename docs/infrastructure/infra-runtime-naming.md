@@ -267,8 +267,10 @@ NOTIFICACAO_LAMBDA_FUNCTION_NAME=oficina-notificacao-lambda-lab
 Secrets e artefatos:
 
 ```text
-AUTH_DB_SECRET_NAME=oficina/lab/database/auth-lambda
-OFICINA_AUTH_DB_SECRET_ID=oficina/lab/database/auth-lambda
+AUTH_DB_NAME=oficina_auth
+AUTH_DB_USER=oficina_auth_user
+AUTH_DB_SECRET_NAME=oficina/lab/database/oficina-auth-lambda
+OFICINA_AUTH_DB_SECRET_ID=oficina/lab/database/oficina-auth-lambda
 AUTH_LAMBDA_ARTIFACT_PREFIX=oficina/lab/lambda/oficina-auth-lambda
 AUTH_SYNC_LAMBDA_ARTIFACT_PREFIX=oficina/lab/lambda/oficina-auth-sync-lambda
 NOTIFICACAO_LAMBDA_ARTIFACT_PREFIX=oficina/lab/lambda/oficina-notificacao-lambda

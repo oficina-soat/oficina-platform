@@ -33,13 +33,13 @@ Quando o usuário solicitar a “próxima tarefa”, deve ser executado o primei
 
 ## Sequência ativa
 
-Não há tarefas na sequência ativa. Novos itens devem ser promovidos explicitamente a partir das candidatas futuras ou dos roadmaps temáticos.
+- [ ] `[D-AUTH-DB-REM-001]` Aplicar no `lab` o banco e a role exclusivos da autenticação, migrar os dados do database legado sem removê-los, publicar as Lambdas com o secret canônico e homologar login, ativação, rejeição de senha inválida, sincronização idempotente e rollback.
 
 ## Candidatas futuras
 
 Estes itens não pertencem à sequência ativa. A promoção deve mover o item para a posição desejada na seção anterior e substituir o prefixo `FUT` por um identificador do épico correspondente.
 
-- [ ] `[FUT-AUTH-DB-001]` Isolar a autenticação em `oficina_auth` e `oficina_auth_user`: Terraform e bootstrap, secret exclusivo, configuração das Lambdas, migração segura de credenciais e tokens, privilégio mínimo, rollback e validação de login/sincronização. O cadastro operacional permanece no `oficina-os-service`; somente a projeção de login e as credenciais pertencem à autenticação.
+Não há candidatas futuras no momento.
 
 ## Extensões opcionais
 

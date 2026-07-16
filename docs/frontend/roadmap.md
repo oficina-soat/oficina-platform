@@ -108,14 +108,61 @@ Esta trilha oferece acesso operacional conveniente à UI, mas não integra os re
 
 ## Evoluções posteriores ao MVP
 
-Estes itens devem ser promovidos e detalhados somente depois da homologação do MVP.
+Estes itens permanecem fora da sequência ativa até a homologação do MVP. Em cada
+trilha, contratos e capacidades do backend antecedem adapters e telas para impedir
+que decisões de negócio sejam reconstruídas no Angular.
 
-- [ ] `[UI-FUT-STOCK-001]` Catálogo, saldo e movimentações de estoque.
-- [ ] `[UI-FUT-BILLING-001]` Orçamento, aprovação/recusa e pagamentos.
-- [ ] `[UI-FUT-USERS-001]` Administração, bloqueio, reativação e inativação de usuários.
-- [ ] `[UI-FUT-DASHBOARD-001]` Dashboard operacional baseado em consultas agregadas fornecidas pelos backends.
-- [ ] `[UI-FUT-REALTIME-001]` Avaliar atualização em tempo real somente se o polling se mostrar insuficiente.
-- [ ] `[UI-FUT-BFF-001]` Avaliar BFF e cookie `HttpOnly` somente se os requisitos de sessão justificarem o custo operacional.
+### Estoque
+
+- [ ] `[UI-FUT-STOCK-CONTRACT-001]` Auditar e evoluir a OpenAPI do Execution para catálogo paginado, filtros, saldos, movimentações e ações permitidas, incluindo erros e idempotência canônicos.
+- [ ] `[UI-FUT-STOCK-BACKEND-001]` Implementar no Execution somente as consultas e ações ausentes identificadas na auditoria, com autorização e invariantes no backend.
+- [ ] `[UI-FUT-STOCK-CLIENT-001]` Criar modelos de apresentação, ports, mappers e adapters HTTP para o contrato de estoque, sem expor DTOs à apresentação.
+- [ ] `[UI-FUT-STOCK-VIEW-001]` Implementar catálogo e consulta de saldo com paginação, filtros remotos e estados de loading, vazio, erro e retry.
+- [ ] `[UI-FUT-STOCK-MOVE-001]` Implementar histórico de movimentações e comandos exibidos exclusivamente a partir das ações permitidas retornadas pela API.
+- [ ] `[UI-FUT-STOCK-TEST-001]` Cobrir aplicação, adapters, acessibilidade e o fluxo E2E principal de estoque.
+
+### Orçamento e pagamento
+
+- [ ] `[UI-FUT-BILLING-CONTRACT-001]` Auditar e evoluir as OpenAPI de OS e Billing para consulta de orçamento, itens, aprovação/recusa, pagamento, estados da Saga e ações permitidas.
+- [ ] `[UI-FUT-BILLING-BACKEND-001]` Implementar nos serviços responsáveis as consultas ou ações ausentes, mantendo cálculo, autorização, idempotência e transições fora da UI.
+- [ ] `[UI-FUT-BILLING-CLIENT-001]` Criar modelos, ports, mappers e adapters HTTP de orçamento e pagamento.
+- [ ] `[UI-FUT-BILLING-BUDGET-001]` Implementar consulta detalhada e aprovação/recusa de orçamento apenas quando oferecidas pela resposta canônica.
+- [ ] `[UI-FUT-BILLING-PAYMENT-001]` Implementar acompanhamento de pagamento e Saga, sem calcular valores nem inferir sucesso ou compensação.
+- [ ] `[UI-FUT-BILLING-TEST-001]` Cobrir aplicação, adapters, rejeições, acessibilidade e fluxos E2E de aprovação e pagamento.
+
+### Administração de usuários
+
+- [ ] `[UI-FUT-USERS-CONTRACT-001]` Auditar o contrato administrativo de usuários para paginação, filtros, detalhes, papéis, estado da credencial e ações permitidas.
+- [ ] `[UI-FUT-USERS-BACKEND-001]` Implementar no backend as lacunas para bloqueio, reativação e inativação, com autorização e auditoria canônicas.
+- [ ] `[UI-FUT-USERS-CLIENT-001]` Criar modelos, ports, mappers e adapters administrativos sem transportar senha, token ou CPF completo para telemetria.
+- [ ] `[UI-FUT-USERS-VIEW-001]` Implementar lista, filtros remotos e detalhe administrativo do usuário.
+- [ ] `[UI-FUT-USERS-ACTIONS-001]` Implementar bloqueio, reativação e inativação exibindo somente ações retornadas pelo backend e exigindo confirmação acessível.
+- [ ] `[UI-FUT-USERS-TEST-001]` Cobrir autorização visual, aplicação, adapters, acessibilidade e fluxos E2E administrativos.
+
+### Dashboard operacional
+
+- [ ] `[UI-FUT-DASHBOARD-DISCOVERY-001]` Definir personas, decisões operacionais, indicadores necessários, atualização e limites de dados do dashboard.
+- [ ] `[UI-FUT-DASHBOARD-CONTRACT-001]` Contratar consultas agregadas próprias nos backends ou em uma API de leitura, incluindo período, atualização e indisponibilidade parcial.
+- [ ] `[UI-FUT-DASHBOARD-BACKEND-001]` Implementar as projeções agregadas sem transferir cálculos, joins de domínio ou interpretação de estados para o navegador.
+- [ ] `[UI-FUT-DASHBOARD-UI-001]` Implementar cards, tabelas e visualizações acessíveis consumindo somente agregados canônicos.
+- [ ] `[UI-FUT-DASHBOARD-TEST-001]` Validar dados parciais, vazio, erro, responsividade, acessibilidade e contrato dos indicadores.
+
+### Atualização em tempo real
+
+- [ ] `[UI-FUT-REALTIME-MEASURE-001]` Medir latência, custo e impacto operacional do polling nos fluxos já implantados.
+- [ ] `[UI-FUT-REALTIME-ADR-001]` Registrar ADR comparando manter polling, SSE e WebSocket somente se a medição demonstrar necessidade.
+- [ ] `[UI-FUT-REALTIME-CONTRACT-001]` Contratar autenticação, retomada, ordenação, deduplicação e fallback da alternativa escolhida.
+- [ ] `[UI-FUT-REALTIME-IMPL-001]` Implementar backend e UI da atualização escolhida, preservando polling manual como fallback observável.
+- [ ] `[UI-FUT-REALTIME-TEST-001]` Testar reconexão, expiração de sessão, eventos duplicados/fora de ordem e degradação para fallback.
+
+### BFF e sessão
+
+- [ ] `[UI-FUT-BFF-DISCOVERY-001]` Levantar riscos e requisitos de sessão que não sejam atendidos com segurança pela SPA atual.
+- [ ] `[UI-FUT-BFF-ADR-001]` Registrar ADR com ameaça, custo operacional, CSRF, CORS, escalabilidade e decisão de adotar ou rejeitar BFF com cookie `HttpOnly`.
+- [ ] `[UI-FUT-BFF-CONTRACT-001]` Se aprovado, definir contratos de sessão, renovação, logout, CSRF e propagação de identidade sem mover regras de negócio ao BFF.
+- [ ] `[UI-FUT-BFF-BACKEND-001]` Implementar e observar o BFF com privilégio mínimo e sem credenciais de domínio próprias.
+- [ ] `[UI-FUT-BFF-UI-001]` Migrar autenticação e adapters da SPA para o contrato de sessão aprovado.
+- [ ] `[UI-FUT-BFF-TEST-001]` Cobrir segurança de cookies, CSRF, expiração, logout, indisponibilidade e migração/rollback.
 
 ## Critério de pronto do MVP
 

@@ -34,7 +34,7 @@ flowchart LR
     subgraph rds["Amazon RDS for PostgreSQL<br/>oficina-postgres-lab"]
       dbOs["database oficina_os<br/>owner oficina_os_user"]
       dbBilling["database oficina_billing<br/>owner oficina_billing_user"]
-      authDb["store PostgreSQL de autenticação<br/>owner oficina_auth_lambda"]
+      authDb["database oficina_auth<br/>owner oficina_auth_user"]
     end
 
     ddb["Amazon DynamoDB<br/>prefixo oficina-execution-lab<br/>catalogo, estoque, execucoes, outbox, idempotencia"]

@@ -362,11 +362,14 @@ Resposta esperada:
     }
   ],
   "valorTotal": 350.00,
-  "status": "GERADO"
+  "status": "GERADO",
+  "acoesPermitidas": ["APROVAR", "RECUSAR"]
 }
 ```
 
 Os itens do orçamento são snapshots financeiros calculados e persistidos pelo `oficina-billing-service` a partir dos itens da Ordem de Serviço. Eles devem preservar a composição usada para aprovação e pagamento, sem criar ownership do catálogo técnico no Billing.
+
+Toda representação de orçamento inclui `acoesPermitidas`. A UI deve oferecer aprovação ou recusa somente quando a ação correspondente for devolvida pelo serviço; após uma decisão, a lista fica vazia.
 
 ### Consultar orçamento
 
@@ -417,6 +420,8 @@ GET /api/v1/pagamentos/{pagamentoId}
 ```http
 GET /api/v1/ordens-servico/{ordemServicoId}/pagamentos
 ```
+
+Toda representação de pagamento inclui `acoesPermitidas`, calculada pelo domínio financeiro. Estados e identificadores externos são apenas apresentados pelos consumidores; sucesso, recusa, cancelamento e compensação nunca devem ser inferidos na UI.
 
 ### Confirmar pagamento
 

@@ -123,12 +123,12 @@ que decisões de negócio sejam reconstruídas no Angular.
 
 ### Orçamento e pagamento
 
-- [ ] `[UI-FUT-BILLING-CONTRACT-001]` Auditar e evoluir as OpenAPI de OS e Billing para consulta de orçamento, itens, aprovação/recusa, pagamento, estados da Saga e ações permitidas.
-- [ ] `[UI-FUT-BILLING-BACKEND-001]` Implementar nos serviços responsáveis as consultas ou ações ausentes, mantendo cálculo, autorização, idempotência e transições fora da UI.
-- [ ] `[UI-FUT-BILLING-CLIENT-001]` Criar modelos, ports, mappers e adapters HTTP de orçamento e pagamento.
-- [ ] `[UI-FUT-BILLING-BUDGET-001]` Implementar consulta detalhada e aprovação/recusa de orçamento apenas quando oferecidas pela resposta canônica.
-- [ ] `[UI-FUT-BILLING-PAYMENT-001]` Implementar acompanhamento de pagamento e Saga, sem calcular valores nem inferir sucesso ou compensação.
-- [ ] `[UI-FUT-BILLING-TEST-001]` Cobrir aplicação, adapters, rejeições, acessibilidade e fluxos E2E de aprovação e pagamento.
+- [x] `[UI-FUT-BILLING-CONTRACT-001]` Auditar e evoluir as OpenAPI de OS e Billing para consulta de orçamento, itens, aprovação/recusa, pagamento, estados da Saga e ações permitidas. Concluído localmente com as ações financeiras canônicas e preservação do estado global consultado na OS.
+- [x] `[UI-FUT-BILLING-BACKEND-001]` Implementar nos serviços responsáveis as consultas ou ações ausentes, mantendo cálculo, autorização, idempotência e transições fora da UI. Concluído localmente com ações derivadas pelas entidades financeiras e revalidação pelos casos de uso existentes.
+- [x] `[UI-FUT-BILLING-CLIENT-001]` Criar modelos, ports, mappers e adapters HTTP de orçamento e pagamento. Concluído localmente na feature isolada `billing`.
+- [x] `[UI-FUT-BILLING-BUDGET-001]` Implementar consulta detalhada e aprovação/recusa de orçamento apenas quando oferecidas pela resposta canônica. Concluído localmente com consulta por OS e decisões idempotentes condicionadas a `acoesPermitidas`.
+- [x] `[UI-FUT-BILLING-PAYMENT-001]` Implementar acompanhamento de pagamento e Saga, sem calcular valores nem inferir sucesso ou compensação. Concluído localmente exibindo valores e estados recebidos das APIs responsáveis.
+- [x] `[UI-FUT-BILLING-TEST-001]` Cobrir aplicação, adapters, rejeições, acessibilidade e fluxos E2E de aprovação e pagamento. Concluído localmente com testes unitários, HTTP, apresentação e Playwright com axe.
 
 ### Administração de usuários
 

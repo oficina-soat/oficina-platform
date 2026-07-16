@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: oficina-billing-service API
-  version: 1.0.0
+  version: 1.1.0
   description: Contrato REST v1 para orcamentos, aprovacoes, recusas e pagamentos.
   license:
     name: Internal
@@ -496,7 +496,7 @@ components:
           type: string
     Orcamento:
       type: object
-      required: [orcamentoId, ordemServicoId, itens, valorTotal, status, criadoEm, atualizadoEm]
+      required: [orcamentoId, ordemServicoId, itens, valorTotal, status, criadoEm, atualizadoEm, acoesPermitidas]
       properties:
         orcamentoId:
           type: string
@@ -521,6 +521,13 @@ components:
         atualizadoEm:
           type: string
           format: date-time
+        acoesPermitidas:
+          type: array
+          items:
+            $ref: "#/components/schemas/AcaoPermitidaOrcamento"
+    AcaoPermitidaOrcamento:
+      type: string
+      enum: [APROVAR, RECUSAR]
     StatusOrcamento:
       type: string
       enum: [GERADO, APROVADO, RECUSADO]
@@ -596,7 +603,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/PagamentoCreateRequest"
         - type: object
-          required: [pagamentoId, status, criadoEm, atualizadoEm]
+          required: [pagamentoId, status, criadoEm, atualizadoEm, acoesPermitidas]
           properties:
             pagamentoId:
               type: string
@@ -614,6 +621,13 @@ components:
             atualizadoEm:
               type: string
               format: date-time
+            acoesPermitidas:
+              type: array
+              items:
+                $ref: "#/components/schemas/AcaoPermitidaPagamento"
+    AcaoPermitidaPagamento:
+      type: string
+      enum: [CONFIRMAR, RECUSAR, CANCELAR]
     MetodoPagamento:
       type: string
       enum: [PIX, CARTAO_CREDITO, CARTAO_DEBITO, DINHEIRO]

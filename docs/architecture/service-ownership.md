@@ -80,13 +80,13 @@ O CRUD administrativo publica [usuarioAdicionado](../../contracts/events/usuario
 
 | Dimensão | Responsabilidade |
 |---|---|
-| Entidades próprias | Orçamento, item financeiro do orçamento, aprovação de orçamento, recusa de orçamento, pagamento, status financeiro, histórico financeiro da OS, dados de integração financeira. |
+| Entidades próprias | Orçamento, item financeiro do orçamento, aprovação de orçamento, recusa de orçamento, tokens de capacidade para decisão pública, pagamento, status financeiro, histórico financeiro da OS, dados de integração financeira. |
 | Banco de dados | Amazon RDS for PostgreSQL, database `oficina_billing`, usuário `oficina_billing_user`. |
-| APIs REST | `/api/v1/orcamentos`, `/api/v1/orcamentos/{orcamentoId}`, `/api/v1/ordens-servico/{ordemServicoId}/orcamentos`, `/api/v1/orcamentos/{orcamentoId}/aprovacao`, `/api/v1/orcamentos/{orcamentoId}/recusa`, `/api/v1/pagamentos`, `/api/v1/pagamentos/{pagamentoId}`, `/api/v1/ordens-servico/{ordemServicoId}/pagamentos`, `/api/v1/pagamentos/{pagamentoId}/confirmacao`, `/api/v1/pagamentos/{pagamentoId}/recusa`, `/api/v1/pagamentos/{pagamentoId}/cancelamento`. |
+| APIs REST | APIs autenticadas de orçamento e pagamento; rotas públicas `/api/v1/ordens-servico/{ordemServicoId}/acompanhar-link`, `/aprovar-link` e `/recusar-link`, protegidas por token de capacidade conforme o [contrato de aprovação do cliente](customer-budget-approval-gap.md). |
 | Eventos produzidos | `orcamentoGerado`, `orcamentoAprovado`, `orcamentoRecusado`, `pagamentoSolicitado`, `pagamentoConfirmado`, `pagamentoRecusado`. |
 | Eventos consumidos | `ordemDeServicoCriada`, `pecaIncluidaNaOrdemDeServico`, `servicoIncluidoNaOrdemDeServico`, `diagnosticoFinalizado`, `execucaoFinalizada`, `ordemDeServicoFinalizada`, `ordemDeServicoEntregue`, `estoqueAcrescentado`, `estoqueBaixado`, `sagaCompensada`, `sagaFinalizadaComSucesso`. |
 | Outbox/jobs | Outbox dos eventos financeiros; jobs de publicação de eventos; jobs de consulta ou conciliação com provedor financeiro quando aplicável. |
-| Integrações externas | Mercado Pago ou provedor financeiro equivalente definido para pagamentos. |
+| Integrações externas | Mercado Pago ou provedor financeiro equivalente definido para pagamentos; `oficina-notificacao-lambda` exclusivamente para entrega da solicitação de aprovação. |
 | Integrações síncronas | Pode consultar `oficina-os-service` para obter dados necessários da OS e seus itens quando não houver projeção local suficiente. |
 | Regras principais | Gerar orçamento, registrar aprovação/recusa, registrar pagamento, confirmar/recusar/cancelar pagamento, manter consistência financeira e publicar eventos financeiros. |
 
@@ -152,6 +152,7 @@ O `oficina-execution-service` não deve:
 | Execução/Reparo | `oficina-execution-service` | Fluxo operacional da oficina. |
 | Orçamento | `oficina-billing-service` | Documento financeiro da OS. |
 | Aprovação/recusa de orçamento | `oficina-billing-service` | Decisão financeira do orçamento. |
+| Token de decisão pública do orçamento | `oficina-billing-service` | Capability de uso único; somente o hash é persistido. A Lambda de notificação apenas entrega os links. |
 | Pagamento | `oficina-billing-service` | Registro e status financeiro. |
 | Integração Mercado Pago | `oficina-billing-service` | Integração externa financeira. |
 | Saga | `oficina-os-service` | Orquestração e estado global do processo distribuído. |

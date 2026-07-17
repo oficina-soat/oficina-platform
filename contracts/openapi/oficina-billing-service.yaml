@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
   title: oficina-billing-service API
-  version: 1.1.0
-  description: Contrato REST v1 para orcamentos, aprovacoes, recusas e pagamentos.
+  version: 1.2.0
+  description: Contrato REST v1 para orcamentos, decisoes publicas por capability, recusas e pagamentos.
   license:
     name: Internal
     identifier: LicenseRef-Internal
@@ -13,6 +13,8 @@ security:
 tags:
   - name: Orcamentos
     description: Operacoes de geracao, consulta, aprovacao e recusa de orcamentos.
+  - name: Decisao publica
+    description: Acompanhamento, confirmacao e decisao do cliente por token de capacidade de uso unico.
   - name: Pagamentos
     description: Operacoes de registro, consulta, confirmacao, recusa e cancelamento de pagamentos.
 paths:
@@ -176,6 +178,89 @@ paths:
           $ref: "#/components/responses/NotFound"
         "409":
           $ref: "#/components/responses/Conflict"
+  /ordens-servico/{ordemServicoId}/acompanhar-link:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
+      - $ref: "#/components/parameters/OrdemServicoId"
+      - $ref: "#/components/parameters/ActionToken"
+    get:
+      tags: [Decisao publica]
+      summary: Acompanhar a Ordem de Servico pelo link do cliente
+      operationId: acompanharOrdemServicoPorLink
+      security: []
+      responses:
+        "200":
+          $ref: "#/components/responses/MagicLinkHtml"
+        "401":
+          $ref: "#/components/responses/MagicLinkUnauthorized"
+  /ordens-servico/{ordemServicoId}/aprovar-link:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
+      - $ref: "#/components/parameters/OrdemServicoId"
+    get:
+      tags: [Decisao publica]
+      summary: Abrir a confirmacao de aprovacao do orcamento
+      operationId: abrirAprovacaoOrcamentoPorLink
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/ActionToken"
+      responses:
+        "200":
+          $ref: "#/components/responses/MagicLinkHtml"
+        "401":
+          $ref: "#/components/responses/MagicLinkUnauthorized"
+    post:
+      tags: [Decisao publica]
+      summary: Confirmar a aprovacao do orcamento
+      operationId: confirmarAprovacaoOrcamentoPorLink
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/DecisaoPublicaRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/MagicLinkHtml"
+        "401":
+          $ref: "#/components/responses/MagicLinkUnauthorized"
+        "409":
+          $ref: "#/components/responses/MagicLinkConflict"
+  /ordens-servico/{ordemServicoId}/recusar-link:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
+      - $ref: "#/components/parameters/OrdemServicoId"
+    get:
+      tags: [Decisao publica]
+      summary: Abrir a confirmacao de recusa do orcamento
+      operationId: abrirRecusaOrcamentoPorLink
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/ActionToken"
+      responses:
+        "200":
+          $ref: "#/components/responses/MagicLinkHtml"
+        "401":
+          $ref: "#/components/responses/MagicLinkUnauthorized"
+    post:
+      tags: [Decisao publica]
+      summary: Confirmar a recusa do orcamento
+      operationId: confirmarRecusaOrcamentoPorLink
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/DecisaoPublicaRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/MagicLinkHtml"
+        "401":
+          $ref: "#/components/responses/MagicLinkUnauthorized"
+        "409":
+          $ref: "#/components/responses/MagicLinkConflict"
   /pagamentos:
     parameters:
       - $ref: "#/components/parameters/CorrelationId"
@@ -398,6 +483,15 @@ components:
         type: string
         minLength: 8
         maxLength: 128
+    ActionToken:
+      name: actionToken
+      in: query
+      required: true
+      description: Token opaco de capacidade, restrito a acao e nunca registrado em telemetria.
+      schema:
+        type: string
+        minLength: 43
+        maxLength: 128
   headers:
     CorrelationId:
       description: Identificador de correlacao retornado em toda resposta de erro.
@@ -481,6 +575,33 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+    MagicLinkHtml:
+      description: Pagina HTML segura de acompanhamento, confirmacao ou resultado.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+      content:
+        text/html:
+          schema:
+            type: string
+    MagicLinkUnauthorized:
+      description: Link invalido, expirado, incompatível ou ja utilizado; a pagina nao distingue a causa.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+      content:
+        text/html:
+          schema:
+            type: string
+    MagicLinkConflict:
+      description: O orcamento nao aceita mais a decisao solicitada.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+      content:
+        text/html:
+          schema:
+            type: string
   schemas:
     GerarOrcamentoRequest:
       type: object
@@ -494,6 +615,18 @@ components:
       properties:
         motivo:
           type: string
+    DecisaoPublicaRequest:
+      type: object
+      required: [actionToken]
+      properties:
+        actionToken:
+          type: string
+          minLength: 43
+          maxLength: 128
+          description: Token opaco submetido pelo formulario de confirmacao; nunca deve ser logado.
+        motivo:
+          type: string
+          maxLength: 500
     Orcamento:
       type: object
       required: [orcamentoId, ordemServicoId, itens, valorTotal, status, criadoEm, atualizadoEm, acoesPermitidas]

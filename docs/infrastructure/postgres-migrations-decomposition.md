@@ -137,6 +137,7 @@ Tabelas novas sugeridas:
 - `dominio_status_pagamento`
 - `orcamento`
 - `orcamento_item`
+- `orcamento_action_token`
 - `pagamento`
 - `financeiro_item_projection`
 - `billing_consumed_event`
@@ -170,6 +171,37 @@ CREATE TABLE orcamento (
 
 CREATE INDEX ix_orcamento_ordem_servico ON orcamento (ordem_de_servico_id);
 ```
+
+### Tokens de decisão pública
+
+O Billing é o proprietário dos tokens de acompanhamento, aprovação e recusa. O valor bruto existe somente durante a geração dos links; a tabela persiste exclusivamente SHA-256 hexadecimal, conforme o [contrato de aprovação do cliente](../architecture/customer-budget-approval-gap.md).
+
+```sql
+CREATE TABLE orcamento_action_token (
+  id uuid PRIMARY KEY,
+  token_hash char(64) NOT NULL,
+  acao varchar(20) NOT NULL,
+  ordem_de_servico_id uuid NOT NULL,
+  orcamento_id uuid NOT NULL,
+  email_destino varchar(320) NOT NULL,
+  criado_em timestamptz NOT NULL,
+  expira_em timestamptz NOT NULL,
+  usado_em timestamptz,
+  CONSTRAINT uk_orcamento_action_token_hash UNIQUE (token_hash),
+  CONSTRAINT fk_orcamento_action_token_orcamento
+    FOREIGN KEY (orcamento_id)
+    REFERENCES orcamento (id),
+  CONSTRAINT ck_orcamento_action_token_acao
+    CHECK (acao IN ('ACOMPANHAR', 'APROVAR', 'RECUSAR')),
+  CONSTRAINT ck_orcamento_action_token_expiracao
+    CHECK (expira_em > criado_em)
+);
+
+CREATE INDEX ix_orcamento_action_token_orcamento
+  ON orcamento_action_token (orcamento_id);
+```
+
+O consumo de `APROVAR` e `RECUSAR` deve bloquear a linha, revalidar token, ação, OS, orçamento, expiração e ausência de `usado_em`, registrar a decisão e a Outbox na mesma transação. `ACOMPANHAR` valida o token sem consumi-lo.
 
 ### Itens do orçamento
 

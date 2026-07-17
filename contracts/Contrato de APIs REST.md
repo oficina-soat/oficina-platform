@@ -413,6 +413,24 @@ POST /api/v1/orcamentos/{orcamentoId}/aprovacao
 POST /api/v1/orcamentos/{orcamentoId}/recusa
 ```
 
+### Links públicos de acompanhamento e decisão
+
+O Billing Service preserva o fluxo de links de capacidade da Fase 3. Estas rotas não exigem JWT; o parâmetro `actionToken` é a credencial restrita à ação, à Ordem de Serviço e ao orçamento.
+
+```http
+GET /api/v1/ordens-servico/{ordemServicoId}/acompanhar-link?actionToken={token}
+GET /api/v1/ordens-servico/{ordemServicoId}/aprovar-link?actionToken={token}
+POST /api/v1/ordens-servico/{ordemServicoId}/aprovar-link
+GET /api/v1/ordens-servico/{ordemServicoId}/recusar-link?actionToken={token}
+POST /api/v1/ordens-servico/{ordemServicoId}/recusar-link
+```
+
+Os `GET` de aprovação e recusa apresentam uma página HTML de confirmação e não alteram estado. Os `POST` recebem `actionToken` em formulário `application/x-www-form-urlencoded`, consomem o token uma única vez e apresentam o resultado em HTML. A recusa pode receber um motivo opcional.
+
+Cada link usa token aleatório de 32 bytes, Base64 URL-safe sem padding, armazenado exclusivamente como hash SHA-256 e válido por 24 horas. A validação exige correspondência de ação, OS, orçamento e token ainda não consumido. O consumo usa lock transacional e a decisão publica no máximo um evento pela Outbox. Token inválido, expirado, incompatível ou reutilizado retorna uma página genérica com HTTP `401`, sem distinguir a causa.
+
+Tokens não podem aparecer em logs, eventos, traces, métricas, mensagens de erro ou respostas administrativas. O contrato implementável está no [OpenAPI do oficina-billing-service](openapi/oficina-billing-service.yaml), e o ownership está na [Aprovação do orçamento pelo cliente](../docs/architecture/customer-budget-approval-gap.md).
+
 ---
 
 ## Pagamentos

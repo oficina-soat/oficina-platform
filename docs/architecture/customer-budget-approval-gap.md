@@ -1,4 +1,8 @@
-# Lacuna de aprovação do orçamento pelo cliente
+# Aprovação do orçamento pelo cliente
+
+## Status
+
+Ownership e contrato alvo definidos. Implementação pendente conforme o [roadmap](../../ROADMAP.md#restauração-da-autorização-do-orçamento-pelo-cliente).
 
 ## Objetivo
 
@@ -43,6 +47,35 @@ Além disso, o OS Service atualmente oferece `INICIAR_EXECUCAO` diretamente em `
 - A recusa retorna a OS ao diagnóstico pelo fluxo canônico já definido.
 - A Lambda de notificações permanece responsável pelo envio, sem absorver regras de orçamento ou transição de estado.
 
+## Ownership definido
+
+| Responsável | Atribuições |
+|---|---|
+| `oficina-billing-service` | Gerar os tokens de capacidade; persistir somente seus hashes; validar expiração, ação, OS e uso único; apresentar as páginas públicas; registrar aprovação ou recusa; publicar o evento financeiro pela Outbox. |
+| `oficina-notificacao-lambda` | Entregar o e-mail já composto ao endereço informado, sem persistir token, consultar orçamento ou decidir transições. |
+| `oficina-os-service` | Manter o cliente e seu contato canônico, fornecer os dados necessários por contrato e atualizar o estado global somente pelos eventos financeiros. |
+| `oficina-ui` | Exibir o estado financeiro e as ações administrativas autenticadas retornadas pelas APIs, sem substituir os links públicos nem inferir transições. |
+| `oficina-infra` | Expor as rotas públicas do Billing sem authorizer e configurar a integração privada e os parâmetros de runtime necessários. |
+
+O token é uma credencial de capacidade restrita a uma ação e não uma credencial de sessão. Auth Lambda e Notification Lambda não se tornam autoridades do orçamento.
+
+## Compatibilidade com a Fase 3
+
+O contrato preserva:
+
+- três links independentes para acompanhar, aprovar e recusar;
+- token aleatório de 32 bytes gerado com CSPRNG e codificado em Base64 URL-safe sem padding;
+- persistência exclusiva do hash SHA-256;
+- vínculo com ação, Ordem de Serviço, orçamento e e-mail destinatário;
+- expiração padrão de 24 horas;
+- consumo único e serializado para aprovação e recusa;
+- página de confirmação carregada por `GET` e decisão efetivada somente por `POST`;
+- resposta HTML segura para acompanhamento, confirmação, sucesso e erro.
+
+As rotas públicas ficam sob `/api/v1/ordens-servico/{ordemServicoId}` e mantêm os sufixos históricos `acompanhar-link`, `aprovar-link` e `recusar-link`. Elas não exigem JWT. O token nunca é aceito em header de autenticação, cookie ou log; é recebido como `actionToken` e deve ser mascarado antes da telemetria.
+
+O uso único é a proteção idempotente da decisão pública: o lock da linha e a Outbox garantem no máximo um evento financeiro. Uma repetição não executa novamente a ação e recebe a mesma página genérica de link inválido, expirado ou já utilizado, sem revelar qual condição ocorreu. As APIs administrativas autenticadas continuam usando `X-Idempotency-Key` normalmente.
+
 ## Escopo de entrega
 
-A correção exige definir formalmente o ownership do token e das rotas públicas, evoluir contratos e infraestrutura, implementar o envio e as decisões, remover o bypass atual e homologar o caminho aprovado, recusado, expirado, reutilizado e indisponível no `lab`.
+A implementação deve materializar os contratos definidos, remover o bypass atual e homologar os caminhos aprovado, recusado, expirado, reutilizado e indisponível no `lab`.

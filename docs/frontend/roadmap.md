@@ -156,7 +156,7 @@ que decisões de negócio sejam reconstruídas no Angular.
 ### Dashboard operacional
 
 - [x] `[UI-FUT-DASHBOARD-DISCOVERY-001]` Definir personas, decisões operacionais, indicadores necessários, atualização e limites de dados do dashboard. Concluído no [discovery do dashboard operacional](dashboard-operational-discovery.md), que separa a visão de negócio da observabilidade técnica, prioriza cards e filas acionáveis por papel, exige agregações canônicas nos backends e explicita atualização, consistência parcial, segurança e itens fora do primeiro incremento.
-- [ ] `[UI-FUT-DASHBOARD-CONTRACT-001]` Contratar consultas agregadas próprias nos backends ou em uma API de leitura, incluindo período, atualização e indisponibilidade parcial.
+- [x] `[UI-FUT-DASHBOARD-CONTRACT-001]` Contratar consultas agregadas próprias nos backends ou em uma API de leitura, incluindo período, atualização e indisponibilidade parcial. Concluído no [contrato do dashboard operacional](../../contracts/dashboard-operational.md) e nas OpenAPIs das quatro autoridades. A primeira versão usa snapshots atuais por domínio, com `generatedAt`, `dataAsOf`, atualização opcional, filas limitadas e composição parcial na UI; intervalos históricos e uma API transversal permanecem fora do escopo até decisão arquitetural específica.
 - [ ] `[UI-FUT-DASHBOARD-BACKEND-001]` Implementar as projeções agregadas sem transferir cálculos, joins de domínio ou interpretação de estados para o navegador.
 - [ ] `[UI-FUT-DASHBOARD-UI-001]` Implementar cards, tabelas e visualizações acessíveis consumindo somente agregados canônicos.
 - [ ] `[UI-FUT-DASHBOARD-TEST-001]` Validar dados parciais, vazio, erro, responsividade, acessibilidade e contrato dos indicadores.

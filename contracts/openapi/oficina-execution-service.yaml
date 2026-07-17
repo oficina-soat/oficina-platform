@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: oficina-execution-service API
-  version: 1.0.0
+  version: 1.1.0
   description: Contrato REST v1 para catalogo de servicos, pecas, estoque, diagnostico, execucao e reparo.
   license:
     name: Internal
@@ -19,7 +19,30 @@ tags:
     description: Operacoes de saldo e movimentos de estoque.
   - name: Execucoes
     description: Operacoes de diagnostico, execucao e reparo.
+  - name: Dashboard
+    description: Leitura agregada da carga de execução e das atenções de estoque.
 paths:
+  /dashboard/execucao:
+    get:
+      tags: [Dashboard]
+      summary: Consultar resumo operacional da execução
+      operationId: consultarDashboardExecucao
+      x-required-roles: [administrativo, mecanico]
+      parameters:
+        - $ref: "#/components/parameters/CorrelationId"
+      responses:
+        "200":
+          description: Snapshot atual da execução e do estoque, agregado pelo Execution Service.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardExecucaoResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
   /servicos:
     parameters:
       - $ref: "#/components/parameters/CorrelationId"
@@ -762,6 +785,18 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Token JWT válido sem um dos papéis exigidos.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ServiceUnavailable:
+      description: Snapshot operacional temporariamente indisponível.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
     NotFound:
       description: Recurso nao encontrado.
       headers:
@@ -787,6 +822,68 @@ components:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
   schemas:
+    DashboardExecucaoResponse:
+      type: object
+      required: [generatedAt, dataAsOf, contagensPorStatus, totalFila, proximasExecucoes, estoqueAtencoes]
+      properties:
+        generatedAt:
+          type: string
+          format: date-time
+        dataAsOf:
+          type: string
+          format: date-time
+          description: Limite temporal do snapshot atual. A primeira versão não oferece séries históricas.
+        refreshAfterSeconds:
+          type: integer
+          minimum: 15
+        contagensPorStatus:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContagemExecucaoPorStatus"
+        totalFila:
+          type: integer
+          format: int64
+          minimum: 0
+        proximasExecucoes:
+          type: array
+          maxItems: 5
+          description: Itens na ordem canônica da fila; o cliente não reordena por prioridade.
+          items:
+            $ref: "#/components/schemas/FilaExecucaoItem"
+        estoqueAtencoes:
+          type: array
+          maxItems: 5
+          items:
+            $ref: "#/components/schemas/EstoqueAtencaoDashboard"
+    ContagemExecucaoPorStatus:
+      type: object
+      required: [status, quantidade]
+      properties:
+        status:
+          $ref: "#/components/schemas/StatusExecucao"
+        quantidade:
+          type: integer
+          format: int64
+          minimum: 0
+    EstoqueAtencaoDashboard:
+      type: object
+      required: [pecaId, nome, saldoAtual, limiteReposicao, atualizadoEm]
+      properties:
+        pecaId:
+          type: string
+          format: uuid
+        nome:
+          type: string
+        saldoAtual:
+          type: number
+          format: decimal
+        limiteReposicao:
+          type: number
+          format: decimal
+          description: Limite canônico aplicado pelo backend para sinalizar a atenção.
+        atualizadoEm:
+          type: string
+          format: date-time
     ServicoCreateRequest:
       type: object
       required: [nome, valorBase]

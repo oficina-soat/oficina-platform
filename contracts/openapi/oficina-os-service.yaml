@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: oficina-os-service API
-  version: 1.2.0
+  version: 1.3.0
   description: Contrato REST v1 para usuários operacionais, clientes, veículos, ordens de serviço, estados e histórico da OS.
   license:
     name: Internal
@@ -19,7 +19,51 @@ tags:
     description: Operacoes de cadastro e consulta de veiculos.
   - name: Ordens de Servico
     description: Operacoes de abertura, consulta, estado e historico de ordens de servico.
+  - name: Dashboard
+    description: Leituras agregadas operacionais sem comandos ou regras no cliente.
 paths:
+  /dashboard/ordens-servico:
+    get:
+      tags: [Dashboard]
+      summary: Consultar resumo operacional das ordens de serviço
+      operationId: consultarDashboardOrdensServico
+      x-required-roles: [administrativo, mecanico, recepcionista]
+      parameters:
+        - $ref: "#/components/parameters/CorrelationId"
+      responses:
+        "200":
+          description: Snapshot atual das ordens e da fila de atenção, já agregado e ordenado pelo OS Service.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardOrdensServicoResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+  /dashboard/usuarios:
+    get:
+      tags: [Dashboard]
+      summary: Consultar resumo operacional dos usuários
+      operationId: consultarDashboardUsuarios
+      x-required-roles: [administrativo]
+      parameters:
+        - $ref: "#/components/parameters/CorrelationId"
+      responses:
+        "200":
+          description: Snapshot atual dos cadastros operacionais que exigem atenção administrativa.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardUsuariosResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
   /usuarios:
     parameters:
       - $ref: "#/components/parameters/CorrelationId"
@@ -835,6 +879,107 @@ components:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
   schemas:
+    DashboardMetadata:
+      type: object
+      required: [generatedAt, dataAsOf]
+      properties:
+        generatedAt:
+          type: string
+          format: date-time
+        dataAsOf:
+          type: string
+          format: date-time
+          description: Limite temporal do snapshot atual. A primeira versão não oferece séries históricas.
+        refreshAfterSeconds:
+          type: integer
+          minimum: 15
+          description: Intervalo técnico sugerido; quando ausente, o cliente oferece somente atualização manual.
+    DashboardOrdensServicoResponse:
+      allOf:
+        - $ref: "#/components/schemas/DashboardMetadata"
+        - type: object
+          required: [contagensPorEstado, atencoes]
+          properties:
+            contagensPorEstado:
+              type: array
+              items:
+                $ref: "#/components/schemas/ContagemOrdemServicoPorEstado"
+            atencoes:
+              type: array
+              maxItems: 5
+              items:
+                $ref: "#/components/schemas/OrdemServicoAtencaoDashboard"
+    ContagemOrdemServicoPorEstado:
+      type: object
+      required: [estado, quantidade]
+      properties:
+        estado:
+          $ref: "#/components/schemas/EstadoOrdemServico"
+        quantidade:
+          type: integer
+          format: int64
+          minimum: 0
+    OrdemServicoAtencaoDashboard:
+      type: object
+      required: [ordemServicoId, estado, descricaoProblema, entrouNoEstadoEm, acoesPermitidas]
+      properties:
+        ordemServicoId:
+          type: string
+          format: uuid
+        estado:
+          $ref: "#/components/schemas/EstadoOrdemServico"
+        descricaoProblema:
+          type: string
+        entrouNoEstadoEm:
+          type: string
+          format: date-time
+        acoesPermitidas:
+          type: array
+          items:
+            $ref: "#/components/schemas/AcaoPermitidaOrdemServico"
+    DashboardUsuariosResponse:
+      allOf:
+        - $ref: "#/components/schemas/DashboardMetadata"
+        - type: object
+          required: [contagensPorStatus, atencoes]
+          properties:
+            contagensPorStatus:
+              type: array
+              items:
+                $ref: "#/components/schemas/ContagemUsuarioPorStatus"
+            atencoes:
+              type: array
+              maxItems: 5
+              items:
+                $ref: "#/components/schemas/UsuarioAtencaoDashboard"
+    ContagemUsuarioPorStatus:
+      type: object
+      required: [status, quantidade]
+      properties:
+        status:
+          $ref: "#/components/schemas/StatusUsuario"
+        quantidade:
+          type: integer
+          format: int64
+          minimum: 0
+    UsuarioAtencaoDashboard:
+      type: object
+      required: [usuarioId, nome, status, atualizadoEm, acoesPermitidas]
+      properties:
+        usuarioId:
+          type: string
+          format: uuid
+        nome:
+          type: string
+        status:
+          $ref: "#/components/schemas/StatusUsuario"
+        atualizadoEm:
+          type: string
+          format: date-time
+        acoesPermitidas:
+          type: array
+          items:
+            $ref: "#/components/schemas/AcaoPermitidaUsuario"
     UsuarioCreateRequest:
       type: object
       required: [nome, documento, papeis]

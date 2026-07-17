@@ -125,6 +125,8 @@ Uma API de leitura dedicada só se justifica se a necessidade futura exigir snap
 
 ## Critérios de aceite para as próximas etapas
 
+Os formatos executáveis foram definidos posteriormente no [contrato do dashboard operacional](../../contracts/dashboard-operational.md).
+
 - os contratos expõem contagens, itens acionáveis, timestamps e links/filtros sem exigir cálculo de domínio no Angular;
 - cada indicador possui autoridade e papéis permitidos explícitos;
 - indisponibilidade parcial não apaga os demais blocos;

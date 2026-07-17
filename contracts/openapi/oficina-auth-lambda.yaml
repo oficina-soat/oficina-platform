@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: oficina-auth-lambda API
-  version: 1.1.0
+  version: 1.2.0
   description: Contrato HTTP para autenticação JWT e ativação segura de credenciais dos usuários operacionais.
   license:
     name: Internal
@@ -13,7 +13,32 @@ tags:
     description: Autenticação por CPF e senha e emissão de JWT.
   - name: Ativacao
     description: Provisionamento de senha sem transportar credenciais pelo oficina-os-service.
+  - name: Dashboard
+    description: Leitura administrativa agregada e sanitizada das credenciais.
 paths:
+  /auth/dashboard/credenciais:
+    get:
+      tags: [Dashboard]
+      summary: Consultar resumo administrativo das credenciais
+      operationId: consultarDashboardCredenciais
+      security:
+        - bearerAuth: []
+      x-required-roles: [administrativo]
+      parameters:
+        - $ref: "#/components/parameters/CorrelationId"
+      responses:
+        "200":
+          description: Snapshot sanitizado das credenciais que exigem atenção.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardCredenciaisResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
   /auth:
     post:
       tags: [Autenticacao]
@@ -210,6 +235,58 @@ components:
         maxLength: 128
       description: Identificador propagado para resposta, logs e traces.
   schemas:
+    DashboardCredenciaisResponse:
+      type: object
+      required: [generatedAt, dataAsOf, contagensPorStatus, atencoes]
+      properties:
+        generatedAt:
+          type: string
+          format: date-time
+        dataAsOf:
+          type: string
+          format: date-time
+          description: Limite temporal do snapshot atual. A primeira versão não oferece séries históricas.
+        refreshAfterSeconds:
+          type: integer
+          minimum: 15
+        contagensPorStatus:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContagemCredencialPorStatus"
+        atencoes:
+          type: array
+          maxItems: 5
+          items:
+            $ref: "#/components/schemas/CredencialAtencaoDashboard"
+    ContagemCredencialPorStatus:
+      type: object
+      required: [status, quantidade]
+      properties:
+        status:
+          $ref: "#/components/schemas/StatusCredencial"
+        quantidade:
+          type: integer
+          format: int64
+          minimum: 0
+    CredencialAtencaoDashboard:
+      type: object
+      required: [usuarioId, status, atualizadoEm, acoesPermitidas]
+      properties:
+        usuarioId:
+          type: string
+          format: uuid
+        status:
+          $ref: "#/components/schemas/StatusCredencial"
+        atualizadoEm:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        acoesPermitidas:
+          type: array
+          items:
+            $ref: "#/components/schemas/AcaoPermitidaCredencial"
     AutenticacaoRequest:
       type: object
       required: [cpf, password]
@@ -265,8 +342,7 @@ components:
       required: [status, acoesPermitidas]
       properties:
         status:
-          type: string
-          enum: [NAO_ATIVADA, ATIVACAO_PENDENTE, ATIVA]
+          $ref: "#/components/schemas/StatusCredencial"
         expiresAt:
           type: string
           format: date-time
@@ -274,9 +350,14 @@ components:
           type: array
           uniqueItems: true
           items:
-            type: string
-            enum: [SOLICITAR_ATIVACAO]
+            $ref: "#/components/schemas/AcaoPermitidaCredencial"
       additionalProperties: false
+    StatusCredencial:
+      type: string
+      enum: [NAO_ATIVADA, ATIVACAO_PENDENTE, ATIVA]
+    AcaoPermitidaCredencial:
+      type: string
+      enum: [SOLICITAR_ATIVACAO]
     AuthError:
       type: object
       required: [message, motivo]
@@ -301,6 +382,12 @@ components:
             $ref: "#/components/schemas/AuthError"
     Forbidden:
       description: JWT válido sem o papel administrativo.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AuthError"
+    ServiceUnavailable:
+      description: Snapshot administrativo temporariamente indisponível.
       content:
         application/json:
           schema:

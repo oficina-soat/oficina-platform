@@ -40,6 +40,7 @@ Este diretório concentra a documentação normativa da plataforma em grupos tem
 
 - [Roadmap do frontend operacional](frontend/roadmap.md)
 - [Discovery do dashboard operacional](frontend/dashboard-operational-discovery.md)
+- [Contrato do dashboard operacional](../contracts/dashboard-operational.md)
 - [Histórico consolidado do roadmap](delivery/roadmap-history.md)
 - [Enunciado do projeto](delivery/Enunciado%20Fase%204.md)
 - [Padrão BDD, Cobertura e Qualidade](delivery/bdd-testing.md)

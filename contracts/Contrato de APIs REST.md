@@ -670,6 +670,12 @@ POST /api/v1/execucoes/{execucaoId}/cancelamento
 
 # Diretrizes de Integração
 
+## Dashboard operacional
+
+As consultas agregadas da interface operacional são definidas no [Contrato do dashboard operacional](dashboard-operational.md). Cada autoridade oferece uma rota de snapshot própria para ordens, usuários, credenciais, execução, estoque ou faturamento. O cliente não agrega listagens, calcula prioridade ou infere pendência a partir de estados.
+
+As rotas são contrato alvo e somente passam a integrar o runtime após a implementação correspondente nos backends e na infraestrutura.
+
 ## Comunicação síncrona
 
 APIs REST devem ser utilizadas somente para:

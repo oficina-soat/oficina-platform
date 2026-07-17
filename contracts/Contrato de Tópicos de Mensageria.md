@@ -198,7 +198,7 @@ Esta tabela deve ser mantida coerente com o [Contrato de Eventos de Domínio](Co
 | `diagnosticoFinalizado` | `oficina.execution.diagnostico-finalizado` | `oficina-execution-service` | `oficina-os-service`, `oficina-billing-service` |
 | `orcamentoGerado` | `oficina.billing.orcamento-gerado` | `oficina-billing-service` | `oficina-os-service` |
 | `orcamentoAprovado` | `oficina.billing.orcamento-aprovado` | `oficina-billing-service` | `oficina-os-service`, `oficina-execution-service` |
-| `orcamentoRecusado` | `oficina.billing.orcamento-recusado` | `oficina-billing-service` | `oficina-os-service` |
+| `orcamentoRecusado` | `oficina.billing.orcamento-recusado` | `oficina-billing-service` | `oficina-os-service`, `oficina-execution-service` |
 | `execucaoIniciada` | `oficina.execution.execucao-iniciada` | `oficina-execution-service` | `oficina-os-service` |
 | `execucaoFinalizada` | `oficina.execution.execucao-finalizada` | `oficina-execution-service` | `oficina-os-service`, `oficina-billing-service` |
 | `ordemDeServicoFinalizada` | `oficina.os.ordem-de-servico-finalizada` | `oficina-os-service` | `oficina-billing-service`, `oficina-execution-service` |

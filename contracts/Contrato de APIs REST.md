@@ -648,23 +648,13 @@ POST /api/v1/execucoes/{execucaoId}/diagnostico/conclusao
 
 ## Reparo
 
-### Iniciar reparo
-
-```http
-POST /api/v1/execucoes/{execucaoId}/reparo/inicio
-```
-
 ### Concluir reparo
 
 ```http
 POST /api/v1/execucoes/{execucaoId}/reparo/conclusao
 ```
 
-### Cancelar execução
-
-```http
-POST /api/v1/execucoes/{execucaoId}/cancelamento
-```
+O início do reparo não é uma ação operacional pública. O Execution Service o executa ao consumir `orcamentoAprovado`. O cancelamento técnico também é comandado pela compensação da Saga iniciada no OS Service; clientes operacionais não recebem essas ações em `acoesPermitidas`.
 
 ---
 

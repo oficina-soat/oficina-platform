@@ -95,7 +95,9 @@ Quando a OS estiver nesse estado, sua representação inclui `INCLUIR_PECA` e `I
 
 ### Alteração de estado
 
-A API operacional não aceita a transição direta de `AGUARDANDO_APROVACAO` para `EM_EXECUCAO` e não oferece `INICIAR_EXECUCAO` em `acoesPermitidas`. A aprovação do cliente no Billing Service publica `orcamentoAprovado`; o início técnico é solicitado pela Saga e confirmado por `execucaoIniciada` antes da mudança do estado global.
+A API operacional da OS aceita diretamente apenas a entrega `FINALIZADA -> ENTREGUE`, e somente quando a Saga estiver em `AGUARDANDO_ENTREGA` após `pagamentoConfirmado`. Início e conclusão de diagnóstico, retomada após recusa, início e conclusão de reparo e finalização técnica são aplicados no estado global exclusivamente pelos eventos das autoridades responsáveis.
+
+A aprovação do cliente no Billing Service publica `orcamentoAprovado`; o Execution Service inicia o reparo internamente e publica `execucaoIniciada`. A recusa publica `orcamentoRecusado` para OS e Execution retomarem o diagnóstico de forma consistente. A API não oferece atalhos equivalentes em `acoesPermitidas`.
 
 Toda alteração de estado deve registrar:
 

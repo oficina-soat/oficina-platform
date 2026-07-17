@@ -47,12 +47,11 @@ Comandos devem usar `X-Idempotency-Key` no formato definido no [Contrato de Idem
 | Comando lógico | Serviço | Operação REST | Chave idempotente |
 |---|---|---|---|
 | `criar-execucao` | `oficina-execution-service` | `POST /api/v1/execucoes` | `saga:<sagaId>:criar-execucao:<ordemServicoId>` |
-| `iniciar-diagnostico` | `oficina-execution-service` | `POST /api/v1/execucoes/{execucaoId}/diagnostico/inicio` | `saga:<sagaId>:iniciar-diagnostico:<execucaoId>` |
 | `gerar-orcamento` | `oficina-billing-service` | `POST /api/v1/orcamentos` | `saga:<sagaId>:gerar-orcamento:<ordemServicoId>` |
-| `iniciar-execucao` | `oficina-execution-service` | `POST /api/v1/execucoes/{execucaoId}/reparo/inicio` | `saga:<sagaId>:iniciar-execucao:<execucaoId>` |
 | `solicitar-pagamento` | `oficina-billing-service` | `POST /api/v1/pagamentos` | `saga:<sagaId>:solicitar-pagamento:<ordemServicoId>` |
-| `cancelar-execucao` | `oficina-execution-service` | `POST /api/v1/execucoes/{execucaoId}/cancelamento` | `saga:<sagaId>:cancelar-execucao:<execucaoId>` |
 | `compensar-estoque` | `oficina-execution-service` | `POST /api/v1/estoques/movimentos/estorno` | `saga:<sagaId>:compensar-estoque:<ordemServicoId>` |
+
+O início do diagnóstico é uma ação do técnico na API pública do Execution Service. O início do reparo ocorre internamente ao consumir `orcamentoAprovado`; a retomada do diagnóstico ocorre ao consumir `orcamentoRecusado`. Cancelamentos técnicos são consequência de `sagaCompensada`, nunca atalhos oferecidos ao operador.
 
 ## Eventos consumidos
 
@@ -63,7 +62,7 @@ Comandos devem usar `X-Idempotency-Key` no formato definido no [Contrato de Idem
 | `diagnosticoFinalizado` | `AGUARDANDO_ORCAMENTO` | Solicitar geração de orçamento. |
 | `orcamentoGerado` | `AGUARDANDO_APROVACAO` | Aguardar decisão do cliente. |
 | `orcamentoAprovado` | `EM_EXECUCAO` | Registrar a autorização; o `oficina-execution-service` inicia o reparo e publica `execucaoIniciada`. |
-| `orcamentoRecusado` | `EM_DIAGNOSTICO` | Retornar OS para diagnóstico sem encerrar a Saga. |
+| `orcamentoRecusado` | `EM_DIAGNOSTICO` | Retornar OS para diagnóstico sem encerrar a Saga; o Execution Service também retoma sua execução técnica. |
 | `execucaoIniciada` | `EM_EXECUCAO` | Registrar execução em andamento. |
 | `execucaoFinalizada` | `AGUARDANDO_PAGAMENTO` | Registrar OS como `FINALIZADA`, publicar `ordemDeServicoFinalizada` e aguardar pagamento. |
 | `pagamentoSolicitado` | `AGUARDANDO_PAGAMENTO` | Registrar pagamento pendente. |

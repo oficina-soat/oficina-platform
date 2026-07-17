@@ -116,9 +116,7 @@ Fonte canônica: [OpenAPI do oficina-execution-service](../../contracts/openapi/
 | `GET` | `/api/v1/ordens-servico/{ordemServicoId}/execucao` |
 | `POST` | `/api/v1/execucoes/{execucaoId}/diagnostico/inicio` |
 | `POST` | `/api/v1/execucoes/{execucaoId}/diagnostico/conclusao` |
-| `POST` | `/api/v1/execucoes/{execucaoId}/reparo/inicio` |
 | `POST` | `/api/v1/execucoes/{execucaoId}/reparo/conclusao` |
-| `POST` | `/api/v1/execucoes/{execucaoId}/cancelamento` |
 | `GET` | `/api/v1/dashboard/execucao` |
 
 ## Endpoints que não devem ser rotas públicas de negócio

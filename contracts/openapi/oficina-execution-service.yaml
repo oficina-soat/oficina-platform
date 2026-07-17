@@ -575,29 +575,6 @@ paths:
           $ref: "#/components/responses/NotFound"
         "409":
           $ref: "#/components/responses/Conflict"
-  /execucoes/{execucaoId}/reparo/inicio:
-    parameters:
-      - $ref: "#/components/parameters/CorrelationId"
-    post:
-      tags: [Execucoes]
-      summary: Iniciar reparo
-      operationId: iniciarReparo
-      parameters:
-        - $ref: "#/components/parameters/ExecucaoId"
-        - $ref: "#/components/parameters/IdempotencyKey"
-      responses:
-        "200":
-          description: Reparo iniciado.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Execucao"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
   /execucoes/{execucaoId}/reparo/conclusao:
     parameters:
       - $ref: "#/components/parameters/CorrelationId"
@@ -617,37 +594,6 @@ paths:
       responses:
         "200":
           description: Reparo concluido.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Execucao"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
-  /execucoes/{execucaoId}/cancelamento:
-    parameters:
-      - $ref: "#/components/parameters/CorrelationId"
-    post:
-      tags: [Execucoes]
-      summary: Cancelar execucao
-      operationId: cancelarExecucao
-      parameters:
-        - $ref: "#/components/parameters/ExecucaoId"
-        - $ref: "#/components/parameters/IdempotencyKey"
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CancelamentoRequest"
-      responses:
-        "200":
-          description: Execucao cancelada.
           content:
             application/json:
               schema:
@@ -1089,7 +1035,7 @@ components:
                 $ref: "#/components/schemas/AcaoPermitidaExecucao"
     AcaoPermitidaExecucao:
       type: string
-      enum: [INICIAR_DIAGNOSTICO, CONCLUIR_DIAGNOSTICO, INICIAR_REPARO, CONCLUIR_REPARO, CANCELAR]
+      enum: [INICIAR_DIAGNOSTICO, CONCLUIR_DIAGNOSTICO, CONCLUIR_REPARO]
     FilaExecucaoItem:
       allOf:
         - $ref: "#/components/schemas/Execucao"
@@ -1112,11 +1058,6 @@ components:
       type: object
       properties:
         observacoes:
-          type: string
-    CancelamentoRequest:
-      type: object
-      properties:
-        motivo:
           type: string
     ErrorResponse:
       type: object

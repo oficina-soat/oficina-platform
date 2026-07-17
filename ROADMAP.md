@@ -47,7 +47,20 @@ Contexto e invariantes estão consolidados na [Lacuna de aprovação do orçamen
 
 Estes itens não pertencem à sequência ativa. A promoção deve mover o item para a posição desejada na seção anterior e substituir o prefixo `FUT` por um identificador do épico correspondente.
 
-Não há candidatas futuras no momento.
+### Diagramas dos fluxos operacionais
+
+Os diagramas devem ser escritos em Mermaid e publicados nos READMEs canônicos dos repositórios que possuem cada responsabilidade. Visões ponta a ponta pertencem ao `oficina-platform`; cada serviço deve manter somente seu recorte, com links para a visão canônica, evitando duplicação de regras e divergência entre estados, APIs e eventos.
+
+- [ ] `[FUT-DIAG-FLOW-001]` Documentar no README do `oficina-platform`, com `stateDiagram-v2`, a visão resumida do ciclo de vida da OS, incluindo estados principais, transições válidas, retomada do diagnóstico, recusa e cancelamento; manter coerência com os contratos de estados, APIs, eventos e Saga.
+- [ ] `[FUT-DIAG-FLOW-002]` Documentar no README do `oficina-os-service` o fluxo de recepção e diagnóstico, cobrindo criação da OS, cliente e veículo, início do diagnóstico, inclusão de peças e serviços e conclusão do diagnóstico; usar `flowchart` para decisões e `sequenceDiagram` quando houver colaboração com outros serviços.
+- [ ] `[FUT-DIAG-FLOW-003]` Documentar a geração do orçamento e a aprovação pelo cliente: manter a sequência ponta a ponta no README do `oficina-platform`, o ownership financeiro e o consumo único dos links no `oficina-billing-service` e somente o recorte de entrega da notificação no `oficina-auth-lambda`; incluir aprovação, recusa, expiração, reutilização inválida e retomada do diagnóstico.
+- [ ] `[FUT-DIAG-FLOW-004]` Documentar o fluxo da aprovação até a execução e conclusão do reparo, com visão ponta a ponta no README do `oficina-platform` e recortes de orquestração e execução nos READMEs de `oficina-os-service` e `oficina-execution-service`.
+- [ ] `[FUT-DIAG-FLOW-005]` Documentar o fluxo de pagamento e entrega, incluindo solicitação, integração com Mercado Pago, webhook, confirmação, falha, indisponibilidade, retentativa, finalização da OS e entrega do veículo; manter a visão ponta a ponta no `oficina-platform` e o recorte financeiro no `oficina-billing-service`.
+- [ ] `[FUT-DIAG-FLOW-006]` Documentar a Saga assíncrona da OS com `sequenceDiagram`, identificando orquestrador, produtores, consumidores, tópicos, correlação, Outbox, retentativas e compensações; manter a visão canônica no `oficina-platform` e, nos três serviços, apenas os eventos produzidos e consumidos por cada um.
+- [ ] `[FUT-DIAG-FLOW-007]` Documentar autenticação e autorização, da credencial até a emissão e validação do JWT, grupos, audiences e restauração da sessão operacional; manter a sequência ponta a ponta no README do `oficina-platform` e os recortes técnicos nos READMEs de `oficina-auth-lambda` e `oficina-ui`, sem introduzir regra de negócio no frontend.
+- [ ] `[FUT-DIAG-FLOW-008]` Documentar a ativação de usuário, incluindo emissão, entrega, validação, expiração e uso único do token; manter a visão ponta a ponta no `oficina-platform` e os recortes de implementação em `oficina-auth-lambda` e `oficina-ui`.
+- [ ] `[FUT-DIAG-FLOW-009]` Documentar no README do `oficina-infra` o fluxo operacional de build e deploy do `lab`, cobrindo GitHub Actions, publicação de artefatos e imagens, ECR, EKS, Lambdas, API Gateway, retomada e suspensão do ambiente, sem misturar a hospedagem opcional da UI aos requisitos de infraestrutura principal.
+- [ ] `[FUT-DIAG-FLOW-010]` Executar revisão anti-divergência de todos os diagramas, validar a renderização Mermaid, links entre as visões canônicas e os recortes por repositório e correspondência com estados, APIs, eventos, tópicos, ownership e recursos de infraestrutura vigentes.
 
 ## Extensões opcionais
 

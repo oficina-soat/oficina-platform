@@ -70,6 +70,19 @@ Comandos devem usar `X-Idempotency-Key` no formato definido no [Contrato de Idem
 | `pagamentoConfirmado` | `AGUARDANDO_ENTREGA` | Liberar entrega da OS. |
 | `pagamentoRecusado` | `AGUARDANDO_PAGAMENTO` | Registrar recusa, bloquear entrega e permitir nova tentativa enquanto a política operacional não for excedida. |
 
+Eventos publicados em tópicos distintos podem ser entregues fora da ordem em que foram
+produzidos. O consumidor deve validar o estado atual antes de aplicar uma transição e
+registrar na inbox, sem regredir a Saga, eventos incompatíveis com uma etapa já superada.
+Em particular:
+
+- `diagnosticoIniciado` só pode levar a Saga de `INICIADA` para `EM_DIAGNOSTICO` ou
+  confirmar que ela já está em `EM_DIAGNOSTICO`;
+- se `diagnosticoFinalizado` chegar primeiro, o `oficina-os-service` deve preservar o
+  histórico válido da OS com as transições `RECEBIDA -> EM_DIAGNOSTICO ->
+  AGUARDANDO_APROVACAO` e avançar a Saga para `AGUARDANDO_ORCAMENTO`;
+- um `diagnosticoIniciado` entregue depois dessa conclusão deve ser tratado de forma
+  idempotente, sem alterar o estado corrente.
+
 ## Eventos produzidos
 
 | Evento | Quando publicar |

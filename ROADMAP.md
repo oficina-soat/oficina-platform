@@ -35,6 +35,9 @@ Quando o usuário solicitar a “próxima tarefa”, deve ser executado o primei
 
 ### Correção das fronteiras operacionais da OS
 
+- [ ] `[D-MECHANIC-WORKSPACE-REM-001]` Implantar e homologar no `lab` o atendimento mecânico unificado, comprovando inclusão de itens e comandos de diagnóstico/reparo na mesma tela, sempre conforme as capabilities de OS e Execution.
+- [ ] `[D-MECHANIC-WORKSPACE-RECON-001]` Detectar e reconciliar no `lab` OS operacionais sem execução associada, preservando criação idempotente e registrando evidência sem alterar estados de negócio; manter monitoramento para novas divergências.
+- [x] `[D-MECHANIC-WORKSPACE-IMPL-001]` Unificar no detalhe acessado pela fila do mecânico a composição técnica da OS e os comandos de diagnóstico/reparo, sem transferir regras entre serviços nem inferir ações no Angular. Concluído localmente no `oficina-ui`: o atendimento reúne composição e execução, mantendo as capabilities de cada backend como única autoridade.
 - [x] `[D-FLOW-AUTHORITY-IMPL-004]` Manter na fila do mecânico todas as execuções com ação operacional disponível (`CRIADA`, `EM_DIAGNOSTICO` e `EM_REPARO`) e retirar estados sem ação manual. Concluído localmente no contrato, Execution Service e UI, com regressão automatizada das transições.
 - [x] `[D-FLOW-AUTHORITY-IMPL-001]` Remover da UI e do OS Service as transições diretas de diagnóstico e finalização que contornavam Execution, Billing e a Saga; liberar entrega somente após pagamento confirmado. Concluído localmente com ações derivadas também pelo estado da Saga e rejeição dos atalhos no backend.
 - [x] `[D-FLOW-AUTHORITY-IMPL-002]` Fazer o Execution retomar o diagnóstico após `orcamentoRecusado`, iniciar reparo apenas pelo evento `orcamentoAprovado` e cancelar somente por compensação da Saga. Concluído localmente nos contratos, consumidor, rotas públicas e UI.

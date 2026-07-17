@@ -41,7 +41,7 @@ Este documento complementa a [ADR-009 - Estratégia de Saga Pattern](../../adr/A
 | 4 | Técnico conclui diagnóstico | `oficina-execution-service` | Concluir diagnóstico | `diagnosticoFinalizado` | `AGUARDANDO_APROVACAO` |
 | 5 | `diagnosticoFinalizado` | `oficina-os-service` | Solicitar orçamento | `orcamentoGerado` | `AGUARDANDO_APROVACAO` |
 | 6 | Aprovação do cliente | `oficina-billing-service` | Aprovar orçamento | `orcamentoAprovado` | `AGUARDANDO_APROVACAO` |
-| 7 | `orcamentoAprovado` | `oficina-os-service` | Solicitar início da execução | `execucaoIniciada` | `EM_EXECUCAO` |
+| 7 | `orcamentoAprovado` | `oficina-execution-service` | Iniciar reparo autorizado de forma idempotente | `execucaoIniciada` | `EM_EXECUCAO` |
 | 8 | Técnico conclui reparo | `oficina-execution-service` | Finalizar execução e baixar estoque consumido | `execucaoFinalizada`, `estoqueBaixado` quando aplicável | `FINALIZADA` |
 | 9 | `execucaoFinalizada` | `oficina-os-service` | Registrar finalização técnica da OS | `ordemDeServicoFinalizada` | `FINALIZADA` |
 | 10 | `ordemDeServicoFinalizada` | `oficina-billing-service` | Solicitar pagamento | `pagamentoSolicitado` | `FINALIZADA` |

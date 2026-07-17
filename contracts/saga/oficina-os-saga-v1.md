@@ -62,7 +62,7 @@ Comandos devem usar `X-Idempotency-Key` no formato definido no [Contrato de Idem
 | `diagnosticoIniciado` | `EM_DIAGNOSTICO` | Registrar transição da OS para `EM_DIAGNOSTICO`. |
 | `diagnosticoFinalizado` | `AGUARDANDO_ORCAMENTO` | Solicitar geração de orçamento. |
 | `orcamentoGerado` | `AGUARDANDO_APROVACAO` | Aguardar decisão do cliente. |
-| `orcamentoAprovado` | `EM_EXECUCAO` | Solicitar início de execução. |
+| `orcamentoAprovado` | `EM_EXECUCAO` | Registrar a autorização; o `oficina-execution-service` inicia o reparo e publica `execucaoIniciada`. |
 | `orcamentoRecusado` | `EM_DIAGNOSTICO` | Retornar OS para diagnóstico sem encerrar a Saga. |
 | `execucaoIniciada` | `EM_EXECUCAO` | Registrar execução em andamento. |
 | `execucaoFinalizada` | `AGUARDANDO_PAGAMENTO` | Registrar OS como `FINALIZADA`, publicar `ordemDeServicoFinalizada` e aguardar pagamento. |

@@ -21,3 +21,6 @@ oficina.billing.orcamento-recusado
 ```text
 oficina-os-service
 ```
+
+O `aggregateId` deve identificar a Ordem de Serviço que coordena a Saga. O
+identificador financeiro permanece disponível em `payload.orcamentoId`.

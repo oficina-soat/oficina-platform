@@ -22,3 +22,6 @@ oficina.billing.orcamento-aprovado
 oficina-os-service
 oficina-execution-service
 ```
+
+O `aggregateId` deve identificar a Ordem de Serviço que coordena a Saga. O
+identificador financeiro permanece disponível em `payload.orcamentoId`.

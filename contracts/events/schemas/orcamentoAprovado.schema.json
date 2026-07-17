@@ -59,7 +59,7 @@
       "eventVersion": 1,
       "occurredAt": "2026-06-23T16:30:00Z",
       "producer": "oficina-billing-service",
-      "aggregateId": "53c52fe8-13cf-4568-9a64-d4f548134b8b",
+      "aggregateId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
       "payload": {
         "orcamentoId": "53c52fe8-13cf-4568-9a64-d4f548134b8b",
         "ordemServicoId": "d290f1ee-6c54-4b01-90e6-d701748f0851",

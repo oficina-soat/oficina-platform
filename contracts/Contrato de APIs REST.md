@@ -614,7 +614,7 @@ GET /api/v1/execucoes/fila
 
 A fila retorna execuções pendentes de ação operacional, ordenadas por prioridade crescente e data de criação. Quanto menor o valor de `prioridade`, mais urgente é a execução.
 
-Por padrão, a fila inclui execuções em `CRIADA`, aguardando início de diagnóstico, e `DIAGNOSTICO_CONCLUIDO`, aguardando início de reparo. O consumidor pode filtrar por `status`.
+Por padrão, a fila inclui somente execuções com ação operacional disponível: `CRIADA`, aguardando início de diagnóstico; `EM_DIAGNOSTICO`, aguardando sua conclusão; e `EM_REPARO`, aguardando conclusão do reparo. Estados que dependem de evento ou decisão externa, como `DIAGNOSTICO_CONCLUIDO`, não integram a fila padrão. O consumidor pode filtrar por `status`, respeitando a mesma definição de fila operacional.
 
 ### Consultar execução
 

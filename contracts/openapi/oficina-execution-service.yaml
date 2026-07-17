@@ -467,7 +467,7 @@ paths:
       parameters:
         - name: status
           in: query
-          description: Quando ausente, retorna execucoes em CRIADA e DIAGNOSTICO_CONCLUIDO.
+          description: Quando ausente, retorna execucoes em CRIADA, EM_DIAGNOSTICO e EM_REPARO, que possuem acao operacional disponivel.
           schema:
             $ref: "#/components/schemas/StatusExecucao"
       responses:

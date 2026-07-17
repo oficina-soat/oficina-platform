@@ -35,6 +35,7 @@ Quando o usuário solicitar a “próxima tarefa”, deve ser executado o primei
 
 ### Correção das fronteiras operacionais da OS
 
+- [x] `[D-FLOW-AUTHORITY-IMPL-004]` Manter na fila do mecânico todas as execuções com ação operacional disponível (`CRIADA`, `EM_DIAGNOSTICO` e `EM_REPARO`) e retirar estados sem ação manual. Concluído localmente no contrato, Execution Service e UI, com regressão automatizada das transições.
 - [x] `[D-FLOW-AUTHORITY-IMPL-001]` Remover da UI e do OS Service as transições diretas de diagnóstico e finalização que contornavam Execution, Billing e a Saga; liberar entrega somente após pagamento confirmado. Concluído localmente com ações derivadas também pelo estado da Saga e rejeição dos atalhos no backend.
 - [x] `[D-FLOW-AUTHORITY-IMPL-002]` Fazer o Execution retomar o diagnóstico após `orcamentoRecusado`, iniciar reparo apenas pelo evento `orcamentoAprovado` e cancelar somente por compensação da Saga. Concluído localmente nos contratos, consumidor, rotas públicas e UI.
 - [x] `[D-FLOW-AUTHORITY-IMPL-003]` Corrigir o consumo dos eventos aninhados de peças e serviços e preservar mensagens falhas como retentáveis. Concluído localmente conforme os JSON Schemas canônicos e com teste de regressão da idempotência.

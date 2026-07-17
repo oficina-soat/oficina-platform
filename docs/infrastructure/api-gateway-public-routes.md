@@ -29,6 +29,8 @@ Fonte canônica: [OpenAPI do oficina-auth-lambda](../../contracts/openapi/oficin
 | `POST` | `/auth` |
 | `POST` | `/auth/token` |
 | `POST` | `/auth/usuarios/{usuarioId}/ativacao` |
+| `GET` | `/auth/usuarios/{usuarioId}/credencial` |
+| `GET` | `/auth/dashboard/credenciais` |
 | `POST` | `/auth/ativacoes` |
 | `GET` | `/.well-known/openid-configuration` |
 | `GET` | `/.well-known/jwks.json` |
@@ -44,6 +46,10 @@ Fonte canônica: [OpenAPI do oficina-os-service](../../contracts/openapi/oficina
 | `GET` | `/api/v1/usuarios/{usuarioId}` |
 | `PUT` | `/api/v1/usuarios/{usuarioId}` |
 | `DELETE` | `/api/v1/usuarios/{usuarioId}` |
+| `POST` | `/api/v1/usuarios/{usuarioId}/bloqueio` |
+| `POST` | `/api/v1/usuarios/{usuarioId}/reativacao` |
+| `GET` | `/api/v1/dashboard/ordens-servico` |
+| `GET` | `/api/v1/dashboard/usuarios` |
 | `POST` | `/api/v1/clientes` |
 | `GET` | `/api/v1/clientes` |
 | `GET` | `/api/v1/clientes/{clienteId}` |
@@ -81,6 +87,7 @@ Fonte canônica: [OpenAPI do oficina-billing-service](../../contracts/openapi/of
 | `POST` | `/api/v1/pagamentos/{pagamentoId}/confirmacao` |
 | `POST` | `/api/v1/pagamentos/{pagamentoId}/recusa` |
 | `POST` | `/api/v1/pagamentos/{pagamentoId}/cancelamento` |
+| `GET` | `/api/v1/dashboard/faturamento` |
 
 ### `oficina-execution-service`
 
@@ -112,6 +119,7 @@ Fonte canônica: [OpenAPI do oficina-execution-service](../../contracts/openapi/
 | `POST` | `/api/v1/execucoes/{execucaoId}/reparo/inicio` |
 | `POST` | `/api/v1/execucoes/{execucaoId}/reparo/conclusao` |
 | `POST` | `/api/v1/execucoes/{execucaoId}/cancelamento` |
+| `GET` | `/api/v1/dashboard/execucao` |
 
 ## Endpoints que não devem ser rotas públicas de negócio
 

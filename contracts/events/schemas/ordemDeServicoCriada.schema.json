@@ -35,6 +35,11 @@
         "clienteId": {
           "$ref": "./common.schema.json#/$defs/uuid"
         },
+        "clienteEmail": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 320
+        },
         "veiculoId": {
           "$ref": "./common.schema.json#/$defs/uuid"
         },
@@ -63,6 +68,7 @@
       "payload": {
         "ordemServicoId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
         "clienteId": "a3f0f8bc-47c5-493f-b580-e30f0e907cb0",
+        "clienteEmail": "cliente@example.com",
         "veiculoId": "7b1f1a8d-7f4a-4f25-8e74-27d50210a61e",
         "descricaoProblema": "Veiculo nao liga",
         "estadoAtual": "RECEBIDA",

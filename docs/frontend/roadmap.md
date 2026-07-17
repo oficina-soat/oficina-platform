@@ -163,11 +163,7 @@ que decisões de negócio sejam reconstruídas no Angular.
 
 ### Atualização em tempo real
 
-- [ ] `[UI-FUT-REALTIME-MEASURE-001]` Medir latência, custo e impacto operacional do polling nos fluxos já implantados.
-- [ ] `[UI-FUT-REALTIME-ADR-001]` Registrar ADR comparando manter polling, SSE e WebSocket somente se a medição demonstrar necessidade.
-- [ ] `[UI-FUT-REALTIME-CONTRACT-001]` Contratar autenticação, retomada, ordenação, deduplicação e fallback da alternativa escolhida.
-- [ ] `[UI-FUT-REALTIME-IMPL-001]` Implementar backend e UI da atualização escolhida, preservando polling manual como fallback observável.
-- [ ] `[UI-FUT-REALTIME-TEST-001]` Testar reconexão, expiração de sessão, eventos duplicados/fora de ordem e degradação para fallback.
+- [x] `[UI-FUT-REALTIME-MEASURE-001]` Medir latência, custo e impacto operacional do polling nos fluxos já implantados. Concluído na [medição de atualização do dashboard](realtime-update-measurement.md): a SPA atual não faz polling, e a rodada no `lab` mediu 50 respostas bem-sucedidas, latência mediana por bloco entre 457 e 549 ms e caudas de até 3,9 s. A projeção de 30 segundos demonstrou custo direto baixo no porte atual, mas pressão proporcional a sessões e registros porque os snapshots ainda percorrem coleções completas. A recomendação é preservar atualização manual e exigir necessidade operacional mensurável antes de ADR ou implementação em tempo real.
 
 ### BFF e sessão
 
@@ -177,6 +173,15 @@ que decisões de negócio sejam reconstruídas no Angular.
 - [ ] `[UI-FUT-BFF-BACKEND-001]` Implementar e observar o BFF com privilégio mínimo e sem credenciais de domínio próprias.
 - [ ] `[UI-FUT-BFF-UI-001]` Migrar autenticação e adapters da SPA para o contrato de sessão aprovado.
 - [ ] `[UI-FUT-BFF-TEST-001]` Cobrir segurança de cookies, CSRF, expiração, logout, indisponibilidade e migração/rollback.
+
+### Atualização em tempo real — trilha condicional
+
+Os itens abaixo não integram a sequência executável enquanto os gatilhos definidos na [medição de atualização do dashboard](realtime-update-measurement.md) não forem observados. A trilha deve começar pela ADR, sem implementar antecipadamente uma solução.
+
+- [ ] `[UI-FUT-REALTIME-ADR-001]` Registrar ADR comparando manter polling, SSE e WebSocket somente se a medição demonstrar necessidade.
+- [ ] `[UI-FUT-REALTIME-CONTRACT-001]` Contratar autenticação, retomada, ordenação, deduplicação e fallback da alternativa escolhida.
+- [ ] `[UI-FUT-REALTIME-IMPL-001]` Implementar backend e UI da atualização escolhida, preservando atualização manual como fallback observável.
+- [ ] `[UI-FUT-REALTIME-TEST-001]` Testar reconexão, expiração de sessão, eventos duplicados/fora de ordem e degradação para fallback.
 
 ## Critério de pronto do MVP
 

@@ -2,13 +2,13 @@
 
 ## Status
 
-Ownership e contrato alvo definidos. Implementação pendente conforme o [roadmap](../../ROADMAP.md#restauração-da-autorização-do-orçamento-pelo-cliente).
+Implementado nos serviços, na UI e na infraestrutura. A homologação integral no `lab` permanece registrada no [roadmap](../../ROADMAP.md#restauração-da-autorização-do-orçamento-pelo-cliente) e só deve ser encerrada depois da validação do artefato mais recente do Billing.
 
 ## Objetivo
 
-Registrar a diferença entre o fluxo de aprovação da Fase 3 e a implementação distribuída atual, preservando os requisitos de segurança e de negócio antes da correção.
+Registrar a restauração do fluxo de autorização do cliente na arquitetura distribuída e preservar seus requisitos de segurança e de negócio.
 
-## Comportamento existente na Fase 3
+## Comportamento de referência
 
 O `oficina-app` enviava ao e-mail do cliente três links vinculados à Ordem de Serviço:
 
@@ -25,16 +25,16 @@ As referências preservadas no repositório legado são:
 - `OrcamentoSenderNotificacaoAdapter`, responsável por incluir os links na notificação do orçamento;
 - `OrdemDeServicoMagicLinkResourceIT` e `MagicLinkServiceIT`, responsáveis pela cobertura integrada.
 
-## Divergência na arquitetura distribuída
+## Divergência identificada durante a decomposição
 
-A decomposição preservou o `oficina-notificacao-lambda`, o e-mail do cliente no OS Service, o orçamento no Billing Service e os eventos `orcamentoGerado`, `orcamentoAprovado` e `orcamentoRecusado`. Entretanto, não foram migrados:
+A decomposição preservou o `oficina-notificacao-lambda`, o e-mail do cliente no OS Service, o orçamento no Billing Service e os eventos `orcamentoGerado`, `orcamentoAprovado` e `orcamentoRecusado`. Na primeira versão distribuída, ainda não haviam sido migrados:
 
 - a emissão dos tokens de acompanhamento, aprovação e recusa;
 - a persistência segura, a expiração e o consumo único;
 - as páginas e rotas públicas associadas aos links;
 - a composição e o envio automático da notificação do orçamento ao cliente.
 
-Além disso, o OS Service atualmente oferece `INICIAR_EXECUCAO` diretamente em `AGUARDANDO_APROVACAO`. Isso permite contornar a decisão do cliente e contradiz a [Saga da Ordem de Serviço](../../contracts/saga/oficina-os-saga-v1.md), que libera a execução somente após `orcamentoAprovado`.
+O OS Service também oferecia `INICIAR_EXECUCAO` diretamente em `AGUARDANDO_APROVACAO`, permitindo contornar a decisão do cliente. Esse bypass foi removido: a [Saga da Ordem de Serviço](../../contracts/saga/oficina-os-saga-v1.md) libera a execução somente após `orcamentoAprovado`.
 
 ## Invariantes da correção
 
@@ -59,7 +59,7 @@ Além disso, o OS Service atualmente oferece `INICIAR_EXECUCAO` diretamente em `
 
 O token é uma credencial de capacidade restrita a uma ação e não uma credencial de sessão. Auth Lambda e Notification Lambda não se tornam autoridades do orçamento.
 
-## Compatibilidade com a Fase 3
+## Compatibilidade preservada
 
 O contrato preserva:
 
@@ -76,6 +76,8 @@ As rotas públicas ficam sob `/api/v1/ordens-servico/{ordemServicoId}` e mantêm
 
 O uso único é a proteção idempotente da decisão pública: o lock da linha e a Outbox garantem no máximo um evento financeiro. Uma repetição não executa novamente a ação e recebe a mesma página genérica de link inválido, expirado ou já utilizado, sem revelar qual condição ocorreu. As APIs administrativas autenticadas continuam usando `X-Idempotency-Key` normalmente.
 
-## Escopo de entrega
+## Estado implementado
 
-A implementação deve materializar os contratos definidos, remover o bypass atual e homologar os caminhos aprovado, recusado, expirado, reutilizado e indisponível no `lab`.
+A implementação materializa os contratos definidos e remove o bypass operacional. O Billing gera e persiste os tokens, compõe a solicitação de notificação e publica a decisão pela Outbox; a Lambda entrega a mensagem; OS Service e UI não expõem `INICIAR_EXECUCAO` enquanto aguardam o cliente. Os eventos financeiros usam a Ordem de Serviço como `aggregateId` e preservam `orcamentoId` no payload, permitindo a correlação correta da Saga.
+
+A homologação deve comprovar no `lab` os caminhos aprovado, recusado, expirado, reutilizado e indisponível. Esse registro de validação é deliberadamente separado do estado da implementação.

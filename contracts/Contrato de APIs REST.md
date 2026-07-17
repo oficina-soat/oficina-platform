@@ -415,7 +415,7 @@ POST /api/v1/orcamentos/{orcamentoId}/recusa
 
 ### Links públicos de acompanhamento e decisão
 
-O Billing Service preserva o fluxo de links de capacidade da Fase 3. Estas rotas não exigem JWT; o parâmetro `actionToken` é a credencial restrita à ação, à Ordem de Serviço e ao orçamento.
+O Billing Service preserva o fluxo de links de capacidade do sistema de referência. Estas rotas não exigem JWT; o parâmetro `actionToken` é a credencial restrita à ação, à Ordem de Serviço e ao orçamento.
 
 ```http
 GET /api/v1/ordens-servico/{ordemServicoId}/acompanhar-link?actionToken={token}

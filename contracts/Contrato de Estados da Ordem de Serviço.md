@@ -24,7 +24,7 @@ Neste estado, podem ser incluídas peças e serviços necessários para compor o
 
 Indica que o diagnóstico foi concluído e que a OS aguarda aprovação do orçamento.
 
-A OS pode avançar para execução caso o orçamento seja aprovado, ou retornar para diagnóstico caso o orçamento seja recusado.
+A OS avança para execução exclusivamente pelo fluxo assíncrono iniciado por `orcamentoAprovado`, ou retorna para diagnóstico caso o orçamento seja recusado.
 
 ### EM_EXECUCAO
 
@@ -48,7 +48,7 @@ Indica que o veículo foi entregue ao cliente e que o ciclo operacional da OS fo
 | -------------------- | --------------------- | -------------------- |
 | RECEBIDA             | iniciar diagnóstico   | EM_DIAGNOSTICO       |
 | EM_DIAGNOSTICO       | finalizar diagnóstico | AGUARDANDO_APROVACAO |
-| AGUARDANDO_APROVACAO | iniciar execução      | EM_EXECUCAO          |
+| AGUARDANDO_APROVACAO | receber `execucaoIniciada` após `orcamentoAprovado` | EM_EXECUCAO |
 | AGUARDANDO_APROVACAO | recusar orçamento     | EM_DIAGNOSTICO       |
 | EM_EXECUCAO          | finalizar execução    | FINALIZADA           |
 | FINALIZADA           | entregar veículo      | ENTREGUE             |
@@ -94,6 +94,8 @@ EM_DIAGNOSTICO
 Quando a OS estiver nesse estado, sua representação inclui `INCLUIR_PECA` e `INCLUIR_SERVICO` em `acoesPermitidas`. A ausência dessas ações impede que clientes ofereçam os comandos, mas a autorização e a validação do estado continuam obrigatórias no backend.
 
 ### Alteração de estado
+
+A API operacional não aceita a transição direta de `AGUARDANDO_APROVACAO` para `EM_EXECUCAO` e não oferece `INICIAR_EXECUCAO` em `acoesPermitidas`. A aprovação do cliente no Billing Service publica `orcamentoAprovado`; o início técnico é solicitado pela Saga e confirmado por `execucaoIniciada` antes da mudança do estado global.
 
 Toda alteração de estado deve registrar:
 

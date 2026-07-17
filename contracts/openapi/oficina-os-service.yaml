@@ -1029,7 +1029,7 @@ components:
                 $ref: "#/components/schemas/AcaoPermitidaOrdemServico"
     AcaoPermitidaOrdemServico:
       type: string
-      enum: [INICIAR_DIAGNOSTICO, INCLUIR_SERVICO, INCLUIR_PECA, CONCLUIR_DIAGNOSTICO, RETOMAR_DIAGNOSTICO, INICIAR_EXECUCAO, FINALIZAR, ENTREGAR, CANCELAR]
+      enum: [INICIAR_DIAGNOSTICO, INCLUIR_SERVICO, INCLUIR_PECA, CONCLUIR_DIAGNOSTICO, RETOMAR_DIAGNOSTICO, FINALIZAR, ENTREGAR, CANCELAR]
     IncluirServicoOrdemServicoRequest:
       type: object
       required: [servicoId, quantidade]

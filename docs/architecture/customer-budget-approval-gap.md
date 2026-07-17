@@ -2,7 +2,7 @@
 
 ## Status
 
-Implementado nos serviços, na UI e na infraestrutura. A homologação integral no `lab` permanece registrada no [roadmap](../../ROADMAP.md#restauração-da-autorização-do-orçamento-pelo-cliente) e só deve ser encerrada depois da validação do artefato mais recente do Billing.
+Implementado e homologado nos serviços, na UI e na infraestrutura. As jornadas e versões validadas estão registradas na [evidência de aprovação do orçamento no lab](../delivery/customer-budget-approval-lab-evidence.md).
 
 ## Objetivo
 
@@ -80,4 +80,4 @@ O uso único é a proteção idempotente da decisão pública: o lock da linha e
 
 A implementação materializa os contratos definidos e remove o bypass operacional. O Billing gera e persiste os tokens, compõe a solicitação de notificação e publica a decisão pela Outbox; a Lambda entrega a mensagem; OS Service e UI não expõem `INICIAR_EXECUCAO` enquanto aguardam o cliente. Os eventos financeiros usam a Ordem de Serviço como `aggregateId` e preservam `orcamentoId` no payload, permitindo a correlação correta da Saga.
 
-A homologação deve comprovar no `lab` os caminhos aprovado, recusado, expirado, reutilizado e indisponível. Esse registro de validação é deliberadamente separado do estado da implementação.
+A homologação no `lab` comprovou os caminhos aprovado e recusado, o bloqueio da transição direta e o consumo único real. Expiração, concorrência, ação incompatível e indisponibilidade permanecem cobertas por testes automatizados para evitar mutações artificiais de relógio, banco ou configuração durante a validação ponta a ponta. O registro está na [evidência de aprovação do orçamento no lab](../delivery/customer-budget-approval-lab-evidence.md).

@@ -2,7 +2,7 @@
 
 ## Escopo
 
-Este documento registra a validação remota de `[B2-BILL-DB-REM-001]` no ambiente `lab`, conforme o [Padrão de isolamento PostgreSQL no RDS compartilhado](../infrastructure/rds-postgresql-isolation.md) e o [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md).
+Este documento registra a validação remota de `[B2-BILL-DB-REM-001]` no ambiente `lab`, conforme o [Padrão de isolamento PostgreSQL no RDS compartilhado](../infrastructure/rds-postgresql-isolation.md) e o [Checklist final de entrega](phase-4-delivery-checklist.md).
 
 Nenhuma senha, URL completa de conexão ou conteúdo de Secret Kubernetes foi exibido ou registrado. As consultas usaram o Secret `oficina-billing-service-database-env` apenas por referência em pods temporários, removidos ao final da validação.
 

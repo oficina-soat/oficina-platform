@@ -18,7 +18,7 @@ As ADRs anteriores estabeleceram:
 * Divisão da solução em microsserviços independentes ([ADR-010](ADR-010%20-%20Estratégia%20de%20Divisão%20dos%20Microsserviços.md));
 * Utilização da AWS como plataforma principal da solução ([ADR-001](ADR-001%20-%20Escolha%20da%20Plataforma%20de%20Nuvem.md)).
 
-Além disso, os requisitos da Fase 4 estabelecem que:
+Além disso, os requisitos do projeto estabelecem que:
 
 * cada microsserviço deve possuir banco de dados próprio;
 * nenhum serviço pode acessar diretamente o banco de outro serviço;
@@ -35,13 +35,13 @@ Dessa forma, torna-se necessário definir uma estratégia de persistência adequ
 
 Definir uma estratégia de persistência que:
 
-* atenda aos requisitos obrigatórios da Fase 4;
+* atenda aos requisitos obrigatórios do projeto;
 * preserve a independência dos microsserviços;
 * reduza acoplamento entre domínios;
 * permita evolução independente dos modelos de dados;
 * mantenha baixo custo operacional;
 * aproveite os serviços já adotados na AWS;
-* mantenha o escopo compatível com a entrega da Fase 4.
+* mantenha o escopo compatível com a entrega do projeto.
 
 ---
 
@@ -92,7 +92,7 @@ Cada microsserviço utiliza a tecnologia de persistência mais adequada ao seu c
 * Melhor aderência ao domínio;
 * Independência tecnológica;
 * Escalabilidade específica por serviço;
-* Atendimento integral aos requisitos da Fase 4.
+* Atendimento integral aos requisitos do projeto.
 
 #### Desvantagens
 
@@ -251,7 +251,7 @@ As migrações serão independentes entre serviços.
 
 Nenhum microsserviço poderá alterar estruturas pertencentes a outro domínio.
 
-Para os serviços baseados em PostgreSQL, as migrações serão executadas sobre databases independentes dentro da instância Amazon RDS PostgreSQL compartilhada da Fase 4, conforme o [Padrão de isolamento PostgreSQL no RDS compartilhado](../docs/infrastructure/rds-postgresql-isolation.md).
+Para os serviços baseados em PostgreSQL, as migrações serão executadas sobre databases independentes dentro da instância Amazon RDS PostgreSQL compartilhada, conforme o [Padrão de isolamento PostgreSQL no RDS compartilhado](../docs/infrastructure/rds-postgresql-isolation.md).
 
 ---
 
@@ -282,7 +282,7 @@ Responsável por:
 
 A decisão foi baseada nos seguintes fatores:
 
-* atendimento integral aos requisitos da Fase 4;
+* atendimento integral aos requisitos do projeto;
 * independência dos microsserviços;
 * aderência ao domínio de negócio;
 * baixo custo operacional;
@@ -309,7 +309,7 @@ Além disso:
 * Melhor aderência tecnológica por domínio;
 * Redução de acoplamento;
 * Escalabilidade específica por serviço;
-* Atendimento aos requisitos da Fase 4;
+* Atendimento aos requisitos do projeto;
 * Escopo compatível com o prazo do projeto;
 * Redução do esforço operacional através de serviços gerenciados.
 
@@ -337,7 +337,7 @@ oficina-vehicle-service
 oficina-catalog-service
 ```
 
-Essa decomposição não faz parte do escopo atual da Fase 4.
+Essa decomposição não faz parte do escopo atual.
 
 ---
 
@@ -407,4 +407,4 @@ Fornece os limites dos domínios que orientam a estratégia de persistência.
 
 ## Observação Final
 
-A estratégia de persistência poliglota busca equilibrar independência, baixo custo, aderência ao domínio e requisitos da Fase 4, permitindo que cada microsserviço evolua de forma autônoma sem comprometer a consistência global do processo de negócio, mantendo ao mesmo tempo um escopo viável para a entrega do projeto e aproveitando os serviços gerenciados já adotados na AWS.
+A estratégia de persistência poliglota busca equilibrar independência, baixo custo, aderência ao domínio e requisitos do projeto, permitindo que cada microsserviço evolua de forma autônoma sem comprometer a consistência global do processo de negócio, mantendo ao mesmo tempo um escopo viável para a entrega e aproveitando os serviços gerenciados já adotados na AWS.

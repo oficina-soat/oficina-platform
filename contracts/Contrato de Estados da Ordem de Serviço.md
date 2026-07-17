@@ -135,10 +135,10 @@ EM_EXECUCAO -> ENTREGUE
 ENTREGUE -> EM_DIAGNOSTICO
 ```
 
-## Observações para a Fase 4
+## Observações para a arquitetura distribuída
 
 Este contrato representa o ciclo de vida da Ordem de Serviço conhecido no domínio atual.
 
-Na arquitetura distribuída da Fase 4, os microsserviços devem respeitar este contrato ao produzir eventos, consumir eventos, expor APIs ou executar etapas de Saga relacionadas à OS.
+Na arquitetura distribuída, os microsserviços devem respeitar este contrato ao produzir eventos, consumir eventos, expor APIs ou executar etapas de Saga relacionadas à OS.
 
 Alterações neste contrato devem ser tratadas como mudanças de contrato de integração e documentadas antes da implementação nos serviços consumidores.

@@ -4,7 +4,7 @@
 
 Definir como copiar, selecionar e adaptar artefatos de `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` para o repositório unificado `oficina-infra` e para os repositórios dos microsserviços, preservando a governança definida em [Escopo do Repositório Unificado de Infraestrutura](infrastructure-repository-scope.md) e no [Plano de Decomposição do oficina-app](../architecture/oficina-app-decomposition.md).
 
-Este plano não altera `oficina-app`, `oficina-infra-db` ou `oficina-infra-k8s`. Esses repositórios devem ser usados apenas como fonte de consulta e cópia controlada; adaptações da Fase 4 devem acontecer nos repositórios de destino.
+Este plano não altera `oficina-app`, `oficina-infra-db` ou `oficina-infra-k8s`. Esses repositórios devem ser usados apenas como fonte de consulta e cópia controlada; adaptações devem acontecer nos repositórios de destino.
 
 O `oficina-auth-lambda` é exceção a essa regra: quando ajustes forem necessários nos fluxos de autenticação, sincronização do cadastro operacional ou notificações, eles devem ser feitos diretamente no próprio repositório `oficina-auth-lambda`, pois ele continua sendo componente serverless ativo da suíte.
 
@@ -103,7 +103,7 @@ Critério de pronto:
 
 ### 5. Migração de DynamoDB e mensageria
 
-Adicionar ao `oficina-infra` os recursos que não existiam nos repositórios legados ou que precisam ser criados para a Fase 4:
+Adicionar ao `oficina-infra` os recursos que não existiam nos repositórios legados ou que precisam ser criados para a arquitetura atual:
 
 - tabelas DynamoDB do `oficina-execution-service`, conforme [Padrão DynamoDB do oficina-execution-service](dynamodb-execution-service.md);
 - tópicos, filas, assinaturas e DLQs conforme o [Contrato de Tópicos de Mensageria](../../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md);
@@ -117,7 +117,7 @@ Critério de pronto:
 
 ### 6. Migração de workflows e scripts
 
-Copiar workflows e scripts úteis dos repositórios antigos, adaptando nomes e variáveis para a Fase 4.
+Copiar workflows e scripts úteis dos repositórios antigos, adaptando nomes e variáveis para os padrões atuais.
 
 Critério de pronto:
 

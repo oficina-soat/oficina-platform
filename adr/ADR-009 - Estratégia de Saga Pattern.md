@@ -10,7 +10,7 @@
 
 A evolução da aplicação para uma arquitetura baseada em microsserviços introduz o desafio de manter consistência entre operações distribuídas executadas por serviços independentes.
 
-Os requisitos da Fase 4 estabelecem a necessidade de utilização do Saga Pattern para coordenar processos distribuídos, garantindo tratamento adequado de falhas e execução de ações compensatórias quando necessário.
+Os requisitos do projeto estabelecem a necessidade de utilização do Saga Pattern para coordenar processos distribuídos, garantindo tratamento adequado de falhas e execução de ações compensatórias quando necessário.
 
 Entre os principais fluxos de negócio da oficina estão:
 
@@ -34,7 +34,7 @@ Definir uma estratégia de coordenação transacional que:
 * permita compensação em caso de falha;
 * reduza acoplamento técnico;
 * facilite observabilidade dos fluxos;
-* seja compatível com a arquitetura definida para a Fase 4;
+* seja compatível com a arquitetura distribuída definida;
 * simplifique testes e demonstrações da solução.
 
 ---
@@ -293,7 +293,7 @@ Os microsserviços participantes deverão seguir obrigatoriamente as seguintes r
 
 A decisão foi baseada nos seguintes fatores:
 
-* Atendimento direto aos requisitos da Fase 4;
+* Atendimento direto aos requisitos do projeto;
 * Facilidade de demonstração da solução;
 * Melhor rastreabilidade dos fluxos distribuídos;
 * Simplificação da implementação das compensações;
@@ -370,4 +370,4 @@ A ADR-009 define como esses mecanismos serão utilizados para coordenar transaç
 
 ## Observação Final
 
-A adoção de uma Saga Orquestrada coordenada pelo OS Service busca equilibrar simplicidade, rastreabilidade e consistência, fornecendo uma solução adequada para os fluxos distribuídos da oficina e para os requisitos da Fase 4 sem introduzir um microsserviço adicional exclusivamente para orquestração.
+A adoção de uma Saga Orquestrada coordenada pelo OS Service busca equilibrar simplicidade, rastreabilidade e consistência, fornecendo uma solução adequada para os fluxos distribuídos da oficina e para os requisitos do projeto sem introduzir um microsserviço adicional exclusivamente para orquestração.

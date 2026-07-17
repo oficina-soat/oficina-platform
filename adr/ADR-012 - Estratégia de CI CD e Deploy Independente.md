@@ -10,7 +10,7 @@
 
 A arquitetura da aplicação foi evoluída para um modelo baseado em microsserviços independentes.
 
-Os requisitos da Fase 4 estabelecem que cada microsserviço deve possuir:
+Os requisitos do projeto estabelecem que cada microsserviço deve possuir:
 
 * repositório próprio;
 * pipeline independente de CI/CD;
@@ -36,7 +36,7 @@ Torna-se necessário definir uma estratégia padronizada de integração contín
 
 Definir uma estratégia de CI/CD que:
 
-* atenda aos requisitos obrigatórios da Fase 4;
+* atenda aos requisitos obrigatórios do projeto;
 * permita deploy independente por microsserviço;
 * reduza esforço operacional;
 * mantenha baixo custo;
@@ -62,7 +62,7 @@ Um único pipeline responsável por todos os microsserviços.
 * Viola a independência dos microsserviços;
 * Aumenta acoplamento entre serviços;
 * Dificulta deploys independentes;
-* Contraria os requisitos da Fase 4.
+* Contraria os requisitos do projeto.
 
 ---
 
@@ -262,7 +262,7 @@ Deploy Automático
 Amazon EKS
 ```
 
-A criação de ambientes adicionais não faz parte do escopo atual da Fase 4.
+A criação de ambientes adicionais não faz parte do escopo atual.
 
 Essa decisão reduz:
 
@@ -304,7 +304,7 @@ Objetivos:
 
 A decisão foi baseada nos seguintes fatores:
 
-* atendimento integral aos requisitos da Fase 4;
+* atendimento integral aos requisitos do projeto;
 * independência dos microsserviços;
 * baixo custo operacional;
 * simplicidade de manutenção;
@@ -390,4 +390,4 @@ Define os componentes de persistência que serão implantados e utilizados pelos
 
 ## Observação Final
 
-A estratégia adotada busca equilibrar independência, qualidade, automação e baixo custo operacional, garantindo que cada microsserviço possa evoluir e ser implantado de forma autônoma, mantendo aderência aos requisitos da Fase 4 e às decisões arquiteturais previamente estabelecidas.
+A estratégia adotada busca equilibrar independência, qualidade, automação e baixo custo operacional, garantindo que cada microsserviço possa evoluir e ser implantado de forma autônoma, mantendo aderência aos requisitos do projeto e às decisões arquiteturais previamente estabelecidas.

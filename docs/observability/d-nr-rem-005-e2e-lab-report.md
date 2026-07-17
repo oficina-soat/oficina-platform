@@ -355,4 +355,4 @@ Na revalidação pós-merge, os logs de Outbox apareceram no New Relic com `corr
 1. Validar visualmente ou reimportar no New Relic os dashboards remotos usando os widgets atualizados em [Dashboard operacional dos microsserviços](new-relic-dashboard-operational.json), conforme `[D-NR-REM-002]`.
 2. Criar ou validar a visão remota da Saga no New Relic conforme `[D-NR-REM-003]`, usando `domainEventType` para eventos como `sagaFinalizadaComSucesso` e `sagaCompensada`.
 3. Criar alertas mínimos no New Relic conforme `[D-NR-REM-004]`.
-4. Registrar as evidências finais de observabilidade distribuída no checklist final da Fase 4 conforme `[D-NR-EVID-001]`.
+4. Registrar as evidências finais de observabilidade distribuída no checklist final de entrega conforme `[D-NR-EVID-001]`.

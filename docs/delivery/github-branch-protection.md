@@ -2,13 +2,13 @@
 
 ## Objetivo
 
-Definir a configuração obrigatória de proteção da branch `main` para os repositórios da Fase 4:
+Definir a configuração obrigatória de proteção da branch `main` para os repositórios da arquitetura distribuída:
 
 - `oficina-os-service`;
 - `oficina-billing-service`;
 - `oficina-execution-service`.
 
-Esta política atende ao requisito de repositórios protegidos do [Enunciado Fase 4](Enunciado%20Fase%204.md) e deve ser aplicada em conjunto com os workflows derivados do [Template GitHub Actions para Microsserviços](../../templates/github-actions/README.md).
+Esta política atende ao requisito de repositórios protegidos do [Enunciado do projeto](Enunciado%20Fase%204.md) e deve ser aplicada em conjunto com os workflows derivados do [Template GitHub Actions para Microsserviços](../../templates/github-actions/README.md).
 
 ## Regra canônica
 
@@ -19,9 +19,9 @@ Cada repositório deve proteger a branch `main` com:
 
 O check obrigatório `service-ci-validate` é produzido pelo workflow `.github/workflows/service-ci.yml` dos três microsserviços. O workflow `.github/workflows/open-pr-to-main.yml` usa o check `develop-validate` e não deve ser configurado como check obrigatório de merge para a `main`, porque ele serve apenas para preparar PRs a partir da branch `develop`.
 
-Não são requisitos canônicos da Fase 4: aprovação obrigatória, descarte de aprovações antigas, aprovação do último push, resolução obrigatória de conversas, branch atualizada em relação à `main`, histórico linear, bloqueio explícito de force push/deleção ou aplicação da regra para administradores. Esses controles podem ser adotados como endurecimento administrativo, mas não devem bloquear a conclusão do item de roadmap quando o requisito do enunciado estiver atendido.
+Não são requisitos canônicos do projeto: aprovação obrigatória, descarte de aprovações antigas, aprovação do último push, resolução obrigatória de conversas, branch atualizada em relação à `main`, histórico linear, bloqueio explícito de force push/deleção ou aplicação da regra para administradores. Esses controles podem ser adotados como endurecimento administrativo, mas não devem bloquear a conclusão do item de roadmap quando o requisito do enunciado estiver atendido.
 
-A validação de conformidade da Fase 4 deve considerar somente os dois requisitos canônicos acima.
+A validação de conformidade deve considerar somente os dois requisitos canônicos acima.
 
 ## Pré-requisitos
 
@@ -108,6 +108,6 @@ Quando a proteção for implementada por Rulesets em vez da branch protection cl
 
 ## Estado operacional
 
-Esta política é a fonte canônica para a configuração de branch protection dos três microsserviços. A aplicação efetiva deve ser registrada no [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md) quando houver evidência do GitHub para os três repositórios.
+Esta política é a fonte canônica para a configuração de branch protection dos três microsserviços. A aplicação efetiva deve ser registrada no [Checklist final de entrega](phase-4-delivery-checklist.md) quando houver evidência do GitHub para os três repositórios.
 
 A [verificação remota de 2026-07-13](github-branch-protection-evidence.md) confirmou PR obrigatório nos três repositórios, mas encontrou `develop-validate` como check exigido no lugar do check canônico `service-ci-validate`. A correção depende do administrador dos Rulesets e o item de roadmap permanece aberto.

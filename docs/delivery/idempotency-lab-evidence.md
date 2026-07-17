@@ -2,7 +2,7 @@
 
 ## Escopo
 
-Este documento registra a validação remota de `[B2-IDEMP-REM-001]` no ambiente `lab`, conforme o [Contrato de Idempotência](../../contracts/idempotency.md) e o [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md).
+Este documento registra a validação remota de `[B2-IDEMP-REM-001]` no ambiente `lab`, conforme o [Contrato de Idempotência](../../contracts/idempotency.md) e o [Checklist final de entrega](phase-4-delivery-checklist.md).
 
 Foram exercitadas operações `POST` reais dos três microsserviços com uma chave `X-Idempotency-Key` exclusiva por serviço. Para cada operação, a mesma requisição foi repetida, a chave foi reutilizada com payload divergente e ambas as verificações foram refeitas depois da substituição controlada dos pods.
 

@@ -1,6 +1,6 @@
 # Conta, região e ambientes AWS
 
-Este documento define os valores canônicos de conta, região e ambientes AWS da suíte da oficina para a Fase 4.
+Este documento define os valores canônicos de conta, região e ambientes AWS da suíte da oficina.
 
 Os valores abaixo foram consolidados a partir dos repositórios já existentes da suíte, especialmente `oficina-infra-k8s`, `oficina-infra-db`, `oficina-app` e `oficina-auth-lambda`.
 
@@ -78,7 +78,7 @@ Novos repositórios, pipelines, scripts e manifests devem usar `us-east-1`, salv
 
 ## Ambiente AWS canônico
 
-Para a Fase 4, será mantido um único ambiente AWS principal:
+Será mantido um único ambiente AWS principal:
 
 ```text
 lab
@@ -101,7 +101,7 @@ deployment.environment=lab
 OFICINA_ENVIRONMENT_NAME=lab
 ```
 
-A criação de ambientes AWS adicionais, como `dev`, `staging`, `homolog` ou `prod`, não faz parte do escopo atual da Fase 4.
+A criação de ambientes AWS adicionais, como `dev`, `staging`, `homolog` ou `prod`, não faz parte do escopo atual.
 
 ---
 
@@ -171,7 +171,7 @@ Banco PostgreSQL RDS:
 DB_IDENTIFIER=oficina-postgres-lab
 ```
 
-Para a Fase 4, esse RDS deve ser ajustado para o padrão definido no roadmap: uma instância PostgreSQL compartilhada com databases independentes para `oficina-os-service` e `oficina-billing-service`.
+Esse RDS deve seguir o padrão definido no roadmap: uma instância PostgreSQL compartilhada com databases independentes para `oficina-os-service` e `oficina-billing-service`.
 
 O isolamento lógico, os databases, usuários, secrets e variáveis de runtime estão definidos no [Padrão de isolamento PostgreSQL no RDS compartilhado](rds-postgresql-isolation.md).
 

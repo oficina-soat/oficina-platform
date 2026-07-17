@@ -42,7 +42,7 @@ Quando esses repositórios estiverem disponíveis, eles devem ser consultados pa
 - issuer, audience e JWKS usados na autenticação
 - padrões de banco de dados, Kubernetes, CI/CD e deploy
 
-Durante a decomposição e consolidação da Fase 4, trate `../oficina-app`, `../oficina-infra-db` e `../oficina-infra-k8s` como fontes de consulta e cópia controlada. Não adapte esses repositórios diretamente nesse fluxo; copie os artefatos necessários e faça as mudanças nos destinos canônicos:
+Durante a decomposição e consolidação da arquitetura distribuída, trate `../oficina-app`, `../oficina-infra-db` e `../oficina-infra-k8s` como fontes de consulta e cópia controlada. Não adapte esses repositórios diretamente nesse fluxo; copie os artefatos necessários e faça as mudanças nos destinos canônicos:
 
 - código de domínio do `oficina-app` deve ser adaptado nos repositórios dos microsserviços;
 - artefatos de infraestrutura de `oficina-infra-db` e `oficina-infra-k8s` devem ser adaptados em `../oficina-infra`.
@@ -72,7 +72,7 @@ O `../oficina-ui` contém apenas a interface operacional. Preserve a [ADR-013](a
 
 - Mantenha AWS como plataforma de nuvem definida, salvo nova ADR explícita.
 - Preserve a governança multi-repositório: este repositório define padrões e contratos, mas não deve absorver código de aplicação, Lambda, banco ou infraestrutura executável.
-- Preserve a regra de destino da migração: `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` não devem receber adaptações da Fase 4 diretamente; `oficina-auth-lambda` pode receber ajustes diretos quando a mudança for do seu próprio componente serverless.
+- Preserve a regra de destino da migração: `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` não devem receber adaptações da arquitetura distribuída diretamente; `oficina-auth-lambda` pode receber ajustes diretos quando a mudança for do seu próprio componente serverless.
 - Preserve a divisão atual dos microsserviços entre `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`.
 - Preserve a estratégia de comunicação híbrida: REST para integrações síncronas e mensageria assíncrona para eventos de domínio.
 - Preserve a Saga Pattern orquestrada pelo `oficina-os-service`, salvo mudança arquitetural documentada por ADR.
@@ -269,7 +269,7 @@ Prefira mensagens curtas, objetivas e diretamente relacionadas à alteração.
 
 - Não transforme este repositório em implementação de microsserviço.
 - Não mova para este repositório responsabilidades que pertencem à aplicação, autenticação, banco ou infraestrutura Kubernetes.
-- Não altere diretamente `oficina-app`, `oficina-infra-db` ou `oficina-infra-k8s` para adaptar a Fase 4; use-os como fonte e aplique as alterações nos repositórios de destino. Para `oficina-auth-lambda`, ajustes diretos são permitidos quando forem necessários ao próprio componente.
+- Não altere diretamente `oficina-app`, `oficina-infra-db` ou `oficina-infra-k8s` para adaptar a arquitetura distribuída; use-os como fonte e aplique as alterações nos repositórios de destino. Para `oficina-auth-lambda`, ajustes diretos são permitidos quando forem necessários ao próprio componente.
 - Não altere silenciosamente contratos compartilhados com `oficina-app`, `oficina-auth-lambda`, `oficina-infra-db` ou `oficina-infra-k8s`.
 - Não crie novos microsserviços fora da divisão atual sem ADR e atualização dos contratos relacionados.
 - Não troque soluções já adotadas por alternativas mais complexas sem justificativa técnica clara.

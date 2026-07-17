@@ -25,7 +25,7 @@ As referências preservadas no repositório legado são:
 - `OrcamentoSenderNotificacaoAdapter`, responsável por incluir os links na notificação do orçamento;
 - `OrdemDeServicoMagicLinkResourceIT` e `MagicLinkServiceIT`, responsáveis pela cobertura integrada.
 
-## Divergência na Fase 4
+## Divergência na arquitetura distribuída
 
 A decomposição preservou o `oficina-notificacao-lambda`, o e-mail do cliente no OS Service, o orçamento no Billing Service e os eventos `orcamentoGerado`, `orcamentoAprovado` e `orcamentoRecusado`. Entretanto, não foram migrados:
 

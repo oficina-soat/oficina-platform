@@ -4,7 +4,7 @@
 
 Definir a verificação operacional mínima para publicar um microsserviço sem exigir deploy simultâneo dos demais.
 
-Este checklist implementa a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md) e complementa o [Template GitHub Actions para Microsserviços](../../templates/github-actions/README.md), a [Estratégia de entrega dos manifestos Kubernetes](../infrastructure/kubernetes-manifest-strategy.md), o [Escopo do Repositório Unificado de Infraestrutura](../infrastructure/infrastructure-repository-scope.md), os [Nomes de runtime, secrets e infraestrutura](../infrastructure/infra-runtime-naming.md), as [Rotas públicas do API Gateway](../infrastructure/api-gateway-public-routes.md) e o [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md).
+Este checklist implementa a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md) e complementa o [Template GitHub Actions para Microsserviços](../../templates/github-actions/README.md), a [Estratégia de entrega dos manifestos Kubernetes](../infrastructure/kubernetes-manifest-strategy.md), o [Escopo do Repositório Unificado de Infraestrutura](../infrastructure/infrastructure-repository-scope.md), os [Nomes de runtime, secrets e infraestrutura](../infrastructure/infra-runtime-naming.md), as [Rotas públicas do API Gateway](../infrastructure/api-gateway-public-routes.md) e o [Checklist final de entrega](phase-4-delivery-checklist.md).
 
 ## Escopo
 
@@ -73,7 +73,7 @@ Para cada alteração candidata a deploy:
    - [ ] criou GitHub Release quando a release ainda não existia;
    - [ ] atualizou somente o `Deployment` do serviço quando `ENABLE_K8S_DEPLOY` não é `false`;
    - [ ] validou rollout do `Deployment`.
-7. Registrar a URL do workflow, tag, digest da imagem e release no [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md), quando a validação for usada como evidência final.
+7. Registrar a URL do workflow, tag, digest da imagem e release no [Checklist final de entrega](phase-4-delivery-checklist.md), quando a validação for usada como evidência final.
 
 ## Validação pós-deploy
 
@@ -111,7 +111,7 @@ Se o deploy falhar ou degradar o serviço:
 - [ ] validar smoke test do serviço revertido;
 - [ ] verificar se mensagens ficaram em DLQ, Outbox parada ou Saga em falha manual;
 - [ ] abrir correção no repositório do microsserviço ou no `oficina-infra`, conforme ownership do erro;
-- [ ] registrar a ocorrência e a evidência no [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md), se impactar a entrega.
+- [ ] registrar a ocorrência e a evidência no [Checklist final de entrega](phase-4-delivery-checklist.md), se impactar a entrega.
 
 Rollback de um serviço não deve reverter bancos, tópicos, filas, secrets ou manifests de outro microsserviço sem decisão explícita e revisão anti-divergência.
 
@@ -121,7 +121,7 @@ Para cada deploy usado como evidência final, registrar:
 
 | Evidência | Onde registrar |
 |---|---|
-| PR aprovado | README do serviço ou [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md) |
+| PR aprovado | README do serviço ou [Checklist final de entrega](phase-4-delivery-checklist.md) |
 | Check `service-ci-validate` aprovado | README do serviço ou checklist final |
 | Quality Gate externo e cobertura | README do serviço ou checklist final |
 | Tag GitHub Release | README do serviço ou checklist final |

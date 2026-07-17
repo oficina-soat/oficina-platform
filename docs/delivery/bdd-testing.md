@@ -83,7 +83,7 @@ O relatório JaCoCo deve ser gerado em:
 target/jacoco-report/
 ```
 
-O arquivo `target/jacoco-report/jacoco.xml` deve ser enviado ao SonarCloud pelo SonarScanner for Maven no workflow `service-ci-validate`. O README de cada microsserviço deve registrar uma evidência de cobertura, como link para o artifact do GitHub Actions, badge, dashboard SonarCloud ou captura anexada à entrega final. O checklist final da Fase 4 deve consolidar esses links quando for criado.
+O arquivo `target/jacoco-report/jacoco.xml` deve ser enviado ao SonarCloud pelo SonarScanner for Maven no workflow `service-ci-validate`. O README de cada microsserviço deve registrar uma evidência de cobertura, como link para o artifact do GitHub Actions, badge, dashboard SonarCloud ou captura anexada à entrega final. O checklist final de entrega deve consolidar esses links.
 
 ## Validação antes do commit
 

@@ -2,9 +2,9 @@
 
 ## Objetivo
 
-Definir como a Fase 4 entrega manifestos Kubernetes por microsserviço sem criar cópias divergentes entre `oficina-platform`, `oficina-infra` e os repositórios dos serviços.
+Definir como entregar manifestos Kubernetes por microsserviço sem criar cópias divergentes entre `oficina-platform`, `oficina-infra` e os repositórios dos serviços.
 
-Esta decisão concilia o requisito do [Enunciado Fase 4](../delivery/Enunciado%20Fase%204.md), que lista manifestos Kubernetes como entregável dos repositórios Git dos microsserviços, com a governança definida no [Escopo do Repositório Unificado de Infraestrutura](infrastructure-repository-scope.md).
+Esta decisão concilia o requisito do [Enunciado do projeto](../delivery/Enunciado%20Fase%204.md), que lista manifestos Kubernetes como entregável dos repositórios Git dos microsserviços, com a governança definida no [Escopo do Repositório Unificado de Infraestrutura](infrastructure-repository-scope.md).
 
 ## Decisão
 

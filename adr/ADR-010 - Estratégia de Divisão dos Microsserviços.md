@@ -8,7 +8,7 @@
 
 ## Contexto
 
-A aplicação da oficina está sendo evoluída para uma arquitetura baseada em microsserviços, conforme os requisitos da Fase 4 do projeto.
+A aplicação da oficina está sendo evoluída para uma arquitetura baseada em microsserviços, conforme os requisitos do projeto.
 
 O desafio exige a separação da solução em, no mínimo, três microsserviços independentes, cada um com:
 
@@ -29,7 +29,7 @@ Antes de definir bancos de dados, contratos, eventos e pipelines, é necessário
 
 Definir uma divisão de microsserviços que:
 
-* atenda aos requisitos obrigatórios da Fase 4;
+* atenda aos requisitos obrigatórios do projeto;
 * represente adequadamente os domínios da oficina;
 * reduza acoplamento entre serviços;
 * permita persistência independente;
@@ -86,7 +86,7 @@ Criar serviços pequenos e especializados, como:
 * Excesso de repositórios;
 * Maior complexidade de integração;
 * Maior esforço de CI/CD e infraestrutura;
-* Escopo elevado para o prazo da Fase 4.
+* Escopo elevado para o prazo da entrega.
 
 ---
 
@@ -100,7 +100,7 @@ Dividir a solução em três microsserviços principais:
 
 #### Vantagens
 
-* Aderência direta ao enunciado da Fase 4;
+* Aderência direta ao enunciado do projeto;
 * Boa separação de responsabilidades;
 * Escopo viável;
 * Facilita a implementação da Saga;
@@ -330,4 +330,4 @@ Esta ADR complementa a [ADR-009](ADR-009%20-%20Estratégia%20de%20Saga%20Pattern
 
 ## Observação Final
 
-A divisão em `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service` busca equilibrar aderência ao domínio, simplicidade de entrega e independência arquitetural, atendendo aos requisitos da Fase 4 sem introduzir decomposição excessiva para o escopo atual do projeto.
+A divisão em `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service` busca equilibrar aderência ao domínio, simplicidade de entrega e independência arquitetural, atendendo aos requisitos do projeto sem introduzir decomposição excessiva para o escopo atual.

@@ -1,10 +1,10 @@
-# Checklist Final de Entrega da Fase 4
+# Checklist final de entrega
 
 ## Objetivo
 
-Consolidar os entregáveis finais da Fase 4, com os links e evidências que devem ser conferidos antes da entrega no portal.
+Consolidar os entregáveis finais, com os links e evidências que devem ser conferidos antes da entrega no portal.
 
-Este checklist complementa o [Enunciado Fase 4](Enunciado%20Fase%204.md), o [ROADMAP](../../ROADMAP.md), o [Diagrama Geral da Arquitetura Final](../architecture/architecture-diagram.md), a [Matriz de Ownership por Microsserviço](../architecture/service-ownership.md), o [Padrão BDD, Cobertura e Qualidade](bdd-testing.md), a [ADR-009 - Estratégia de Saga Pattern](../../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), a [ADR-010 - Estratégia de Divisão dos Microsserviços](../../adr/ADR-010%20-%20Estratégia%20de%20Divisão%20dos%20Microsserviços.md), a [ADR-011 - Estratégia de Persistência Poliglota por Microsserviço](../../adr/ADR-011%20-%20Estratégia%20de%20Persistência%20Poliglota%20por%20Microsserviço.md), a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md), o [Checklist de Deploy Independente](independent-deploy-checklist.md), o [Padrão de Observabilidade Distribuída](../observability/observability.md), os [Runbooks Operacionais Mínimos](../observability/operational-runbooks.md) e as [Rotas públicas do API Gateway](../infrastructure/api-gateway-public-routes.md).
+Este checklist complementa o [Enunciado do projeto](Enunciado%20Fase%204.md), o [ROADMAP](../../ROADMAP.md), o [Diagrama Geral da Arquitetura Final](../architecture/architecture-diagram.md), a [Matriz de Ownership por Microsserviço](../architecture/service-ownership.md), o [Padrão BDD, Cobertura e Qualidade](bdd-testing.md), a [ADR-009 - Estratégia de Saga Pattern](../../adr/ADR-009%20-%20Estratégia%20de%20Saga%20Pattern.md), a [ADR-010 - Estratégia de Divisão dos Microsserviços](../../adr/ADR-010%20-%20Estratégia%20de%20Divisão%20dos%20Microsserviços.md), a [ADR-011 - Estratégia de Persistência Poliglota por Microsserviço](../../adr/ADR-011%20-%20Estratégia%20de%20Persistência%20Poliglota%20por%20Microsserviço.md), a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md), o [Checklist de Deploy Independente](independent-deploy-checklist.md), o [Padrão de Observabilidade Distribuída](../observability/observability.md), os [Runbooks Operacionais Mínimos](../observability/operational-runbooks.md) e as [Rotas públicas do API Gateway](../infrastructure/api-gateway-public-routes.md).
 
 ## Datas e Responsáveis
 
@@ -110,7 +110,7 @@ Essa consolidação conclui `[D-NR-EVID-001]`. GUIDs, queries completas e result
 
 ## Cenários de Demonstração
 
-Roteiro canônico: [Roteiro do Vídeo de Demonstração da Fase 4](video-demonstration-script.md).
+Roteiro canônico: [Roteiro do vídeo de demonstração](video-demonstration-script.md).
 
 O vídeo de até 15 minutos deve demonstrar:
 
@@ -167,5 +167,5 @@ Antes de fechar a entrega:
 - [ ] validar links para OpenAPI, contratos, cobertura e pipelines;
 - [ ] confirmar que os nomes de serviços, eventos, tópicos, bancos, secrets e variáveis seguem os contratos canônicos;
 - [ ] conferir que o vídeo e o PDF usam os mesmos nomes canônicos dos contratos;
-- [ ] confirmar que nenhuma evidência aponta para `oficina-app` como backend runtime da Fase 4;
+- [ ] confirmar que nenhuma evidência aponta para `oficina-app` como backend runtime atual;
 - [ ] registrar neste documento a data final, participantes, links dos repositórios e link do vídeo.

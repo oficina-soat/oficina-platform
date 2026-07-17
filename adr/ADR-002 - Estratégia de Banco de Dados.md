@@ -10,7 +10,7 @@ Esta ADR foi criada em um contexto anterior à adoção da arquitetura baseada e
 
 Na arquitetura original, a estratégia de persistência considerava uma visão centralizada do banco de dados da aplicação, adequada ao modelo então adotado.
 
-Com a evolução da solução para a Fase 4, tornou-se necessário redefinir a estratégia de persistência para atender aos requisitos de:
+Com a evolução da solução para a arquitetura distribuída, tornou-se necessário redefinir a estratégia de persistência para atender aos requisitos de:
 
 * bancos de dados independentes por microsserviço;
 * propriedade exclusiva dos dados por domínio;

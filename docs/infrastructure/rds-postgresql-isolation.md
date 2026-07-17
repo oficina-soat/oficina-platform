@@ -2,13 +2,13 @@
 
 ## Objetivo
 
-Definir o padrão canônico de isolamento lógico para os databases PostgreSQL usados por `oficina-os-service` e `oficina-billing-service` na instância Amazon RDS compartilhada da Fase 4.
+Definir o padrão canônico de isolamento lógico para os databases PostgreSQL usados por `oficina-os-service` e `oficina-billing-service` na instância Amazon RDS compartilhada.
 
 Este documento complementa a [ADR-011 - Estratégia de Persistência Poliglota por Microsserviço](../../adr/ADR-011%20-%20Estratégia%20de%20Persistência%20Poliglota%20por%20Microsserviço.md), a [Matriz de Ownership por Microsserviço](../architecture/service-ownership.md), os [Nomes de runtime, secrets e infraestrutura](infra-runtime-naming.md) e o [Escopo do Repositório Unificado de Infraestrutura](infrastructure-repository-scope.md).
 
 ## Decisão
 
-A Fase 4 usa uma única instância Amazon RDS for PostgreSQL para os serviços relacionais, com databases, usuários, credenciais, migrations e permissões independentes por microsserviço.
+A solução usa uma única instância Amazon RDS for PostgreSQL para os serviços relacionais, com databases, usuários, credenciais, migrations e permissões independentes por microsserviço.
 
 ```text
 Amazon RDS for PostgreSQL: oficina-postgres-lab

@@ -57,5 +57,5 @@ Extensões não integram os requisitos obrigatórios nem a sequência ativa. A h
 
 Estes itens permanecem deliberadamente no fim e só devem ser executados quando os materiais finais estiverem disponíveis.
 
-- [ ] `[D-DELIVERY-EVID-001]` Registrar data da entrega da Fase 4, participantes, links dos repositórios e link do vídeo no [Checklist final da Fase 4](docs/delivery/phase-4-delivery-checklist.md) ou no documento de entrega.
+- [ ] `[D-DELIVERY-EVID-001]` Registrar data da entrega, participantes, links dos repositórios e link do vídeo no [Checklist final de entrega](docs/delivery/phase-4-delivery-checklist.md) ou no documento de entrega.
 - [ ] `[D-VIDEO-EVID-001]` Registrar as evidências finais do vídeo de demonstração após a gravação e a homologação do ambiente.

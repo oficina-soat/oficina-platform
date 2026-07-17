@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Definir a baseline sugerida de migrations PostgreSQL para os microsserviços relacionais da Fase 4, usando como ponto de partida as migrations atuais em `../oficina-infra-db/sql/migrations/`.
+Definir a baseline sugerida de migrations PostgreSQL para os microsserviços relacionais, usando como ponto de partida as migrations atuais em `../oficina-infra-db/sql/migrations/`.
 
 Esta proposta não altera o repositório `oficina-infra-db` nem cria migrations executáveis nos repositórios dos microsserviços. O objetivo é registrar a modelagem sugerida para avaliação antes da implementação.
 
@@ -15,7 +15,7 @@ As migrations atuais do `oficina-infra-db` misturam responsabilidades hoje desti
 - estoque;
 - estrutura relacional histórica do `oficina-app`.
 
-Na decomposição da Fase 4:
+Na decomposição dos microsserviços:
 
 - `oficina-os-service` usa PostgreSQL database `oficina_os`;
 - `oficina-billing-service` usa PostgreSQL database `oficina_billing`;
@@ -29,7 +29,7 @@ Na decomposição da Fase 4:
 - Persistir itens financeiros do orçamento no `oficina-billing-service`, alinhados ao OpenAPI e ao evento `orcamentoGerado`.
 - Em `orcamento_item`, `item_id` deve referenciar o item da Ordem de Serviço; `referencia_catalogo_id` deve guardar opcionalmente a referência ao catálogo técnico.
 - Itens do orçamento devem ser imutáveis após o status `GERADO`; qualquer alteração de composição deve gerar novo orçamento ou novo fluxo explícito de substituição.
-- Cada orçamento deve possuir no máximo um pagamento na Fase 4, usando restrição única em `pagamento.orcamento_id`.
+- Cada orçamento deve possuir no máximo um pagamento, usando restrição única em `pagamento.orcamento_id`.
 - Criar Outbox em cada database PostgreSQL para publicação confiável dos eventos de domínio.
 - A Outbox PostgreSQL deve usar apenas os estados `PENDING`, `PUBLISHED` e `FAILED`, sem estado intermediário `PROCESSING`; concorrência deve ser controlada pelo publicador com lock transacional.
 - Não persistir senha ou hash no `oficina-os-service`; credenciais pertencem ao `oficina-auth-lambda`. A coluna histórica `usuario.password_hash` deve ser removida por migration incremental.
@@ -383,6 +383,6 @@ CREATE INDEX ix_outbox_event_aggregate
 - `orcamento_item.item_id` referencia o item da OS.
 - `referencia_catalogo_id` é opcional e referencia o catálogo técnico quando disponível.
 - Itens do orçamento são imutáveis após `GERADO`.
-- `pagamento.orcamento_id` deve ser único na Fase 4.
+- `pagamento.orcamento_id` deve ser único.
 - Outbox usa apenas `PENDING`, `PUBLISHED` e `FAILED`.
 - O padrão transversal da Outbox está definido em [Padrão Outbox por Serviço](../architecture/outbox-pattern.md).

@@ -2,7 +2,7 @@
 
 ## Escopo
 
-Este documento registra a validação remota de `[B2-EXEC-DDB-REM-001]` no ambiente `lab`, conforme o [Padrão DynamoDB do oficina-execution-service](../infrastructure/dynamodb-execution-service.md) e o [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md).
+Este documento registra a validação remota de `[B2-EXEC-DDB-REM-001]` no ambiente `lab`, conforme o [Padrão DynamoDB do oficina-execution-service](../infrastructure/dynamodb-execution-service.md) e o [Checklist final de entrega](phase-4-delivery-checklist.md).
 
 As consultas e os fluxos de negócio foram executados por pods temporários dentro do cluster, usando o runtime AWS disponível no EKS. Nenhuma credencial AWS foi exibida ou registrada, e todos os pods auxiliares foram removidos ao final.
 

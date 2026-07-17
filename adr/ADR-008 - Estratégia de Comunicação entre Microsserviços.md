@@ -10,7 +10,7 @@
 
 A evolução da aplicação para uma arquitetura baseada em microsserviços exige a definição de mecanismos de comunicação que garantam autonomia dos serviços, baixo acoplamento e suporte a transações distribuídas.
 
-Os requisitos da Fase 4 estabelecem que a solução deve utilizar:
+Os requisitos do projeto estabelecem que a solução deve utilizar:
 
 * APIs RESTful síncronas quando necessário;
 * Mensageria assíncrona para eventos e integração desacoplada;
@@ -275,7 +275,7 @@ Os microsserviços deverão seguir obrigatoriamente as seguintes regras:
 
 A decisão foi baseada nos seguintes fatores:
 
-* Atendimento integral aos requisitos da Fase 4;
+* Atendimento integral aos requisitos do projeto;
 * Melhor equilíbrio entre simplicidade e desacoplamento;
 * Facilidade de implementação da Saga;
 * Baixo custo operacional;
@@ -359,7 +359,7 @@ Essa combinação fornece equilíbrio entre simplicidade operacional e desacopla
 
 **Status: Substituído por esta ADR**
 
-A [ADR-004](ADR-004%20-%20Padrões%20de%20comunicação.md) foi criada em um contexto anterior à adoção da arquitetura de microsserviços da Fase 4.
+A [ADR-004](ADR-004%20-%20Padrões%20de%20comunicação.md) foi criada em um contexto anterior à adoção da arquitetura atual de microsserviços.
 
 Esta ADR amplia e substitui a estratégia anterior, incorporando:
 
@@ -386,4 +386,4 @@ Esta ADR amplia e substitui a estratégia anterior, incorporando:
 
 ## Observação Final
 
-A estratégia híbrida baseada em REST, SNS e SQS busca equilibrar simplicidade, custo, resiliência e desacoplamento, fornecendo uma base adequada para a evolução da arquitetura distribuída da oficina e para a implementação segura dos fluxos transacionais da Fase 4.
+A estratégia híbrida baseada em REST, SNS e SQS busca equilibrar simplicidade, custo, resiliência e desacoplamento, fornecendo uma base adequada para a evolução da arquitetura distribuída da oficina e para a implementação segura dos fluxos transacionais do projeto.

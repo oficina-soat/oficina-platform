@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Definir quais rotas REST da Fase 4 devem ser expostas pelo API Gateway público da suíte e quais endpoints operacionais não devem ser publicados como API de negócio.
+Definir quais rotas REST devem ser expostas pelo API Gateway público da suíte e quais endpoints operacionais não devem ser publicados como API de negócio.
 
 Este documento complementa o [Contrato de APIs REST](../../contracts/Contrato%20de%20APIs%20REST.md), as especificações OpenAPI em [contracts/openapi/](../../contracts/openapi/), a [Estratégia de entrega dos manifestos Kubernetes](kubernetes-manifest-strategy.md), o [Escopo do Repositório Unificado de Infraestrutura](infrastructure-repository-scope.md) e os nomes canônicos de [Conta, região e ambientes AWS](aws-environments.md).
 
@@ -143,4 +143,4 @@ O item de rotas públicas está definido quando:
 - este documento lista todas as rotas das OpenAPI canônicas;
 - o [ROADMAP](../../ROADMAP.md) aponta para esta decisão;
 - o `oficina-infra` materializa as rotas no API Gateway usando os backends reais do ambiente `lab`;
-- o [Checklist Final de Entrega da Fase 4](../delivery/phase-4-delivery-checklist.md) registra a URL pública e a evidência de chamada das rotas relevantes para a demonstração.
+- o [Checklist final de entrega](../delivery/phase-4-delivery-checklist.md) registra a URL pública e a evidência de chamada das rotas relevantes para a demonstração.

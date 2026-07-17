@@ -4,7 +4,7 @@
 
 Definir os contratos REST fundamentais da plataforma distribuída da oficina mecânica.
 
-Este documento estabelece as interfaces síncronas entre os microsserviços da Fase 4 e serve como referência para implementação, documentação OpenAPI, testes de integração e comunicação entre equipes.
+Este documento estabelece as interfaces síncronas entre os microsserviços e serve como referência para implementação, documentação OpenAPI, testes de integração e comunicação entre equipes.
 
 Os contratos aqui definidos devem ser considerados estáveis e versionados.
 

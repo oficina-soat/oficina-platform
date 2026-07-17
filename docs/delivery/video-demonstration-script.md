@@ -1,10 +1,10 @@
-# Roteiro do Vídeo de Demonstração da Fase 4
+# Roteiro do vídeo de demonstração
 
 ## Objetivo
 
-Orientar a gravação do vídeo final de até 15 minutos exigido pelo [Enunciado da Fase 4](Enunciado%20Fase%204.md), cobrindo arquitetura distribuída, fluxo completo da Ordem de Serviço, Saga com compensação, CI/CD independente, Kubernetes, qualidade, Mercado Pago e rastreamento no New Relic.
+Orientar a gravação do vídeo final de até 15 minutos exigido pelo [Enunciado do projeto](Enunciado%20Fase%204.md), cobrindo arquitetura distribuída, fluxo completo da Ordem de Serviço, Saga com compensação, CI/CD independente, Kubernetes, qualidade, Mercado Pago e rastreamento no New Relic.
 
-Este roteiro complementa o [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md), o [Diagrama Geral da Arquitetura Final](../architecture/architecture-diagram.md), os [Fluxos da Saga da Ordem de Serviço](../architecture/saga-flows.md), o [Checklist de Deploy Independente](independent-deploy-checklist.md), o [Padrão de Observabilidade Distribuída](../observability/observability.md) e o [Relatório do E2E no ambiente lab](../observability/d-nr-rem-005-e2e-lab-report.md).
+Este roteiro complementa o [Checklist final de entrega](phase-4-delivery-checklist.md), o [Diagrama Geral da Arquitetura Final](../architecture/architecture-diagram.md), os [Fluxos da Saga da Ordem de Serviço](../architecture/saga-flows.md), o [Checklist de Deploy Independente](independent-deploy-checklist.md), o [Padrão de Observabilidade Distribuída](../observability/observability.md) e o [Relatório do E2E no ambiente lab](../observability/d-nr-rem-005-e2e-lab-report.md).
 
 ## Formato e Limite
 
@@ -83,7 +83,7 @@ Ocultar notificações, favoritos pessoais, e-mail, account IDs desnecessários 
 
 Mostrar o título da entrega e informar:
 
-> Esta é a plataforma distribuída da oficina mecânica da Fase 4. A demonstração mostrará uma Ordem de Serviço passando pelos três microsserviços, uma falha compensada pela Saga, deploy independente em Kubernetes e correlação ponta a ponta no New Relic.
+> Esta é a plataforma distribuída da oficina mecânica. A demonstração mostrará uma Ordem de Serviço passando pelos três microsserviços, uma falha compensada pela Saga, deploy independente em Kubernetes e correlação ponta a ponta no New Relic.
 
 Não gastar tempo apresentando integrantes; os nomes e identificações pertencem ao PDF final.
 
@@ -288,6 +288,6 @@ Antes do upload, assistir ao arquivo final e confirmar:
 - [ ] cobertura, Quality Gate e OpenAPI são legíveis;
 - [ ] nomes de serviços, eventos, bancos e tecnologias coincidem com os contratos;
 - [ ] nenhuma credencial ou dado pessoal real aparece em áudio ou vídeo;
-- [ ] o link publicado foi registrado no [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md).
+- [ ] o link publicado foi registrado no [Checklist final de entrega](phase-4-delivery-checklist.md).
 
 O upload e o registro das evidências finais pertencem aos itens remotos `[D-VIDEO-EVID-001]` e `[D-DELIVERY-EVID-001]` do [ROADMAP](../../ROADMAP.md); preparar este roteiro não os conclui automaticamente.

@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Definir como o código existente do `oficina-app` deve ser decomposto nos microsserviços da Fase 4:
+Definir como o código existente do `oficina-app` deve ser decomposto nos microsserviços da arquitetura distribuída:
 
 - `oficina-os-service`;
 - `oficina-billing-service`;
@@ -13,7 +13,7 @@ Este plano deve orientar agentes e desenvolvedores durante a criação dos novos
 ## Premissas
 
 - Os novos repositórios dos microsserviços existem apenas com `README.md` placeholder.
-- O `oficina-app` será usado como origem de migração de código e referência funcional, mas não será mantido como backend monolítico da Fase 4.
+- O `oficina-app` será usado como origem de migração de código e referência funcional, mas não será mantido como backend monolítico.
 - Não há consumidores externos ou front-end que precisem ser migrados durante esta decomposição.
 - Não há necessidade de preservar histórico ou dados existentes de ambiente.
 - A massa inicial deve reaproveitar os dados do seed atual do `oficina-app`, pois eles já são conhecidos e funcionais.
@@ -236,7 +236,7 @@ Eventos consumidos:
 
 Não haverá migração histórica de dados.
 
-A estratégia oficial para a Fase 4 é seed limpo por microsserviço, usando o `import.sql` atual do `oficina-app` como referência funcional.
+A estratégia oficial é usar seed limpo por microsserviço, com o `import.sql` atual do `oficina-app` como referência funcional.
 
 ### Seed do oficina-os-service
 
@@ -328,7 +328,7 @@ Após a migração dos componentes relevantes:
 - Não existe biblioteca `common` compartilhada entre os microsserviços.
 - Pessoa e Usuário estão sob ownership do `oficina-os-service`.
 - O CRUD REST de usuários operacionais está materializado no `oficina-os-service`; a sincronização assíncrona e a ativação segura de credenciais estão materializadas no `oficina-auth-lambda`.
-- O seed da Fase 4 usa os dados funcionais do `import.sql` atual como referência.
+- O seed dos microsserviços usa os dados funcionais do `import.sql` atual como referência.
 - `oficina-billing-service` nasce de contratos, não de código legado inexistente.
 - Rotas, eventos, tópicos e bancos permanecem coerentes com [Matriz de Ownership por Microsserviço](service-ownership.md), [Contrato de APIs REST](../../contracts/Contrato%20de%20APIs%20REST.md), [Contrato de Eventos de Domínio](../../contracts/Contrato%20de%20Eventos%20de%20Domínio.md) e [Contrato de Tópicos de Mensageria](../../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md).
 - O `oficina-app` fica apenas como referência após a decomposição.

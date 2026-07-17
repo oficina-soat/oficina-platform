@@ -2,9 +2,9 @@
 
 ## Objetivo
 
-Definir os procedimentos mínimos para diagnosticar, conter e registrar incidentes operacionais da Fase 4.
+Definir os procedimentos mínimos para diagnosticar, conter e registrar incidentes operacionais da solução.
 
-Este documento complementa o [Padrão de Observabilidade Distribuída](observability.md), o [Padrão Outbox por Serviço](../architecture/outbox-pattern.md), os [Fluxos da Saga da Ordem de Serviço](../architecture/saga-flows.md), o [Checklist de Deploy Independente](../delivery/independent-deploy-checklist.md), o [Escopo do Repositório Unificado de Infraestrutura](../infrastructure/infrastructure-repository-scope.md), os [Nomes de runtime, secrets e infraestrutura](../infrastructure/infra-runtime-naming.md), o [Contrato de Erros REST](../../contracts/error-model.md), o [Contrato de Tópicos de Mensageria](../../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md) e o [Checklist Final de Entrega da Fase 4](../delivery/phase-4-delivery-checklist.md).
+Este documento complementa o [Padrão de Observabilidade Distribuída](observability.md), o [Padrão Outbox por Serviço](../architecture/outbox-pattern.md), os [Fluxos da Saga da Ordem de Serviço](../architecture/saga-flows.md), o [Checklist de Deploy Independente](../delivery/independent-deploy-checklist.md), o [Escopo do Repositório Unificado de Infraestrutura](../infrastructure/infrastructure-repository-scope.md), os [Nomes de runtime, secrets e infraestrutura](../infrastructure/infra-runtime-naming.md), o [Contrato de Erros REST](../../contracts/error-model.md), o [Contrato de Tópicos de Mensageria](../../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md) e o [Checklist final de entrega](../delivery/phase-4-delivery-checklist.md).
 
 ## Escopo
 
@@ -21,7 +21,7 @@ Runbooks cobertos:
 | Banco indisponível | readiness falhando por PostgreSQL ou DynamoDB | Serviço dono do banco |
 | Rollback de deploy | rollout falho ou regressão pós-deploy | Serviço alterado |
 
-Estes runbooks não substituem a criação remota de dashboards e alertas no New Relic. Quando New Relic, AWS, EKS ou GitHub exigirem credenciais administrativas, a execução remota deve ser registrada como evidência externa no [Checklist Final de Entrega da Fase 4](../delivery/phase-4-delivery-checklist.md).
+Estes runbooks não substituem a criação remota de dashboards e alertas no New Relic. Quando New Relic, AWS, EKS ou GitHub exigirem credenciais administrativas, a execução remota deve ser registrada como evidência externa no [Checklist final de entrega](../delivery/phase-4-delivery-checklist.md).
 
 ## Coleta inicial
 
@@ -248,7 +248,7 @@ Use quando um rollout falhar ou uma regressão for detectada após publicar nova
 
 - [ ] registrar workflow, release, imagem revertida, causa provável e evidência;
 - [ ] abrir correção no repositório dono;
-- [ ] atualizar o [Checklist Final de Entrega da Fase 4](../delivery/phase-4-delivery-checklist.md) quando o rollback fizer parte de evidência ou limitação da entrega.
+- [ ] atualizar o [Checklist final de entrega](../delivery/phase-4-delivery-checklist.md) quando o rollback fizer parte de evidência ou limitação da entrega.
 
 ## Escalação
 
@@ -275,4 +275,4 @@ Para incidentes usados como evidência final ou de homologação, registrar:
 | Ação | Contenção, correção, rollback ou reprocessamento. |
 | Resultado | Métrica ou validação que confirma recuperação. |
 
-O [Checklist Final de Entrega da Fase 4](../delivery/phase-4-delivery-checklist.md) deve concentrar links ou identificadores das evidências finais.
+O [Checklist final de entrega](../delivery/phase-4-delivery-checklist.md) deve concentrar links ou identificadores das evidências finais.

@@ -8,7 +8,7 @@
 
 ## Contexto
 
-A aplicação da oficina está sendo evoluída para uma arquitetura baseada em microsserviços, conforme os requisitos da Fase 4 do projeto.
+A aplicação da oficina está sendo evoluída para uma arquitetura baseada em microsserviços, conforme os requisitos do projeto.
 
 Entre os requisitos obrigatórios estão:
 
@@ -289,4 +289,4 @@ Essa separação busca equilibrar padronização e autonomia.
 
 ## Observação Final
 
-A adoção do repositório `oficina-platform` tem como objetivo centralizar artefatos compartilhados e decisões arquiteturais sem comprometer a independência dos microsserviços, promovendo uma arquitetura mais organizada, rastreável e aderente aos requisitos da Fase 4.
+A adoção do repositório `oficina-platform` tem como objetivo centralizar artefatos compartilhados e decisões arquiteturais sem comprometer a independência dos microsserviços, promovendo uma arquitetura mais organizada, rastreável e aderente aos requisitos do projeto.

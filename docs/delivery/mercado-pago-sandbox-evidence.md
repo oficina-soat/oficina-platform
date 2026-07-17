@@ -2,7 +2,7 @@
 
 ## Escopo
 
-Este documento registra as validações remotas de `[B2-MP-REM-001]` e a conclusão de `[B2-MP-EVID-001]` no ambiente `lab`, conforme os [nomes de runtime, secrets e infraestrutura](../infrastructure/infra-runtime-naming.md) e o [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md).
+Este documento registra as validações remotas de `[B2-MP-REM-001]` e a conclusão de `[B2-MP-EVID-001]` no ambiente `lab`, conforme os [nomes de runtime, secrets e infraestrutura](../infrastructure/infra-runtime-naming.md) e o [Checklist final de entrega](phase-4-delivery-checklist.md).
 
 Nenhum access token, JWT, segredo AWS ou conteúdo de Secret Kubernetes foi exibido ou registrado. As consultas automatizadas usaram as credenciais apenas em memória e registraram somente metadados e respostas sanitizadas.
 

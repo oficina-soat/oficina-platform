@@ -8,7 +8,7 @@
 
 ## Observação
 
-Esta ADR foi criada em um contexto anterior à adoção da arquitetura de microsserviços definida para a Fase 4 do projeto.
+Esta ADR foi criada em um contexto anterior à adoção da arquitetura atual de microsserviços.
 
 Com a evolução da solução, tornou-se necessário formalizar uma estratégia de comunicação específica para ambientes distribuídos, contemplando:
 

@@ -8,7 +8,7 @@
 
 ## Contexto
 
-A Fase 4 exige a evolução da aplicação para uma arquitetura baseada em microsserviços independentes, com comunicação distribuída, bancos de dados isolados, automação de deploy, observabilidade e coordenação transacional utilizando Saga Pattern.
+O projeto exige a evolução da aplicação para uma arquitetura baseada em microsserviços independentes, com comunicação distribuída, bancos de dados isolados, automação de deploy, observabilidade e coordenação transacional utilizando Saga Pattern.
 
 Os requisitos estabelecem que cada microsserviço possua:
 
@@ -268,6 +268,6 @@ Os microsserviços passam a referenciar os artefatos definidos no `oficina-platf
 
 ## Observação final
 
-O repositório `oficina-platform` não substitui os repositórios dos microsserviços exigidos pela Fase 4.
+O repositório `oficina-platform` não substitui os repositórios dos microsserviços exigidos pelo projeto.
 
 Seu objetivo é centralizar a governança da plataforma, fornecendo uma visão unificada da arquitetura e servindo como fonte oficial para contratos, padrões e decisões compartilhadas.

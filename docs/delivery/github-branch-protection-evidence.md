@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Registrar a verificação remota de `[B2-GH-REM-001]` nos repositórios `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, conforme a [Política de Proteção da Branch Main](github-branch-protection.md) e o [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md).
+Registrar a verificação remota de `[B2-GH-REM-001]` nos repositórios `oficina-os-service`, `oficina-billing-service` e `oficina-execution-service`, conforme a [Política de Proteção da Branch Main](github-branch-protection.md) e o [Checklist final de entrega](phase-4-delivery-checklist.md).
 
 ## Verificação de 2026-07-13
 
@@ -89,5 +89,5 @@ Após a correção:
 
 - repetir a consulta para os três repositórios;
 - registrar data, Ruleset e resultado conforme;
-- atualizar o [Checklist Final de Entrega da Fase 4](phase-4-delivery-checklist.md);
+- atualizar o [Checklist final de entrega](phase-4-delivery-checklist.md);
 - marcar `[B2-GH-REM-001]` como concluído no [ROADMAP](../../ROADMAP.md).

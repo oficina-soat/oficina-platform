@@ -17,7 +17,7 @@ O objetivo é evitar novos nomes implícitos ao evoluir os microsserviços e o n
 
 ## Valores fechados
 
-Os valores abaixo já aparecem nos repositórios irmãos ou nos templates atuais deste repositório e devem ser tratados como canônicos para a Fase 4.
+Os valores abaixo já aparecem nos repositórios irmãos ou nos templates atuais deste repositório e devem ser tratados como canônicos.
 
 ### Ambiente AWS
 
@@ -79,7 +79,7 @@ OFICINA_PERSISTENCE_KIND=postgresql
 
 Credenciais AWS estáticas não são obrigatórias no pod. A validação deve aceitar a cadeia padrão do AWS SDK e a identidade IAM efetiva do workload. Em ambientes permanentes, essa identidade deve ser associada à ServiceAccount por IRSA ou EKS Pod Identity e seguir menor privilégio. Quando credenciais estáticas forem informadas, `AWS_ACCESS_KEY_ID` e `AWS_SECRET_ACCESS_KEY` formam o par obrigatório; `AWS_SESSION_TOKEN` é opcional para credencial básica e, quando presente, deve ser usado com o par para formar a credencial temporária. Para permitir a verificação sem eventos sintéticos, a policy produtora usa `sns:GetTopicAttributes` e `sns:Publish` apenas nos tópicos do serviço; a policy consumidora inclui `sqs:GetQueueUrl` apenas nas filas do serviço; e a policy DynamoDB do Execution inclui `dynamodb:DescribeTable` nas tabelas próprias.
 
-No VocLabs, managed policies criadas pelo Terraform usam nome content-addressed com os 12 primeiros caracteres do SHA-256 da descrição e do documento IAM. Os padrões físicos são `oficina-lab-domain-messaging-<servico>-producer-<hash-12>`, `oficina-lab-domain-messaging-<servico>-consumer-<hash-12>` e `oficina-execution-lab-runtime-dynamodb-<hash-12>`. Essa estratégia substitui a policy quando o conteúdo muda, pois a role de laboratório pode negar `iam:CreatePolicyVersion`. ARNs com hash não devem ser fixados em código; em contas que permitam associações por workload, os attachments devem ser gerenciados pelo Terraform a partir dos outputs do `oficina-infra`, conforme [DynamoDB e mensageria da Fase 4](../../../oficina-infra/docs/dynamodb-messaging.md).
+No VocLabs, managed policies criadas pelo Terraform usam nome content-addressed com os 12 primeiros caracteres do SHA-256 da descrição e do documento IAM. Os padrões físicos são `oficina-lab-domain-messaging-<servico>-producer-<hash-12>`, `oficina-lab-domain-messaging-<servico>-consumer-<hash-12>` e `oficina-execution-lab-runtime-dynamodb-<hash-12>`. Essa estratégia substitui a policy quando o conteúdo muda, pois a role de laboratório pode negar `iam:CreatePolicyVersion`. ARNs com hash não devem ser fixados em código; em contas que permitam associações por workload, os attachments devem ser gerenciados pelo Terraform a partir dos outputs do `oficina-infra`, conforme [DynamoDB e mensageria](../../../oficina-infra/docs/dynamodb-messaging.md).
 
 O VocLabs atual também nega `iam:AttachRolePolicy` e `iam:PutRolePolicy`, não possui EKS Pod Identity configurado e entrega aos pods, por padrão, a `LabEksNodeRole` sem acesso runtime a SNS, SQS ou DynamoDB. Por isso, quando a sessão é `voclabs` e `EKS_NODE_ROLE_ARN` não foi informado, o `oficina-infra` usa a `LabRole` preexistente como role do managed node group. Essa role já permite as dependências runtime necessárias na região `us-east-1` e possui relação de confiança e policies básicas para nodes EKS. A troca do node group usa nome com prefixo e `create_before_destroy`, criando o sucessor antes de remover o anterior. Essa é uma exceção exclusiva do laboratório e não substitui a identidade de menor privilégio por workload em ambientes permanentes.
 
@@ -141,7 +141,7 @@ OFICINA_MERCADO_PAGO_PAYER_EMAIL=<email-comprador-sandbox>
 
 `OFICINA_MERCADO_PAGO_API_URL` não precisa ser cadastrada como variável GitHub enquanto o endpoint oficial for `https://api.mercadopago.com`, pois esse já é o default do `oficina-billing-service`. `OFICINA_MERCADO_PAGO_PAYER_EMAIL` também não precisa ser configurada sempre; use apenas se o Mercado Pago exigir um e-mail de comprador sandbox específico para o teste ou se o default local não for aceito.
 
-Não cadastre Public Key, Client ID, Client Secret, dados de cartão, chave Pix ou webhook secret para a Fase 4 atual, porque o fluxo implementado no `oficina-billing-service` chama o backend do Mercado Pago diretamente com `Access Token` e método `PIX`. Esses valores só devem entrar no padrão quando houver frontend Mercado Pago, OAuth, produção real ou webhook assíncrono.
+Não cadastre Public Key, Client ID, Client Secret, dados de cartão, chave Pix ou webhook secret no escopo atual, porque o fluxo implementado no `oficina-billing-service` chama o backend do Mercado Pago diretamente com `Access Token` e método `PIX`. Esses valores só devem entrar no padrão quando houver frontend Mercado Pago, OAuth, produção real ou webhook assíncrono.
 
 ### Credenciais AWS do GitHub Actions
 
@@ -286,7 +286,7 @@ oficina-os-usuario-excluido-oficina-auth-sync-lambda
 
 Cada fila possui a DLQ do tópico correspondente. O event source mapping deve habilitar `ReportBatchItemFailures`. A Lambda HTTP usa `OFICINA_AUTH_ACTIVATION_TTL_HOURS=24` como validade padrão configurável para tokens de ativação; tokens e senhas nunca são variáveis de ambiente nem secrets compartilhados.
 
-### PostgreSQL legado e transição Fase 4
+### PostgreSQL legado e transição para a arquitetura atual
 
 Valores encontrados nos repositórios de infraestrutura legados:
 
@@ -300,9 +300,9 @@ APP_SECRET_NAME=oficina/lab/database/app
 OFICINA_DB_APP_SECRET_ID=oficina/lab/database/app
 ```
 
-Esses valores descrevem o modelo atual/legado. Para a Fase 4, a decisão canônica continua sendo uma instância RDS PostgreSQL compartilhada com databases, usuários, secrets e migrations isolados para `oficina-os-service` e `oficina-billing-service`, conforme [ROADMAP.md](../../ROADMAP.md), [Conta, região e ambientes AWS](aws-environments.md) e [Padrão de isolamento PostgreSQL no RDS compartilhado](rds-postgresql-isolation.md).
+Esses valores descrevem o modelo legado. A decisão canônica continua sendo uma instância RDS PostgreSQL compartilhada com databases, usuários, secrets e migrations isolados para `oficina-os-service` e `oficina-billing-service`, conforme [ROADMAP.md](../../ROADMAP.md), [Conta, região e ambientes AWS](aws-environments.md) e [Padrão de isolamento PostgreSQL no RDS compartilhado](rds-postgresql-isolation.md).
 
-Valores canônicos da Fase 4:
+Valores canônicos:
 
 ```text
 DB_IDENTIFIER=oficina-postgres-lab

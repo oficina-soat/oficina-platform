@@ -118,7 +118,7 @@ O arquivo [common.schema.json](events/schemas/common.schema.json) concentra tipo
 
 # Eventos Fora do Escopo Inicial
 
-Os eventos abaixo não fazem parte do contrato fundamental da Fase 4 e podem ser definidos posteriormente caso surja necessidade de integração entre microsserviços:
+Os eventos abaixo não fazem parte do contrato fundamental atual e podem ser definidos posteriormente caso surja necessidade de integração entre microsserviços:
 
 ```text
 clienteAdicionado

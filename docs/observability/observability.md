@@ -35,7 +35,7 @@ Os microsserviços devem usar observabilidade distribuída baseada em:
 - propagação obrigatória de `correlationId` em HTTP, metadados operacionais de eventos, logs e traces;
 - atributos padronizados de serviço, namespace e ambiente.
 
-O ambiente canônico da Fase 4 é `lab`, conforme [Conta, região e ambientes AWS](../infrastructure/aws-environments.md).
+O ambiente canônico é `lab`, conforme [Conta, região e ambientes AWS](../infrastructure/aws-environments.md).
 
 AWS continua sendo a plataforma de nuvem da solução. A coleta dos sinais operacionais deve ser feita pelo New Relic OpenTelemetry Collector instalado no cluster EKS `eks-lab` por Helm, com OTLP/gRPC habilitado para traces, coleta de logs dos pods e coleta das métricas expostas em `/q/metrics`.
 
@@ -332,7 +332,7 @@ Regras obrigatórias:
 
 - todos os dashboards devem filtrar por `service.name`, `service.namespace` e `deployment.environment`;
 - `service.namespace` deve ser `oficina`;
-- `deployment.environment` deve ser `lab` no ambiente da Fase 4;
+- `deployment.environment` deve ser `lab` no ambiente canônico;
 - traces devem chegar ao New Relic por OTLP recebido pelo New Relic OpenTelemetry Collector, usando o exportador gerenciado pelo Quarkus;
 - logs JSON devem ser coletados do stdout dos pods e correlacionados com `service.name`, `correlationId`, `traceId` e `spanId` quando disponíveis;
 - métricas expostas em `/q/metrics` devem ser coletadas pelo New Relic OpenTelemetry Collector com configuração compatível com Prometheus;

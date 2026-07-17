@@ -1,6 +1,6 @@
 # Dashboards New Relic
 
-Este documento reúne templates JSON para criar manualmente os dashboards mínimos da Fase 4 no New Relic.
+Este documento reúne templates JSON para criar manualmente os dashboards mínimos da solução no New Relic.
 
 Os templates seguem o [Padrão de Observabilidade Distribuída](observability.md), usam o ambiente canônico definido em [Conta, região e ambientes AWS](../infrastructure/aws-environments.md) e dependem do New Relic OpenTelemetry Collector instalado pelo `oficina-infra`, conforme [Nomes de runtime, secrets e infraestrutura](../infrastructure/infra-runtime-naming.md).
 

@@ -2,9 +2,9 @@
 
 ## Objetivo
 
-Representar a arquitetura final da Fase 4 com os três microsserviços, persistência independente, mensageria assíncrona, deploy em Kubernetes, observabilidade distribuída e integração financeira externa.
+Representar a arquitetura atual com os três microsserviços, persistência independente, mensageria assíncrona, deploy em Kubernetes, observabilidade distribuída e integração financeira externa.
 
-Este documento complementa o [Checklist Final de Entrega da Fase 4](../delivery/phase-4-delivery-checklist.md), a [Matriz de Ownership por Microsserviço](service-ownership.md), as [Rotas públicas do API Gateway](../infrastructure/api-gateway-public-routes.md), o [Escopo do Repositório Unificado de Infraestrutura](../infrastructure/infrastructure-repository-scope.md), o [Padrão de Observabilidade Distribuída](../observability/observability.md), o [Contrato de Tópicos de Mensageria](../../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md) e a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md).
+Este documento complementa o [Checklist final de entrega](../delivery/phase-4-delivery-checklist.md), a [Matriz de Ownership por Microsserviço](service-ownership.md), as [Rotas públicas do API Gateway](../infrastructure/api-gateway-public-routes.md), o [Escopo do Repositório Unificado de Infraestrutura](../infrastructure/infrastructure-repository-scope.md), o [Padrão de Observabilidade Distribuída](../observability/observability.md), o [Contrato de Tópicos de Mensageria](../../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md) e a [ADR-012 - Estratégia de CI/CD e Deploy Independente](../../adr/ADR-012%20-%20Estratégia%20de%20CI%20CD%20e%20Deploy%20Independente.md).
 
 ## Diagrama
 
@@ -117,7 +117,7 @@ flowchart LR
 - Eventos devem ser publicados somente após persistência local, usando Outbox.
 - `oficina-platform` não contém código runtime dos microsserviços nem infraestrutura executável.
 - `oficina-infra` é o destino canônico para Terraform, Kubernetes, API Gateway, RDS, DynamoDB, SNS/SQS, ECR, New Relic OpenTelemetry Collector e scripts operacionais.
-- `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` não aparecem como runtime final da Fase 4; quando consultados, servem apenas como fonte histórica ou origem de cópia controlada.
+- `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` não aparecem no runtime atual; quando consultados, servem apenas como fonte histórica ou origem de cópia controlada.
 
 ## Referências
 

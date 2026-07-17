@@ -8,7 +8,7 @@ Este documento é normativo para agentes ao evoluir infraestrutura compartilhada
 
 ## Decisão
 
-O repositório canônico de infraestrutura da Fase 4 é:
+O repositório canônico de infraestrutura é:
 
 ```text
 oficina-infra
@@ -94,14 +94,14 @@ Essa estrutura é recomendada para reduzir ambiguidade. Ajustes são permitidos 
 
 ## Migração dos Repositórios Legados
 
-O plano operacional de cópia e adaptação dos repositórios legados está definido em [Plano de migração para o repositório unificado de infraestrutura](infrastructure-migration-plan.md). Os repositórios `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` devem ser tratados como fontes históricas sem alteração durante a migração; correções e normalizações da Fase 4 devem acontecer nos destinos canônicos. O `oficina-auth-lambda` continua ativo e pode receber ajustes diretos quando a mudança pertencer aos fluxos de autenticação, sincronização do cadastro operacional ou notificações.
+O plano operacional de cópia e adaptação dos repositórios legados está definido em [Plano de migração para o repositório unificado de infraestrutura](infrastructure-migration-plan.md). Os repositórios `oficina-app`, `oficina-infra-db` e `oficina-infra-k8s` devem ser tratados como fontes históricas sem alteração durante a migração; correções e normalizações devem acontecer nos destinos canônicos. O `oficina-auth-lambda` continua ativo e pode receber ajustes diretos quando a mudança pertencer aos fluxos de autenticação, sincronização do cadastro operacional ou notificações.
 
 | Origem | Migrar para `oficina-infra` | Observação |
 |---|---|---|
 | `oficina-infra-db` | Terraform de RDS, scripts de bootstrap, padrões de secrets e workflows úteis. | Migrations legadas do `oficina-app` devem ficar apenas como referência para decomposição. |
 | `oficina-infra-k8s` | Terraform/Kubernetes de EKS, API Gateway, rotas, scripts operacionais e workflows úteis. | Artefatos do backend monolítico `oficina-app` devem ser marcados como legados ou removidos quando substituídos. |
 
-Antes de migrar qualquer artefato executável, validar se ele ainda usa nomes legados como `oficina-app`, `simple-eks`, conta AWS fixa, database `app` ou secret `oficina/lab/database/app`. Quando o valor for legado, o novo repositório deve usar os nomes canônicos da Fase 4.
+Antes de migrar qualquer artefato executável, validar se ele ainda usa nomes legados como `oficina-app`, `simple-eks`, conta AWS fixa, database `app` ou secret `oficina/lab/database/app`. Quando o valor for legado, o novo repositório deve usar os nomes canônicos atuais.
 
 ## Critérios de Pronto
 

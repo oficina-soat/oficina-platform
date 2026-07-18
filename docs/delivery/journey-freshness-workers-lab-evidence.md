@@ -4,7 +4,7 @@
 
 Em 18/07/2026, o `lab` foi homologado com os publicadores da Outbox separados dos consumidores e com um worker independente por fila nos três microsserviços. A jornada sintética percorreu início e conclusão de diagnóstico, recusa e retomada, nova conclusão e aprovação, reparo, pagamento e entrega.
 
-O resultado funcional foi aprovado: a OS terminou em `ENTREGUE`, a Saga terminou em `FINALIZADA_COM_SUCESSO`, as 32 filas ativas terminaram zeradas e nenhum pod reiniciou. A rodada também expôs uma corrida idempotente no Billing durante o pagamento; ela se recuperou por retry sem duplicar o efeito financeiro. O Billing `1.7.1` eliminou a colisão no PostgreSQL, mas a homologação remota encontrou duas chamadas concorrentes ao provedor e permanece bloqueada antes da [nova medição estatística](../../ROADMAP.md#assertividade-da-atualização-da-jornada-operacional).
+O resultado funcional foi aprovado: a OS terminou em `ENTREGUE`, a Saga terminou em `FINALIZADA_COM_SUCESSO`, as 32 filas ativas terminaram zeradas e nenhum pod reiniciou. A rodada também expôs uma corrida idempotente no Billing durante o pagamento; ela se recuperou por retry sem duplicar o efeito financeiro. O Billing `1.7.1` eliminou a colisão no PostgreSQL, e o Billing `1.7.2` eliminou a chamada concorrente ao provedor. A [homologação remota final](#homologação-remota-do-billing-172) aprovou a porta de entrada para a [nova medição estatística](../../ROADMAP.md#assertividade-da-atualização-da-jornada-operacional).
 
 Esta homologação valida o rollout e fornece amostras operacionais isoladas. Ela não substitui as 30 amostras por transição exigidas pela [ADR-014](../../adr/ADR-014%20-%20Convergência%20da%20Jornada%20e%20Isolamento%20dos%20Workers.md) e pelo [plano de remediação](../architecture/journey-freshness-remediation-plan.md#7-repetir-a-medição-e-comparar).
 
@@ -13,7 +13,7 @@ Esta homologação valida o rollout e fornece amostras operacionais isoladas. El
 | Componente | Versão homologada | Estado observado |
 |---|---:|---|
 | `oficina-execution-service` | `1.5.0` | Deployment com `1/1` réplica pronta, health `UP` e zero reinício |
-| `oficina-billing-service` | `1.7.0` | Deployment com `1/1` réplica pronta, health `UP` e zero reinício |
+| `oficina-billing-service` | `1.7.2` | Deployment com `1/1` réplica pronta, health `UP` e zero reinício após a homologação final |
 | `oficina-os-service` | `1.11.0` | Deployment com `1/1` réplica pronta, health `UP` e zero reinício |
 
 Os logs comprovaram execução simultânea por unidades distintas: o publicador em `outbox-publisher-worker` e os consumidores em threads `domain-event-consumer-<fila>`. Os eventos correlacionados passaram de `PENDING` para `PUBLISHED`, foram recebidos pelo consumidor correspondente e terminaram confirmados.
@@ -98,7 +98,7 @@ A homologação, entretanto, ficou **bloqueada** pelo critério de ACK sem retry
 
 A falha externa expôs uma lacuna anterior à persistência: os dois concorrentes ainda executam `pagamentoGateway.solicitar` antes de disputar o `create-if-absent`. A identidade determinística preserva a mesma chave de idempotência e a restrição do PostgreSQL evita duplicação local, mas não evita duas chamadas simultâneas ao provedor nem o retry observado. O teste concorrente atual também explicita esse comportamento ao esperar duas chamadas ao gateway.
 
-Por isso, `[D-JOURNEY-FRESHNESS-BILLING-IDEMPOTENCY-REM-001]` permanece aberta. O [roadmap](../../ROADMAP.md#assertividade-da-atualização-da-jornada-operacional) exige o rollout do ownership concorrente por orçamento implementado a seguir antes de repetir a homologação, preservando retentativa legítima se a única solicitação ao provedor falhar.
+Por isso, naquele momento `[D-JOURNEY-FRESHNESS-BILLING-IDEMPOTENCY-REM-001]` permaneceu aberta. O [roadmap](../../ROADMAP.md#assertividade-da-atualização-da-jornada-operacional) passou a exigir o rollout do ownership concorrente por orçamento implementado a seguir antes de repetir a homologação, preservando retentativa legítima se a única solicitação ao provedor falhar.
 
 ### Correção da concorrência no provedor
 
@@ -113,7 +113,32 @@ Os testes agora comprovam:
 - propagação da falha isolada e liberação do claim para a retentativa seguinte;
 - exclusão entre duas instâncias reais do adapter PostgreSQL, liberação condicionada ao owner e recuperação após expiração do lease.
 
-O `clean verify` do profile PostgreSQL passou com 151 testes, migrations Flyway aplicadas em PostgreSQL 16 real, todas as verificações JaCoCo e cobertura de instruções de 94,58%. Como `SONAR_TOKEN` não estava disponível, o Quality Gate remoto não foi consultado localmente. A correção ainda requer publicação, rollout do Billing `1.7.2` e repetição da homologação bloqueada antes da remedição estatística.
+O `clean verify` do profile PostgreSQL passou com 152 testes, migrations Flyway aplicadas em PostgreSQL 16 real, todas as verificações JaCoCo e cobertura de instruções de 94,66%. Como `SONAR_TOKEN` não estava disponível, o Quality Gate não foi consultado localmente; a análise do PR foi aprovada posteriormente pelo SonarCloud. A publicação, o rollout e a repetição da homologação estão registrados a seguir.
+
+### Homologação remota do Billing 1.7.2
+
+Em 18/07/2026, o pipeline de `main` do Billing concluiu validação, publicação da release `v1.7.2` e deploy no [run `29657927042`](https://github.com/oficina-soat/oficina-billing-service/actions/runs/29657927042). O `lab` executou a imagem `oficina-billing-service:1.7.2` com uma réplica pronta, health `UP`, PostgreSQL reativo e JDBC `UP`, zero reinício, Outbox pendente zerada e idade do item pendente mais antigo igual a zero.
+
+A finalização concorrente foi repetida pela jornada canônica com a correlação técnica `billing-provider-rem-20260718T195022Z`. Somente identificadores sintéticos foram preservados:
+
+| Agregado | Identificador |
+|---|---|
+| Ordem de Serviço | `1ae039f3-4642-4489-a9b1-225f41bbd2b8` |
+| Execução | `8a80edb5-f257-4d67-aa44-c6c8e8d757d8` |
+| Orçamento aprovado | `c3397294-c3cf-3807-afb0-6eab9e8f5981` |
+| Pagamento | `ebbd40b1-8f6a-3728-925b-9876d4ed167e` |
+| `pagamentoSolicitado` | `7b82293e-08ab-36cd-9300-3067c0a5af39` |
+
+Às `19:50:39.321Z`, o worker `domain-event-consumer-oficina-execution-execucao-finalizada` consumiu `execucaoFinalizada` e confirmou a mensagem às `19:50:39.329Z`. Às `19:50:39.340Z`, o worker independente `domain-event-consumer-oficina-os-ordem-de-servico-finalizada` consumiu `ordemDeServicoFinalizada` e confirmou a mensagem às `19:50:39.346Z`. Cada `eventId` teve um registro `CONSUMED` e um `ACKED`; não houve log de falha, retry, HTTP `500`, violação de constraint ou `uk_pagamento_orcamento` associado aos dois eventos.
+
+O contador `payment_provider_requests_count_total` partiu sem série no pod recém-implantado e terminou em `1` para `method=PIX`, `outcome=pending` e `providerStatus=pending`. Portanto, os dois gatilhos convergentes produziram uma única chamada ao Mercado Pago. A auditoria no PostgreSQL confirmou:
+
+- uma linha em `pagamento` para o orçamento, com o identificador canônico acima;
+- uma linha `pagamentoSolicitado` na `outbox_event`, já em `PUBLISHED` e com uma tentativa de publicação;
+- os dois eventos de finalização presentes em `billing_consumed_event`;
+- nenhum claim remanescente em `pagamento_provider_claim` após a conclusão.
+
+Antes e depois da rodada, as filas `oficina-execution-execucao-finalizada-oficina-billing-service` e `oficina-os-ordem-de-servico-finalizada-oficina-billing-service` apresentaram zero mensagem visível, em voo ou atrasada. As 22 DLQs mantiveram exatamente as mesmas 45 mensagens históricas e a mesma distribuição, sem nova entrada. A jornada prosseguiu pelo pagamento confirmado, disponibilizou a capability `ENTREGAR`, terminou a OS em `ENTREGUE` e publicou a finalização bem-sucedida da Saga. Assim, `[D-JOURNEY-FRESHNESS-BILLING-IDEMPOTENCY-REM-001]` está concluído e a [nova medição estatística](../../ROADMAP.md#assertividade-da-atualização-da-jornada-operacional) está desbloqueada.
 
 ## Segurança da evidência
 

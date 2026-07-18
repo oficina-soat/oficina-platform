@@ -98,7 +98,22 @@ A homologação, entretanto, ficou **bloqueada** pelo critério de ACK sem retry
 
 A falha externa expôs uma lacuna anterior à persistência: os dois concorrentes ainda executam `pagamentoGateway.solicitar` antes de disputar o `create-if-absent`. A identidade determinística preserva a mesma chave de idempotência e a restrição do PostgreSQL evita duplicação local, mas não evita duas chamadas simultâneas ao provedor nem o retry observado. O teste concorrente atual também explicita esse comportamento ao esperar duas chamadas ao gateway.
 
-Por isso, `[D-JOURNEY-FRESHNESS-BILLING-IDEMPOTENCY-REM-001]` permanece aberta. O [roadmap](../../ROADMAP.md#assertividade-da-atualização-da-jornada-operacional) agora exige ownership concorrente por orçamento antes de repetir a homologação, preservando retentativa legítima se a única solicitação ao provedor falhar.
+Por isso, `[D-JOURNEY-FRESHNESS-BILLING-IDEMPOTENCY-REM-001]` permanece aberta. O [roadmap](../../ROADMAP.md#assertividade-da-atualização-da-jornada-operacional) exige o rollout do ownership concorrente por orçamento implementado a seguir antes de repetir a homologação, preservando retentativa legítima se a única solicitação ao provedor falhar.
+
+### Correção da concorrência no provedor
+
+Em 18/07/2026, o Billing `1.7.2`, commit local `ceb7533`, passou a reivindicar no PostgreSQL um claim com lease por orçamento antes de chamar o gateway de pagamento. A migration `V7__add_payment_provider_claim.sql` mantém `owner_id`, expiração e atualização do claim; a aquisição usa upsert condicional somente após expiração e a liberação exige o mesmo proprietário. Assim, réplicas distintas não mantêm transação nem conexão de banco abertas durante o HTTP.
+
+O proprietário chama o Mercado Pago e persiste pagamento e Outbox antes de liberar o claim. O concorrente aguarda o pagamento canônico e reutiliza a Outbox idempotente sem chamar o provedor. Se o proprietário falhar, libera o claim para takeover e aguarda o resultado concorrente; sem outro consumidor que conclua, a falha original é preservada para a retentativa SQS. Os timeouts padrão de conexão e leitura foram limitados a 3 e 10 segundos, abaixo do lease de 30 segundos.
+
+Os testes agora comprovam:
+
+- uma única chamada ao gateway quando `execucaoFinalizada` e `ordemDeServicoFinalizada` chegam simultaneamente;
+- takeover quando a primeira chamada falha, com os dois eventos consumidos, uma linha de pagamento e uma Outbox;
+- propagação da falha isolada e liberação do claim para a retentativa seguinte;
+- exclusão entre duas instâncias reais do adapter PostgreSQL, liberação condicionada ao owner e recuperação após expiração do lease.
+
+O `clean verify` do profile PostgreSQL passou com 151 testes, migrations Flyway aplicadas em PostgreSQL 16 real, todas as verificações JaCoCo e cobertura de instruções de 94,58%. Como `SONAR_TOKEN` não estava disponível, o Quality Gate remoto não foi consultado localmente. A correção ainda requer publicação, rollout do Billing `1.7.2` e repetição da homologação bloqueada antes da remedição estatística.
 
 ## Segurança da evidência
 

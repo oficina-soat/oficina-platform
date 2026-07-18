@@ -139,6 +139,7 @@ Tabelas novas sugeridas:
 - `orcamento_item`
 - `orcamento_action_token`
 - `pagamento`
+- `pagamento_provider_claim`
 - `financeiro_item_projection`
 - `billing_consumed_event`
 - `outbox_event`
@@ -345,6 +346,28 @@ CREATE INDEX ix_pagamento_ordem_servico ON pagamento (ordem_de_servico_id);
 CREATE INDEX ix_pagamento_orcamento ON pagamento (orcamento_id);
 ```
 
+### Claim da solicitação ao provedor
+
+O Billing deve reivindicar um único proprietário por orçamento antes da chamada ao provedor de pagamento. O claim usa lease recuperável, não mantém transação nem conexão PostgreSQL abertas durante o HTTP e só pode ser liberado pelo mesmo `owner_id`. A migration incremental canônica no serviço é `V7__add_payment_provider_claim.sql`.
+
+```sql
+CREATE TABLE pagamento_provider_claim (
+  orcamento_id uuid PRIMARY KEY,
+  owner_id uuid NOT NULL,
+  claim_until timestamptz NOT NULL,
+  updated_at timestamptz NOT NULL,
+  CONSTRAINT fk_pagamento_provider_claim_orcamento
+    FOREIGN KEY (orcamento_id)
+    REFERENCES orcamento (id)
+    ON DELETE CASCADE
+);
+
+CREATE INDEX ix_pagamento_provider_claim_until
+  ON pagamento_provider_claim (claim_until);
+```
+
+A aquisição deve criar o claim ausente ou substituir atomicamente apenas um lease expirado. A liberação deve exigir `orcamento_id` e `owner_id`; quando a única chamada falhar, a ausência de pagamento preserva a retentativa do evento.
+
 ## Outbox PostgreSQL
 
 A mesma estrutura pode ser usada em `oficina_os` e `oficina_billing`, dentro do database de cada serviço.
@@ -384,5 +407,6 @@ CREATE INDEX ix_outbox_event_aggregate
 - `referencia_catalogo_id` é opcional e referencia o catálogo técnico quando disponível.
 - Itens do orçamento são imutáveis após `GERADO`.
 - `pagamento.orcamento_id` deve ser único.
+- A chamada ao provedor usa claim com lease por orçamento e liberação condicionada ao proprietário.
 - Outbox usa apenas `PENDING`, `PUBLISHED` e `FAILED`.
 - O padrão transversal da Outbox está definido em [Padrão Outbox por Serviço](../architecture/outbox-pattern.md).

@@ -9,6 +9,8 @@ Este diretório concentra a documentação normativa da plataforma em grupos tem
 - [Plano de Decomposição do oficina-app](architecture/oficina-app-decomposition.md)
 - [Fluxos da Saga da Ordem de Serviço](architecture/saga-flows.md)
 - [Padrão Outbox por Serviço](architecture/outbox-pattern.md)
+- [Medição de atualização da jornada operacional](architecture/journey-freshness-measurement.md)
+- [Plano de redução da defasagem da jornada](architecture/journey-freshness-remediation-plan.md)
 
 ## Infraestrutura
 

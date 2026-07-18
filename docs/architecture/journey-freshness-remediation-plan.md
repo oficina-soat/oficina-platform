@@ -129,6 +129,12 @@ Em 18/07/2026, a etapa 5 foi concluída nas versões Execution `1.5.0`, Billing 
 
 As suítes integrais passaram com 113 testes no Execution, 146 no Billing e 205 no OS, incluindo `clean verify`, JaCoCo, DynamoDB Local, PostgreSQL e LocalStack. O frontend passou com 81,58% de statements e 81,89% de linhas cobertas.
 
+### Evidência do rollout controlado
+
+Em 18/07/2026, a etapa 6 foi concluída no `lab` com Execution `1.5.0`, Billing `1.7.0` e OS `1.11.0`. A [evidência dos workers no lab](../delivery/journey-freshness-workers-lab-evidence.md) registra a jornada completa, saúde, Outbox, filas, DLQs, consumo instantâneo e os identificadores técnicos sintéticos usados na validação.
+
+Os publicadores e consumidores isolados convergiram a jornada até `ENTREGUE`, com todas as filas ativas e Outboxes zeradas ao final. A paralelização também revelou uma corrida no Billing entre gatilhos concorrentes do mesmo pagamento. A constraint canônica impediu duplicação e o retry recebeu ACK, mas a correção idempotente passou a ser porta de entrada para a etapa 7, evitando contaminar a comparação estatística com falhas recuperáveis de persistência.
+
 ### 7. Repetir a medição e comparar
 
 - repetir no `lab` os mesmos marcos da linha de base: término HTTP, `PENDING`, `PUBLISHED`, consumo e persistência no OS;

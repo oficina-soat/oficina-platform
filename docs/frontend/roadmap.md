@@ -179,12 +179,12 @@ que decisões de negócio sejam reconstruídas no Angular.
 
 ### Atualização em tempo real — trilha condicional
 
-Os itens abaixo não integram a sequência executável enquanto os gatilhos definidos na [medição de atualização do dashboard](realtime-update-measurement.md) não forem observados. A trilha deve começar pela ADR, sem implementar antecipadamente uma solução.
+O dashboard isoladamente não atingiu os gatilhos definidos na [medição de atualização do dashboard](realtime-update-measurement.md). Posteriormente, a [medição de atualização da jornada](../architecture/journey-freshness-measurement.md) observou convergência global entre 57 e 70 segundos após comandos de diagnóstico e desbloqueou a ADR canônica `[D-JOURNEY-FRESHNESS-ADR-001]` no [roadmap da plataforma](../../ROADMAP.md). Os itens abaixo continuam condicionais e não podem antecipar essa ADR.
 
-- [ ] `[UI-FUT-REALTIME-ADR-001]` Registrar ADR comparando manter polling, SSE e WebSocket somente se a medição demonstrar necessidade.
-- [ ] `[UI-FUT-REALTIME-CONTRACT-001]` Contratar autenticação, retomada, ordenação, deduplicação e fallback da alternativa escolhida.
-- [ ] `[UI-FUT-REALTIME-IMPL-001]` Implementar backend e UI da atualização escolhida, preservando atualização manual como fallback observável.
-- [ ] `[UI-FUT-REALTIME-TEST-001]` Testar reconexão, expiração de sessão, eventos duplicados/fora de ordem e degradação para fallback.
+- [ ] `[UI-FUT-REALTIME-ADR-001]` Participar da ADR canônica `[D-JOURNEY-FRESHNESS-ADR-001]`, comparando atualização manual, polling limitado, SSE e WebSocket sob as restrições de sessão, acessibilidade, fallback e infraestrutura observadas pela UI; este item depende de `[D-JOURNEY-FRESHNESS-MEASURE-001]` e não cria uma decisão paralela.
+- [ ] `[UI-FUT-REALTIME-CONTRACT-001]` **Bloqueado pela ADR canônica.** Se aprovada atualização em tempo real, contratar autenticação, retomada, ordenação, deduplicação, invalidação de snapshots e fallback da alternativa escolhida.
+- [ ] `[UI-FUT-REALTIME-IMPL-001]` **Bloqueado pela ADR e pelo contrato.** Implementar na UI somente o mecanismo aprovado, preservando atualização manual como fallback observável e sem inferir estado ou capabilities.
+- [ ] `[UI-FUT-REALTIME-TEST-001]` **Bloqueado pela implementação aprovada.** Testar reconexão, expiração de sessão, eventos duplicados ou fora de ordem, indisponibilidade da borda e degradação para fallback.
 
 ## Critério de pronto do MVP
 

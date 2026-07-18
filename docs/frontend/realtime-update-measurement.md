@@ -71,3 +71,5 @@ A próxima decisão deve usar como linha de base:
 4. abrir ADR comparando polling, SSE e WebSocket somente se houver requisito mensurável de defasagem que a atualização manual não atenda.
 
 Gatilho sugerido para reavaliação: operação precisar de atualização automática com defasagem máxima definida, ou uso manual sustentado indicar mais de uma atualização por minuto por sessão durante uma janela representativa.
+
+Esta conclusão permanece válida para o dashboard. A medição posterior da [atualização da jornada operacional](../architecture/journey-freshness-measurement.md) avaliou outro fluxo e encontrou defasagem de 57 a 70 segundos após comandos de diagnóstico, desbloqueando a ADR canônica de assertividade da jornada sem alterar retrospectivamente o resultado deste experimento.

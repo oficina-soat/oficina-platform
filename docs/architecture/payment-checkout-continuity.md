@@ -86,6 +86,17 @@ O endpoint de confirmação manual pode continuar existindo para métodos realme
 - validar ausência de secrets e dados PIX em logs, traces e métricas;
 - implantar no `lab`, validar Quality Gates e registrar evidência com sandbox do Mercado Pago antes de concluir a trilha.
 
+## Estado da implementação local
+
+As etapas que não dependem do `lab` foram concluídas:
+
+- os [contratos REST](../../contracts/Contrato%20de%20APIs%20REST.md), a [OpenAPI do Billing](../../contracts/openapi/oficina-billing-service.yaml) e o [contrato de idempotência](../../contracts/idempotency.md) incluem instruções PIX, reconciliação autenticada e webhook assinado;
+- o Billing `1.8.0` persiste as instruções, consulta o provedor e converge webhook e atualização manual por transição condicional e Outbox determinística, sem permitir confirmação manual de cobrança integrada;
+- a infraestrutura contrata somente o webhook como rota pública, projeta o secret no Billing e mantém a reconciliação protegida;
+- a UI apresenta as instruções PIX, executa **Atualizar situação** e encaminha o operador ao detalhe da OS após a confirmação, preservando a capability canônica para **Registrar entrega**.
+
+Permanece aberta no [roadmap](../../ROADMAP.md) somente a implantação e homologação: configurar no sandbox a URL e o secret do webhook, ativar os alertas, validar os Quality Gates remotos e produzir evidência ponta a ponta no `lab`, incluindo duplicidade, ordem, concorrência e sanitização da telemetria.
+
 ## Relação com atualização da jornada
 
 A [nova medição da jornada](journey-freshness-remeasurement.md) comprovou p95 inferior a `457 ms` entre comando e convergência canônica. A continuidade do pagamento não exige SSE ou WebSocket: a UI pode atualizar o snapshot sob ação explícita do operador, e o webhook resolve a comunicação provedor → Billing sem manter conexão com o navegador.

@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: oficina-billing-service API
-  version: 1.3.0
+  version: 1.4.0
   description: Contrato REST v1 para orcamentos, decisoes publicas por capability, recusas e pagamentos.
   license:
     name: Internal
@@ -17,6 +17,8 @@ tags:
     description: Acompanhamento, confirmacao e decisao do cliente por token de capacidade de uso unico.
   - name: Pagamentos
     description: Operacoes de registro, consulta, confirmacao, recusa e cancelamento de pagamentos.
+  - name: Integracoes financeiras
+    description: Callbacks autenticados pelo provedor financeiro, sem autenticacao JWT.
   - name: Dashboard
     description: Leitura agregada das atenções de orçamento e pagamento.
 paths:
@@ -292,6 +294,7 @@ paths:
       tags: [Pagamentos]
       summary: Registrar pagamento
       operationId: registrarPagamento
+      x-required-roles: [administrativo, recepcionista]
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
@@ -333,6 +336,7 @@ paths:
       tags: [Pagamentos]
       summary: Consultar pagamento
       operationId: consultarPagamento
+      x-required-roles: [administrativo, recepcionista]
       parameters:
         - $ref: "#/components/parameters/PagamentoId"
       responses:
@@ -353,6 +357,7 @@ paths:
       tags: [Pagamentos]
       summary: Consultar pagamentos da OS
       operationId: consultarPagamentosDaOrdemServico
+      x-required-roles: [administrativo, recepcionista]
       parameters:
         - $ref: "#/components/parameters/OrdemServicoId"
       responses:
@@ -375,6 +380,8 @@ paths:
       tags: [Pagamentos]
       summary: Confirmar pagamento
       operationId: confirmarPagamento
+      description: Confirmação operacional restrita a pagamentos sem provedor integrado. Cobranças Mercado Pago devem usar reconciliação.
+      x-required-roles: [administrativo]
       parameters:
         - $ref: "#/components/parameters/PagamentoId"
         - $ref: "#/components/parameters/IdempotencyKey"
@@ -406,6 +413,7 @@ paths:
       tags: [Pagamentos]
       summary: Recusar pagamento
       operationId: recusarPagamento
+      x-required-roles: [administrativo]
       parameters:
         - $ref: "#/components/parameters/PagamentoId"
         - $ref: "#/components/parameters/IdempotencyKey"
@@ -437,6 +445,7 @@ paths:
       tags: [Pagamentos]
       summary: Cancelar pagamento
       operationId: cancelarPagamento
+      x-required-roles: [administrativo]
       parameters:
         - $ref: "#/components/parameters/PagamentoId"
         - $ref: "#/components/parameters/IdempotencyKey"
@@ -461,6 +470,68 @@ paths:
           $ref: "#/components/responses/NotFound"
         "409":
           $ref: "#/components/responses/Conflict"
+  /pagamentos/{pagamentoId}/reconciliacao:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
+    post:
+      tags: [Pagamentos]
+      summary: Atualizar a situação do pagamento pelo provedor
+      description: Consulta o Mercado Pago no backend e aplica somente transições confirmadas pelo provedor.
+      operationId: reconciliarPagamento
+      x-required-roles: [administrativo, recepcionista]
+      parameters:
+        - $ref: "#/components/parameters/PagamentoId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Situação reconciliada ou preservada quando ainda pendente.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pagamento"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "502":
+          $ref: "#/components/responses/BadGateway"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+  /integracoes/mercado-pago/webhooks:
+    post:
+      tags: [Integracoes financeiras]
+      summary: Receber atualização de pagamento do Mercado Pago
+      description: Valida a assinatura, consulta o pagamento no provedor e processa a atualização de forma idempotente. Não confia no status recebido no callback.
+      operationId: receberWebhookMercadoPago
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/MercadoPagoSignature"
+        - $ref: "#/components/parameters/MercadoPagoRequestId"
+        - $ref: "#/components/parameters/MercadoPagoDataId"
+        - $ref: "#/components/parameters/MercadoPagoType"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MercadoPagoWebhookRequest"
+      responses:
+        "204":
+          description: Notificação validada e processada ou reconhecida idempotentemente.
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "502":
+          $ref: "#/components/responses/BadGateway"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
 components:
   securitySchemes:
     bearerAuth:
@@ -516,6 +587,40 @@ components:
         type: string
         minLength: 43
         maxLength: 128
+    MercadoPagoSignature:
+      name: x-signature
+      in: header
+      required: true
+      description: Assinatura HMAC enviada pelo Mercado Pago; nunca deve ser registrada.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 512
+    MercadoPagoRequestId:
+      name: x-request-id
+      in: header
+      required: true
+      description: Identificador da entrega usado na validação da assinatura.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
+    MercadoPagoDataId:
+      name: data.id
+      in: query
+      required: true
+      description: Identificador externo do pagamento notificado.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
+    MercadoPagoType:
+      name: type
+      in: query
+      required: true
+      schema:
+        type: string
+        const: payment
   headers:
     CorrelationId:
       description: Identificador de correlacao retornado em toda resposta de erro.
@@ -842,6 +947,34 @@ components:
       properties:
         motivo:
           type: string
+    MercadoPagoWebhookRequest:
+      type: object
+      required: [action, data, type]
+      properties:
+        action:
+          type: string
+          enum: [payment.created, payment.updated]
+        api_version:
+          type: string
+        data:
+          type: object
+          required: [id]
+          properties:
+            id:
+              type: string
+        date_created:
+          type: string
+          format: date-time
+        id:
+          oneOf:
+            - type: string
+            - type: integer
+              format: int64
+        live_mode:
+          type: boolean
+        type:
+          type: string
+          const: payment
     Pagamento:
       allOf:
         - $ref: "#/components/schemas/PagamentoCreateRequest"
@@ -858,6 +991,8 @@ components:
               example: mercado-pago
             transacaoExternaId:
               type: string
+            instrucoesPix:
+              $ref: "#/components/schemas/InstrucoesPix"
             criadoEm:
               type: string
               format: date-time
@@ -870,7 +1005,27 @@ components:
                 $ref: "#/components/schemas/AcaoPermitidaPagamento"
     AcaoPermitidaPagamento:
       type: string
-      enum: [CONFIRMAR, RECUSAR, CANCELAR]
+      enum: [ATUALIZAR_STATUS, CONFIRMAR, RECUSAR, CANCELAR]
+    InstrucoesPix:
+      type: object
+      required: [copiaECola]
+      description: Dados transitórios da cobrança PIX. Não devem aparecer em logs, traces ou métricas.
+      properties:
+        copiaECola:
+          type: string
+          minLength: 1
+          maxLength: 2048
+        qrCodeBase64:
+          type: string
+          minLength: 1
+          maxLength: 262144
+        ticketUrl:
+          type: string
+          format: uri
+          maxLength: 2048
+        expiraEm:
+          type: string
+          format: date-time
     MetodoPagamento:
       type: string
       enum: [PIX, CARTAO_CREDITO, CARTAO_DEBITO, DINHEIRO]

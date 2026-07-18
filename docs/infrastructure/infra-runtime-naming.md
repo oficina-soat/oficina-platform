@@ -124,6 +124,7 @@ Secret GitHub recomendado:
 
 ```text
 OFICINA_MERCADO_PAGO_ACCESS_TOKEN=<access-token-sandbox-do-mercado-pago>
+OFICINA_MERCADO_PAGO_WEBHOOK_SECRET=<assinatura-secreta-do-webhook>
 ```
 
 Variável GitHub recomendada quando a integração deve permanecer habilitada por padrão no `lab`:
@@ -141,7 +142,7 @@ OFICINA_MERCADO_PAGO_PAYER_EMAIL=<email-comprador-sandbox>
 
 `OFICINA_MERCADO_PAGO_API_URL` não precisa ser cadastrada como variável GitHub enquanto o endpoint oficial for `https://api.mercadopago.com`, pois esse já é o default do `oficina-billing-service`. `OFICINA_MERCADO_PAGO_PAYER_EMAIL` também não precisa ser configurada sempre; use apenas se o Mercado Pago exigir um e-mail de comprador sandbox específico para o teste ou se o default local não for aceito.
 
-Não cadastre Public Key, Client ID, Client Secret, dados de cartão, chave Pix ou webhook secret no escopo atual, porque o fluxo implementado no `oficina-billing-service` chama o backend do Mercado Pago diretamente com `Access Token` e método `PIX`. Esses valores só devem entrar no padrão quando houver frontend Mercado Pago, OAuth, produção real ou webhook assíncrono.
+Não cadastre Public Key, Client ID, Client Secret, dados de cartão ou chave Pix no escopo atual. O Access Token e o webhook secret pertencem exclusivamente ao Billing, devem ser armazenados como secrets e nunca podem ser projetados para a UI, ConfigMap, logs ou telemetria.
 
 ### Credenciais AWS do GitHub Actions
 

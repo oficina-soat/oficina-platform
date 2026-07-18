@@ -459,11 +459,25 @@ GET /api/v1/ordens-servico/{ordemServicoId}/pagamentos
 
 Toda representação de pagamento inclui `acoesPermitidas`, calculada pelo domínio financeiro. Estados e identificadores externos são apenas apresentados pelos consumidores; sucesso, recusa, cancelamento e compensação nunca devem ser inferidos na UI.
 
+Pagamentos PIX integrados podem incluir `instrucoesPix` com `copiaECola`, `qrCodeBase64`, `ticketUrl` e `expiraEm`. Esses campos são dados transitórios de pagamento: podem ser apresentados somente a usuários autorizados e não podem aparecer em logs, traces, métricas ou analytics do frontend.
+
+Quando `provedor=mercado-pago` e o estado estiver pendente, a ação canônica é `ATUALIZAR_STATUS`. `CONFIRMAR` fica restrita a pagamentos sem provedor integrado e nunca deve permitir que a UI declare sucesso de uma cobrança Mercado Pago sem consulta ao provedor.
+
 ### Confirmar pagamento
 
 ```http
 POST /api/v1/pagamentos/{pagamentoId}/confirmacao
 ```
+
+Essa operação é uma confirmação operacional para métodos sem provedor integrado e exige papel `administrativo`. Pagamentos Mercado Pago devem ser atualizados pela reconciliação abaixo.
+
+### Reconciliar pagamento integrado
+
+```http
+POST /api/v1/pagamentos/{pagamentoId}/reconciliacao
+```
+
+Exige `Idempotency-Key` e papel `administrativo` ou `recepcionista`. O Billing consulta `GET /v1/payments/{id}` com sua própria credencial, valida o vínculo da referência externa e aplica de forma idempotente somente a transição confirmada pelo provedor. A resposta pode continuar `CRIADO` enquanto o PIX estiver pendente.
 
 ### Recusar pagamento
 
@@ -476,6 +490,14 @@ POST /api/v1/pagamentos/{pagamentoId}/recusa
 ```http
 POST /api/v1/pagamentos/{pagamentoId}/cancelamento
 ```
+
+### Webhook Mercado Pago
+
+```http
+POST /api/v1/integracoes/mercado-pago/webhooks?data.id={transacaoExternaId}&type=payment
+```
+
+A rota não usa JWT nem `Idempotency-Key`, pois o chamador é o provedor. Ela exige `x-signature` e `x-request-id`, valida HMAC e tolerância temporal com o secret da aplicação, aceita apenas notificações `payment`, consulta o pagamento no Mercado Pago e não confia em status informado no payload. Reentregas e concorrência com a reconciliação manual devem convergir sem republicar eventos ou regredir estado.
 
 ---
 

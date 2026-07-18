@@ -12,7 +12,7 @@ Todas as rotas REST de negócio documentadas nas OpenAPI dos três microsserviç
 
 Neste contexto, "pública" significa roteável pela entrada pública da plataforma. A regra não remove os contratos de autenticação, autorização, erro padronizado, idempotência e `correlationId` definidos pelo [Contrato de APIs REST](../../contracts/Contrato%20de%20APIs%20REST.md), pelo [Contrato de Erros REST](../../contracts/error-model.md) e pelo [Contrato de Idempotência](../../contracts/idempotency.md).
 
-Não foram identificadas, nas OpenAPI canônicas, rotas administrativas, callbacks internos, webhooks internos ou endpoints de banco/mensageria que devam ficar privados dentro do conjunto de APIs de negócio. A exposição pública deve ser limitada às rotas listadas neste documento.
+Não foram identificadas, nas OpenAPI canônicas, rotas administrativas, callbacks internos ou endpoints de banco/mensageria que devam ficar privados dentro do conjunto de APIs de negócio. A exposição pública deve ser limitada às rotas listadas neste documento. O webhook do Mercado Pago é a única rota de negócio anônima do Billing: sua autenticação ocorre por assinatura HMAC e consulta server-to-server ao provedor.
 
 O CRUD de usuários operacionais é administrativo, mas continua roteável pela entrada pública: todas as operações em `/api/v1/usuarios` exigem JWT com o papel `administrativo` no `oficina-os-service`. Exposição no API Gateway não equivale a acesso anônimo nem substitui a autorização no microsserviço.
 
@@ -87,6 +87,8 @@ Fonte canônica: [OpenAPI do oficina-billing-service](../../contracts/openapi/of
 | `POST` | `/api/v1/pagamentos/{pagamentoId}/confirmacao` |
 | `POST` | `/api/v1/pagamentos/{pagamentoId}/recusa` |
 | `POST` | `/api/v1/pagamentos/{pagamentoId}/cancelamento` |
+| `POST` | `/api/v1/pagamentos/{pagamentoId}/reconciliacao` |
+| `POST` | `/api/v1/integracoes/mercado-pago/webhooks` |
 | `GET` | `/api/v1/dashboard/faturamento` |
 
 ### `oficina-execution-service`

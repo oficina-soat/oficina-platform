@@ -82,6 +82,7 @@ Exemplo de escopo lógico:
 
 ```text
 oficina-billing-service:POST:/api/v1/pagamentos:<cliente-ou-sujeito>:7c8f5c52-03f3-4f7a-91a3-f3d675c51c4c
+oficina-billing-service:POST:/api/v1/pagamentos/{pagamentoId}/reconciliacao:<cliente-ou-sujeito>:a4cd3f06-d71e-4248-836d-66c75ec749d4
 ```
 
 A mesma chave pode ser reutilizada em outro endpoint sem conflito, pois o path faz parte do escopo.
@@ -241,6 +242,8 @@ Cada consumidor deve registrar eventos processados com:
 - data de processamento.
 
 Reprocessar o mesmo `eventId` no mesmo consumidor não deve duplicar efeitos colaterais.
+
+Webhooks de provedores que não controlam `X-Idempotency-Key` devem ser idempotentes pela identidade externa notificada, tipo da notificação e estado local. O webhook Mercado Pago deve validar `data.id`, consultar a fonte externa e compartilhar a mesma atualização condicional usada pela reconciliação manual; callback duplicado, fora de ordem ou concorrente não pode republicar `pagamentoConfirmado` ou `pagamentoRecusado`.
 
 ---
 

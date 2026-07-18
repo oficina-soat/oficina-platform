@@ -64,6 +64,8 @@ Durante a indisponibilidade SMTP, a retentativa de `diagnosticoFinalizado` recri
 
 O redeploy da Notification Lambda foi reaplicado pelo [run `29611520320`](https://github.com/oficina-soat/oficina-auth-lambda/actions/runs/29611520320). Depois disso, uma notificação sintética independente retornou HTTP `204` e foi recebida no MailHog, comprovando a restauração do transporte; ela não reprocessou com segurança o evento original. A correção da duplicação foi registrada como tarefa anterior à homologação ponta a ponta no [roadmap](../../ROADMAP.md#correção-das-fronteiras-operacionais-da-os).
 
+A correção foi concluída localmente no Billing `1.6.1`. O `eventId` de `diagnosticoFinalizado` agora deriva identificadores determinísticos para o orçamento e para `orcamentoGerado`. Se a notificação falhar, a mensagem continua retentável, mas reutiliza o orçamento `GERADO` e a mesma Outbox; se o orçamento já tiver sido aprovado ou recusado, a retentativa não regride seu estado nem envia nova solicitação. A regressão automatizada cobre falha seguida de sucesso, orçamento decidido entre tentativas e persistência idempotente no PostgreSQL. A comprovação remota pertence à homologação ponta a ponta ainda aberta.
+
 ## Segurança da evidência
 
 JWT, credenciais, links de aprovação, e-mail, CPF e demais dados pessoais não foram persistidos. A evidência registra somente identificadores técnicos sintéticos, estados, capabilities, revisões e resultados HTTP necessários à rastreabilidade.

@@ -4,7 +4,7 @@
 
 Em 18/07/2026, o `lab` foi homologado com os publicadores da Outbox separados dos consumidores e com um worker independente por fila nos três microsserviços. A jornada sintética percorreu início e conclusão de diagnóstico, recusa e retomada, nova conclusão e aprovação, reparo, pagamento e entrega.
 
-O resultado funcional foi aprovado: a OS terminou em `ENTREGUE`, a Saga terminou em `FINALIZADA_COM_SUCESSO`, as 32 filas ativas terminaram zeradas e nenhum pod reiniciou. A rodada também expôs uma corrida idempotente no Billing durante o pagamento; ela se recuperou por retry sem duplicar o efeito financeiro. A correção foi implementada localmente no Billing `1.7.1` e deve ser homologada antes da [nova medição estatística](../../ROADMAP.md#assertividade-da-atualização-da-jornada-operacional).
+O resultado funcional foi aprovado: a OS terminou em `ENTREGUE`, a Saga terminou em `FINALIZADA_COM_SUCESSO`, as 32 filas ativas terminaram zeradas e nenhum pod reiniciou. A rodada também expôs uma corrida idempotente no Billing durante o pagamento; ela se recuperou por retry sem duplicar o efeito financeiro. O Billing `1.7.1` eliminou a colisão no PostgreSQL, mas a homologação remota encontrou duas chamadas concorrentes ao provedor e permanece bloqueada antes da [nova medição estatística](../../ROADMAP.md#assertividade-da-atualização-da-jornada-operacional).
 
 Esta homologação valida o rollout e fornece amostras operacionais isoladas. Ela não substitui as 30 amostras por transição exigidas pela [ADR-014](../../adr/ADR-014%20-%20Convergência%20da%20Jornada%20e%20Isolamento%20dos%20Workers.md) e pelo [plano de remediação](../architecture/journey-freshness-remediation-plan.md#7-repetir-a-medição-e-comparar).
 
@@ -76,7 +76,29 @@ Em 18/07/2026, o Billing `1.7.1`, commit local `4bf0bc2`, passou a derivar do or
 
 O teste de regressão executa `execucaoFinalizada` e `ordemDeServicoFinalizada` em threads simultâneas, sincronizadas antes da persistência, e comprova uma identidade, uma linha de pagamento e uma Outbox. Outro teste usa PostgreSQL 16 real para validar que somente uma das inserções concorrentes cria o registro. O `clean verify` passou com 148 testes, todas as verificações JaCoCo e o XML de cobertura gerado. Como `SONAR_TOKEN` não estava disponível, o Quality Gate remoto não foi consultado localmente.
 
-A correção ainda requer rollout do Billing `1.7.1` e repetição do cenário no `lab`; até essa homologação, a observação remota desta evidência continua representando o comportamento do Billing `1.7.0`.
+O rollout do Billing `1.7.1` e a repetição remota estão registrados a seguir. A correção eliminou a colisão no PostgreSQL, mas a homologação não foi aprovada porque a concorrência ainda alcança o provedor de pagamento.
+
+### Homologação remota do Billing 1.7.1
+
+Em 18/07/2026, o pipeline de `main` do Billing concluiu validação, publicação e deploy no [run `29654721675`](https://github.com/oficina-soat/oficina-billing-service/actions/runs/29654721675). O `lab` passou a executar a imagem `1.7.1`, com uma réplica pronta, health `UP`, zero reinício e idade da Outbox pendente igual a zero.
+
+A finalização concorrente foi repetida com a correlação técnica `billing-idempotency-rem-20260718T180730Z`. Somente identificadores sintéticos foram preservados:
+
+| Agregado | Identificador |
+|---|---|
+| Ordem de Serviço | `915eb72a-8eeb-41f0-b0e5-f2a4ab50957f` |
+| Execução | `e8265386-e9c8-4d58-ad49-9f79e9e70f43` |
+| Orçamento aprovado | `58bf44bd-4075-3ab4-b311-39aae547f158` |
+| Pagamento | `c8da115f-0ffd-336a-bb9f-a3a53cdc1989` |
+| `pagamentoSolicitado` | `bc0b3c0a-9b46-3e7e-b4f1-ea0f40edc68d` |
+
+O PostgreSQL confirmou uma única linha de pagamento para o orçamento e uma única Outbox `pagamentoSolicitado` para o pagamento. Os logs não registraram `duplicate key`, `uk_pagamento_orcamento` nem outra violação de constraint. Depois da convergência, as 32 filas ativas estavam sem mensagens visíveis, em voo ou atrasadas; as 22 DLQs continuavam com as mesmas 45 mensagens históricas, sem nova entrada. A jornada não regrediu: a OS chegou a `FINALIZADA`, o pagamento foi confirmado pelo fluxo canônico e a OS terminou em `ENTREGUE`.
+
+A homologação, entretanto, ficou **bloqueada** pelo critério de ACK sem retry. Às `18:07:42.770Z`, o consumidor de `ordemDeServicoFinalizada` recebeu HTTP `500` do Mercado Pago e manteve a mensagem retentável. O consumidor de `execucaoFinalizada` concluiu o pagamento único e recebeu ACK às `18:07:44.363Z`; ao reencontrar esse pagamento, `ordemDeServicoFinalizada` recebeu ACK às `18:08:12.588Z`, cerca de 29,8 segundos depois da falha.
+
+A falha externa expôs uma lacuna anterior à persistência: os dois concorrentes ainda executam `pagamentoGateway.solicitar` antes de disputar o `create-if-absent`. A identidade determinística preserva a mesma chave de idempotência e a restrição do PostgreSQL evita duplicação local, mas não evita duas chamadas simultâneas ao provedor nem o retry observado. O teste concorrente atual também explicita esse comportamento ao esperar duas chamadas ao gateway.
+
+Por isso, `[D-JOURNEY-FRESHNESS-BILLING-IDEMPOTENCY-REM-001]` permanece aberta. O [roadmap](../../ROADMAP.md#assertividade-da-atualização-da-jornada-operacional) agora exige ownership concorrente por orçamento antes de repetir a homologação, preservando retentativa legítima se a única solicitação ao provedor falhar.
 
 ## Segurança da evidência
 

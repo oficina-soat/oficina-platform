@@ -35,6 +35,12 @@ O comando foi rápido nos dois casos. Entre 76% e 83% da defasagem total ocorreu
 
 O log `domain event consumed` é emitido após a persistência da transição pelo gateway do OS Service; portanto, ele foi adotado como limite de convergência do estado canônico. Não havia uma sondagem HTTP sincronizada imediatamente após esse marco, logo esta rodada não atribui latência adicional à leitura pelo API Gateway.
 
+## Amostra de controle após as correções funcionais
+
+Antes de alterar os workers, a [homologação ponta a ponta das fronteiras](../delivery/mechanic-workspace-lab-evidence.md#homologação-ponta-a-ponta-das-fronteiras) repetiu o início de diagnóstico com Execution `1.4.2`, OS `1.10.4` e Billing `1.6.1`. A resposta do comando até a leitura do estado `EM_DIAGNOSTICO` no OS levou `56,454 s`.
+
+Essa única amostra não substitui a linha de base nem possui tamanho para percentis. Ela funciona como controle: ficou apenas `0,738 s` abaixo dos `57,192 s` anteriores e confirma que as correções de fronteira, idempotência financeira e resolução da OS nos eventos de pagamento não reduziram incidentalmente o atraso dos workers. A comparação estatística permanece reservada à remedição com pelo menos 30 amostras por transição.
+
 ## Interpretação
 
 A medição confirma uma necessidade operacional de atualização mais assertiva, mas não demonstra que SSE seja a primeira correção. Um stream emitido pelo OS Service reduziria a espera entre convergência e atualização visual, porém continuaria notificando somente depois dos 57–70 segundos observados.

@@ -64,8 +64,35 @@ Durante a indisponibilidade SMTP, a retentativa de `diagnosticoFinalizado` recri
 
 O redeploy da Notification Lambda foi reaplicado pelo [run `29611520320`](https://github.com/oficina-soat/oficina-auth-lambda/actions/runs/29611520320). Depois disso, uma notificação sintética independente retornou HTTP `204` e foi recebida no MailHog, comprovando a restauração do transporte; ela não reprocessou com segurança o evento original. A correção da duplicação foi registrada como tarefa anterior à homologação ponta a ponta no [roadmap](../../ROADMAP.md#correção-das-fronteiras-operacionais-da-os).
 
-A correção foi concluída localmente no Billing `1.6.1`. O `eventId` de `diagnosticoFinalizado` agora deriva identificadores determinísticos para o orçamento e para `orcamentoGerado`. Se a notificação falhar, a mensagem continua retentável, mas reutiliza o orçamento `GERADO` e a mesma Outbox; se o orçamento já tiver sido aprovado ou recusado, a retentativa não regride seu estado nem envia nova solicitação. A regressão automatizada cobre falha seguida de sucesso, orçamento decidido entre tentativas e persistência idempotente no PostgreSQL. A comprovação remota pertence à homologação ponta a ponta ainda aberta.
+A correção foi concluída localmente no Billing `1.6.1`. O `eventId` de `diagnosticoFinalizado` agora deriva identificadores determinísticos para o orçamento e para `orcamentoGerado`. Se a notificação falhar, a mensagem continua retentável, mas reutiliza o orçamento `GERADO` e a mesma Outbox; se o orçamento já tiver sido aprovado ou recusado, a retentativa não regride seu estado nem envia nova solicitação. A regressão automatizada cobre falha seguida de sucesso, orçamento decidido entre tentativas e persistência idempotente no PostgreSQL. A comprovação no `lab` está registrada na homologação ponta a ponta abaixo.
+
+## Homologação ponta a ponta das fronteiras
+
+Em 18/07/2026, a jornada completa foi repetida no `lab` com Billing `1.6.1`, OS `1.10.4`, Execution `1.4.2` e a UI já publicada. Billing e OS foram implantados diretamente pelas imagens versionadas do ECR; os três Deployments terminaram com uma réplica pronta e disponível. A OS sintética `f3b16275-40fc-441e-8d41-bc687fa1a6fb` permaneceu como sentinela durante toda a validação.
+
+| Marco | Evidência observada |
+|---|---|
+| Fronteira inicial | As tentativas diretas `RECEBIDA → EM_DIAGNOSTICO` e `RECEBIDA → FINALIZADA` no OS Service retornaram HTTP `409`; a execução `9cc7cad6-9599-4978-8e3a-302d5dc6db0a` foi criada pelo evento canônico. |
+| Diagnóstico e composição | O início foi comandado no Execution e a OS convergiu para `EM_DIAGNOSTICO`; um serviço ativo foi incluído somente depois de `INCLUIR_SERVICO` aparecer nas capabilities. |
+| Recusa por e-mail | A primeira conclusão criou somente o orçamento `80e9ba33-144b-303e-8652-495df61de85f`. O MailHog recebeu os links públicos; a recusa sem sessão foi confirmada uma vez, a reutilização do capability retornou HTTP `409` e OS e Execution voltaram a `EM_DIAGNOSTICO`. |
+| Aprovação por e-mail | A nova conclusão, que possui outro `eventId`, criou o orçamento `0a851b8c-0ca9-3d0e-9722-646696820919`. O link mais recente foi aprovado sem sessão uma vez, a reutilização retornou HTTP `409` e o reparo foi liberado em `EM_EXECUCAO`/`EM_REPARO`. |
+| Reparo e pagamento | O Execution concluiu o reparo e a OS convergiu para `FINALIZADA`. A tentativa de `ENTREGUE` antes do pagamento retornou HTTP `409`. O Billing criou e confirmou o pagamento `f87f7f5b-6e6a-41fe-9c6e-f1cad5942d8e`. |
+| Entrega | Após o consumo de `pagamentoConfirmado`, o OS expôs somente a capability compatível e aceitou `FINALIZADA → ENTREGUE`; os eventos finais de OS e Saga foram publicados. |
+
+Foram observados exatamente dois orçamentos, correspondentes às duas conclusões deliberadas de diagnóstico: um `RECUSADO` e um `APROVADO`. Não houve recriação por retry, regressão do orçamento decidido nem pagamento duplicado, comprovando no ambiente a correção do Billing `1.6.1` em conjunto com os testes automatizados.
+
+### Correção encontrada durante a homologação
+
+Os eventos financeiros usam `pagamentoId` como `aggregateId` e carregam a OS em `payload.ordemServicoId`, conforme o contrato. O OS `1.10.3` já resolvia corretamente o payload durante a persistência, mas a instrumentação anterior ao consumo ainda consultava a Saga pelo aggregate financeiro. `pagamentoSolicitado` e `pagamentoConfirmado` falharam com “Ordem de serviço não encontrada” e atingiram a DLQ após cinco recebimentos.
+
+O OS `1.10.4`, commit local `644cde2`, passou a usar `payload.ordemServicoId` também nessa leitura de observabilidade, com regressão automatizada na qual `aggregateId=pagamentoId`. A validação completa executou 203 testes, os dois cenários Cucumber e os limites de cobertura JaCoCo sem falhas. Como `SONAR_TOKEN` não estava disponível, o Quality Gate remoto não foi consultado localmente.
+
+Depois do rollout, os dois envelopes originais foram reconstruídos exclusivamente a partir das linhas `PUBLISHED` da Outbox do Billing e republicados nas filas de origem. O OS consumiu e confirmou `pagamentoConfirmado`; uma entrega posterior fora de ordem de `pagamentoSolicitado` não regrediu a Saga, e a duplicata financeira foi reconhecida sem novo efeito. As filas de origem terminaram com zero mensagem visível ou em voo. As mensagens históricas não relacionadas nas DLQs foram preservadas.
+
+### Controle anterior à remediação dos workers
+
+Sem alterar o desenho dos workers, o início de diagnóstico desta rodada convergiu no OS `56,454 s` depois da resposta do comando. O resultado é compatível com os `57,192 s` da [linha de base da jornada](../architecture/journey-freshness-measurement.md) e confirma que o rollout funcional não resolveu incidentalmente a defasagem: desacoplar publicadores e isolar consumidores por fila continua sendo a próxima correção arquitetural.
 
 ## Segurança da evidência
 
-JWT, credenciais, links de aprovação, e-mail, CPF e demais dados pessoais não foram persistidos. A evidência registra somente identificadores técnicos sintéticos, estados, capabilities, revisões e resultados HTTP necessários à rastreabilidade.
+JWT, credenciais, links e tokens de aprovação, e-mail, CPF e demais dados pessoais não foram persistidos. A evidência registra somente identificadores técnicos sintéticos, estados, capabilities, revisões e resultados HTTP necessários à rastreabilidade.

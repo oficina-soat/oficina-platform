@@ -6,7 +6,7 @@ Em 18/07/2026, o `lab` foi homologado com os publicadores da Outbox separados do
 
 O resultado funcional foi aprovado: a OS terminou em `ENTREGUE`, a Saga terminou em `FINALIZADA_COM_SUCESSO`, as 32 filas ativas terminaram zeradas e nenhum pod reiniciou. A rodada também expôs uma corrida idempotente no Billing durante o pagamento; ela se recuperou por retry sem duplicar o efeito financeiro. O Billing `1.7.1` eliminou a colisão no PostgreSQL, e o Billing `1.7.2` eliminou a chamada concorrente ao provedor. A [homologação remota final](#homologação-remota-do-billing-172) aprovou a porta de entrada para a [nova medição estatística](../../ROADMAP.md#assertividade-da-atualização-da-jornada-operacional).
 
-Esta homologação valida o rollout e fornece amostras operacionais isoladas. Ela não substitui as 30 amostras por transição exigidas pela [ADR-014](../../adr/ADR-014%20-%20Convergência%20da%20Jornada%20e%20Isolamento%20dos%20Workers.md) e pelo [plano de remediação](../architecture/journey-freshness-remediation-plan.md#7-repetir-a-medição-e-comparar).
+Esta homologação valida o rollout e fornece amostras operacionais isoladas. Ela não substitui as 30 amostras por transição exigidas pela [ADR-014](../../adr/ADR-014%20-%20Convergência%20da%20Jornada%20e%20Isolamento%20dos%20Workers.md) e pelo [plano de remediação](../architecture/journey-freshness-remediation-plan.md#7-repetir-a-medição-e-comparar); a comparação estatística foi concluída posteriormente na [nova medição da jornada](../architecture/journey-freshness-remeasurement.md).
 
 ## Artefatos implantados
 
@@ -43,7 +43,7 @@ A correlação técnica da rodada foi `freshness-rem-20260718T165150Z`. Somente 
 | Confirmação do pagamento | Capability `ENTREGAR` disponível | `1.998 ms` |
 | Entrega | OS em `ENTREGUE` e Saga finalizada com sucesso | `472 ms` |
 
-Os tempos acima representam uma única primeira observação por polling e não uma decomposição estatística dos marcos HTTP → Outbox → SQS → persistência. Mesmo inferiores ao máximo de `10 s` da ADR, eles não autorizam concluir que o `p95 ≤ 5 s` foi atingido. Essa conclusão pertence à próxima medição, que deve comparar pelo menos 30 amostras por transição com a [linha de base de 57,192–70,450 s](../architecture/journey-freshness-measurement.md).
+Os tempos acima representam uma única primeira observação por polling e não uma decomposição estatística dos marcos HTTP → Outbox → SQS → persistência. Isoladamente, mesmo inferiores ao máximo de `10 s` da ADR, eles não autorizavam concluir que o `p95 ≤ 5 s` havia sido atingido. A [nova medição da jornada](../architecture/journey-freshness-remeasurement.md) realizou depois a comparação com 30 amostras por transição e confirmou a meta.
 
 A tentativa de entregar a OS antes da confirmação do pagamento retornou HTTP `409`, preservando a fronteira operacional. Depois de `pagamentoConfirmado`, a capability canônica foi exposta e a entrega foi aceita.
 

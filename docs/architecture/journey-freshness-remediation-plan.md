@@ -150,6 +150,12 @@ O [rollout e a homologação remota do Billing 1.7.2](../delivery/journey-freshn
 - caso a meta não seja atingida, identificar o novo trecho dominante antes de propor alteração no frontend;
 - somente depois dessa comparação reavaliar atualização manual, polling limitado, SSE e WebSocket para o intervalo entre convergência e navegador.
 
+### Evidência da nova medição
+
+Em 18/07/2026, a [nova medição da atualização da jornada](journey-freshness-remeasurement.md) concluiu a etapa 7 com 30 amostras por transição. O p95 de resposta até convergência foi `456,893 ms` para `diagnosticoIniciado` e `420,999 ms` para `diagnosticoFinalizado`; os máximos ficaram abaixo de `478 ms`, sem perda, duplicação observável, nova DLQ, backlog residual, reinício ou saturação relevante.
+
+A jornada estendida percorreu recusa, retomada, nova aprovação, reparo, pagamento e entrega com Billing `1.7.2`, terminando em `ENTREGUE` e realizando uma única nova solicitação ao provedor. A meta da ADR-014 foi atingida e a reavaliação do canal entre convergência e navegador está desbloqueada.
+
 ## Critérios de pronto do épico
 
 - publicadores não compartilham loop nem executor com consumidores;

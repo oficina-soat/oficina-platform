@@ -10,6 +10,7 @@ Este diretório concentra a documentação normativa da plataforma em grupos tem
 - [Fluxos da Saga da Ordem de Serviço](architecture/saga-flows.md)
 - [Padrão Outbox por Serviço](architecture/outbox-pattern.md)
 - [Medição de atualização da jornada operacional](architecture/journey-freshness-measurement.md)
+- [Nova medição após o isolamento dos workers](architecture/journey-freshness-remeasurement.md)
 - [Plano de redução da defasagem da jornada](architecture/journey-freshness-remediation-plan.md)
 
 ## Infraestrutura

@@ -81,7 +81,7 @@ Os serviços devem preservar `eventId`, `correlationId`, `aggregateId` e timesta
 4. recebimento até persistência;
 5. resposta HTTP até convergência no OS.
 
-Métricas devem expor backlog, idade do item mais antigo e progresso por publicador e por fila, sem JWT, capability, e-mail, CPF ou demais dados pessoais. A [nova medição](../docs/architecture/journey-freshness-remediation-plan.md#7-repetir-a-medição-e-comparar) deve comparar média, p50, p95 e máximo de cada trecho diretamente com a linha de base.
+Métricas devem expor backlog, idade do item mais antigo e progresso por publicador e por fila, sem JWT, capability, e-mail, CPF ou demais dados pessoais. A [nova medição](../docs/architecture/journey-freshness-remeasurement.md) comparou média, p50, p95 e máximo de cada trecho diretamente com a linha de base. O resultado atingiu p95 inferior a `457 ms`, máximo inferior a `478 ms` e redução média superior a 99%, sem perda, duplicação observável, crescimento de DLQ ou saturação relevante.
 
 ## Fonte da verdade e atualização do frontend
 
@@ -109,6 +109,7 @@ Depois da nova medição, o trecho entre convergência e navegador será reavali
 
 - [Plano de redução da defasagem](../docs/architecture/journey-freshness-remediation-plan.md)
 - [Medição da atualização da jornada](../docs/architecture/journey-freshness-measurement.md)
+- [Nova medição após o isolamento dos workers](../docs/architecture/journey-freshness-remeasurement.md)
 - [Contrato de tópicos de mensageria](../contracts/Contrato%20de%20Tópicos%20de%20Mensageria.md)
 - [Contrato de idempotência](../contracts/idempotency.md)
 - [Frontend operacional Angular](ADR-013%20-%20Frontend%20Operacional%20Angular.md)

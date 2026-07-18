@@ -65,6 +65,6 @@ Referências oficiais:
 
 O item de medição está concluído e desbloqueia a ADR. A evidência atende ao gatilho de reavaliação porque duas ações diretamente observadas pelo operador mantiveram snapshots globais divergentes por quase um minuto ou mais.
 
-A [ADR-014](../../adr/ADR-014%20-%20Convergência%20da%20Jornada%20e%20Isolamento%20dos%20Workers.md) aprovou a correção dos workers com meta de p95 ≤ 5 s e máximo ≤ 10 s. Projeção versionada, SSE ou outro canal automático permanecem condicionados à nova medição; o snapshot persistido do OS Service continua sendo a fonte da verdade.
+A [ADR-014](../../adr/ADR-014%20-%20Convergência%20da%20Jornada%20e%20Isolamento%20dos%20Workers.md) aprovou a correção dos workers com meta de p95 ≤ 5 s e máximo ≤ 10 s. Projeção versionada, SSE ou outro canal automático ficaram condicionados à nova medição; o snapshot persistido do OS Service continua sendo a fonte da verdade.
 
-A decomposição das correções de mensageria, os critérios de resiliência e o método de comparação posterior estão no [plano de redução da defasagem da jornada](journey-freshness-remediation-plan.md).
+A decomposição das correções de mensageria e os critérios de resiliência estão no [plano de redução da defasagem da jornada](journey-freshness-remediation-plan.md). A [nova medição após as correções](journey-freshness-remeasurement.md) registrou p95 inferior a `457 ms` e redução média superior a 99% nas duas transições.

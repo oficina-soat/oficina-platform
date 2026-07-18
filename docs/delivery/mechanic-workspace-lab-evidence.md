@@ -41,6 +41,23 @@ O monitor operacional criado em `oficina-infra/scripts/manual/reconcile-os-execu
 
 O modo de reconciliação foi executado e recusou corretamente a criação automática para os quatro estados avançados. Nenhum estado de negócio foi alterado. O script somente cria de forma idempotente uma execução em `CRIADA` quando a OS divergente ainda está em `RECEBIDA`; demais estados exigem uma política explícita de reconciliação.
 
+### Reconciliação dos registros históricos
+
+Em 18/07/2026, a política de backfill compatível foi aprovada e aplicada aos quatro registros. O estado atual de cada OS foi confirmado por consulta somente leitura no PostgreSQL antes da gravação. A tabela de execuções ainda não possuía associação para nenhum dos quatro identificadores.
+
+| Estado da OS | Estado materializado na execução | Resultado |
+|---|---|---|
+| `EM_DIAGNOSTICO` | `EM_DIAGNOSTICO` | Snapshot e histórico criados |
+| `AGUARDANDO_APROVACAO` | `DIAGNOSTICO_CONCLUIDO` | Snapshot e histórico criados |
+| `EM_EXECUCAO` | `EM_REPARO` | Snapshot e histórico criados |
+| `FINALIZADA` | `REPARO_CONCLUIDO` | Snapshot e histórico criados |
+
+Cada reparação usou identificadores determinísticos e uma transação condicional no DynamoDB para criar o snapshot e um único histórico auditável. Nenhum comando de domínio foi executado, nenhuma Outbox foi criada e nenhum evento retroativo foi publicado. A correlação técnica `os-execution-reconciliation-backfill` identificou oito itens na tabela de execuções — snapshot e histórico de cada OS — e zero item na Outbox.
+
+Após o backfill, o [monitor operacional](../../../oficina-infra/docs/os-execution-reconciliation.md) foi executado novamente pelas APIs públicas e retornou `Nenhuma OS operacional sem execucao associada.`. A execução usou um JWT de manutenção com validade de cinco minutos, mantido somente em memória e não registrado na evidência.
+
+A recuperação point-in-time da tabela `oficina-execution-lab-execucoes` estava desabilitada na data da operação. Essa condição era preexistente; a segurança desta rodada dependeu das transações condicionais e da verificação prévia de ausência. A habilitação de PITR deve ser tratada separadamente na infraestrutura, sem invalidar o resultado funcional da reconciliação.
+
 ## Anomalia encontrada
 
 Durante a indisponibilidade SMTP, a retentativa de `diagnosticoFinalizado` recriou o orçamento da OS sintética antes de concluir a notificação. Foram observados cinco orçamentos para a mesma OS: um `APROVADO` e quatro `GERADO`. A mensagem original de autorização não chegou ao MailHog.

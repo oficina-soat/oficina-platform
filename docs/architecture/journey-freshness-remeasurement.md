@@ -104,4 +104,4 @@ Esses sinais não substituem monitoramento contínuo de capacidade, mas descarta
 
 A remediação atingiu a meta da ADR-014 com ampla margem: p95 de `456,893 ms` e `420,999 ms`, contra o limite de `5 s`, e máximos inferiores a `478 ms`, contra o limite de `10 s`. A comparação mostra reduções médias de 99,476% e 99,656% no trecho resposta HTTP até convergência canônica.
 
-O item de remedição estatística está concluído. Esta evidência desbloqueia a reavaliação do trecho convergência → navegador, que deve decidir entre atualização manual, polling limitado, SSE ou WebSocket sem atribuir ao canal visual o atraso de mensageria já removido.
+O item de remedição estatística está concluído. Como o atraso de mensageria foi removido e não restou evidência de defasagem relevante entre convergência e navegador, a [ADR-014](../../adr/ADR-014%20-%20Convergência%20da%20Jornada%20e%20Isolamento%20dos%20Workers.md#verificação-posterior-e-encerramento-do-canal-automático) preserva atualização manual e encerra polling recorrente, SSE e WebSocket sem tarefas ativas. A decisão pode ser reaberta somente por nova necessidade operacional mensurável.

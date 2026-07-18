@@ -166,7 +166,7 @@ que decisões de negócio sejam reconstruídas no Angular.
 
 ### Atualização em tempo real
 
-- [x] `[UI-FUT-REALTIME-MEASURE-001]` Medir latência, custo e impacto operacional do polling nos fluxos já implantados. Concluído na [medição de atualização do dashboard](realtime-update-measurement.md): a SPA atual não faz polling, e a rodada no `lab` mediu 50 respostas bem-sucedidas, latência mediana por bloco entre 457 e 549 ms e caudas de até 3,9 s. A projeção de 30 segundos demonstrou custo direto baixo no porte atual, mas pressão proporcional a sessões e registros porque os snapshots ainda percorrem coleções completas. A recomendação é preservar atualização manual e exigir necessidade operacional mensurável antes de ADR ou implementação em tempo real.
+- [x] `[UI-FUT-REALTIME-MEASURE-001]` Medir latência, custo e impacto operacional do polling nos fluxos já implantados. Concluído na [medição de atualização do dashboard](realtime-update-measurement.md): a SPA atual não faz polling, e a rodada no `lab` mediu 50 respostas bem-sucedidas, latência mediana por bloco entre 457 e 549 ms e caudas de até 3,9 s. Após a correção das filas, a [ADR-014](../../adr/ADR-014%20-%20Convergência%20da%20Jornada%20e%20Isolamento%20dos%20Workers.md#verificação-posterior-e-encerramento-do-canal-automático) preservou atualização manual e encerrou polling recorrente, SSE e WebSocket; as alternativas permanecem registradas na decisão arquitetural, sem tarefas condicionais neste roadmap.
 
 ### BFF e sessão
 
@@ -176,15 +176,6 @@ que decisões de negócio sejam reconstruídas no Angular.
 - [ ] `[UI-FUT-BFF-BACKEND-001]` Implementar e observar o BFF com privilégio mínimo e sem credenciais de domínio próprias.
 - [ ] `[UI-FUT-BFF-UI-001]` Migrar autenticação e adapters da SPA para o contrato de sessão aprovado.
 - [ ] `[UI-FUT-BFF-TEST-001]` Cobrir segurança de cookies, CSRF, expiração, logout, indisponibilidade e migração/rollback.
-
-### Atualização em tempo real — trilha condicional
-
-O dashboard isoladamente não atingiu os gatilhos definidos na [medição de atualização do dashboard](realtime-update-measurement.md). Posteriormente, a [medição de atualização da jornada](../architecture/journey-freshness-measurement.md) observou convergência global entre 57 e 70 segundos após comandos de diagnóstico e desbloqueou a ADR canônica `[D-JOURNEY-FRESHNESS-ADR-001]` no [roadmap da plataforma](../../ROADMAP.md). Os itens abaixo continuam condicionais e não podem antecipar essa ADR.
-
-- [ ] `[UI-FUT-REALTIME-ADR-001]` Participar da ADR canônica `[D-JOURNEY-FRESHNESS-ADR-001]`, comparando atualização manual, polling limitado, SSE e WebSocket sob as restrições de sessão, acessibilidade, fallback e infraestrutura observadas pela UI; este item depende de `[D-JOURNEY-FRESHNESS-MEASURE-001]` e não cria uma decisão paralela.
-- [ ] `[UI-FUT-REALTIME-CONTRACT-001]` **Bloqueado pela ADR canônica.** Se aprovada atualização em tempo real, contratar autenticação, retomada, ordenação, deduplicação, invalidação de snapshots e fallback da alternativa escolhida.
-- [ ] `[UI-FUT-REALTIME-IMPL-001]` **Bloqueado pela ADR e pelo contrato.** Implementar na UI somente o mecanismo aprovado, preservando atualização manual como fallback observável e sem inferir estado ou capabilities.
-- [ ] `[UI-FUT-REALTIME-TEST-001]` **Bloqueado pela implementação aprovada.** Testar reconexão, expiração de sessão, eventos duplicados ou fora de ordem, indisponibilidade da borda e degradação para fallback.
 
 ## Critério de pronto do MVP
 

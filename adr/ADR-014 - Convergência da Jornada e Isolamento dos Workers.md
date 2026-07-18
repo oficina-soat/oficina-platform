@@ -89,6 +89,14 @@ O snapshot persistido pelo OS Service permanece a fonte da verdade. O frontend p
 
 Depois da nova medição, o trecho entre convergência e navegador será reavaliado. Se ainda justificar atualização automática, uma decisão complementar escolherá polling limitado, SSE ou WebSocket e contratará a projeção/invalidação necessária. Uma eventual SSE usará invalidação versionada, não eventos de domínio como estado de tela, e exigirá borda AWS compatível com streaming.
 
+## Verificação posterior e encerramento do canal automático
+
+A [nova medição após o isolamento dos workers](../docs/architecture/journey-freshness-remeasurement.md) registrou p95 inferior a `457 ms`, máximo inferior a `478 ms` e redução média superior a 99% nas transições de diagnóstico. Não houve perda, duplicação observável, crescimento de DLQ, backlog residual ou saturação relevante.
+
+O atraso que motivou a avaliação de SSE estava na mensageria e foi eliminado. Não existe evidência remanescente de defasagem entre convergência e navegador que justifique polling recorrente, projeção versionada, SSE, WebSocket, nova borda de streaming ou fan-out entre réplicas. A atualização manual do snapshot canônico permanece como decisão vigente.
+
+As alternativas de canal automático ficam registradas nesta ADR como consideradas e não selecionadas, sem tarefas abertas no roadmap. A discussão somente deve ser reaberta se uma nova medição isolada do trecho convergência → navegador demonstrar requisito operacional mensurável que a atualização manual não atenda.
+
 ## Consequências
 
 ### Positivas

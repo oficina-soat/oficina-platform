@@ -154,7 +154,7 @@ O [rollout e a homologação remota do Billing 1.7.2](../delivery/journey-freshn
 
 Em 18/07/2026, a [nova medição da atualização da jornada](journey-freshness-remeasurement.md) concluiu a etapa 7 com 30 amostras por transição. O p95 de resposta até convergência foi `456,893 ms` para `diagnosticoIniciado` e `420,999 ms` para `diagnosticoFinalizado`; os máximos ficaram abaixo de `478 ms`, sem perda, duplicação observável, nova DLQ, backlog residual, reinício ou saturação relevante.
 
-A jornada estendida percorreu recusa, retomada, nova aprovação, reparo, pagamento e entrega com Billing `1.7.2`, terminando em `ENTREGUE` e realizando uma única nova solicitação ao provedor. A meta da ADR-014 foi atingida e a reavaliação do canal entre convergência e navegador está desbloqueada.
+A jornada estendida percorreu recusa, retomada, nova aprovação, reparo, pagamento e entrega com Billing `1.7.2`, terminando em `ENTREGUE` e realizando uma única nova solicitação ao provedor. A meta da ADR-014 foi atingida. Como não restou evidência de atraso relevante após a convergência, a [verificação posterior](../../adr/ADR-014%20-%20Convergência%20da%20Jornada%20e%20Isolamento%20dos%20Workers.md#verificação-posterior-e-encerramento-do-canal-automático) manteve atualização manual e encerrou a trilha de canal automático.
 
 ## Critérios de pronto do épico
 

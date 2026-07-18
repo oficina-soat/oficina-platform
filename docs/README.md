@@ -12,6 +12,7 @@ Este diretório concentra a documentação normativa da plataforma em grupos tem
 - [Medição de atualização da jornada operacional](architecture/journey-freshness-measurement.md)
 - [Nova medição após o isolamento dos workers](architecture/journey-freshness-remeasurement.md)
 - [Plano de redução da defasagem da jornada](architecture/journey-freshness-remediation-plan.md)
+- [Continuidade do pagamento e entrega pela UI](architecture/payment-checkout-continuity.md)
 
 ## Infraestrutura
 

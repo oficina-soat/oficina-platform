@@ -114,6 +114,21 @@ Essa etapa deve anteceder o rollout para evitar uma comparação baseada apenas 
 - manter rollback por versão e por configuração do worker;
 - não habilitar polling, SSE ou WebSocket no frontend durante esta rodada, para isolar o efeito da correção.
 
+### Evidências da etapa de resiliência
+
+Em 18/07/2026, a etapa 5 foi concluída nas versões Execution `1.5.0`, Billing `1.7.0` e OS `1.11.0`. A matriz abaixo registra a cobertura usada como porta de entrada para o rollout no `lab`.
+
+| Cenário | Evidência automatizada |
+|---|---|
+| Fila vazia ou consumidor lento não bloqueia outra fila nem o publicador | `DomainMessagingWorkerTest` nos três serviços inicia os loops reais e mantém uma fila bloqueada enquanto observa outra fila e o publicador progredirem; cada unidade continua limitada a uma thread por pod. |
+| Múltiplas réplicas e restart de pod | Os testes dos adapters `DynamoDbExecutionStore`, `PostgresBillingRepository` e `PostgresAtendimentoSeedStore` comprovam exclusão entre proprietários, rejeição de conclusão por réplica alheia e recuperação após expiração do lease. |
+| Duplicidade, perda de notificação, retry e evento fora de ordem | `ExecutionEventConsumerTest`, `BillingEventConsumerTest`, `InMemoryAtendimentoGatewayTest` e `PostgresAtendimentoSeedStoreTest` cobrem reprocessamento idempotente, retentativa após falha e progressão da Saga sem regressão. |
+| Backlog, falha e DLQ | `OperationalMetricsTest` nos três serviços valida backlog, tentativas, falhas de consumo e contagem de DLQ; as integrações `SnsSqsMessagingIntegrationTest` validam publicação, consumo e confirmação com LocalStack. |
+| Encerramento gracioso | `DomainMessagingWorkerTest` nos três serviços valida parada dos executores habilitados e sempre encerra o worker nos testes concorrentes. |
+| Reconexão, sessão expirada e fallback visual | A suíte do `oficina-ui` valida restauração e expiração da sessão, nova tentativa após indisponibilidade e preservação do último snapshot. Como a [ADR-014](../../adr/ADR-014%20-%20Convergência%20da%20Jornada%20e%20Isolamento%20dos%20Workers.md) não aprovou canal automático nesta etapa, não há conexão SSE ou WebSocket a reconectar. |
+
+As suítes integrais passaram com 113 testes no Execution, 146 no Billing e 205 no OS, incluindo `clean verify`, JaCoCo, DynamoDB Local, PostgreSQL e LocalStack. O frontend passou com 81,58% de statements e 81,89% de linhas cobertas.
+
 ### 7. Repetir a medição e comparar
 
 - repetir no `lab` os mesmos marcos da linha de base: término HTTP, `PENDING`, `PUBLISHED`, consumo e persistência no OS;

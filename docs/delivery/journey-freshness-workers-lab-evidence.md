@@ -4,7 +4,7 @@
 
 Em 18/07/2026, o `lab` foi homologado com os publicadores da Outbox separados dos consumidores e com um worker independente por fila nos três microsserviços. A jornada sintética percorreu início e conclusão de diagnóstico, recusa e retomada, nova conclusão e aprovação, reparo, pagamento e entrega.
 
-O resultado funcional foi aprovado: a OS terminou em `ENTREGUE`, a Saga terminou em `FINALIZADA_COM_SUCESSO`, as 32 filas ativas terminaram zeradas e nenhum pod reiniciou. A rodada também expôs uma corrida idempotente no Billing durante o pagamento; ela se recuperou por retry sem duplicar o efeito financeiro, mas deve ser corrigida antes da [nova medição estatística](../../ROADMAP.md#assertividade-da-atualização-da-jornada-operacional).
+O resultado funcional foi aprovado: a OS terminou em `ENTREGUE`, a Saga terminou em `FINALIZADA_COM_SUCESSO`, as 32 filas ativas terminaram zeradas e nenhum pod reiniciou. A rodada também expôs uma corrida idempotente no Billing durante o pagamento; ela se recuperou por retry sem duplicar o efeito financeiro. A correção foi implementada localmente no Billing `1.7.1` e deve ser homologada antes da [nova medição estatística](../../ROADMAP.md#assertividade-da-atualização-da-jornada-operacional).
 
 Esta homologação valida o rollout e fornece amostras operacionais isoladas. Ela não substitui as 30 amostras por transição exigidas pela [ADR-014](../../adr/ADR-014%20-%20Convergência%20da%20Jornada%20e%20Isolamento%20dos%20Workers.md) e pelo [plano de remediação](../architecture/journey-freshness-remediation-plan.md#7-repetir-a-medição-e-comparar).
 
@@ -69,6 +69,14 @@ Os workers paralelos do Billing processaram concorrentemente gatilhos que conver
 A restrição do banco impediu efeito financeiro duplicado. A mensagem permaneceu retentável e recebeu ACK às `16:56:28.144Z`, aproximadamente `28,6 s` depois, quando o pagamento existente já pôde ser reutilizado. A fila terminou vazia e nenhuma mensagem nova chegou à DLQ.
 
 Apesar da recuperação, tratar a colisão esperada como falha de persistência gera erro operacional e atraso desnecessário. A correção deve tornar atômico o fluxo “obter ou criar pagamento” — ou reconhecer a colisão de identidade como sucesso idempotente — e comprovar, com consumidores realmente concorrentes, uma única linha de pagamento e uma única Outbox. Essa correção foi inserida antes da nova medição no [roadmap](../../ROADMAP.md#assertividade-da-atualização-da-jornada-operacional).
+
+### Correção idempotente
+
+Em 18/07/2026, o Billing `1.7.1`, commit local `4bf0bc2`, passou a derivar do orçamento a identidade canônica do pagamento e de `pagamentoSolicitado`. O adapter PostgreSQL usa inserção `create-if-absent` com `ON CONFLICT DO NOTHING`; o concorrente que perde a criação reutiliza o pagamento persistido e registra a mesma Outbox idempotente. A identidade determinística do pagamento também preserva a mesma `X-Idempotency-Key` na integração com Mercado Pago.
+
+O teste de regressão executa `execucaoFinalizada` e `ordemDeServicoFinalizada` em threads simultâneas, sincronizadas antes da persistência, e comprova uma identidade, uma linha de pagamento e uma Outbox. Outro teste usa PostgreSQL 16 real para validar que somente uma das inserções concorrentes cria o registro. O `clean verify` passou com 148 testes, todas as verificações JaCoCo e o XML de cobertura gerado. Como `SONAR_TOKEN` não estava disponível, o Quality Gate remoto não foi consultado localmente.
+
+A correção ainda requer rollout do Billing `1.7.1` e repetição do cenário no `lab`; até essa homologação, a observação remota desta evidência continua representando o comportamento do Billing `1.7.0`.
 
 ## Segurança da evidência
 

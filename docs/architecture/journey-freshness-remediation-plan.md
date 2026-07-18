@@ -4,7 +4,7 @@
 
 Planejar a correção da defasagem entre um comando aceito por um microsserviço e a convergência do estado canônico da jornada no `oficina-os-service`. O plano parte da [medição de atualização da jornada](journey-freshness-measurement.md), detalha o trabalho de mensageria que deve constar no [roadmap](../../ROADMAP.md) e preserva a necessidade de formalizar a decisão na ADR prevista antes da implementação.
 
-Este plano ataca primeiro a causa medida. Polling, SSE ou WebSocket tratam apenas o trecho posterior à convergência e devem ser reavaliados depois da correção e da nova medição.
+Este plano ataca primeiro a causa medida, conforme decidido na [ADR-014](../../adr/ADR-014%20-%20Convergência%20da%20Jornada%20e%20Isolamento%20dos%20Workers.md). Polling, SSE ou WebSocket tratam apenas o trecho posterior à convergência e devem ser reavaliados depois da correção e da nova medição.
 
 ## Linha de base
 
@@ -67,7 +67,7 @@ A paralelização é entre filas. Dentro de cada fila, o processamento deve cont
 - definir a meta de comando até convergência e o tamanho mínimo da amostra de homologação;
 - adiar a escolha de SSE/WebSocket até existir a medição posterior à correção da mensageria.
 
-Meta recomendada para avaliação na ADR: `p95` de resposta HTTP até convergência no OS menor ou igual a 10 s e nenhuma amostra acima de 20 s, em uma janela sem backlog prévio. Esses valores são proposta, não contrato vigente.
+A [ADR-014](../../adr/ADR-014%20-%20Convergência%20da%20Jornada%20e%20Isolamento%20dos%20Workers.md) aprovou a meta de `p95` de resposta HTTP até convergência no OS menor ou igual a `5 s` e nenhuma amostra acima de `10 s`, em uma janela sem backlog prévio.
 
 ### 2. Preparar observabilidade comparável
 

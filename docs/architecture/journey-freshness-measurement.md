@@ -65,6 +65,6 @@ Referências oficiais:
 
 O item de medição está concluído e desbloqueia a ADR. A evidência atende ao gatilho de reavaliação porque duas ações diretamente observadas pelo operador mantiveram snapshots globais divergentes por quase um minuto ou mais.
 
-As implementações continuam bloqueadas: a ADR deve definir uma meta mensurável e decidir se o escopo termina na correção dos workers ou também inclui projeção versionada e SSE. Caso escolha SSE, o stream deve ser apenas um mecanismo de invalidação; o snapshot persistido do OS Service permanece a fonte da verdade.
+A [ADR-014](../../adr/ADR-014%20-%20Convergência%20da%20Jornada%20e%20Isolamento%20dos%20Workers.md) aprovou a correção dos workers com meta de p95 ≤ 5 s e máximo ≤ 10 s. Projeção versionada, SSE ou outro canal automático permanecem condicionados à nova medição; o snapshot persistido do OS Service continua sendo a fonte da verdade.
 
 A decomposição das correções de mensageria, os critérios de resiliência e o método de comparação posterior estão no [plano de redução da defasagem da jornada](journey-freshness-remediation-plan.md).

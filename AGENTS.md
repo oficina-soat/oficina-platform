@@ -238,6 +238,8 @@ Não deixe alterações relevantes sem commit, salvo quando o usuário pedir exp
 
 Não faça `git push`, salvo se o usuário pedir explicitamente.
 
+Não dispare, reexecute, aprove, cancele nem altere execuções de workflows do GitHub Actions, inclusive por `gh workflow run`, `gh run rerun`, `workflow_dispatch` ou API, salvo quando o usuário pedir explicitamente a execução do workflow ou da operação remota específica. Pedidos gerais para executar uma tarefa, implantar, homologar, validar ou avançar o roadmap não autorizam implicitamente o uso de GitHub Actions. Quando um workflow for necessário para continuar, interrompa antes do disparo e solicite autorização. Consultas somente leitura de runs, jobs, checks e logs existentes continuam permitidas para diagnóstico e coleta de evidências.
+
 Antes de criar o commit:
 
 - adicione ao Git todos os arquivos novos criados no escopo da tarefa com `git add <arquivos-da-tarefa>`

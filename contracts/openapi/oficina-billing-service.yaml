@@ -576,7 +576,7 @@ paths:
     post:
       tags: [Integracoes financeiras]
       summary: Receber atualização de pagamento do Mercado Pago
-      description: Valida a assinatura com o x-request-id original, consulta a order ou o payment legado conforme o tipo persistido e processa a atualização de forma idempotente. Não confia na action nem no status recebido no callback.
+      description: Valida a assinatura com o x-request-id original, consulta a order ou o payment legado conforme o tipo persistido e processa a atualização de forma idempotente. Não confia na action nem no status recebido no callback. Uma referência assinada desconhecida é reconhecida sem efeito e sem revelar a existência de pagamentos; falhas transitórias continuam retentáveis.
       operationId: receberWebhookMercadoPago
       security: []
       parameters:
@@ -592,7 +592,7 @@ paths:
               $ref: "#/components/schemas/MercadoPagoWebhookRequest"
       responses:
         "200":
-          description: Notificação validada e processada ou reconhecida idempotentemente.
+          description: Notificação validada e processada, reconhecida idempotentemente ou ignorada por não corresponder a uma referência local.
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":

@@ -511,7 +511,7 @@ POST /api/v1/pagamentos/{pagamentoId}/cancelamento
 POST /api/v1/integracoes/mercado-pago/webhooks?data.id={transacaoExternaId}&type=order
 ```
 
-A rota não usa JWT nem `Idempotency-Key`, pois o chamador é o provedor. Ela exige `x-signature` e o `x-request-id` original, valida HMAC e tolerância temporal com o secret da aplicação, aceita notificações `order` e, durante a compatibilidade, `payment`, e exige coerência entre query string e corpo. A action deve possuir prefixo correspondente `order.*` ou `payment.*`, mas nunca é aceita como evidência financeira: o Billing consulta o recurso persistido no Mercado Pago antes de alterar o domínio. Notificação válida ou duplicada retorna `200`; falha transitória permanece sem reconhecimento para permitir retry. Reentregas e concorrência com a reconciliação manual devem convergir sem republicar eventos ou regredir estado.
+A rota não usa JWT nem `Idempotency-Key`, pois o chamador é o provedor. Ela exige `x-signature` e o `x-request-id` original, valida HMAC e tolerância temporal com o secret da aplicação, aceita notificações `order` e, durante a compatibilidade, `payment`, e exige coerência entre query string e corpo. A action deve possuir prefixo correspondente `order.*` ou `payment.*`, mas nunca é aceita como evidência financeira: o Billing consulta o recurso persistido no Mercado Pago antes de alterar o domínio. Notificação válida ou duplicada retorna `200`. Uma referência assinada desconhecida também retorna `200`, sem consultar o provedor nem revelar se o pagamento existe; falha transitória permanece sem reconhecimento para permitir retry. Reentregas e concorrência com a reconciliação manual devem convergir sem republicar eventos ou regredir estado.
 
 ---
 

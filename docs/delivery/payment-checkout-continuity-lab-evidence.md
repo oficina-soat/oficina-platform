@@ -2,9 +2,9 @@
 
 ## Resultado
 
-Em 19/07/2026, a primeira execução de `[D-PAYMENT-CONTINUITY-TEST-REM-001]` validou Billing `1.8.0`, infraestrutura e UI no `lab`, percorreu a jornada até a cobrança PIX pela API legada `/v1/payments` e comprovou a convergência sob notificações duplicadas, fora de ordem e concorrentes. Na retomada do mesmo dia, os deploys e Quality Gates de Billing `1.9.0`, infraestrutura e UI estavam concluídos, mas a criação pela API Orders foi recusada pelo Mercado Pago porque o secret implantado usava uma credencial `TEST-*`. A documentação atual do provedor exige Access Token de teste com prefixo `APP_USR` para Orders.
+Em 19/07/2026, a primeira execução de `[D-PAYMENT-CONTINUITY-TEST-REM-001]` validou Billing `1.8.0`, infraestrutura e UI no `lab`, percorreu a jornada até a cobrança PIX pela API legada `/v1/payments` e comprovou a convergência sob notificações duplicadas, fora de ordem e concorrentes. Na retomada do mesmo dia, os deploys e Quality Gates de Billing `1.9.0`, infraestrutura e UI estavam concluídos, mas a criação pela API Orders foi recusada pelo Mercado Pago porque o secret implantado usava uma credencial `TEST-*`. Após a substituição pelo Access Token de teste `APP_USR` exigido pelo provedor, a mesma jornada convergiu para uma order PIX, um pagamento confirmado, uma Outbox financeira terminal e uma entrega.
 
-A homologação permanece parcial: nenhuma confirmação financeira foi fabricada, nenhuma capability **Registrar entrega** foi liberada e nenhuma entrega foi concluída sem evidência válida do provedor.
+A confirmação ocorreu exclusivamente por reconciliação server-to-server com o Mercado Pago; nenhuma confirmação financeira foi fabricada. A homologação funcional está concluída e a tarefa permanece aberta somente para confirmar a configuração no painel de Webhooks do Mercado Pago e consultar os traces e o alerta no painel do New Relic.
 
 Nenhum access token, JWT, secret de webhook, código PIX, imagem QR Code ou URL de pagamento foi registrado nesta evidência. As credenciais foram usadas somente em memória e as inspeções persistiram apenas status, contagens e identificadores internos.
 
@@ -25,6 +25,8 @@ Na retomada para Orders, a inspeção somente leitura confirmou:
 | UI | O [run 29682148164](https://github.com/oficina-soat/oficina-ui/actions/runs/29682148164) concluiu os Quality Gates e o deploy. | Revisão `8300c057a2ac727b80f3e879df3d5af629b4cc97` pronta. |
 
 As variáveis não sensíveis do cenário foram normalizadas para `OFICINA_MERCADO_PAGO_PAYER_EMAIL=test_user_br@testuser.com` e `OFICINA_MERCADO_PAGO_PAYER_FIRST_NAME=APRO`, e o Billing foi reiniciado com sucesso. Nenhum workflow foi disparado nessa normalização.
+
+Após a troca do secret, o [PR 57 da infraestrutura](https://github.com/oficina-soat/oficina-infra/pull/57) publicou a validação preventiva de credenciais e o [run 29691640986](https://github.com/oficina-soat/oficina-infra/actions/runs/29691640986) concluiu os jobs `validate` e `deploy`. O rollout deixou o Billing `1.9.0` pronto no modo `orders` com credencial da classe `APP_USR`; um probe vazio passou da autenticação e recebeu `400` de validação de payload, sem criar order.
 
 A policy `Oficina SOAT - Alertas Minimos Lab` já possui a condição ativa **Pagamento indisponível**, ID `63810244`, conforme a [evidência dos alertas mínimos](../observability/new-relic-alerts-lab-evidence.md). A releitura remota nesta execução não foi possível porque não havia New Relic User API Key no ambiente local.
 
@@ -111,13 +113,40 @@ Na janela da retomada, os logs correlacionados do OS e do Billing não continham
 
 Como prevenção, o deploy canônico da infraestrutura passou a rejeitar credenciais `TEST-*` no modo `orders` antes de acessar o cluster e documenta o caminho correto para obter a credencial `APP_USR`. Isso evita que uma configuração conhecida como incompatível volte a ser aplicada silenciosamente.
 
+### Continuação após a correção da credencial
+
+Uma cópia do evento `ordemDeServicoFinalizada` desta jornada foi reenviada da DLQ para a fila de origem do Billing, sem remover a mensagem de auditoria. O processamento criou a order e publicou `pagamentoSolicitado`. A consulta pública apresentou o pagamento `CRIADO`, a ação canônica `ATUALIZAR_STATUS` e as instruções de copia e cola e QR Code, sem expor o conteúdo na evidência.
+
+A reconciliação autenticada, com `Idempotency-Key`, consultou a order no Mercado Pago e retornou `200` com o pagamento `CONFIRMADO`. O evento `pagamentoConfirmado` convergiu no OS, que expôs a capability canônica `ENTREGAR`; a transição autenticada retornou `200` e deixou a OS em `ENTREGUE`.
+
+Depois da confirmação, foram submetidos concorrentemente pela URL pública:
+
+- dois webhooks assinados `order.updated`, ambos com `200`;
+- um webhook assinado semanticamente anterior `order.created`, com `200`;
+- uma reconciliação autenticada com chave distinta, com `200`;
+- duas novas cópias do mesmo evento terminal de OS para o Billing.
+
+As contagens finais confirmaram convergência sem duplicação nem regressão:
+
+```text
+budgets|1|APROVADO
+payments|1|external_refs=1|CONFIRMADO|ORDER
+outbox|orcamentoAprovado|1|PUBLISHED
+outbox|orcamentoGerado|1|PUBLISHED
+outbox|pagamentoConfirmado|1|PUBLISHED
+outbox|pagamentoSolicitado|1|PUBLISHED
+terminal_consumed|ordemDeServicoFinalizada|1
+os|ENTREGUE
+delivery_history|1
+```
+
+A auditoria da janela final encontrou 21 registros correlacionados no OS, 16 no Billing e 20 no Execution, todos sem ocorrência genérica ou exata de access token, webhook secret, assinatura, identificador externo, CPF, e-mail, código ou URL PIX. As métricas continham 153 séries `payment_provider_*`, zero identificador da jornada e zero padrão sensível. Os collectors OpenTelemetry não registraram erro de exportação nem padrão sensível.
+
 ## Pendências para concluir a tarefa
 
 A tarefa permanece aberta no [roadmap](../../ROADMAP.md) pelos seguintes pontos dependentes do ambiente externo:
 
-1. substituir o secret `OFICINA_MERCADO_PAGO_ACCESS_TOKEN` do ambiente `lab` por um Access Token de teste `APP_USR` da aplicação, obtido em **Suas integrações > Dados da integração > Testes > Credenciais de teste**, e executar novo deploy da infraestrutura; o valor não deve ser enviado por chat nem registrado em evidência;
-2. no painel do Mercado Pago, confirmar a URL de teste HTTPS, o evento **Order (Mercado Pago)** e, durante a compatibilidade legada, **Pagamentos**, além de confirmar que o secret de webhook corresponde ao implantado;
-3. executar uma nova jornada e, após `processed/accredited`, repetir webhook ou **Atualizar situação**, comprovando uma order, um pagamento, uma única Outbox `pagamentoConfirmado`, a capability **Registrar entrega** e a OS em `ENTREGUE`, inclusive sob duplicidade, ordem invertida e concorrência;
-4. consultar logs e spans da correlação no New Relic com uma User API Key, confirmando a sanitização e relendo o estado atual da policy de alertas.
+1. no painel do Mercado Pago, confirmar a URL HTTPS do `lab`, o evento **Order (Mercado Pago)** e, durante a compatibilidade legada, **Pagamentos**, além de confirmar que o secret de webhook corresponde ao implantado; a rota pública e a assinatura já passaram nos testes sintéticos, mas a configuração do painel não possui API de leitura disponível nesta execução;
+2. consultar os spans da correlação no New Relic com uma User API Key, confirmando a sanitização, e reler o estado atual da policy **Oficina SOAT - Alertas Minimos Lab** e da condição **Pagamento indisponível**.
 
-Até esses passos, não é correto marcar `[D-PAYMENT-CONTINUITY-TEST-REM-001]` como concluída nem contornar a evidência do provedor por confirmação manual, pois isso violaria a [direção de continuidade do pagamento](../architecture/payment-checkout-continuity.md) e o [contrato REST](../../contracts/Contrato%20de%20APIs%20REST.md).
+Até essas confirmações externas, não é correto marcar `[D-PAYMENT-CONTINUITY-TEST-REM-001]` como concluída. A jornada funcional já satisfaz a [direção de continuidade do pagamento](../architecture/payment-checkout-continuity.md) e o [contrato REST](../../contracts/Contrato%20de%20APIs%20REST.md) sem confirmação manual indevida.

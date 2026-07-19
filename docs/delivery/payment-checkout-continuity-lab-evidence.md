@@ -2,9 +2,9 @@
 
 ## Resultado
 
-Em 19/07/2026, a primeira execução de `[D-PAYMENT-CONTINUITY-TEST-REM-001]` validou Billing `1.8.0`, infraestrutura e UI no `lab`, percorreu a jornada até a cobrança PIX pela API legada `/v1/payments` e comprovou a convergência sob notificações duplicadas, fora de ordem e concorrentes. Na retomada do mesmo dia, os deploys e Quality Gates de Billing `1.9.0`, infraestrutura e UI estavam concluídos, mas a criação pela API Orders foi recusada pelo Mercado Pago porque o secret implantado usava uma credencial `TEST-*`. Após a substituição pelo Access Token de teste `APP_USR` exigido pelo provedor, a mesma jornada convergiu para uma order PIX, um pagamento confirmado, uma Outbox financeira terminal e uma entrega.
+Em 19/07/2026, a primeira execução de `[D-PAYMENT-CONTINUITY-TEST-REM-001]` validou Billing `1.8.0`, infraestrutura e UI no `lab`, percorreu a jornada até a cobrança PIX pela API legada `/v1/payments` e comprovou a convergência sob notificações duplicadas, fora de ordem e concorrentes. Na retomada do mesmo dia, os deploys e Quality Gates de Billing `1.9.0`, infraestrutura e UI estavam concluídos, mas a criação pela API Orders foi recusada pelo Mercado Pago porque o secret implantado usava uma credencial `TEST-*`. Após a substituição pelo Access Token de teste `APP_USR` exigido pelo provedor, a mesma jornada convergiu por reconciliação para uma order PIX, um pagamento confirmado, uma Outbox financeira terminal e uma entrega.
 
-A confirmação ocorreu exclusivamente por reconciliação server-to-server com o Mercado Pago; nenhuma confirmação financeira foi fabricada. A homologação funcional está concluída e a tarefa permanece aberta somente para confirmar a configuração no painel de Webhooks do Mercado Pago e consultar os traces e o alerta no painel do New Relic.
+A confirmação ocorreu exclusivamente por reconciliação server-to-server com o Mercado Pago; nenhuma confirmação financeira foi fabricada. Uma jornada adicional confirmou que o painel envia notificações reais de Orders e que a telemetria está disponível no New Relic, mas revelou uma incompatibilidade na tolerância temporal da assinatura: o provedor envia `ts` em milissegundos e o Billing `1.9.0` o compara como epoch em segundos. A homologação permanece aberta até corrigir e repetir a convergência por webhook real.
 
 Nenhum access token, JWT, secret de webhook, código PIX, imagem QR Code ou URL de pagamento foi registrado nesta evidência. As credenciais foram usadas somente em memória e as inspeções persistiram apenas status, contagens e identificadores internos.
 
@@ -28,7 +28,9 @@ As variáveis não sensíveis do cenário foram normalizadas para `OFICINA_MERCA
 
 Após a troca do secret, o [PR 57 da infraestrutura](https://github.com/oficina-soat/oficina-infra/pull/57) publicou a validação preventiva de credenciais e o [run 29691640986](https://github.com/oficina-soat/oficina-infra/actions/runs/29691640986) concluiu os jobs `validate` e `deploy`. O rollout deixou o Billing `1.9.0` pronto no modo `orders` com credencial da classe `APP_USR`; um probe vazio passou da autenticação e recebeu `400` de validação de payload, sem criar order.
 
-A policy `Oficina SOAT - Alertas Minimos Lab` já possui a condição ativa **Pagamento indisponível**, ID `63810244`, conforme a [evidência dos alertas mínimos](../observability/new-relic-alerts-lab-evidence.md). A releitura remota nesta execução não foi possível porque não havia New Relic User API Key no ambiente local.
+Após a rotação do secret de webhook, o [run 29695522333](https://github.com/oficina-soat/oficina-infra/actions/runs/29695522333) concluiu validação e deploy. O novo pod do Billing ficou pronto no modo `orders`; um probe com assinatura inválida recebeu `401` e outro, assinado com o secret efetivamente projetado, passou da autenticação e recebeu `404` para uma order deliberadamente inexistente.
+
+A policy `Oficina SOAT - Alertas Minimos Lab` já possuía a condição ativa **Pagamento indisponível**, ID `63810244`, conforme a [evidência dos alertas mínimos](../observability/new-relic-alerts-lab-evidence.md). Naquela etapa, a releitura remota não foi possível porque ainda não havia New Relic User API Key no ambiente local; a verificação foi concluída posteriormente neste documento.
 
 ## Jornada operacional
 
@@ -109,7 +111,7 @@ projection|1|true
 
 As filas de origem terminaram sem mensagens visíveis nem em processamento. A DLQ de `ordemDeServicoFinalizada` tinha cinco mensagens no total, das quais três mensagens inspecionadas pertenciam à correlação desta jornada; a DLQ de `execucaoFinalizada` tinha seis mensagens no total, sem atribuição integral à jornada. Nada foi removido ou redirecionado porque a credencial inválida faria o processamento falhar novamente.
 
-Na janela da retomada, os logs correlacionados do OS e do Billing não continham padrões de token, assinatura, QR Code, código ou URL PIX. As métricas do Billing continham zero identificador da jornada e zero padrão sensível. A releitura dos traces e da policy **Pagamento indisponível** continua limitada pela ausência de New Relic User API Key.
+Na janela daquela retomada, os logs correlacionados do OS e do Billing não continham padrões de token, assinatura, QR Code, código ou URL PIX. As métricas do Billing continham zero identificador da jornada e zero padrão sensível. A releitura dos traces e da policy **Pagamento indisponível** ainda estava limitada pela ausência de New Relic User API Key e foi concluída na jornada adicional registrada abaixo.
 
 Como prevenção, o deploy canônico da infraestrutura passou a rejeitar credenciais `TEST-*` no modo `orders` antes de acessar o cluster e documenta o caminho correto para obter a credencial `APP_USR`. Isso evita que uma configuração conhecida como incompatível volte a ser aplicada silenciosamente.
 
@@ -142,11 +144,49 @@ delivery_history|1
 
 A auditoria da janela final encontrou 21 registros correlacionados no OS, 16 no Billing e 20 no Execution, todos sem ocorrência genérica ou exata de access token, webhook secret, assinatura, identificador externo, CPF, e-mail, código ou URL PIX. As métricas continham 153 séries `payment_provider_*`, zero identificador da jornada e zero padrão sensível. Os collectors OpenTelemetry não registraram erro de exportação nem padrão sensível.
 
+## Webhook real após a rotação do secret
+
+Uma jornada nova e isolada foi executada exclusivamente pelas APIs públicas, sem reutilizar pagamento ou order anterior e sem chamar reconciliação manual:
+
+| Marco | Resultado |
+|---|---|
+| Correlação | `payment-orders-real-webhook-20260719T170650Z` |
+| Ordem de Serviço | `c9f49dff-6cf0-4609-8ce4-0db03a329bf6`, finalizada após diagnóstico, orçamento e reparo. |
+| Execução | `7cc83db8-0e0c-4123-8c9a-1e1394a66ec5`, em `REPARO_CONCLUIDO`. |
+| Orçamento | `c063b380-4a1d-3631-af0f-ffb14ac70d45`, aprovado, no valor de `R$ 10,00`. |
+| Pagamento | `7c388135-75df-334d-a5f0-97ce83f2d646`, método PIX, persistido como `CRIADO`. |
+| Mercado Pago | A consulta autenticada somente leitura retornou a order como `processed/accredited`, com a transação `processed` e `external_reference` correspondente ao `pagamentoId`. |
+| Outbox correlacionada | Uma ocorrência de `orcamentoGerado`, uma de `orcamentoAprovado` e uma de `pagamentoSolicitado`; nenhuma `pagamentoConfirmado`. |
+
+Entre `17:09:01Z` e `17:09:07Z`, o API Gateway recebeu quatro chamadas reais na rota `POST /api/v1/integracoes/mercado-pago/webhooks`, originadas de quatro endereços do provedor. Todas chegaram ao Billing e todas receberam `401`. Isso confirma URL, evento **Order (Mercado Pago)** e entrega pelo provedor; o pagamento local permaneceu `CRIADO` porque nenhuma notificação passou pela validação HMAC.
+
+A [documentação oficial de notificações de Orders](https://www.mercadopago.com.br/developers/pt/docs/checkout-api-orders/notifications) exemplifica `x-signature` com `ts` de 13 dígitos e constrói o manifesto com o valor recebido sem alteração. O Billing `1.9.0` também usa o valor bruto no manifesto, mas compara esse mesmo número diretamente com `Instant.getEpochSecond()` para aplicar a tolerância. Dois probes sem order válida, assinados com o secret de runtime e sem efeito de negócio, isolaram a divergência:
+
+```text
+timestamp em segundos      -> 404, assinatura aceita e order inexistente
+timestamp em milissegundos -> 401, assinatura rejeitada antes da consulta
+```
+
+Portanto, a rotação do secret foi implantada e o painel está enviando notificações, mas o webhook real de Orders é rejeitado por incompatibilidade de unidade temporal. A correção deve normalizar apenas o valor usado no cálculo da idade para segundos, preservando o `ts` original no manifesto HMAC e a comparação constante do hash.
+
+## Releitura remota no New Relic
+
+A New Relic User API Key permitiu concluir as verificações antes pendentes:
+
+- a correlação nova possui 62 logs no Billing, 28 no OS e 21 no Execution, totalizando 111 registros e 65 `traceId` distintos;
+- uma amostra de 20 desses traces encontrou spans nos três serviços: 7 no Billing, 8 no OS e 10 no Execution;
+- a janela do webhook registrou os `401` reais e os probes controlados sem incluir headers ou payloads sensíveis;
+- não houve atributo com nome relacionado a secret, assinatura, autorização, access token, QR Code, URL de pagamento ou código copia e cola nos logs e spans correlacionados;
+- não houve ocorrência dos padrões sensíveis conhecidos nas mensagens de log ou nos nomes de spans;
+- a policy **Oficina SOAT - Alertas Minimos Lab** mantém nove condições, e **Pagamento indisponível**, ID `63810244`, está ativa, com prioridade crítica e sem incidente aberto na releitura.
+
 ## Pendências para concluir a tarefa
 
-A tarefa permanece aberta no [roadmap](../../ROADMAP.md) pelos seguintes pontos dependentes do ambiente externo:
+A configuração do painel e a observabilidade remota deixaram de ser pendências. Para concluir `[D-PAYMENT-CONTINUITY-TEST-REM-001]` ainda é necessário:
 
-1. no painel do Mercado Pago, confirmar a URL HTTPS do `lab`, o evento **Order (Mercado Pago)** e, durante a compatibilidade legada, **Pagamentos**, além de confirmar que o secret de webhook corresponde ao implantado; a rota pública e a assinatura já passaram nos testes sintéticos, mas a configuração do painel não possui API de leitura disponível nesta execução;
-2. consultar os spans da correlação no New Relic com uma User API Key, confirmando a sanitização, e reler o estado atual da policy **Oficina SOAT - Alertas Minimos Lab** e da condição **Pagamento indisponível**.
+1. corrigir no Billing a validação da tolerância para aceitar o `ts` em milissegundos usado por Orders, mantendo compatibilidade com notificações legadas em segundos;
+2. publicar e implantar uma versão nova do Billing;
+3. repetir uma jornada `APRO` sem reconciliação manual e comprovar webhook real `200` → `pagamentoConfirmado` único → capability **Registrar entrega** → `ENTREGUE`;
+4. repetir duplicidade, ordem invertida, concorrência e sanitização sobre a versão corrigida.
 
-Até essas confirmações externas, não é correto marcar `[D-PAYMENT-CONTINUITY-TEST-REM-001]` como concluída. A jornada funcional já satisfaz a [direção de continuidade do pagamento](../architecture/payment-checkout-continuity.md) e o [contrato REST](../../contracts/Contrato%20de%20APIs%20REST.md) sem confirmação manual indevida.
+Até essa correção e nova homologação, não é correto marcar a tarefa como concluída. A jornada permaneceu em estado seguro: o provedor é a fonte de verdade, o Billing não fabricou confirmação e nenhuma Outbox terminal foi publicada sem uma notificação autenticada ou reconciliação explícita.

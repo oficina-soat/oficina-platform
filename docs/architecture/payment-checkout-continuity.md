@@ -91,11 +91,11 @@ O endpoint de confirmação manual pode continuar existindo para métodos realme
 As etapas que não dependem do `lab` foram concluídas:
 
 - os [contratos REST](../../contracts/Contrato%20de%20APIs%20REST.md), a [OpenAPI do Billing](../../contracts/openapi/oficina-billing-service.yaml) e o [contrato de idempotência](../../contracts/idempotency.md) incluem instruções PIX, reconciliação autenticada e webhook assinado;
-- o Billing `1.8.0` persiste as instruções, consulta o provedor e converge webhook e atualização manual por transição condicional e Outbox determinística, sem permitir confirmação manual de cobrança integrada;
+- o Billing `1.9.0` persiste as instruções, cria e consulta Orders, converge atualização manual por transição condicional e Outbox determinística e não permite confirmação manual de cobrança integrada; a validação temporal do webhook real ainda precisa aceitar o `ts` em milissegundos;
 - a infraestrutura contrata somente o webhook como rota pública, projeta o secret no Billing e mantém a reconciliação protegida;
 - a UI apresenta as instruções PIX, executa **Atualizar situação** e encaminha o operador ao detalhe da OS após a confirmação, preservando a capability canônica para **Registrar entrega**.
 
-A [homologação da continuidade do pagamento no lab](../delivery/payment-checkout-continuity-lab-evidence.md) já comprovou implantação, Quality Gates, apresentação do PIX, assinatura pública, duplicidade, ordem, concorrência, unicidade e sanitização local. Como a cobrança criada em `/v1/payments` permaneceu pendente no sandbox, o [plano de migração para a API Orders](mercado-pago-orders-migration-plan.md) deve ser executado antes da retomada remota. A tarefa de homologação permanece aberta no [roadmap](../../ROADMAP.md) para aprovação `APRO`, notificação originada pelo Mercado Pago, entrega e releitura remota de traces e alertas.
+A [homologação da continuidade do pagamento no lab](../delivery/payment-checkout-continuity-lab-evidence.md) já comprovou implantação, Quality Gates, apresentação do PIX, reconciliação server-to-server, duplicidade, ordem, concorrência, unicidade e sanitização remota. A jornada com Orders também comprovou `APRO`, order `processed/accredited` e envio real do evento **Order (Mercado Pago)**, mas revelou que o Billing `1.9.0` aplica a tolerância como epoch em segundos sobre o `ts` de 13 dígitos enviado em milissegundos. A tarefa de homologação permanece aberta no [roadmap](../../ROADMAP.md) para corrigir essa unidade temporal e repetir a convergência por webhook real até a entrega, sem reconciliação manual.
 
 ## Relação com atualização da jornada
 

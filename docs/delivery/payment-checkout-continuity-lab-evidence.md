@@ -4,9 +4,9 @@
 
 Em 19/07/2026, a primeira execução de `[D-PAYMENT-CONTINUITY-TEST-REM-001]` validou Billing `1.8.0`, infraestrutura e UI no `lab`, percorreu a jornada até a cobrança PIX pela API legada `/v1/payments` e comprovou a convergência sob notificações duplicadas, fora de ordem e concorrentes. Na retomada do mesmo dia, os deploys e Quality Gates de Billing `1.9.0`, infraestrutura e UI estavam concluídos, mas a criação pela API Orders foi recusada pelo Mercado Pago porque o secret implantado usava uma credencial `TEST-*`. Após a substituição pelo Access Token de teste `APP_USR` exigido pelo provedor, a mesma jornada convergiu por reconciliação para uma order PIX, um pagamento confirmado, uma Outbox financeira terminal e uma entrega.
 
-A confirmação ocorreu exclusivamente por reconciliação server-to-server com o Mercado Pago; nenhuma confirmação financeira foi fabricada. Uma jornada adicional confirmou que o painel envia notificações reais de Orders e que a telemetria está disponível no New Relic, mas revelou uma incompatibilidade na tolerância temporal da assinatura: o provedor envia `ts` em milissegundos e o Billing `1.9.0` o compara como epoch em segundos. A incompatibilidade foi corrigida localmente no Billing `1.10.1`; a homologação permanece aberta até publicar, implantar e repetir a convergência por webhook real.
+A confirmação ocorreu exclusivamente por reconciliação server-to-server com o Mercado Pago; nenhuma confirmação financeira foi fabricada. Uma jornada adicional confirmou que o painel envia notificações reais de Orders e que a telemetria está disponível no New Relic, mas revelou uma incompatibilidade na tolerância temporal da assinatura: o provedor envia `ts` em milissegundos e o Billing `1.9.0` o compara como epoch em segundos. O Billing `1.10.1` corrigiu essa incompatibilidade e o `1.10.2` acrescentou diagnóstico sanitizado da etapa de validação. Um callback real recebido pelo `1.10.2` foi classificado como `hash_mismatch`, comprovando que a pendência atual é a divergência entre o secret de assinatura configurado no Mercado Pago e o valor projetado no runtime. A homologação permanece aberta até rotacionar a credencial correta e repetir a convergência por webhook real.
 
-Nenhum access token, JWT, secret de webhook, código PIX, imagem QR Code ou URL de pagamento foi registrado nesta evidência. As credenciais foram usadas somente em memória e as inspeções persistiram apenas status, contagens e identificadores internos.
+Nenhum access token, JWT, secret de webhook, código PIX, imagem QR Code ou URL de pagamento foi registrado nesta evidência. As consultas e inspeções aqui documentadas apresentam apenas status, contagens e identificadores internos.
 
 ## Deploy e Quality Gates
 
@@ -29,6 +29,10 @@ As variáveis não sensíveis do cenário foram normalizadas para `OFICINA_MERCA
 Após a troca do secret, o [PR 57 da infraestrutura](https://github.com/oficina-soat/oficina-infra/pull/57) publicou a validação preventiva de credenciais e o [run 29691640986](https://github.com/oficina-soat/oficina-infra/actions/runs/29691640986) concluiu os jobs `validate` e `deploy`. O rollout deixou o Billing `1.9.0` pronto no modo `orders` com credencial da classe `APP_USR`; um probe vazio passou da autenticação e recebeu `400` de validação de payload, sem criar order.
 
 Após a rotação do secret de webhook, o [run 29695522333](https://github.com/oficina-soat/oficina-infra/actions/runs/29695522333) concluiu validação e deploy. O novo pod do Billing ficou pronto no modo `orders`; um probe com assinatura inválida recebeu `401` e outro, assinado com o secret efetivamente projetado, passou da autenticação e recebeu `404` para uma order deliberadamente inexistente.
+
+O Billing `1.10.1` foi publicado e implantado pelo [PR 37](https://github.com/oficina-soat/oficina-billing-service/pull/37) e pelo [run 29698187287](https://github.com/oficina-soat/oficina-billing-service/actions/runs/29698187287). Como o callback real continuou recebendo `401`, o Billing `1.10.2` passou a registrar somente o motivo de baixa cardinalidade da rejeição, sem headers, assinatura, corpo ou identificadores externos. O [PR 38](https://github.com/oficina-soat/oficina-billing-service/pull/38), o [run 29699146767](https://github.com/oficina-soat/oficina-billing-service/actions/runs/29699146767) e a [release `v1.10.2`](https://github.com/oficina-soat/oficina-billing-service/releases/tag/v1.10.2) concluíram Quality Gate, publicação e deploy; o pod ficou pronto com a imagem `1.10.2`.
+
+A aplicação canônica dos Secrets Kubernetes também foi endurecida para usar Server-Side Apply e remover a annotation legada `kubectl.kubernetes.io/last-applied-configuration`, que não deve armazenar material reversível de credenciais. O [PR 59](https://github.com/oficina-soat/oficina-infra/pull/59) introduziu a proteção, o [PR 60](https://github.com/oficina-soat/oficina-infra/pull/60) assumiu explicitamente o ownership dos campos anteriormente gerenciados pelo Client-Side Apply e o [PR 61](https://github.com/oficina-soat/oficina-infra/pull/61) aplicou o mesmo padrão à licença do New Relic. O [run 29700717753](https://github.com/oficina-soat/oficina-infra/actions/runs/29700717753) concluiu validação e deploy; a varredura de todos os namespaces encontrou zero Secret com essa annotation, todos os workloads da oficina ficaram prontos e os três pods do collector permaneceram `Running` e prontos.
 
 A policy `Oficina SOAT - Alertas Minimos Lab` já possuía a condição ativa **Pagamento indisponível**, ID `63810244`, conforme a [evidência dos alertas mínimos](../observability/new-relic-alerts-lab-evidence.md). Naquela etapa, a releitura remota não foi possível porque ainda não havia New Relic User API Key no ambiente local; a verificação foi concluída posteriormente neste documento.
 
@@ -169,11 +173,15 @@ timestamp em milissegundos -> 401, assinatura rejeitada antes da consulta
 
 Portanto, a rotação do secret foi implantada e o painel está enviando notificações, mas o Billing `1.9.0` rejeita o webhook real de Orders por incompatibilidade de unidade temporal.
 
-### Correção local no Billing `1.10.1`
+### Correção e diagnóstico no Billing `1.10.1` e `1.10.2`
 
-O commit local `5cb92e9` normaliza para segundos somente o valor usado no cálculo da idade quando o epoch possui 13 dígitos. O `ts` original continua no manifesto HMAC e a comparação constante do hash não foi alterada; notificações legadas de 10 dígitos permanecem compatíveis. Foram adicionados testes de aceitação dentro da janela e rejeição fora da janela para milissegundos.
+O commit `5cb92e9` normaliza para segundos somente o valor usado no cálculo da idade quando o epoch possui 13 dígitos. O `ts` original continua no manifesto HMAC e a comparação constante do hash não foi alterada; notificações legadas de 10 dígitos permanecem compatíveis. Foram adicionados testes de aceitação dentro da janela e rejeição fora da janela para milissegundos.
 
-A validação da candidata passou com 199 testes, PostgreSQL 16 real, todas as 10 migrations, constraints de arquitetura e JaCoCo de 93,84% de linhas e 79,89% de branches. O relatório XML foi gerado. A análise SonarCloud local não foi executada porque `SONAR_TOKEN` não estava disponível; o Quality Gate remoto continua obrigatório antes da publicação.
+A validação da candidata passou com 199 testes, PostgreSQL 16 real, todas as 10 migrations, constraints de arquitetura e JaCoCo de 93,84% de linhas e 79,89% de branches. O relatório XML foi gerado e o Quality Gate remoto aprovou a publicação.
+
+Depois do deploy, probes controlados com o secret efetivamente projetado aceitaram tanto `ts` de 10 como de 13 dígitos e avançaram até o `404` esperado de uma order inexistente. Isso eliminou a unidade temporal como causa residual. O commit `9b740dc`, publicado em `1.10.2`, adicionou a classificação sanitizada das rejeições. Um callback real do Mercado Pago recebido em `19:16:12Z` foi registrado como `webhookValidationReason=hash_mismatch`; a mesma ocorrência foi relida no New Relic com `service.version=1.10.2`.
+
+O diagnóstico oficial somente leitura de notificações do Mercado Pago encontrou duas notificações de Orders, ambas com retorno `401` e nenhuma entrega bem-sucedida na janela consultada. A implementação oficial de validação do [SDK Node.js do Mercado Pago](https://github.com/mercadopago/sdk-nodejs/blob/03f66609884f724dfa718db3afba729462569a4c/src/utils/webhook/index.ts) usa o mesmo manifesto formado por `id`, `request-id` e `ts` bruto. Com o algoritmo, a unidade temporal e a projeção local validados, a evidência converge para secret de assinatura divergente entre a aplicação do provedor e o runtime.
 
 ## Releitura remota no New Relic
 
@@ -182,16 +190,17 @@ A New Relic User API Key permitiu concluir as verificações antes pendentes:
 - a correlação nova possui 62 logs no Billing, 28 no OS e 21 no Execution, totalizando 111 registros e 65 `traceId` distintos;
 - uma amostra de 20 desses traces encontrou spans nos três serviços: 7 no Billing, 8 no OS e 10 no Execution;
 - a janela do webhook registrou os `401` reais e os probes controlados sem incluir headers ou payloads sensíveis;
+- a versão `1.10.2` registrou uma única classificação `hash_mismatch` para o callback real, sem persistir assinatura, secret ou payload;
 - não houve atributo com nome relacionado a secret, assinatura, autorização, access token, QR Code, URL de pagamento ou código copia e cola nos logs e spans correlacionados;
 - não houve ocorrência dos padrões sensíveis conhecidos nas mensagens de log ou nos nomes de spans;
 - a policy **Oficina SOAT - Alertas Minimos Lab** mantém nove condições, e **Pagamento indisponível**, ID `63810244`, está ativa, com prioridade crítica e sem incidente aberto na releitura.
 
 ## Pendências para concluir a tarefa
 
-A configuração do painel, a observabilidade remota e a correção local deixaram de ser pendências. Para concluir `[D-PAYMENT-CONTINUITY-TEST-REM-001]` ainda é necessário:
+A configuração do evento Orders, a observabilidade remota, a correção temporal e o diagnóstico sanitizado deixaram de ser pendências. Para concluir `[D-PAYMENT-CONTINUITY-TEST-REM-001]` ainda é necessário:
 
-1. publicar e implantar o Billing `1.10.1`, após aprovação do Quality Gate remoto;
+1. rotacionar no mesmo ambiente e na mesma aplicação Mercado Pago o Access Token e o secret de assinatura, atualizar os secrets externos do deploy e confirmar que o runtime recebeu o novo valor; a rotação de ambos é necessária porque material reversível foi identificado durante a inspeção operacional, embora tenha sido removido das annotations ativas;
 2. repetir uma jornada `APRO` sem reconciliação manual e comprovar webhook real `200` → `pagamentoConfirmado` único → capability **Registrar entrega** → `ENTREGUE`;
-3. repetir duplicidade, ordem invertida, concorrência e sanitização sobre a versão corrigida.
+3. repetir duplicidade, ordem invertida, concorrência e sanitização sobre a credencial rotacionada e a versão `1.10.2`.
 
-Até a publicação e a nova homologação, não é correto marcar a tarefa como concluída. A jornada permaneceu em estado seguro: o provedor é a fonte de verdade, o Billing não fabricou confirmação e nenhuma Outbox terminal foi publicada sem uma notificação autenticada ou reconciliação explícita.
+Até a rotação e a nova homologação, não é correto marcar a tarefa como concluída. A jornada permaneceu em estado seguro: o provedor é a fonte de verdade, o Billing não fabricou confirmação e nenhuma Outbox terminal foi publicada sem uma notificação autenticada ou reconciliação explícita.

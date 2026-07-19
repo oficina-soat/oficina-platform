@@ -74,6 +74,8 @@ Fonte canônica: [OpenAPI do oficina-billing-service](../../contracts/openapi/of
 | `POST` | `/api/v1/orcamentos` |
 | `GET` | `/api/v1/orcamentos/{orcamentoId}` |
 | `GET` | `/api/v1/ordens-servico/{ordemServicoId}/orcamentos` |
+| `GET` | `/api/v1/ordens-servico/{ordemServicoId}/orcamento-link` |
+| `POST` | `/api/v1/ordens-servico/{ordemServicoId}/orcamento-link` |
 | `GET` | `/api/v1/ordens-servico/{ordemServicoId}/acompanhar-link` |
 | `GET` | `/api/v1/ordens-servico/{ordemServicoId}/aprovar-link` |
 | `POST` | `/api/v1/ordens-servico/{ordemServicoId}/aprovar-link` |
@@ -81,6 +83,7 @@ Fonte canônica: [OpenAPI do oficina-billing-service](../../contracts/openapi/of
 | `POST` | `/api/v1/ordens-servico/{ordemServicoId}/recusar-link` |
 | `POST` | `/api/v1/orcamentos/{orcamentoId}/aprovacao` |
 | `POST` | `/api/v1/orcamentos/{orcamentoId}/recusa` |
+| `POST` | `/api/v1/orcamentos/{orcamentoId}/notificacao/reenvio` |
 | `POST` | `/api/v1/pagamentos` |
 | `GET` | `/api/v1/pagamentos/{pagamentoId}` |
 | `GET` | `/api/v1/ordens-servico/{ordemServicoId}/pagamentos` |

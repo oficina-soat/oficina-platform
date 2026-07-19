@@ -381,13 +381,13 @@ Resposta esperada:
   ],
   "valorTotal": 350.00,
   "status": "GERADO",
-  "acoesPermitidas": ["APROVAR", "RECUSAR"]
+  "acoesPermitidas": ["APROVAR", "RECUSAR", "REENVIAR_EMAIL"]
 }
 ```
 
 Os itens do orçamento são snapshots financeiros calculados e persistidos pelo `oficina-billing-service` a partir dos itens da Ordem de Serviço. Eles devem preservar a composição usada para aprovação e pagamento, sem criar ownership do catálogo técnico no Billing.
 
-Toda representação de orçamento inclui `acoesPermitidas`. A UI deve oferecer aprovação ou recusa somente quando a ação correspondente for devolvida pelo serviço; após uma decisão, a lista fica vazia.
+Toda representação de orçamento inclui `acoesPermitidas`. A UI deve oferecer aprovação, recusa ou reenvio da solicitação por e-mail somente quando a ação correspondente for devolvida pelo serviço; após uma decisão, a lista fica vazia. `REENVIAR_EMAIL` é uma ação operacional autenticada para `administrativo` e `recepcionista`, válida somente enquanto o orçamento estiver `GERADO`.
 
 ### Consultar orçamento
 
@@ -413,21 +413,29 @@ POST /api/v1/orcamentos/{orcamentoId}/aprovacao
 POST /api/v1/orcamentos/{orcamentoId}/recusa
 ```
 
-### Links públicos de acompanhamento e decisão
-
-O Billing Service preserva o fluxo de links de capacidade do sistema de referência. Estas rotas não exigem JWT; o parâmetro `actionToken` é a credencial restrita à ação, à Ordem de Serviço e ao orçamento.
+### Reenviar solicitação de decisão por e-mail
 
 ```http
-GET /api/v1/ordens-servico/{ordemServicoId}/acompanhar-link?actionToken={token}
-GET /api/v1/ordens-servico/{ordemServicoId}/aprovar-link?actionToken={token}
-POST /api/v1/ordens-servico/{ordemServicoId}/aprovar-link
-GET /api/v1/ordens-servico/{ordemServicoId}/recusar-link?actionToken={token}
-POST /api/v1/ordens-servico/{ordemServicoId}/recusar-link
+POST /api/v1/orcamentos/{orcamentoId}/notificacao/reenvio
+X-Idempotency-Key: {chave}
 ```
 
-Os `GET` de aprovação e recusa apresentam uma página HTML de confirmação e não alteram estado. Os `POST` recebem `actionToken` em formulário `application/x-www-form-urlencoded`, consomem o token uma única vez e apresentam o resultado em HTML. A recusa pode receber um motivo opcional.
+A operação exige JWT com papel `administrativo` ou `recepcionista`, aceita somente orçamento `GERADO`, invalida capabilities emitidas anteriormente, cria uma nova capability `DECIDIR` com validade de 24 horas e solicita nova entrega ao e-mail canônico projetado. Repetições com a mesma chave de idempotência não podem produzir novos tokens nem e-mails adicionais. Falha da dependência de notificação retorna erro retryable e preserva a possibilidade de nova tentativa.
 
-Cada link usa token aleatório de 32 bytes, Base64 URL-safe sem padding, armazenado exclusivamente como hash SHA-256 e válido por 24 horas. A validação exige correspondência de ação, OS, orçamento e token ainda não consumido. O consumo usa lock transacional e a decisão publica no máximo um evento pela Outbox. Token inválido, expirado, incompatível ou reutilizado retorna uma página genérica com HTTP `401`, sem distinguir a causa.
+### Link público unificado de orçamento e decisão
+
+O Billing Service envia ao cliente um único link. A rota não exige JWT; o parâmetro `actionToken` é a capability `DECIDIR`, restrita à Ordem de Serviço, ao orçamento e ao conjunto fechado de decisões aprovar ou recusar.
+
+```http
+GET /api/v1/ordens-servico/{ordemServicoId}/orcamento-link?actionToken={token}
+POST /api/v1/ordens-servico/{ordemServicoId}/orcamento-link
+```
+
+O `GET` apresenta em uma única página HTML os itens, quantidades, valores, total, estado e os botões **Aprovar orçamento** e **Recusar orçamento**, sem alterar estado. O `POST` recebe `actionToken`, `decisao=APROVAR|RECUSAR` e motivo opcional em formulário `application/x-www-form-urlencoded`, consome a capability uma única vez e apresenta o resultado em HTML.
+
+Cada link usa token aleatório de 32 bytes, Base64 URL-safe sem padding, armazenado exclusivamente como hash SHA-256 e válido por 24 horas. A validação exige capability `DECIDIR`, correspondência de OS e orçamento e token ainda não consumido. O consumo usa lock transacional e a decisão publica no máximo um evento pela Outbox. Token inválido, expirado, incompatível ou reutilizado retorna uma página genérica sem distinguir a causa.
+
+As rotas históricas `acompanhar-link`, `aprovar-link` e `recusar-link` permanecem temporariamente disponíveis apenas para capabilities já emitidas. Novas emissões e reenvios usam exclusivamente `orcamento-link`; a compatibilidade não autoriza gerar novamente os três links.
 
 Tokens não podem aparecer em logs, eventos, traces, métricas, mensagens de erro ou respostas administrativas. O contrato implementável está no [OpenAPI do oficina-billing-service](openapi/oficina-billing-service.yaml), e o ownership está na [Aprovação do orçamento pelo cliente](../docs/architecture/customer-budget-approval-gap.md).
 

@@ -175,7 +175,7 @@ CREATE INDEX ix_orcamento_ordem_servico ON orcamento (ordem_de_servico_id);
 
 ### Tokens de decisão pública
 
-O Billing é o proprietário dos tokens de acompanhamento, aprovação e recusa. O valor bruto existe somente durante a geração dos links; a tabela persiste exclusivamente SHA-256 hexadecimal, conforme o [contrato de aprovação do cliente](../architecture/customer-budget-approval-gap.md).
+O Billing é o proprietário da capability `DECIDIR`. O valor bruto existe somente durante a geração do link; a tabela persiste exclusivamente SHA-256 hexadecimal, conforme o [contrato de aprovação do cliente](../architecture/customer-budget-approval-gap.md). Os valores históricos `ACOMPANHAR`, `APROVAR` e `RECUSAR` permanecem aceitos durante a compatibilidade com links já emitidos.
 
 ```sql
 CREATE TABLE orcamento_action_token (
@@ -193,7 +193,7 @@ CREATE TABLE orcamento_action_token (
     FOREIGN KEY (orcamento_id)
     REFERENCES orcamento (id),
   CONSTRAINT ck_orcamento_action_token_acao
-    CHECK (acao IN ('ACOMPANHAR', 'APROVAR', 'RECUSAR')),
+    CHECK (acao IN ('ACOMPANHAR', 'APROVAR', 'RECUSAR', 'DECIDIR')),
   CONSTRAINT ck_orcamento_action_token_expiracao
     CHECK (expira_em > criado_em)
 );
@@ -202,7 +202,7 @@ CREATE INDEX ix_orcamento_action_token_orcamento
   ON orcamento_action_token (orcamento_id);
 ```
 
-O consumo de `APROVAR` e `RECUSAR` deve bloquear a linha, revalidar token, ação, OS, orçamento, expiração e ausência de `usado_em`, registrar a decisão e a Outbox na mesma transação. `ACOMPANHAR` valida o token sem consumi-lo.
+O consumo de `DECIDIR` deve bloquear a linha, revalidar token, OS, orçamento, expiração e ausência de `usado_em`, aceitar somente a escolha `APROVAR|RECUSAR` e registrar a decisão e a Outbox na mesma transação. As ações históricas preservam o comportamento anterior somente durante a compatibilidade.
 
 ### Itens do orçamento
 

@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: oficina-billing-service API
-  version: 1.5.0
+  version: 1.6.0
   description: Contrato REST v1 para orcamentos, decisoes publicas por capability, recusas e pagamentos.
   license:
     name: Internal
@@ -91,7 +91,7 @@ paths:
                     status: GERADO
                     criadoEm: "2026-06-23T15:30:00Z"
                     atualizadoEm: "2026-06-23T15:30:00Z"
-                    acoesPermitidas: [APROVAR, RECUSAR]
+                    acoesPermitidas: [APROVAR, RECUSAR, REENVIAR_EMAIL]
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -204,6 +204,70 @@ paths:
           $ref: "#/components/responses/NotFound"
         "409":
           $ref: "#/components/responses/Conflict"
+  /orcamentos/{orcamentoId}/notificacao/reenvio:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
+    post:
+      tags: [Orcamentos]
+      summary: Reenviar a solicitação de decisão do orçamento por e-mail
+      operationId: reenviarNotificacaoOrcamento
+      x-required-roles: [administrativo, recepcionista]
+      parameters:
+        - $ref: "#/components/parameters/OrcamentoId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "204":
+          description: Nova capability emitida e solicitação de entrega aceita pela notificação.
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "502":
+          $ref: "#/components/responses/BadGateway"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+  /ordens-servico/{ordemServicoId}/orcamento-link:
+    parameters:
+      - $ref: "#/components/parameters/CorrelationId"
+      - $ref: "#/components/parameters/OrdemServicoId"
+    get:
+      tags: [Decisao publica]
+      summary: Abrir os dados e as decisões do orçamento em uma única página
+      operationId: abrirDecisaoOrcamentoPorLink
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/ActionToken"
+      responses:
+        "200":
+          $ref: "#/components/responses/MagicLinkHtml"
+        "401":
+          $ref: "#/components/responses/MagicLinkUnauthorized"
+    post:
+      tags: [Decisao publica]
+      summary: Registrar aprovação ou recusa com uma capability única
+      operationId: confirmarDecisaoOrcamentoPorLink
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/DecisaoPublicaUnificadaRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/MagicLinkHtml"
+        "400":
+          $ref: "#/components/responses/MagicLinkBadRequest"
+        "401":
+          $ref: "#/components/responses/MagicLinkUnauthorized"
+        "409":
+          $ref: "#/components/responses/MagicLinkConflict"
   /ordens-servico/{ordemServicoId}/acompanhar-link:
     parameters:
       - $ref: "#/components/parameters/CorrelationId"
@@ -213,6 +277,7 @@ paths:
       tags: [Decisao publica]
       summary: Acompanhar a Ordem de Servico pelo link do cliente
       operationId: acompanharOrdemServicoPorLink
+      deprecated: true
       security: []
       responses:
         "200":
@@ -227,6 +292,7 @@ paths:
       tags: [Decisao publica]
       summary: Abrir a confirmacao de aprovacao do orcamento
       operationId: abrirAprovacaoOrcamentoPorLink
+      deprecated: true
       security: []
       parameters:
         - $ref: "#/components/parameters/ActionToken"
@@ -239,6 +305,7 @@ paths:
       tags: [Decisao publica]
       summary: Confirmar a aprovacao do orcamento
       operationId: confirmarAprovacaoOrcamentoPorLink
+      deprecated: true
       security: []
       requestBody:
         required: true
@@ -261,6 +328,7 @@ paths:
       tags: [Decisao publica]
       summary: Abrir a confirmacao de recusa do orcamento
       operationId: abrirRecusaOrcamentoPorLink
+      deprecated: true
       security: []
       parameters:
         - $ref: "#/components/parameters/ActionToken"
@@ -273,6 +341,7 @@ paths:
       tags: [Decisao publica]
       summary: Confirmar a recusa do orcamento
       operationId: confirmarRecusaOrcamentoPorLink
+      deprecated: true
       security: []
       requestBody:
         required: true
@@ -719,6 +788,15 @@ components:
         text/html:
           schema:
             type: string
+    MagicLinkBadRequest:
+      description: A decisão informada não pertence ao conjunto APROVAR ou RECUSAR.
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+      content:
+        text/html:
+          schema:
+            type: string
     MagicLinkUnauthorized:
       description: Link invalido, expirado, incompatível ou ja utilizado; a pagina nao distingue a causa.
       headers:
@@ -842,6 +920,21 @@ components:
         motivo:
           type: string
           maxLength: 500
+    DecisaoPublicaUnificadaRequest:
+      type: object
+      required: [actionToken, decisao]
+      properties:
+        actionToken:
+          type: string
+          minLength: 43
+          maxLength: 128
+          description: Capability opaca DECIDIR; nunca deve ser logada.
+        decisao:
+          type: string
+          enum: [APROVAR, RECUSAR]
+        motivo:
+          type: string
+          maxLength: 500
     Orcamento:
       type: object
       required: [orcamentoId, ordemServicoId, itens, valorTotal, status, criadoEm, atualizadoEm, acoesPermitidas]
@@ -875,7 +968,7 @@ components:
             $ref: "#/components/schemas/AcaoPermitidaOrcamento"
     AcaoPermitidaOrcamento:
       type: string
-      enum: [APROVAR, RECUSAR]
+      enum: [APROVAR, RECUSAR, REENVIAR_EMAIL]
     StatusOrcamento:
       type: string
       enum: [GERADO, APROVADO, RECUSADO]

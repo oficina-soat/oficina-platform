@@ -86,6 +86,15 @@ Contexto e invariantes estão consolidados na [Lacuna de aprovação do orçamen
 - [x] `[D-APPROVAL-IMPL-004]` Remover `INICIAR_EXECUCAO` das ações da OS em `AGUARDANDO_APROVACAO` e impedir a transição direta no backend, na OpenAPI e na UI; liberar a execução exclusivamente pelo evento `orcamentoAprovado`. Concluído com rejeição da transição operacional direta, remoção da capability nos contratos e na UI e preservação do avanço orientado por `orcamentoAprovado` seguido de `execucaoIniciada`.
 - [x] `[D-APPROVAL-TEST-001]` Cobrir contratos, autorização, expiração, reutilização, concorrência, idempotência, indisponibilidade de notificação e fluxos E2E aprovado e recusado; homologar no `lab` sem expor tokens ou dados pessoais nas evidências. Concluído com cobertura automatizada dos cenários de segurança e falha e [homologação no lab](docs/delivery/customer-budget-approval-lab-evidence.md) das jornadas aprovada e recusada, bloqueio do atalho operacional e consumo único real.
 
+### Aprimoramento da decisão e do reenvio do orçamento
+
+O contrato vigente está consolidado na [Aprovação do orçamento pelo cliente](docs/architecture/customer-budget-approval-gap.md).
+
+- [x] `[D-APPROVAL-UX-CONTRACT-001]` Substituir novas emissões dos três links por uma capability única `DECIDIR`, de uso único, com tela pública contendo itens, total e os botões de aprovação e recusa; preservar temporariamente as rotas antigas somente para links já emitidos.
+- [x] `[D-APPROVAL-RESEND-IMPL-001]` Contratar e implementar no Billing `1.10.0` o reenvio idempotente da solicitação para orçamento `GERADO`, restrito a `administrativo` e `recepcionista`, invalidando capabilities anteriores sem recriar orçamento, Outbox `orcamentoGerado` ou efeito financeiro.
+- [x] `[D-APPROVAL-UX-UI-INFRA-001]` Incluir na UI o botão **Reenviar e-mail do orçamento** condicionado a `REENVIAR_EMAIL`, expor as novas rotas na infraestrutura e proteger no Quality Gate o proxy `/mailhog/ -> mailhog:8025`. A verificação somente leitura do ambiente em 19/07/2026 confirmou que a UI, o port-forward e a Lambda de notificação usam o mesmo pod e o mesmo NLB SMTP ativo.
+- [ ] `[D-APPROVAL-UX-REM-001]` Implantar Billing `1.10.0`, infraestrutura e UI e homologar no `lab` um único e-mail, apresentação completa do orçamento, aprovação, recusa, consumo único, reenvio, invalidação do link anterior e convergência entre MailHog da UI e port-forward; validar os Quality Gates remotos sem expor capability ou e-mail nas evidências.
+
 ## Candidatas futuras
 
 Estes itens não pertencem à sequência ativa. A promoção deve mover o item para a posição desejada na seção anterior e substituir o prefixo `FUT` por um identificador do épico correspondente.

@@ -82,7 +82,7 @@ O CRUD administrativo publica [usuarioAdicionado](../../contracts/events/usuario
 |---|---|
 | Entidades próprias | Orçamento, item financeiro do orçamento, aprovação de orçamento, recusa de orçamento, tokens de capacidade para decisão pública, pagamento, status financeiro, histórico financeiro da OS, dados de integração financeira. |
 | Banco de dados | Amazon RDS for PostgreSQL, database `oficina_billing`, usuário `oficina_billing_user`. |
-| APIs REST | APIs autenticadas de orçamento e pagamento; rotas públicas `/api/v1/ordens-servico/{ordemServicoId}/acompanhar-link`, `/aprovar-link` e `/recusar-link`, protegidas por token de capacidade conforme o [contrato de aprovação do cliente](customer-budget-approval-gap.md). |
+| APIs REST | APIs autenticadas de orçamento, reenvio de notificação e pagamento; rota pública vigente `/api/v1/ordens-servico/{ordemServicoId}/orcamento-link`, protegida pela capability `DECIDIR`; rotas históricas de acompanhamento, aprovação e recusa permanecem somente para compatibilidade conforme o [contrato de aprovação do cliente](customer-budget-approval-gap.md). |
 | Eventos produzidos | `orcamentoGerado`, `orcamentoAprovado`, `orcamentoRecusado`, `pagamentoSolicitado`, `pagamentoConfirmado`, `pagamentoRecusado`. |
 | Eventos consumidos | `ordemDeServicoCriada`, `pecaIncluidaNaOrdemDeServico`, `servicoIncluidoNaOrdemDeServico`, `diagnosticoFinalizado`, `execucaoFinalizada`, `ordemDeServicoFinalizada`, `ordemDeServicoEntregue`, `estoqueAcrescentado`, `estoqueBaixado`, `sagaCompensada`, `sagaFinalizadaComSucesso`. |
 | Outbox/jobs | Outbox dos eventos financeiros; jobs de publicação de eventos; jobs de consulta ou conciliação com provedor financeiro quando aplicável. |

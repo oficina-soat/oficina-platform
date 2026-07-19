@@ -55,3 +55,5 @@ Este diretório concentra a documentação normativa da plataforma em grupos tem
 - [Checklist final de entrega](delivery/phase-4-delivery-checklist.md)
 - [Roteiro do vídeo de demonstração](delivery/video-demonstration-script.md)
 - [Ferramentas de validação local](delivery/validation-tooling.md)
+- [Evidência local da migração Mercado Pago Orders](delivery/payment-orders-local-evidence.md)
+- [Homologação da continuidade do pagamento no Lab](delivery/payment-checkout-continuity-lab-evidence.md)

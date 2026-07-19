@@ -72,7 +72,7 @@ A consulta dos spans já exportados no New Relic não pôde ser repetida sem uma
 A tarefa permanece aberta no [roadmap](../../ROADMAP.md) pelos seguintes pontos dependentes do ambiente externo:
 
 1. após a migração, acessar **Suas integrações > Webhooks** no Mercado Pago, confirmar a URL de teste HTTPS, o evento **Order (Mercado Pago)** e, durante a compatibilidade legada, **Pagamentos**, além de confirmar que o secret gerado corresponde ao secret implantado; então executar o simulador e registrar a entrega `2xx` originada pelo provedor;
-2. executar o [plano de migração para a API Orders](../architecture/mercado-pago-orders-migration-plan.md). O fluxo validado nesta evidência usa `/v1/payments`, cujo PIX permaneceu `pending`; a sequência Orders agora antecede a homologação no [roadmap](../../ROADMAP.md) para viabilizar a aprovação automática `APRO`;
+2. publicar e implantar a candidata Billing `1.9.0` e a configuração já aprovadas na [evidência local da migração Orders](payment-orders-local-evidence.md). O fluxo validado nesta evidência usa `/v1/payments`, cujo PIX permaneceu `pending`; a retomada usará Orders para viabilizar a aprovação automática `APRO`;
 3. após `processed/accredited`, repetir webhook ou **Atualizar situação**, comprovar uma única Outbox `pagamentoConfirmado`, a capability **Registrar entrega** e a OS em `ENTREGUE`;
 4. consultar logs e spans da correlação no New Relic com uma User API Key, confirmando a sanitização e relendo o estado atual da policy de alertas.
 

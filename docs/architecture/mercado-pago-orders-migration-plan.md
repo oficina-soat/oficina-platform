@@ -8,7 +8,9 @@ Este plano complementa a [continuidade do pagamento e entrega pela UI](payment-c
 
 ## Estado atual
 
-O Billing `1.8.0` cria cobranças em `POST /v1/payments`, persiste o ID numérico do payment em `transacaoExternaId` e reconcilia por `GET /v1/payments/{id}`. O webhook aceita somente `type=payment`. Essa integração apresentou corretamente o PIX, mas a cobrança sandbox permaneceu pendente na [homologação parcial](../delivery/payment-checkout-continuity-lab-evidence.md).
+O `lab` ainda executa o Billing `1.8.0`, que cria cobranças em `POST /v1/payments`, persiste o ID numérico do payment em `transacaoExternaId` e reconcilia por `GET /v1/payments/{id}`. Essa integração apresentou corretamente o PIX, mas a cobrança sandbox permaneceu pendente na [homologação parcial](../delivery/payment-checkout-continuity-lab-evidence.md).
+
+A candidata local `1.9.0` e a projeção de infraestrutura já implementam as quatro etapas preparatórias deste plano. A [evidência local da migração Orders](../delivery/payment-orders-local-evidence.md) registra contratos, migration, testes, cobertura e validações. Portanto, a próxima etapa é exclusivamente `[D-PAYMENT-CONTINUITY-TEST-REM-001]`: publicar e implantar os artefatos, configurar o evento **Order (Mercado Pago)** e executar a jornada no `lab`, sempre mediante autorização explícita para qualquer workflow.
 
 A documentação atual do Mercado Pago define para Orders:
 

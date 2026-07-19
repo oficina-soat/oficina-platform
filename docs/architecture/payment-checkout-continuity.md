@@ -95,7 +95,7 @@ As etapas que não dependem do `lab` foram concluídas:
 - a infraestrutura contrata somente o webhook como rota pública, projeta o secret no Billing e mantém a reconciliação protegida;
 - a UI apresenta as instruções PIX, executa **Atualizar situação** e encaminha o operador ao detalhe da OS após a confirmação, preservando a capability canônica para **Registrar entrega**.
 
-A [homologação da continuidade do pagamento no lab](../delivery/payment-checkout-continuity-lab-evidence.md) já comprovou implantação, Quality Gates, apresentação do PIX, assinatura pública, duplicidade, ordem, concorrência, unicidade e sanitização local. A tarefa permanece aberta no [roadmap](../../ROADMAP.md) para a notificação originada pelo painel do Mercado Pago, a aprovação real do pagamento no sandbox, a entrega e a releitura remota de traces e alertas.
+A [homologação da continuidade do pagamento no lab](../delivery/payment-checkout-continuity-lab-evidence.md) já comprovou implantação, Quality Gates, apresentação do PIX, assinatura pública, duplicidade, ordem, concorrência, unicidade e sanitização local. Como a cobrança criada em `/v1/payments` permaneceu pendente no sandbox, o [plano de migração para a API Orders](mercado-pago-orders-migration-plan.md) deve ser executado antes da retomada remota. A tarefa de homologação permanece aberta no [roadmap](../../ROADMAP.md) para aprovação `APRO`, notificação originada pelo Mercado Pago, entrega e releitura remota de traces e alertas.
 
 ## Relação com atualização da jornada
 

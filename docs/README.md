@@ -13,6 +13,7 @@ Este diretório concentra a documentação normativa da plataforma em grupos tem
 - [Nova medição após o isolamento dos workers](architecture/journey-freshness-remeasurement.md)
 - [Plano de redução da defasagem da jornada](architecture/journey-freshness-remediation-plan.md)
 - [Continuidade do pagamento e entrega pela UI](architecture/payment-checkout-continuity.md)
+- [Plano de migração do Mercado Pago Payments para Orders](architecture/mercado-pago-orders-migration-plan.md)
 
 ## Infraestrutura
 

@@ -71,9 +71,9 @@ A consulta dos spans já exportados no New Relic não pôde ser repetida sem uma
 
 A tarefa permanece aberta no [roadmap](../../ROADMAP.md) pelos seguintes pontos dependentes do ambiente externo:
 
-1. acessar **Suas integrações > Webhooks** no Mercado Pago, confirmar a URL de teste HTTPS, o evento **Pagamentos** e que o secret gerado corresponde ao secret implantado, então executar o simulador e registrar a entrega `2xx` originada pelo provedor;
-2. obter uma transição sandbox comprovável para `approved` na integração usada pelo Billing. O fluxo atual usa `/v1/payments`, cujo PIX criado nesta execução permaneceu `pending`; a documentação atual de aprovação automática por `APRO` pertence a `/v1/orders`, e migrar o adapter é uma mudança de implementação que exige decisão explícita;
-3. após `approved`, repetir webhook ou **Atualizar situação**, comprovar uma única Outbox `pagamentoConfirmado`, a capability **Registrar entrega** e a OS em `ENTREGUE`;
+1. após a migração, acessar **Suas integrações > Webhooks** no Mercado Pago, confirmar a URL de teste HTTPS, o evento **Order (Mercado Pago)** e, durante a compatibilidade legada, **Pagamentos**, além de confirmar que o secret gerado corresponde ao secret implantado; então executar o simulador e registrar a entrega `2xx` originada pelo provedor;
+2. executar o [plano de migração para a API Orders](../architecture/mercado-pago-orders-migration-plan.md). O fluxo validado nesta evidência usa `/v1/payments`, cujo PIX permaneceu `pending`; a sequência Orders agora antecede a homologação no [roadmap](../../ROADMAP.md) para viabilizar a aprovação automática `APRO`;
+3. após `processed/accredited`, repetir webhook ou **Atualizar situação**, comprovar uma única Outbox `pagamentoConfirmado`, a capability **Registrar entrega** e a OS em `ENTREGUE`;
 4. consultar logs e spans da correlação no New Relic com uma User API Key, confirmando a sanitização e relendo o estado atual da policy de alertas.
 
 Até esses passos, não é correto marcar `[D-PAYMENT-CONTINUITY-TEST-REM-001]` como concluída nem contornar a evidência do provedor por confirmação manual, pois isso violaria a [direção de continuidade do pagamento](../architecture/payment-checkout-continuity.md) e o [contrato REST](../../contracts/Contrato%20de%20APIs%20REST.md).

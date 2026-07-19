@@ -4,7 +4,7 @@
 
 Em 19/07/2026, a primeira execução de `[D-PAYMENT-CONTINUITY-TEST-REM-001]` validou Billing `1.8.0`, infraestrutura e UI no `lab`, percorreu a jornada até a cobrança PIX pela API legada `/v1/payments` e comprovou a convergência sob notificações duplicadas, fora de ordem e concorrentes. Na retomada do mesmo dia, os deploys e Quality Gates de Billing `1.9.0`, infraestrutura e UI estavam concluídos, mas a criação pela API Orders foi recusada pelo Mercado Pago porque o secret implantado usava uma credencial `TEST-*`. Após a substituição pelo Access Token de teste `APP_USR` exigido pelo provedor, a mesma jornada convergiu por reconciliação para uma order PIX, um pagamento confirmado, uma Outbox financeira terminal e uma entrega.
 
-A confirmação ocorreu exclusivamente por reconciliação server-to-server com o Mercado Pago; nenhuma confirmação financeira foi fabricada. Uma jornada adicional confirmou que o painel envia notificações reais de Orders e que a telemetria está disponível no New Relic, mas revelou uma incompatibilidade na tolerância temporal da assinatura: o provedor envia `ts` em milissegundos e o Billing `1.9.0` o compara como epoch em segundos. A homologação permanece aberta até corrigir e repetir a convergência por webhook real.
+A confirmação ocorreu exclusivamente por reconciliação server-to-server com o Mercado Pago; nenhuma confirmação financeira foi fabricada. Uma jornada adicional confirmou que o painel envia notificações reais de Orders e que a telemetria está disponível no New Relic, mas revelou uma incompatibilidade na tolerância temporal da assinatura: o provedor envia `ts` em milissegundos e o Billing `1.9.0` o compara como epoch em segundos. A incompatibilidade foi corrigida localmente no Billing `1.10.1`; a homologação permanece aberta até publicar, implantar e repetir a convergência por webhook real.
 
 Nenhum access token, JWT, secret de webhook, código PIX, imagem QR Code ou URL de pagamento foi registrado nesta evidência. As credenciais foram usadas somente em memória e as inspeções persistiram apenas status, contagens e identificadores internos.
 
@@ -167,7 +167,13 @@ timestamp em segundos      -> 404, assinatura aceita e order inexistente
 timestamp em milissegundos -> 401, assinatura rejeitada antes da consulta
 ```
 
-Portanto, a rotação do secret foi implantada e o painel está enviando notificações, mas o webhook real de Orders é rejeitado por incompatibilidade de unidade temporal. A correção deve normalizar apenas o valor usado no cálculo da idade para segundos, preservando o `ts` original no manifesto HMAC e a comparação constante do hash.
+Portanto, a rotação do secret foi implantada e o painel está enviando notificações, mas o Billing `1.9.0` rejeita o webhook real de Orders por incompatibilidade de unidade temporal.
+
+### Correção local no Billing `1.10.1`
+
+O commit local `5cb92e9` normaliza para segundos somente o valor usado no cálculo da idade quando o epoch possui 13 dígitos. O `ts` original continua no manifesto HMAC e a comparação constante do hash não foi alterada; notificações legadas de 10 dígitos permanecem compatíveis. Foram adicionados testes de aceitação dentro da janela e rejeição fora da janela para milissegundos.
+
+A validação da candidata passou com 199 testes, PostgreSQL 16 real, todas as 10 migrations, constraints de arquitetura e JaCoCo de 93,84% de linhas e 79,89% de branches. O relatório XML foi gerado. A análise SonarCloud local não foi executada porque `SONAR_TOKEN` não estava disponível; o Quality Gate remoto continua obrigatório antes da publicação.
 
 ## Releitura remota no New Relic
 
@@ -182,11 +188,10 @@ A New Relic User API Key permitiu concluir as verificações antes pendentes:
 
 ## Pendências para concluir a tarefa
 
-A configuração do painel e a observabilidade remota deixaram de ser pendências. Para concluir `[D-PAYMENT-CONTINUITY-TEST-REM-001]` ainda é necessário:
+A configuração do painel, a observabilidade remota e a correção local deixaram de ser pendências. Para concluir `[D-PAYMENT-CONTINUITY-TEST-REM-001]` ainda é necessário:
 
-1. corrigir no Billing a validação da tolerância para aceitar o `ts` em milissegundos usado por Orders, mantendo compatibilidade com notificações legadas em segundos;
-2. publicar e implantar uma versão nova do Billing;
-3. repetir uma jornada `APRO` sem reconciliação manual e comprovar webhook real `200` → `pagamentoConfirmado` único → capability **Registrar entrega** → `ENTREGUE`;
-4. repetir duplicidade, ordem invertida, concorrência e sanitização sobre a versão corrigida.
+1. publicar e implantar o Billing `1.10.1`, após aprovação do Quality Gate remoto;
+2. repetir uma jornada `APRO` sem reconciliação manual e comprovar webhook real `200` → `pagamentoConfirmado` único → capability **Registrar entrega** → `ENTREGUE`;
+3. repetir duplicidade, ordem invertida, concorrência e sanitização sobre a versão corrigida.
 
-Até essa correção e nova homologação, não é correto marcar a tarefa como concluída. A jornada permaneceu em estado seguro: o provedor é a fonte de verdade, o Billing não fabricou confirmação e nenhuma Outbox terminal foi publicada sem uma notificação autenticada ou reconciliação explícita.
+Até a publicação e a nova homologação, não é correto marcar a tarefa como concluída. A jornada permaneceu em estado seguro: o provedor é a fonte de verdade, o Billing não fabricou confirmação e nenhuma Outbox terminal foi publicada sem uma notificação autenticada ou reconciliação explícita.

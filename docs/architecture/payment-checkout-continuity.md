@@ -95,7 +95,7 @@ As etapas que não dependem do `lab` foram concluídas:
 - a infraestrutura contrata somente o webhook como rota pública, projeta o secret no Billing e mantém a reconciliação protegida;
 - a UI apresenta as instruções PIX, executa **Atualizar situação** e encaminha o operador ao detalhe da OS após a confirmação, preservando a capability canônica para **Registrar entrega**.
 
-Permanece aberta no [roadmap](../../ROADMAP.md) somente a implantação e homologação: configurar no sandbox a URL e o secret do webhook, ativar os alertas, validar os Quality Gates remotos e produzir evidência ponta a ponta no `lab`, incluindo duplicidade, ordem, concorrência e sanitização da telemetria.
+A [homologação da continuidade do pagamento no lab](../delivery/payment-checkout-continuity-lab-evidence.md) já comprovou implantação, Quality Gates, apresentação do PIX, assinatura pública, duplicidade, ordem, concorrência, unicidade e sanitização local. A tarefa permanece aberta no [roadmap](../../ROADMAP.md) para a notificação originada pelo painel do Mercado Pago, a aprovação real do pagamento no sandbox, a entrega e a releitura remota de traces e alertas.
 
 ## Relação com atualização da jornada
 

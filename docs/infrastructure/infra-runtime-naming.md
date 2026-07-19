@@ -137,10 +137,12 @@ Variáveis opcionais, configure apenas quando houver necessidade de sobrescrever
 
 ```text
 OFICINA_MERCADO_PAGO_API_URL=https://api.mercadopago.com
-OFICINA_MERCADO_PAGO_PAYER_EMAIL=<email-comprador-sandbox>
+OFICINA_MERCADO_PAGO_API_MODE=orders
+OFICINA_MERCADO_PAGO_PAYER_EMAIL=test_user_br@testuser.com
+OFICINA_MERCADO_PAGO_PAYER_FIRST_NAME=APRO
 ```
 
-`OFICINA_MERCADO_PAGO_API_URL` não precisa ser cadastrada como variável GitHub enquanto o endpoint oficial for `https://api.mercadopago.com`, pois esse já é o default do `oficina-billing-service`. `OFICINA_MERCADO_PAGO_PAYER_EMAIL` também não precisa ser configurada sempre; use apenas se o Mercado Pago exigir um e-mail de comprador sandbox específico para o teste ou se o default local não for aceito.
+`OFICINA_MERCADO_PAGO_API_URL` e `OFICINA_MERCADO_PAGO_API_MODE` não precisam ser cadastradas como variáveis GitHub enquanto forem usados os defaults `https://api.mercadopago.com` e `orders`. Para a homologação automática no `lab`, configure o e-mail oficial de teste e `OFICINA_MERCADO_PAGO_PAYER_FIRST_NAME=APRO`. O Billing deve recusar o startup com `APRO` fora de `lab` ou `test`. O valor temporário `payments` em `OFICINA_MERCADO_PAGO_API_MODE` existe somente para rollback de criação; orders já persistidas continuam consultadas como Orders.
 
 Não cadastre Public Key, Client ID, Client Secret, dados de cartão ou chave Pix no escopo atual. O Access Token e o webhook secret pertencem exclusivamente ao Billing, devem ser armazenados como secrets e nunca podem ser projetados para a UI, ConfigMap, logs ou telemetria.
 

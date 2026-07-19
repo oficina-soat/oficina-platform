@@ -44,7 +44,7 @@ Referências oficiais:
 | UI | Manter `instrucoesPix`, `acoesPermitidas` e a ação **Atualizar situação**; não chamar Orders diretamente no frontend. |
 | Versão | Publicar a mudança como Billing `1.9.0`, pois altera de forma compatível a integração externa sem quebrar a API pública. |
 
-Os nomes propostos para configuração são `OFICINA_MERCADO_PAGO_API_MODE=orders` e `OFICINA_MERCADO_PAGO_PAYER_FIRST_NAME=APRO` no `lab`. A primeira etapa de contrato deve ratificar esses nomes em conjunto com os artefatos de runtime antes da implementação.
+Os nomes canônicos de configuração são `OFICINA_MERCADO_PAGO_API_MODE=orders` e `OFICINA_MERCADO_PAGO_PAYER_FIRST_NAME=APRO` no `lab`.
 
 ## Contrato de tradução
 

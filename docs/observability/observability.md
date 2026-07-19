@@ -260,7 +260,7 @@ Métricas de provedor financeiro mínimas para `oficina-billing-service`:
 | `payment.provider.failures.count` | Counter | `service`, `provider`, `method`, `reason` |
 | `payment.provider.unavailable.count` | Counter | `service`, `provider`, `reason` |
 
-Para Mercado Pago, `provider` deve ser `mercado-pago` e `method` deve refletir o método local de pagamento, como `PIX`. `outcome` deve usar valores de baixa cardinalidade, como `confirmed`, `rejected`, `pending`, `failure` ou `not_integrated`. `providerStatus` deve refletir apenas os status de negócio retornados pelo provedor, como `approved`, `rejected`, `cancelled`, `refunded`, `charged_back`, `pending` ou `in_process`.
+Para Mercado Pago, `provider` deve ser `mercado-pago` e `method` deve refletir o método local de pagamento, como `PIX`. `outcome` deve usar valores de baixa cardinalidade, como `confirmed`, `rejected`, `pending`, `failure` ou `not_integrated`. `providerStatus` deve refletir apenas status de negócio conhecidos do provedor: `created`, `processing`, `action_required`, `processed`, `failed`, `canceled`, `expired`, `refunded` ou `charged_back` para Orders, além de `approved`, `rejected`, `cancelled`, `pending` e `in_process` durante a compatibilidade com Payments. Valores desconhecidos devem ser agrupados como `other`.
 
 As métricas de provedor financeiro não devem usar `pagamentoId`, `ordemServicoId`, `transacaoExternaId`, CPF, e-mail, `correlationId` ou qualquer identificador de alta cardinalidade como dimensão. Esses identificadores pertencem a logs e traces.
 

@@ -443,7 +443,11 @@ POST /api/v1/pagamentos
 
 Quando a integração Mercado Pago estiver habilitada no `oficina-billing-service`, esta operação solicita pagamento PIX no provedor financeiro externo. Falhas de comunicação com o provedor devem retornar `502 Bad Gateway`; configuração obrigatória ausente ou método sem suporte na integração direta deve retornar `503 Service Unavailable`, preservando o [Contrato de Erros REST](error-model.md).
 
-A referência externa oficial para a integração é a [Referência API Mercado Pago](https://www.mercadopago.com.br/developers/pt/reference), usando o recurso de criação de pagamento `POST /v1/payments` quando a integração direta estiver habilitada.
+A referência externa oficial para novas cobranças é a [API Orders do Mercado Pago](https://www.mercadopago.com.br/developers/pt/docs/checkout-api-orders/payment-integration/pix), usando `POST /v1/orders` com `type=online`, `processing_mode=automatic`, uma única transação PIX, `external_reference=pagamentoId` e `X-Idempotency-Key=pagamentoId`. O modo de criação `payments` permanece temporariamente disponível apenas para rollback operacional; ele não altera o tipo persistido das cobranças já criadas.
+
+Para novas cobranças, `transacaoExternaId` contém o ID da order. O Billing persiste adicionalmente, sem exposição em REST ou eventos, se a referência é `ORDER` ou `PAYMENT`. Registros Mercado Pago anteriores à migração são classificados como `PAYMENT`, novas cobranças usam `ORDER` e o recurso nunca deve ser inferido pelo formato do identificador.
+
+No sandbox `lab`, o cenário de aprovação automática usa `payer.email=test_user_br@testuser.com` e pode configurar `payer.first_name=APRO`. O marcador `APRO` é proibido fora de `lab` e `test` e deve impedir o startup quando configurado em outro ambiente.
 
 ### Consultar pagamento
 
@@ -477,7 +481,9 @@ Essa operação é uma confirmação operacional para métodos sem provedor inte
 POST /api/v1/pagamentos/{pagamentoId}/reconciliacao
 ```
 
-Exige `Idempotency-Key` e papel `administrativo` ou `recepcionista`. O Billing consulta `GET /v1/payments/{id}` com sua própria credencial, valida o vínculo da referência externa e aplica de forma idempotente somente a transição confirmada pelo provedor. A resposta pode continuar `CRIADO` enquanto o PIX estiver pendente.
+Exige `Idempotency-Key` e papel `administrativo` ou `recepcionista`. O Billing consulta `GET /v1/orders/{id}` para referências `ORDER` e preserva `GET /v1/payments/{id}` somente para referências legadas `PAYMENT`. Com sua própria credencial, valida ID, `external_reference`, valor total e transação PIX antes de aplicar de forma idempotente somente a transição confirmada pelo provedor. A resposta pode continuar `CRIADO` enquanto o PIX estiver pendente.
+
+A tradução de Orders é `created`, `processing` e `action_required/waiting_payment|waiting_transfer` para `CRIADO`; `processed/accredited` para `CONFIRMADO`; e `failed`, `canceled`, `expired`, `refunded` ou `charged_back` para `RECUSADO`. Combinação ausente, contraditória ou desconhecida falha como dependência sem alterar o estado local. As instruções PIX vêm de `transactions.payments[0].payment_method`; `expiraEm` permanece opcional quando o provedor não informar um instante absoluto.
 
 ### Recusar pagamento
 
@@ -494,10 +500,10 @@ POST /api/v1/pagamentos/{pagamentoId}/cancelamento
 ### Webhook Mercado Pago
 
 ```http
-POST /api/v1/integracoes/mercado-pago/webhooks?data.id={transacaoExternaId}&type=payment
+POST /api/v1/integracoes/mercado-pago/webhooks?data.id={transacaoExternaId}&type=order
 ```
 
-A rota não usa JWT nem `Idempotency-Key`, pois o chamador é o provedor. Ela exige `x-signature` e `x-request-id`, valida HMAC e tolerância temporal com o secret da aplicação, aceita apenas notificações `payment`, consulta o pagamento no Mercado Pago e não confia em status informado no payload. Reentregas e concorrência com a reconciliação manual devem convergir sem republicar eventos ou regredir estado.
+A rota não usa JWT nem `Idempotency-Key`, pois o chamador é o provedor. Ela exige `x-signature` e o `x-request-id` original, valida HMAC e tolerância temporal com o secret da aplicação, aceita notificações `order` e, durante a compatibilidade, `payment`, e exige coerência entre query string e corpo. A action deve possuir prefixo correspondente `order.*` ou `payment.*`, mas nunca é aceita como evidência financeira: o Billing consulta o recurso persistido no Mercado Pago antes de alterar o domínio. Notificação válida ou duplicada retorna `200`; falha transitória permanece sem reconhecimento para permitir retry. Reentregas e concorrência com a reconciliação manual devem convergir sem republicar eventos ou regredir estado.
 
 ---
 

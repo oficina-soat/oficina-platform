@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: oficina-billing-service API
-  version: 1.4.0
+  version: 1.5.0
   description: Contrato REST v1 para orcamentos, decisoes publicas por capability, recusas e pagamentos.
   license:
     name: Internal
@@ -507,7 +507,7 @@ paths:
     post:
       tags: [Integracoes financeiras]
       summary: Receber atualização de pagamento do Mercado Pago
-      description: Valida a assinatura, consulta o pagamento no provedor e processa a atualização de forma idempotente. Não confia no status recebido no callback.
+      description: Valida a assinatura com o x-request-id original, consulta a order ou o payment legado conforme o tipo persistido e processa a atualização de forma idempotente. Não confia na action nem no status recebido no callback.
       operationId: receberWebhookMercadoPago
       security: []
       parameters:
@@ -522,7 +522,7 @@ paths:
             schema:
               $ref: "#/components/schemas/MercadoPagoWebhookRequest"
       responses:
-        "204":
+        "200":
           description: Notificação validada e processada ou reconhecida idempotentemente.
         "400":
           $ref: "#/components/responses/BadRequest"
@@ -609,7 +609,7 @@ components:
       name: data.id
       in: query
       required: true
-      description: Identificador externo do pagamento notificado.
+      description: Identificador externo da order ou do payment legado notificado.
       schema:
         type: string
         minLength: 1
@@ -620,7 +620,7 @@ components:
       required: true
       schema:
         type: string
-        const: payment
+        enum: [order, payment]
   headers:
     CorrelationId:
       description: Identificador de correlacao retornado em toda resposta de erro.
@@ -953,7 +953,8 @@ components:
       properties:
         action:
           type: string
-          enum: [payment.created, payment.updated]
+          pattern: '^(order|payment)\.[a-z_]+$'
+          examples: [order.action_required, order.processed, payment.updated]
         api_version:
           type: string
         data:
@@ -974,7 +975,7 @@ components:
           type: boolean
         type:
           type: string
-          const: payment
+          enum: [order, payment]
     Pagamento:
       allOf:
         - $ref: "#/components/schemas/PagamentoCreateRequest"

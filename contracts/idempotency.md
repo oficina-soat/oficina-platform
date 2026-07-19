@@ -243,7 +243,9 @@ Cada consumidor deve registrar eventos processados com:
 
 Reprocessar o mesmo `eventId` no mesmo consumidor não deve duplicar efeitos colaterais.
 
-Webhooks de provedores que não controlam `X-Idempotency-Key` devem ser idempotentes pela identidade externa notificada, tipo da notificação e estado local. O webhook Mercado Pago deve validar `data.id`, consultar a fonte externa e compartilhar a mesma atualização condicional usada pela reconciliação manual; callback duplicado, fora de ordem ou concorrente não pode republicar `pagamentoConfirmado` ou `pagamentoRecusado`.
+Webhooks de provedores que não controlam `X-Idempotency-Key` devem ser idempotentes pela identidade externa notificada, tipo da notificação e estado local. O webhook Mercado Pago deve validar `data.id`, `type`, a coerência entre query e corpo e a assinatura composta com o `x-request-id` original. A busca usa a chave lógica `(tipoReferenciaExterna, transacaoExternaId)`, sem inferir o recurso pelo formato do ID: `ORDER` consulta `/v1/orders/{id}` e `PAYMENT` consulta `/v1/payments/{id}` durante a compatibilidade. Ambos compartilham a mesma atualização condicional da reconciliação manual; callback duplicado, fora de ordem ou concorrente não pode republicar `pagamentoConfirmado` ou `pagamentoRecusado`.
+
+Na criação de Orders, o Billing usa o mesmo `pagamentoId` como `external_reference` e `X-Idempotency-Key`. Repetições causadas por timeout, concorrência ou retomada devem reencontrar a mesma order e não criar uma segunda cobrança.
 
 ---
 

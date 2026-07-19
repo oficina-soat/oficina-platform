@@ -4,7 +4,7 @@
 
 Em 19/07/2026, a primeira execução de `[D-PAYMENT-CONTINUITY-TEST-REM-001]` validou Billing `1.8.0`, infraestrutura e UI no `lab`, percorreu a jornada até a cobrança PIX pela API legada `/v1/payments` e comprovou a convergência sob notificações duplicadas, fora de ordem e concorrentes. Na retomada do mesmo dia, os deploys e Quality Gates de Billing `1.9.0`, infraestrutura e UI estavam concluídos, mas a criação pela API Orders foi recusada pelo Mercado Pago porque o secret implantado usava uma credencial `TEST-*`. Após a substituição pelo Access Token de teste `APP_USR` exigido pelo provedor, a mesma jornada convergiu por reconciliação para uma order PIX, um pagamento confirmado, uma Outbox financeira terminal e uma entrega.
 
-A confirmação ocorreu exclusivamente por reconciliação server-to-server com o Mercado Pago; nenhuma confirmação financeira foi fabricada. Uma jornada adicional confirmou que o painel envia notificações reais de Orders e que a telemetria está disponível no New Relic, mas revelou uma incompatibilidade na tolerância temporal da assinatura: o provedor envia `ts` em milissegundos e o Billing `1.9.0` o compara como epoch em segundos. O Billing `1.10.1` corrigiu essa incompatibilidade e o `1.10.2` acrescentou diagnóstico sanitizado da etapa de validação. Um callback real histórico recebido pelo `1.10.2` foi classificado como `hash_mismatch`; porém dois testes posteriores do painel passaram pela validação HMAC com a configuração atual e receberam `404` somente porque usavam o ID fictício `123456`. O Billing `1.10.3` passou a reconhecer esse caso com `200`, e a homologação permanece aberta apenas até repetir a convergência por webhook real de Order.
+A confirmação ocorreu exclusivamente por reconciliação server-to-server com o Mercado Pago; nenhuma confirmação financeira foi fabricada. Jornadas adicionais confirmaram que o provedor envia notificações reais de Orders e que a telemetria está disponível no New Relic. As versões `1.10.1` a `1.10.7` corrigiram e isolaram timestamp, diagnóstico, referência desconhecida, origem e capitalização do `data.id`. O teste do painel e probes assinados com o secret projetado são aceitos, mas callbacks reais de Orders continuam classificados como `hash_mismatch`. A homologação permanece aberta para alinhar o secret do modo produção da aplicação e repetir a convergência por webhook real.
 
 Nenhum access token, JWT, secret de webhook, código PIX, imagem QR Code ou URL de pagamento foi registrado nesta evidência. As consultas e inspeções aqui documentadas apresentam apenas status, contagens e identificadores internos.
 
@@ -206,11 +206,24 @@ A New Relic User API Key permitiu concluir as verificações antes pendentes:
 - não houve ocorrência dos padrões sensíveis conhecidos nas mensagens de log ou nos nomes de spans;
 - a policy **Oficina SOAT - Alertas Minimos Lab** mantém nove condições, e **Pagamento indisponível**, ID `63810244`, está ativa, com prioridade crítica e sem incidente aberto na releitura.
 
+## Retomada com Billing `1.10.4` a `1.10.7`
+
+As quatro candidatas foram validadas, publicadas e implantadas pelos PRs [40](https://github.com/oficina-soat/oficina-billing-service/pull/40), [41](https://github.com/oficina-soat/oficina-billing-service/pull/41), [42](https://github.com/oficina-soat/oficina-billing-service/pull/42) e [43](https://github.com/oficina-soat/oficina-billing-service/pull/43). Os runs de `main` [29703814863](https://github.com/oficina-soat/oficina-billing-service/actions/runs/29703814863), [29705310623](https://github.com/oficina-soat/oficina-billing-service/actions/runs/29705310623), [29706235157](https://github.com/oficina-soat/oficina-billing-service/actions/runs/29706235157) e [29706740936](https://github.com/oficina-soat/oficina-billing-service/actions/runs/29706740936) concluíram validação, SonarCloud, publicação e deploy. A versão final `1.10.7` passou com 202 testes, PostgreSQL 16, todas as 10 migrations e JaCoCo de 93,85% de linhas e 79,76% de branches.
+
+O diagnóstico avançou sem relaxar a autenticação: `1.10.4` iniciou o isolamento da referência assinada; `1.10.5` usou a query original; `1.10.6` preservou a capitalização do ID conforme o SDK oficial; e `1.10.7` passou a usar o `data.id` resolvido da query ou do corpo coerente. Probes controlados continuaram válidos. Em todas as candidatas, os callbacks reais chegaram à rota pública, mas foram rejeitados com `401 hash_mismatch`.
+
+A jornada `payment-orders-v1107-20260719T225359Z` produziu a OS `a7d3396c-a768-431c-a6da-bb0fce315b03`, a execução `617ff9e8-8239-4067-84d4-c67c7f84fae3`, o orçamento aprovado `fd79ce0d-2bcc-30b5-8123-1e14c2b29265` e o pagamento `1effe3aa-3801-33c8-b951-fd2e12492ea1`. A consulta somente leitura do provedor confirmou order e transação `processed/accredited`. Quatro callbacks reais chegaram ao Billing `1.10.7` e retornaram `401 hash_mismatch`; sem reconciliação manual, o pagamento local permaneceu `CRIADO` e nenhuma Outbox terminal foi fabricada.
+
+O contraste entre o teste do painel aceito e as entregas reais recusadas, depois de eliminadas as variações do manifesto HMAC, deixa como hipótese residual uma divergência entre o secret projetado no runtime e o secret usado para assinar notificações do modo produção. A [documentação oficial de Webhooks](https://www.mercadopago.com.br/developers/pt/docs/links-and-debts/additional-content/your-integrations/notifications/webhooks) separa as configurações de teste e produção e associa o secret à aplicação. A próxima execução deve usar o secret exibido em **Webhooks → Configurar notificações → Modo produção** da mesma aplicação vinculada ao Access Token `APP_USR`.
+
+O New Relic registrou apenas rota, status, versão e o motivo sanitizado. Não foram persistidos secret, assinatura, headers de autenticação, payload ou dados PIX.
+
 ## Pendências para concluir a tarefa
 
-A configuração do evento Orders, a observabilidade remota, a correção temporal, o diagnóstico sanitizado e o teste de URL com `HTTP 200` deixaram de ser pendências. Para concluir `[D-PAYMENT-CONTINUITY-TEST-REM-001]` ainda é necessário:
+A configuração do evento Orders, a observabilidade remota, as correções do manifesto e o teste de URL com `HTTP 200` deixaram de ser pendências. Para concluir `[D-PAYMENT-CONTINUITY-TEST-REM-001]` ainda é necessário:
 
-1. repetir uma jornada `APRO` nova, sem reconciliação manual, e comprovar webhook real de Order `200` → `pagamentoConfirmado` único → capability **Registrar entrega** → `ENTREGUE`;
-2. repetir duplicidade, ordem invertida, concorrência e sanitização sobre a configuração atual e a versão `1.10.3`.
+1. alinhar o secret de Webhooks do modo produção da aplicação Mercado Pago com `OFICINA_MERCADO_PAGO_WEBHOOK_SECRET` no runtime;
+2. repetir uma jornada `APRO` nova, sem reconciliação manual, e comprovar webhook real de Order `200` → `pagamentoConfirmado` único → capability **Registrar entrega** → `ENTREGUE`;
+3. repetir duplicidade, ordem invertida, concorrência e sanitização sobre a versão `1.10.7`.
 
 Até a nova homologação, não é correto marcar a tarefa como concluída. A jornada permaneceu em estado seguro: o provedor é a fonte de verdade, o Billing não fabricou confirmação e nenhuma Outbox terminal foi publicada sem uma notificação autenticada ou reconciliação explícita.

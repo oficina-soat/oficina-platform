@@ -233,4 +233,6 @@ A evidência sanitizada confirmou:
 
 O resultado reforça que a causa restante está na associação entre a credencial de teste, a aplicação que assina o callback real e o secret configurado, ou em comportamento não documentado do provedor. Ele não autoriza flexibilizar a validação HMAC. O Billing `1.10.13` remove o filtro, a propriedade e a documentação operacional da captura bruta; permanece apenas a instrumentação sanitizada.
 
+Para reproduções manuais, o script [Cálculo da assinatura Webhook do Mercado Pago](../../scripts/manual/calcular-assinatura-webhook-mercado-pago.py) recebe secret, `data.id`, `x-request-id` e `ts` e imprime o HMAC-SHA256. A implementação replica o processamento do `WebhookSignatureValidator` do SDK Python oficial: remove espaços nas extremidades, preserva a caixa de `data.id`, omite pares vazios e monta o manifesto com ponto e vírgula final.
+
 A tarefa `[D-PAYMENT-CONTINUITY-WEBHOOK-DIAG-001]` do [roadmap](../../ROADMAP.md) continua aberta para o esclarecimento do Mercado Pago e para a comprovação do fluxo corrigido.

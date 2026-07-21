@@ -197,6 +197,8 @@ O [PR 47 do Billing](https://github.com/oficina-soat/oficina-billing-service/pul
 
 O callback permaneceu em `hash_mismatch` e a jornada expirou com o pagamento local em `CRIADO`. O formato canônico também foi confrontado com o [validador oficial Java do Mercado Pago](https://github.com/mercadopago/sdk-java/blob/master/src/main/java/com/mercadopago/webhook/WebhookSignatureValidator.java), que monta os mesmos pares `id`, `request-id` e `ts`. Como probes HMAC com o secret do runtime e simulações de teste e produção do painel são aceitos pelo mesmo endpoint, enquanto o callback real não corresponde ao manifesto canônico nem às variantes observáveis, a causa restante está fora da transformação conhecida da plataforma: a assinatura real de Orders não é compatível com o secret configurado ou com os componentes documentados. Essa evidência deve acompanhar um chamado ao Mercado Pago; não autoriza desabilitar ou flexibilizar a validação HMAC.
 
+O [fluxo visual do diagnóstico](../architecture/mercado-pago-orders-webhook-diagnostic-flow.md) organiza essas evidências em diagramas da jornada, da validação HMAC e das hipóteses eliminadas.
+
 ## Releitura remota no New Relic
 
 A New Relic User API Key permitiu concluir as verificações antes pendentes:

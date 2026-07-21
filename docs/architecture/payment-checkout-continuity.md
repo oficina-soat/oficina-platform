@@ -97,6 +97,8 @@ As etapas que não dependem do `lab` foram concluídas:
 
 A [homologação da continuidade do pagamento no lab](../delivery/payment-checkout-continuity-lab-evidence.md) já comprovou implantação, Quality Gates, apresentação do PIX, reconciliação server-to-server, duplicidade, ordem, concorrência, unicidade e sanitização remota. A jornada com Orders também comprovou `APRO`, order `processed/accredited` e envio real do evento **Order (Mercado Pago)**. O Billing `1.10.1` corrigiu a tolerância do `ts` de 13 dígitos; a instrumentação até `1.10.10` comprovou que query e corpo preservam o mesmo `data.id`, o header contém `ts,v1` e nenhuma variante segura do manifesto oficial reproduz a assinatura real, embora simulações do painel e probes com o secret projetado sejam aceitos. O item de diagnóstico do [roadmap](../../ROADMAP.md) permanece aberto para escalonamento ao Mercado Pago, correção externa comprovada, remoção da instrumentação temporária e repetição da convergência por webhook real até a entrega, sem reconciliação manual.
 
+O [fluxo visual do diagnóstico do webhook de Orders](mercado-pago-orders-webhook-diagnostic-flow.md) detalha a jornada completa, os componentes envolvidos, a validação HMAC, o ponto exato do `hash_mismatch`, as hipóteses eliminadas e as informações necessárias para o escalonamento ao provedor.
+
 ## Relação com atualização da jornada
 
 A [nova medição da jornada](journey-freshness-remeasurement.md) comprovou p95 inferior a `457 ms` entre comando e convergência canônica. A continuidade do pagamento não exige SSE ou WebSocket: a UI pode atualizar o snapshot sob ação explícita do operador, e o webhook resolve a comunicação provedor → Billing sem manter conexão com o navegador.

@@ -4,7 +4,7 @@
 
 Em 19/07/2026, a primeira execução de `[D-PAYMENT-CONTINUITY-TEST-REM-001]` validou Billing `1.8.0`, infraestrutura e UI no `lab`, percorreu a jornada até a cobrança PIX pela API legada `/v1/payments` e comprovou a convergência sob notificações duplicadas, fora de ordem e concorrentes. Na retomada do mesmo dia, os deploys e Quality Gates de Billing `1.9.0`, infraestrutura e UI estavam concluídos, mas a criação pela API Orders foi recusada pelo Mercado Pago porque o secret implantado usava uma credencial `TEST-*`. Após a substituição pelo Access Token de teste `APP_USR` exigido pelo provedor, a mesma jornada convergiu por reconciliação para uma order PIX, um pagamento confirmado, uma Outbox financeira terminal e uma entrega.
 
-A confirmação ocorreu exclusivamente por reconciliação server-to-server com o Mercado Pago; nenhuma confirmação financeira foi fabricada. Uma jornada adicional confirmou que o painel envia notificações reais de Orders e que a telemetria está disponível no New Relic, mas revelou uma incompatibilidade na tolerância temporal da assinatura: o provedor envia `ts` em milissegundos e o Billing `1.9.0` o compara como epoch em segundos. O Billing `1.10.1` corrigiu essa incompatibilidade e o `1.10.2` acrescentou diagnóstico sanitizado da etapa de validação. Callbacks reais recebidos pelo `1.10.2` foram classificados como `hash_mismatch`, enquanto simulações de teste e produção do painel foram aceitas com `200`. A causa permanece em investigação: os identificadores distintos apresentados nas credenciais de teste e nos dados da integração pertencem à mesma aplicação e não comprovam divergência de aplicação, token ou secret.
+A confirmação ocorreu exclusivamente por reconciliação server-to-server com o Mercado Pago; nenhuma confirmação financeira foi fabricada. Uma jornada adicional confirmou que o painel envia notificações reais de Orders e que a telemetria está disponível no New Relic, mas revelou uma incompatibilidade na tolerância temporal da assinatura: o provedor envia `ts` em milissegundos e o Billing `1.9.0` o compara como epoch em segundos. O Billing `1.10.1` corrigiu essa incompatibilidade e a instrumentação sanitizada até `1.10.10` isolou a rejeição residual como `hash_mismatch`. Callbacks reais não correspondem ao manifesto oficial nem às variantes observáveis, enquanto simulações de teste e produção do painel e probes com o secret projetado são aceitos. A incompatibilidade externa precisa ser escalonada ao Mercado Pago antes da retirada da instrumentação e da homologação final.
 
 Nenhum access token, JWT, secret de webhook, código PIX, imagem QR Code ou URL de pagamento foi registrado nesta evidência. As consultas e inspeções aqui documentadas apresentam apenas status, contagens e identificadores internos.
 
@@ -183,6 +183,20 @@ Depois do deploy, probes controlados com o secret efetivamente projetado aceitar
 
 O diagnóstico oficial somente leitura de notificações do Mercado Pago encontrou duas notificações de Orders, ambas com retorno `401` e nenhuma entrega bem-sucedida na janela consultada. A implementação oficial de validação do [SDK Node.js do Mercado Pago](https://github.com/mercadopago/sdk-nodejs/blob/03f66609884f724dfa718db3afba729462569a4c/src/utils/webhook/index.ts) usa o mesmo manifesto formado por `id`, `request-id` e `ts` bruto. O algoritmo, a unidade temporal e a projeção local foram validados, mas a aceitação das simulações e a rejeição dos callbacks reais exigem comparar de forma instrumentada os componentes recebidos e o manifesto canônico antes de atribuir a causa a credenciais ou configuração externa.
 
+### Comparação instrumentada no Billing `1.10.8` a `1.10.10`
+
+As versões `1.10.8`, `1.10.9` e `1.10.10` ampliaram temporariamente a telemetria sem registrar assinatura, secret, credencial, manifesto reversível ou identificador externo bruto. Os identificadores e o manifesto foram representados por fingerprints SHA-256 truncados; nomes desconhecidos do header foram descartados; os testes de manifestos alternativos emitiram somente o nome categórico de uma eventual correspondência.
+
+O [PR 47 do Billing](https://github.com/oficina-soat/oficina-billing-service/pull/47) corrigiu a cobertura da ampliação, passou no Quality Gate e foi publicado e implantado pelo [run 29837941903](https://github.com/oficina-soat/oficina-billing-service/actions/runs/29837941903) como `1.10.10`. A jornada executada após o rollout recebeu um callback real de Orders e registrou somente as seguintes classificações:
+
+- `data.id` da query e do corpo eram iguais;
+- o identificador era alfanumérico em maiúsculas e possuía 32 caracteres;
+- o header de assinatura continha somente os componentes reconhecidos `ts` e `v1`;
+- o manifesto incluía `data.id`;
+- nenhuma variante com `data.id` em minúsculas, `x-request-id` em minúsculas ou sem espaços, omissão de `request-id`, omissão de `data.id` ou combinação dessas alterações reproduziu o hash recebido.
+
+O callback permaneceu em `hash_mismatch` e a jornada expirou com o pagamento local em `CRIADO`. O formato canônico também foi confrontado com o [validador oficial Java do Mercado Pago](https://github.com/mercadopago/sdk-java/blob/master/src/main/java/com/mercadopago/webhook/WebhookSignatureValidator.java), que monta os mesmos pares `id`, `request-id` e `ts`. Como probes HMAC com o secret do runtime e simulações de teste e produção do painel são aceitos pelo mesmo endpoint, enquanto o callback real não corresponde ao manifesto canônico nem às variantes observáveis, a causa restante está fora da transformação conhecida da plataforma: a assinatura real de Orders não é compatível com o secret configurado ou com os componentes documentados. Essa evidência deve acompanhar um chamado ao Mercado Pago; não autoriza desabilitar ou flexibilizar a validação HMAC.
+
 ## Releitura remota no New Relic
 
 A New Relic User API Key permitiu concluir as verificações antes pendentes:
@@ -199,8 +213,8 @@ A New Relic User API Key permitiu concluir as verificações antes pendentes:
 
 A configuração do evento Orders, a observabilidade remota, a correção temporal e a rotação possível do secret deixaram de ser pendências. Para concluir `[D-PAYMENT-CONTINUITY-TEST-REM-001]` ainda é necessário:
 
-1. executar o item de instrumentação temporária `[D-PAYMENT-CONTINUITY-WEBHOOK-DIAG-001]` do [roadmap](../../ROADMAP.md), comparando somente metadados não secretos do callback real e da simulação;
-2. corrigir a causa comprovada, remover a instrumentação temporária — ou reduzi-la a métricas operacionais seguras — e repetir uma jornada `APRO` sem reconciliação manual;
+1. escalonar ao Mercado Pago a incompatibilidade comprovada entre callbacks reais de Orders, simulações do painel e o algoritmo oficial, sem anexar assinatura, secret, access token ou dados PIX;
+2. após a correção externa comprovada, remover a instrumentação temporária — ou reduzi-la a métricas operacionais seguras — e repetir uma jornada `APRO` sem reconciliação manual;
 3. comprovar webhook real `200` → `pagamentoConfirmado` único → capability **Registrar entrega** → `ENTREGUE`, incluindo duplicidade, ordem invertida, concorrência e sanitização.
 
 Até o diagnóstico e a nova homologação, não é correto marcar a tarefa como concluída. A jornada permaneceu em estado seguro: o provedor é a fonte de verdade, o Billing não fabricou confirmação e nenhuma Outbox terminal foi publicada sem uma notificação autenticada ou reconciliação explícita.

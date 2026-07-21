@@ -220,7 +220,7 @@ Após a correção externa, a jornada deve ser repetida até comprovar webhook r
 
 ## Exceção temporária para captura bruta no `lab`
 
-Como as comparações sanitizadas não identificaram a origem do `hash_mismatch`, foi autorizada uma captura pontual da requisição completa no ambiente de testes. O Billing `1.10.12` adiciona a variável `OFICINA_MERCADO_PAGO_WEBHOOK_RAW_CAPTURE_ENABLED`, desabilitada por padrão e recusada no startup fora de `lab` ou `test`. Quando habilitada, a primeira chamada ao webhook é gravada em `/tmp/mercado-pago-webhook-request.json` com URI e query string, todos os headers e corpo brutos. A evidência não é enviada a logs, traces, métricas ou armazenamento persistente; o arquivo tem limite de 1 MiB, modo `0600` e não é sobrescrito por chamadas posteriores.
+Como as comparações sanitizadas não identificaram a origem do `hash_mismatch`, foi autorizada uma captura pontual da requisição completa no ambiente de testes. O Billing `1.10.12` adiciona a variável `OFICINA_MERCADO_PAGO_WEBHOOK_RAW_CAPTURE_ENABLED`, desabilitada por padrão e recusada no startup fora de `lab` ou `test`. Quando habilitada, a primeira chamada ao webhook é gravada em `${user.dir}/.oficina-diagnostics/mercado-pago-webhook-request.json` — `/work/.oficina-diagnostics/mercado-pago-webhook-request.json` na imagem atual — com URI e query string, todos os headers e corpo brutos. A evidência não é enviada a logs, traces, métricas ou armazenamento persistente; o arquivo tem limite de 1 MiB, fica em diretório privado com modo `0700`, recebe modo `0600` e não é sobrescrito por chamadas posteriores.
 
 Essa exceção não altera a validação da assinatura nem a resposta funcional do webhook. Sua sequência operacional obrigatória é:
 
@@ -228,7 +228,7 @@ Essa exceção não altera a validação da assinatura nem a resposta funcional 
 2. habilitar a variável somente no deployment de `lab` e aguardar o rollout;
 3. produzir uma única Order de teste e aguardar o callback real;
 4. ler o arquivo uma única vez para a análise autorizada;
-5. apagar `/tmp/mercado-pago-webhook-request.json`, remover a variável do deployment e confirmar o rollout;
+5. apagar `/work/.oficina-diagnostics/mercado-pago-webhook-request.json`, remover a variável do deployment e confirmar o rollout;
 6. registrar apenas conclusões sanitizadas na evidência permanente;
 7. remover a classe de captura, a propriedade e estas instruções em uma versão subsequente do Billing.
 

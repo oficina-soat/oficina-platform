@@ -2,6 +2,7 @@
 """Calcula a assinatura v1 de um webhook conforme o SDK Python do Mercado Pago."""
 
 import argparse
+import binascii
 import hashlib
 import hmac
 
@@ -30,11 +31,12 @@ def calculate_signature(secret: str, data_id: str, request_id: str, ts: str) -> 
     if request_id:
         parts.append(f"request-id:{request_id}")
     parts.append(f"ts:{ts}")
-    manifest = ";".join(parts) + ";"
+    signedTemplate = ";".join(parts) + ";"
 
-    return hmac.new(
-        secret.encode("utf-8"), manifest.encode("utf-8"), hashlib.sha256
-    ).hexdigest()
+    cyphedSignature = binascii.hexlify(
+        hmac.new(secret.encode(), signedTemplate.encode(), hashlib.sha256).digest()
+    )
+    return cyphedSignature.decode()
 
 
 def parse_args() -> argparse.Namespace:

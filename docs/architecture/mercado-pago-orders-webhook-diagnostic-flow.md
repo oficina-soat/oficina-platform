@@ -68,13 +68,13 @@ Para cada notificação, o Mercado Pago envia três componentes usados na valida
 - `x-request-id`, recebido como header HTTP;
 - `ts`, extraído do header `x-signature`.
 
-O manifesto documentado é construído nesta ordem:
+O manifesto documentado é construído nesta ordem. Na [instrução manual de validação do Mercado Pago](https://www.mercadopago.com.br/developers/pt/docs/split-payments/additional-content/your-integrations/notifications/webhooks), um `data.id` alfanumérico deve ser convertido para minúsculas somente para esse cálculo:
 
 ```text
-id:<data.id>;request-id:<x-request-id>;ts:<ts>;
+id:<data.id normalizado>;request-id:<x-request-id>;ts:<ts>;
 ```
 
-O Mercado Pago calcula um HMAC-SHA256 desse manifesto usando o secret do webhook. O Billing repete o cálculo com o secret projetado no pod e compara os dois hashes em tempo constante.
+O Mercado Pago calcula um HMAC-SHA256 desse manifesto usando o secret do webhook. O Billing repete o cálculo com o secret projetado no pod e compara os dois hashes em tempo constante. Como o SDK Java oficial atual descreve o `data.id` literal, o Billing `1.10.11` aceita a forma normalizada e a forma literal quando qualquer uma delas produz uma assinatura válida com o mesmo secret. Essa compatibilidade não altera o identificador original usado em `GET /v1/orders/{id}`.
 
 Existem dois resultados mutuamente exclusivos para uma chamada de webhook. Se o hash for válido, o Billing consulta a API Orders, recebe `processed/accredited`, confirma o pagamento e responde `200` ao callback. Se o hash for inválido, o Billing responde `401` imediatamente e não consulta a API Orders. Uma mesma chamada nunca percorre os dois fluxos.
 

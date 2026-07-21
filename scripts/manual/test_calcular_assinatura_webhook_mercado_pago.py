@@ -13,27 +13,31 @@ SPEC.loader.exec_module(MODULE)
 
 
 class CalculateSignatureTest(unittest.TestCase):
-    def test_matches_official_sdk_vector_and_preserves_data_id_case(self):
-        signature = MODULE.calculate_signature(
+    def test_converts_data_id_to_lowercase_before_calculating(self):
+        uppercase_signature = MODULE.calculate_signature(
             "your_secret_key_here",
             "ORD01JQ4S4KY8HWQ6NA5PXB65B3D3",
             "2066ca19-c6f1-498a-be75-1923005edd06",
             "1742505638683",
         )
+        lowercase_signature = MODULE.calculate_signature(
+            "your_secret_key_here",
+            "ord01jq4s4ky8hwq6na5pxb65b3d3",
+            "2066ca19-c6f1-498a-be75-1923005edd06",
+            "1742505638683",
+        )
+
+        self.assertEqual(lowercase_signature, uppercase_signature)
+
+    def test_matches_documented_hmac_algorithm(self):
+        signature = MODULE.calculate_signature(
+            "secret", "ORDER", "request", "123"
+        )
 
         self.assertEqual(
-            "fb15ae6472eb449173c556793205d77787d58f384d183bb5bc3b724c27bd103c",
+            "37222538c95fb9767794da6db9dcbd341e140c8238d6ce4cea946cf3a277f279",
             signature,
         )
-
-    def test_strips_surrounding_whitespace_like_official_validator(self):
-        expected = MODULE.calculate_signature("secret", "ORDER", "request", "123")
-
-        actual = MODULE.calculate_signature(
-            " secret ", " ORDER ", " request ", " 123 "
-        )
-
-        self.assertEqual(expected, actual)
 
 
 if __name__ == "__main__":

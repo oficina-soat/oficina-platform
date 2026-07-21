@@ -218,18 +218,19 @@ O sistema falha de forma segura:
 
 Após a correção externa, a jornada deve ser repetida até comprovar webhook real `200` → pagamento `CONFIRMADO` → Outbox única → capability **Registrar entrega** → Ordem de Serviço `ENTREGUE`. Só então a instrumentação temporária poderá ser removida ou reduzida a métricas operacionais de baixa cardinalidade.
 
-## Exceção temporária para captura bruta no `lab`
+## Resultado da captura excepcional no `lab`
 
-Como as comparações sanitizadas não identificaram a origem do `hash_mismatch`, foi autorizada uma captura pontual da requisição completa no ambiente de testes. O Billing `1.10.12` adiciona a variável `OFICINA_MERCADO_PAGO_WEBHOOK_RAW_CAPTURE_ENABLED`, desabilitada por padrão e recusada no startup fora de `lab` ou `test`. Quando habilitada, a primeira chamada ao webhook é gravada em `${user.dir}/.oficina-diagnostics/mercado-pago-webhook-request.json` — `/work/.oficina-diagnostics/mercado-pago-webhook-request.json` na imagem atual — com URI e query string, todos os headers e corpo brutos. A evidência não é enviada a logs, traces, métricas ou armazenamento persistente; o arquivo tem limite de 1 MiB, fica em diretório privado com modo `0700`, recebe modo `0600` e não é sobrescrito por chamadas posteriores.
+O Billing `1.10.12` foi usado para uma captura pontual autorizada da requisição completa. O mecanismo ficou ativo somente durante uma Order de teste, gravou uma única evidência em arquivo efêmero privado, não enviou o conteúdo a logs, traces ou métricas e não alterou a validação funcional. Imediatamente após a leitura, o arquivo e o diretório foram apagados, a variável foi removida do deployment e o rollout com a captura desativada foi confirmado.
 
-Essa exceção não altera a validação da assinatura nem a resposta funcional do webhook. Sua sequência operacional obrigatória é:
+A evidência sanitizada confirmou:
 
-1. implantar o Billing `1.10.12` com a captura ainda desabilitada;
-2. habilitar a variável somente no deployment de `lab` e aguardar o rollout;
-3. produzir uma única Order de teste e aguardar o callback real;
-4. ler o arquivo uma única vez para a análise autorizada;
-5. apagar `/work/.oficina-diagnostics/mercado-pago-webhook-request.json`, remover a variável do deployment e confirmar o rollout;
-6. registrar apenas conclusões sanitizadas na evidência permanente;
-7. remover a classe de captura, a propriedade e estas instruções em uma versão subsequente do Billing.
+- callback real com `live_mode=false` e `application_id=554294311968810`;
+- simulações anteriores do painel com `application_id=8556144455468533`;
+- `data.id` alfanumérico em maiúsculas idêntico na query e no corpo;
+- `x-request-id` UUID em minúsculas e assinatura composta por `ts,v1`;
+- manifesto normalizado, manifesto literal e variantes sem `data.id` ou sem `request-id` incompatíveis com o hash recebido quando calculados com o secret do runtime;
+- transporte pela API Gateway sem alteração dos componentes usados pelo manifesto documentado.
 
-A tarefa `[D-PAYMENT-CONTINUITY-WEBHOOK-DIAG-001]` do [roadmap](../../ROADMAP.md) permanece aberta até a limpeza do mecanismo temporário e a comprovação do fluxo corrigido.
+O resultado reforça que a causa restante está na associação entre a credencial de teste, a aplicação que assina o callback real e o secret configurado, ou em comportamento não documentado do provedor. Ele não autoriza flexibilizar a validação HMAC. O Billing `1.10.13` remove o filtro, a propriedade e a documentação operacional da captura bruta; permanece apenas a instrumentação sanitizada.
+
+A tarefa `[D-PAYMENT-CONTINUITY-WEBHOOK-DIAG-001]` do [roadmap](../../ROADMAP.md) continua aberta para o esclarecimento do Mercado Pago e para a comprovação do fluxo corrigido.

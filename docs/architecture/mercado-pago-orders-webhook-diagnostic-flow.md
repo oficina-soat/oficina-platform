@@ -76,8 +76,13 @@ id:<data.id>;request-id:<x-request-id>;ts:<ts>;
 
 O Mercado Pago calcula um HMAC-SHA256 desse manifesto usando o secret do webhook. O Billing repete o cálculo com o secret projetado no pod e compara os dois hashes em tempo constante.
 
+Existem dois resultados mutuamente exclusivos para uma chamada de webhook. Se o hash for válido, o Billing consulta a API Orders, recebe `processed/accredited`, confirma o pagamento e responde `200` ao callback. Se o hash for inválido, o Billing responde `401` imediatamente e não consulta a API Orders. Uma mesma chamada nunca percorre os dois fluxos.
+
+### Fluxo esperado quando o hash é válido
+
 ```mermaid
 sequenceDiagram
+    autonumber
     participant MP as Mercado Pago
     participant EDGE as API Gateway
     participant BILL as Billing
@@ -89,15 +94,33 @@ sequenceDiagram
     EDGE->>BILL: encaminha callback preservando x-request-id
     BILL->>BILL: remonta o mesmo manifesto
     BILL->>BILL: calcula HMAC-SHA256 com o secret do runtime
-    BILL->>BILL: compara hash recebido e hash calculado
-    alt hashes iguais
-        BILL->>API: GET /v1/orders/id
-        API-->>BILL: processed / accredited
-        BILL-->>MP: 200 OK
-    else hashes diferentes — situação atual
-        BILL-->>MP: 401 Unauthorized
-        Note over BILL,API: A API Orders não é consultada pelo webhook rejeitado
-    end
+    BILL->>BILL: hashes iguais — assinatura aceita
+    BILL->>API: GET /v1/orders/id
+    API-->>BILL: processed / accredited
+    BILL->>BILL: pagamento CONFIRMADO e Outbox idempotente
+    BILL-->>EDGE: 200 OK
+    EDGE-->>MP: 200 OK
+```
+
+Nesse fluxo, o `processed/accredited` é a resposta da consulta autenticada do Billing à API Orders. O `200 OK` é a resposta do Billing à chamada de webhook que iniciou o processamento.
+
+### Fluxo atual quando o hash é inválido
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant MP as Mercado Pago
+    participant EDGE as API Gateway
+    participant BILL as Billing
+    participant API as API Orders
+
+    MP->>EDGE: POST webhook + x-signature + x-request-id + data.id
+    EDGE->>BILL: encaminha callback preservando x-request-id
+    BILL->>BILL: remonta o manifesto e calcula HMAC-SHA256
+    BILL->>BILL: hashes diferentes — hash_mismatch
+    BILL-->>EDGE: 401 Unauthorized
+    EDGE-->>MP: 401 Unauthorized
+    Note over BILL,API: GET /v1/orders/id não é executado
 ```
 
 ## Ponto exato da falha atual

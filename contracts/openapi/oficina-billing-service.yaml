@@ -576,7 +576,7 @@ paths:
     post:
       tags: [Integracoes financeiras]
       summary: Receber atualização de pagamento do Mercado Pago
-      description: Valida a assinatura com o x-request-id original, consulta a order ou o payment legado conforme o tipo persistido e processa a atualização de forma idempotente. Não confia na action nem no status recebido no callback.
+      description: Valida a assinatura com o x-request-id original e o data.id resolvido sem alterar sua capitalização. O identificador é obtido da query string ou, quando o transporte a omitir, do corpo obrigatório; quando ambos existirem, devem ser coerentes. Em seguida, consulta a order ou o payment legado conforme o tipo persistido e processa a atualização de forma idempotente. Não confia na action nem no status recebido no callback. Uma referência assinada desconhecida é reconhecida sem efeito e sem revelar a existência de pagamentos; falhas transitórias continuam retentáveis.
       operationId: receberWebhookMercadoPago
       security: []
       parameters:
@@ -592,7 +592,7 @@ paths:
               $ref: "#/components/schemas/MercadoPagoWebhookRequest"
       responses:
         "200":
-          description: Notificação validada e processada ou reconhecida idempotentemente.
+          description: Notificação validada e processada, reconhecida idempotentemente ou ignorada por não corresponder a uma referência local.
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -677,8 +677,8 @@ components:
     MercadoPagoDataId:
       name: data.id
       in: query
-      required: true
-      description: Identificador externo da order ou do payment legado notificado.
+      required: false
+      description: Identificador externo da order ou do payment legado notificado, preservado exatamente como recebido. Quando ausente no transporte, o valor obrigatório de data.id no corpo é usado na validação HMAC; quando presente nos dois locais, os valores devem ser coerentes.
       schema:
         type: string
         minLength: 1

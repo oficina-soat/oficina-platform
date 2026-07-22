@@ -148,7 +148,7 @@ que decisões de negócio sejam reconstruídas no Angular.
 - [x] `[UI-FUT-BILLING-TEST-001]` Cobrir aplicação, adapters, rejeições, acessibilidade e fluxos E2E de aprovação e pagamento. Concluído localmente com testes unitários, HTTP, apresentação e Playwright com axe.
 - [x] `[UI-FUT-BILLING-RESEND-001]` Exibir **Reenviar e-mail do orçamento** somente diante da ação canônica `REENVIAR_EMAIL`, chamar o comando idempotente do Billing e informar que o link anterior foi invalidado, sem inferir a elegibilidade pelo estado no Angular.
 - [x] `[UI-FUT-MAILHOG-CONVERGENCE-001]` Manter **E-mails do lab** em `/mailhog/`, encaminhar pelo Nginx ao Service Kubernetes `mailhog:8025` e validar o upstream no Quality Gate para que a UI e o port-forward observem a caixa que recebe as notificações.
-- [ ] `[UI-FUT-BILLING-RESEND-REM-001]` Publicar e homologar no `lab` a tela de reenvio, o link único e a convergência do MailHog após o rollout coordenado de Billing, infraestrutura e UI.
+- [ ] `[UI-FUT-BILLING-RESEND-REM-001]` Publicar e homologar no `lab` a tela de reenvio, o link único e a convergência do MailHog após o rollout coordenado de Billing, infraestrutura e UI. A [retomada remota](../delivery/customer-budget-approval-lab-evidence.md#retomada-do-link-único-e-reenvio) comprovou publicação, reenvio, link único, página completa, aprovação e convergência do MailHog; faltam repetir recusa e consumo único no formato unificado e validar a invalidação do link anterior.
 
 ### Administração de usuários
 

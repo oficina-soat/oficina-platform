@@ -57,3 +57,4 @@ Este diretório concentra a documentação normativa da plataforma em grupos tem
 - [Ferramentas de validação local](delivery/validation-tooling.md)
 - [Evidência local da migração Mercado Pago Orders](delivery/payment-orders-local-evidence.md)
 - [Homologação da continuidade do pagamento no Lab](delivery/payment-checkout-continuity-lab-evidence.md)
+- [Homologação da decisão de orçamento no Lab](delivery/budget-approval-ux-lab-evidence.md)

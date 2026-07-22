@@ -142,7 +142,7 @@ OFICINA_MERCADO_PAGO_PAYER_EMAIL=test_user_br@testuser.com
 OFICINA_MERCADO_PAGO_PAYER_FIRST_NAME=APRO
 ```
 
-`OFICINA_MERCADO_PAGO_API_URL` e `OFICINA_MERCADO_PAGO_API_MODE` não precisam ser cadastradas como variáveis GitHub enquanto forem usados os defaults `https://api.mercadopago.com` e `orders`. Para a homologação automática no `lab`, configure o e-mail oficial de teste e `OFICINA_MERCADO_PAGO_PAYER_FIRST_NAME=APRO`. O Billing deve recusar o startup com `APRO` fora de `lab` ou `test`. O valor temporário `payments` em `OFICINA_MERCADO_PAGO_API_MODE` existe somente para rollback de criação; orders já persistidas continuam consultadas como Orders.
+`OFICINA_MERCADO_PAGO_API_URL` e `OFICINA_MERCADO_PAGO_API_MODE` não precisam ser cadastradas como variáveis GitHub enquanto forem usados os defaults `https://api.mercadopago.com` e `orders`. Para a homologação automática no `lab`, o fluxo canônico de implantação também usa como defaults o e-mail oficial `test_user_br@testuser.com` e `OFICINA_MERCADO_PAGO_PAYER_FIRST_NAME=APRO`, materializando ambos no secret Kubernetes mesmo quando as variáveis GitHub não estiverem cadastradas. O Billing deve recusar o startup com `APRO` fora de `lab` ou `test`. O valor temporário `payments` em `OFICINA_MERCADO_PAGO_API_MODE` existe somente para rollback de criação; orders já persistidas continuam consultadas como Orders.
 
 Não cadastre Public Key, Client ID, Client Secret, dados de cartão ou chave Pix no escopo atual. O Access Token e o webhook secret pertencem exclusivamente ao Billing, devem ser armazenados como secrets e nunca podem ser projetados para a UI, ConfigMap, logs ou telemetria.
 
